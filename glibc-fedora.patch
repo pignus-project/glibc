@@ -3505,3 +3505,14 @@
  #define IEXTEN	0x00008000
  
  /* modem lines */
+--- libc/linuxthreads/sysdeps/powerpc/tcb-offsets.sym.jj	2005-03-04 14:21:29.000000000 -0500
++++ libc/linuxthreads/sysdeps/powerpc/tcb-offsets.sym	2005-03-04 14:26:29.000000000 -0500
+@@ -8,7 +8,7 @@
+ -- Abuse tls.h macros to derive offsets relative to the thread register.
+ #  undef __thread_register
+ #  define __thread_register	((void *) 0)
+-#  define thread_offsetof(mem)	((void *) &THREAD_SELF->p_##mem - (void *) 0)
++#  define thread_offsetof(mem)	((ptrdiff_t) THREAD_SELF + offsetof (struct _pthread_descr_struct, p_##mem))
+ 
+ # else
+ 
