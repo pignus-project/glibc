@@ -1,4 +1,4 @@
-%define glibcrelease 26
+%define glibcrelease 29
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 Summary: The GNU libc libraries.
 Name: glibc
@@ -23,10 +23,6 @@ Provides: ld.so.2
 Obsoletes: libc
 %endif
 Prereq: basesystem
-%ifarch i686
-BuildPreReq: libaio-devel >= 0.3.8
-Requires: libredhat-kernel.so.1
-%endif
 # This is for building auxiliary programs like memusage
 # For initial glibc bootstraps it can be commented out
 BuildPreReq: gd-devel libpng-devel zlib-devel
@@ -43,13 +39,16 @@ Conflicts: rpm <= 4.0-0.65
 Conflicts: glibc-devel < 2.2.3
 Patch: glibc-kernel-2.4.patch
 Patch2: glibc-2.2.4.patch
-Source2: glibc-aio.patch
 Patch3: glibc-2.2.4-fixes.patch
 Patch4: glibc-2.2.4-s390.patch
 Patch5: glibc-2.2.4-i386-postupgrade.patch
 Patch6: glibc-2.2.4-s390-2.patch
-Patch7: glibc-2.2.4-sunrpc.patch
-Patch8: glibc-2.2.4-collate.patch
+Patch7: glibc-2.2.4-security.patch
+Patch8: glibc-2.2.4-ia64-strncpy.patch
+Patch9: glibc-2.2.4-sunrpc.patch
+Patch10: glibc-2.2.4-collate.patch
+Patch11: glibc-2.2.4-xdr_array.patch
+Patch12: glibc-2.2.4-calloc.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
@@ -160,6 +159,10 @@ case `uname -r` in
 %endif
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
+%patch10 -p1
+%patch11 -p1
+%patch12 -p1
 
 %ifarch armv4l sparc64 ia64 s390 s390x
 rm -rf glibc-compat
@@ -245,7 +248,6 @@ cd build-%{_target_cpu}-linux && \
 
 %ifarch i686
 rm -rf build-%{_target_cpu}-linux2.4
-patch -z .aio -b -p1 -E < %{SOURCE2}
 mkdir build-%{_target_cpu}-linux2.4 ; cd build-%{_target_cpu}-linux2.4
 GCC=gcc
 BuildFlags=`cat ../BuildFlags`
@@ -265,13 +267,11 @@ make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
 mkdir -p $RPM_BUILD_ROOT/lib/%{_target_cpu}/
 cp -a libc.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libc-*.so`
 ln -sf `basename $RPM_BUILD_ROOT/lib/libc-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libc.so.*`
-cp -a rt/librt.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/librt-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/lib/librt-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/librt.so.*`
 cp -a math/libm.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libm-*.so`
 ln -sf `basename $RPM_BUILD_ROOT/lib/libm-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libm.so.*`
 cp -a linuxthreads/libpthread.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libpthread-*.so`
 ln -sf `basename $RPM_BUILD_ROOT/lib/libpthread-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libpthread.so.*`
-strip -R .comment $RPM_BUILD_ROOT/lib/{libc,libm,libpthread,librt}-*.so
+strip -R .comment $RPM_BUILD_ROOT/lib/{libc,libm,libpthread}-*.so
 cd ..
 %endif
 
@@ -519,14 +519,27 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Tue Apr 23 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-26
+* Wed Aug  7 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-29
+- fix the calloc patch so that calloc (131072, 0) doesn't
+  crash
+
+* Thu Aug  1 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-28
+- fix xdr_array buffer overflow
+- fix calloc overflow (both patches by Solar Designer)
+
+* Mon Jul 22 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-27
 - use uninterposable sendto/recvfrom/recvmsg in RPC when
   working on sockets opened through uninterposable socket (#63382)
 - fix zh_TW sorting (#63692)
 - run make check during build process
 
-* Tue Apr  9 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-25
-- rebuilt with kernel aio
+* Tue Jul  9 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-26
+- fix IA-64 strncpy (David Mosberger)
+
+* Tue Jul  9 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-25
+- fix buffer overflows in getnetby* (if nsswitch.conf
+  network: line includes dns) and gethostby* for apps compiled
+  against glibc 2.0.
 
 * Tue Apr  2 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-24
 - remove nice(2) return value fix - too many apps broken,
@@ -543,9 +556,6 @@ rm -f *.filelist*
   (#60763, #60745)
 - remove /lib/i686/ libraries in glibc_post_upgrade when
   performing i386 glibc install
-
-* Sat Jan 26 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-19.4
-- use kernel aio in /lib/i686/librt*
 
 * Sat Dec  8 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-19.3
 - fix inttypes.h typo (#57268)
