@@ -1,4 +1,4 @@
-%define glibcrelease 1
+%define glibcrelease 2
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200312011225
+%define glibcdate 200312290658
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -1007,8 +1007,28 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Dec 29 2003 Jakub Jelinek <jakub@redhat.com> 2.3.3-2
+- update from CVS
+  - faster getpid () in NPTL builds
+  - fix to make pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, )
+    really disable cancellation (#112512)
+  - more regex fixes and speedups
+  - fix nextafter*/nexttoward*
+  - handle 6th syscall(3) argument on AMD64
+  - handle memalign/posix_memalign in mtrace
+  - fix linuxthreads memory leak (#112208)
+  - remove throw () from cancellation points in linuxthreads (#112602)
+  - fix NPTL unregister_atfork
+  - fix unwinding through alternate signal stacks
+
 * Mon Dec  1 2003 Jakub Jelinek <jakub@redhat.com> 2.3.3-1
-- lots of regex fixes and speedups
+- update from CVS
+  - 2.3.3 release
+  - lots of regex fixes and speedups (#110401)
+  - fix atan2
+  - fix pshared condvars in NPTL
+  - fix pthread_attr_destroy for attributes created with
+    pthread_attr_init@GLIBC_2.0
 - for the time being, include both nb_NO* and no_NO* as locales
   so that the distribution can catch up with the no_NO->nb_NO
   transition
@@ -1030,6 +1050,7 @@ rm -f *.filelist*
   - fix pthread_exit in libpthread.a (#109790)
   - FTW_ACTIONRETVAL support
   - lots of regex fixes and speedups
+  - fix ceill/floorl on AMD64
 
 * Mon Oct 27 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-101
 - update from CVS
