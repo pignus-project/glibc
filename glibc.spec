@@ -1,4 +1,4 @@
-%define glibcrelease 36
+%define glibcrelease 37
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200407050320
+%define glibcdate 200407160442
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -20,11 +20,6 @@ Patch1: %{name}-nptl-check.patch
 Patch2: %{name}-ppc-assume.patch
 Patch3: %{name}-execstack-disable.patch
 Patch4: %{name}-ia64-lib64.patch
-Patch5: glibc-ffs.patch
-Patch6: glibc-ppc64-fixes.patch
-Patch7: glibc-nscd-warn.patch
-Patch8: glibc-constraints.patch
-Patch9: glibc-diffarg.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -261,11 +256,6 @@ esac
 %patch4 -p1
 %endif
 %endif
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir asm
@@ -1229,10 +1219,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jul 16 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-37
+- update from CVS
+  - allow pthread_cancel in DSO destructors run at exit time
+- fix pow{f,,l} on IA-32 and powl on x86-64
+- allow PIEs on IA-32 to have main in a shared library they depend on
+
 * Mon Jul  5 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-36
 - s390* .plt slot reduction
 - fix pthread_rwlock_timedrdlock on x86_64
-- fix ppc64 longjmp/setjmp related exports
 
 * Wed Jun 30 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-35
 - tweak spec file for the libpthread-0.61.so -> libpthread-2.3.3.so
