@@ -1,36 +1,6 @@
---- glibc-20040925T0738/ChangeLog	25 Sep 2004 06:49:33 -0000	1.8793
-+++ glibc-20040925T0738-fedora/ChangeLog	26 Sep 2004 04:48:47 -0000	1.8782.2.4
-@@ -1,3 +1,29 @@
-+2004-09-25  Ulrich Drepper  <drepper@redhat.com>
-+
-+	* intl/dcigettext.c (DCIGETTEXT): Protect tfind/tsearch calls.
-+	* intl/dcigettext.c (_nl_find_msg): Call _nl_load_domain also if
-+	decided < 0.
-+	* intl/finddomain.c (_nl_find_domain): Likewise.
-+	* intl/l10nflist.c (_nl_make_l10nflist): Initialize lock.
-+	* intl/loadinfo.h (struct loaded_l10nfile): Add lock element.
-+	* intl/loadmsgcat.c (_nl_load_domain): Set decided to 1 only once we
-+	are done.  First set to -1 to signal initialization is ongoing.
-+	Protect against concurrent callers with recursive lock.
-+	* intl/finddomain.c (_nl_find_domain): Protect calls to
-+	_nl_make_l10nflist.
-+	* sysdeps/posix/getaddrinfo.c (getaddrinfo): If determinination of
-+	source address fails, initialized source_addr_len field so that
-+	duplicate address recognition does not copy junk.  [BZ #322]
-+
-+2004-09-25  Jakub Jelinek  <jakub@redhat.com>
-+
-+	* sysdeps/unix/sysv/linux/i386/setuid.c (__setuid): Remove second
-+	result declaration.
-+
-+2004-09-22  Andreas Schwab  <schwab@suse.de>
-+
-+	* sysdeps/unix/sysv/linux/ia64/sysdep.h: Adjust whitespace.
-+
- 2004-09-24  Ulrich Drepper  <drepper@redhat.com>
- 
- 	* misc/daemon.c (daemon): Don't succeed if /dev/null cannot be
-@@ -83,6 +109,22 @@
+--- glibc-20040926T0823/ChangeLog	26 Sep 2004 05:49:15 -0000	1.8800
++++ glibc-20040926T0823-fedora/ChangeLog	26 Sep 2004 08:39:27 -0000	1.8782.2.5
+@@ -116,6 +116,22 @@
  	* string/string.h: Add __nonnull annotations.
  	* stdlib/stdlib.h: Likewise.
  
@@ -53,7 +23,7 @@
  2004-09-20  H.J. Lu  <hongjiu.lu@intel.com>
  
  	* sysdeps/unix/sysv/linux/ia64/sysdep.h (DO_INLINE_SYSCALL):
-@@ -812,6 +854,23 @@
+@@ -845,6 +861,23 @@
  	before return type.
  	* locale/localename.c (__current_locale_name): Likewise.
  
@@ -77,7 +47,7 @@
  2004-08-30  Roland McGrath  <roland@frob.com>
  
  	* scripts/extract-abilist.awk: If `lastversion' variable defined, omit
-@@ -968,6 +1027,22 @@
+@@ -1001,6 +1034,22 @@
  	* resolv/nss_dns/dns-canon.c (_nss_dns_getcanonname_r): Initialize
  	status to NSS_STATUS_UNAVAIL.
  
@@ -100,7 +70,7 @@
  2004-08-19  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/posix/getaddrinfo.c (gaih_inet): Use h->h_name in the
-@@ -1272,6 +1347,12 @@
+@@ -1305,6 +1354,12 @@
  
  	* iconvdata/testdata/ISO-2022-JP-3: Regenerated.
  
@@ -113,8 +83,8 @@
  2004-08-10  Alfred M. Szmidt  <ams@kemisten.nu>
  
  	* sysdeps/generic/bits/in.h (struct ip_mreq): Remove definition.
---- glibc-20040925T0738/ChangeLog.11	10 Nov 2000 03:31:36 -0000	1.1
-+++ glibc-20040925T0738-fedora/ChangeLog.11	22 Sep 2004 21:20:47 -0000	1.1.4.1
+--- glibc-20040926T0823/ChangeLog.11	10 Nov 2000 03:31:36 -0000	1.1
++++ glibc-20040926T0823-fedora/ChangeLog.11	22 Sep 2004 21:20:47 -0000	1.1.4.1
 @@ -1352,6 +1352,11 @@
  	* sysdeps/unix/sysv/linux/mips/sys/tas.h: Add missing .mips0 at the
  	end of inline assembler code.
@@ -164,8 +134,8 @@
  	* sysdeps/arm/bits/huge_val.h (HUGE_VAL, HUGE_VALF): Add
  	__extension__ to hexadecimal floating constant notation.
  	* sysdeps/i386/bits/huge_val.h (HUGE_VAL, HUGE_VALF, HUGE_VALL):
---- glibc-20040925T0738/ChangeLog.12	16 Aug 2001 05:24:54 -0000	1.1
-+++ glibc-20040925T0738-fedora/ChangeLog.12	22 Sep 2004 21:20:47 -0000	1.1.4.1
+--- glibc-20040926T0823/ChangeLog.12	16 Aug 2001 05:24:54 -0000	1.1
++++ glibc-20040926T0823-fedora/ChangeLog.12	22 Sep 2004 21:20:47 -0000	1.1.4.1
 @@ -7729,6 +7729,13 @@
  
  	* Versions.def [ld]: Add GLIBC_2.2.1.
@@ -192,8 +162,8 @@
  2001-01-02  Franz Sirl	<Franz.Sirl-kernel@lauterbach.com>
  
  	* sysdeps/powerpc/dl-machine.c (__process_machine_rela): Fix typo.
---- glibc-20040925T0738/csu/elf-init.c	16 Aug 2004 04:51:00 -0000	1.3
-+++ glibc-20040925T0738-fedora/csu/elf-init.c	22 Sep 2004 21:20:47 -0000	1.3.2.1
+--- glibc-20040926T0823/csu/elf-init.c	16 Aug 2004 04:51:00 -0000	1.3
++++ glibc-20040926T0823-fedora/csu/elf-init.c	22 Sep 2004 21:20:47 -0000	1.3.2.1
 @@ -44,6 +44,24 @@ extern void (*__init_array_start []) (vo
  extern void (*__init_array_end []) (void) attribute_hidden;
  extern void (*__fini_array_start []) (void) attribute_hidden;
@@ -219,8 +189,8 @@
  #endif
  
  /* These function symbols are provided for the .init/.fini section entry
---- glibc-20040925T0738/elf/dl-support.c	6 Jul 2004 04:15:11 -0000	1.84
-+++ glibc-20040925T0738-fedora/elf/dl-support.c	22 Sep 2004 21:20:48 -0000	1.84.2.1
+--- glibc-20040926T0823/elf/dl-support.c	6 Jul 2004 04:15:11 -0000	1.84
++++ glibc-20040926T0823-fedora/elf/dl-support.c	22 Sep 2004 21:20:48 -0000	1.84.2.1
 @@ -287,6 +287,11 @@ _dl_non_dynamic_init (void)
    if (_dl_platform != NULL)
      _dl_platformlen = strlen (_dl_platform);
@@ -233,8 +203,8 @@
    /* Scan for a program header telling us the stack is nonexecutable.  */
    if (_dl_phdr != NULL)
      for (uint_fast16_t i = 0; i < _dl_phnum; ++i)
---- glibc-20040925T0738/elf/ldconfig.c	10 Aug 2004 04:04:32 -0000	1.47
-+++ glibc-20040925T0738-fedora/elf/ldconfig.c	22 Sep 2004 21:20:48 -0000	1.47.2.1
+--- glibc-20040926T0823/elf/ldconfig.c	10 Aug 2004 04:04:32 -0000	1.47
++++ glibc-20040926T0823-fedora/elf/ldconfig.c	22 Sep 2004 21:20:48 -0000	1.47.2.1
 @@ -944,17 +944,19 @@ search_dirs (void)
  
  
@@ -316,8 +286,8 @@
      }
  
    search_dirs ();
---- glibc-20040925T0738/elf/rtld.c	23 Sep 2004 07:44:04 -0000	1.331
-+++ glibc-20040925T0738-fedora/elf/rtld.c	25 Sep 2004 07:55:40 -0000	1.330.2.2
+--- glibc-20040926T0823/elf/rtld.c	23 Sep 2004 07:44:04 -0000	1.331
++++ glibc-20040926T0823-fedora/elf/rtld.c	25 Sep 2004 07:55:40 -0000	1.330.2.2
 @@ -1077,6 +1077,49 @@ of this helper program; chances are you 
    ++GL(dl_nloaded);
    ++GL(dl_load_adds);
@@ -433,8 +403,8 @@
    if (__builtin_expect (npreloads, 0) != 0)
      {
        /* Set up PRELOADS with a vector of the preloaded libraries.  */
---- glibc-20040925T0738/elf/tst-tls10.h	17 Apr 2003 19:19:01 -0000	1.1
-+++ glibc-20040925T0738-fedora/elf/tst-tls10.h	22 Sep 2004 21:20:48 -0000	1.1.2.1
+--- glibc-20040926T0823/elf/tst-tls10.h	17 Apr 2003 19:19:01 -0000	1.1
++++ glibc-20040926T0823-fedora/elf/tst-tls10.h	22 Sep 2004 21:20:48 -0000	1.1.2.1
 @@ -1,8 +1,8 @@
  #include <tls.h>
  #include <stdlib.h>
@@ -446,8 +416,8 @@
  # define USE_TLS__THREAD
  
  struct A
---- glibc-20040925T0738/iconv/iconvconfig.c	24 Sep 2004 17:09:04 -0000	1.20
-+++ glibc-20040925T0738-fedora/iconv/iconvconfig.c	22 Sep 2004 21:20:51 -0000	1.19.2.1
+--- glibc-20040926T0823/iconv/iconvconfig.c	24 Sep 2004 17:09:04 -0000	1.20
++++ glibc-20040926T0823-fedora/iconv/iconvconfig.c	22 Sep 2004 21:20:51 -0000	1.19.2.1
 @@ -989,6 +989,34 @@ next_prime (uint32_t seed)
                                module name offset
                           (following last entry with step count 0)
@@ -524,8 +494,8 @@
    /* Open the output file.  */
    assert (GCONV_MODULES_CACHE[0] == '/');
    strcpy (stpcpy (mempcpy (tmpfname, prefix, prefix_len), GCONV_MODULES_CACHE),
---- glibc-20040925T0738/include/features.h	23 Jul 2004 06:50:54 -0000	1.35
-+++ glibc-20040925T0738-fedora/include/features.h	22 Sep 2004 21:20:53 -0000	1.35.2.1
+--- glibc-20040926T0823/include/features.h	23 Jul 2004 06:50:54 -0000	1.35
++++ glibc-20040926T0823-fedora/include/features.h	22 Sep 2004 21:20:53 -0000	1.35.2.1
 @@ -163,8 +163,8 @@
  
  /* If none of the ANSI/POSIX macros are defined, use POSIX.1 and POSIX.2
@@ -537,347 +507,8 @@
  # define _POSIX_SOURCE	1
  # if defined _XOPEN_SOURCE && (_XOPEN_SOURCE - 0) < 500
  #  define _POSIX_C_SOURCE	2
---- glibc-20040925T0738/intl/dcigettext.c	11 Jun 2003 21:45:34 -0000	1.45
-+++ glibc-20040925T0738-fedora/intl/dcigettext.c	26 Sep 2004 04:48:47 -0000	1.45.2.1
-@@ -1,5 +1,5 @@
- /* Implementation of the internal dcigettext function.
--   Copyright (C) 1995-2002, 2003 Free Software Foundation, Inc.
-+   Copyright (C) 1995-2002, 2003, 2004 Free Software Foundation, Inc.
-    This file is part of the GNU C Library.
- 
-    The GNU C Library is free software; you can redistribute it and/or
-@@ -439,7 +439,15 @@ DCIGETTEXT (domainname, msgid1, msgid2, 
-   search->domainname = (char *) domainname;
-   search->category = category;
- 
-+  /* Since tfind/tsearch manage a balanced tree, concurrent tfind and
-+     tsearch calls can be fatal.  */
-+  __libc_rwlock_define_initialized (static, tree_lock);
-+  __libc_rwlock_rdlock (tree_lock);
-+
-   foundp = (struct known_translation_t **) tfind (search, &root, transcmp);
-+
-+  __libc_rwlock_unlock (tree_lock);
-+
-   freea (search);
-   if (foundp != NULL && (*foundp)->counter == _nl_msg_cat_cntr)
-     {
-@@ -633,9 +641,14 @@ DCIGETTEXT (domainname, msgid1, msgid2, 
- 		      newp->translation = retval;
- 		      newp->translation_length = retlen;
- 
-+		      __libc_rwlock_wrlock (tree_lock);
-+
- 		      /* Insert the entry in the search tree.  */
- 		      foundp = (struct known_translation_t **)
- 			tsearch (newp, &root, transcmp);
-+
-+		      __libc_rwlock_unlock (tree_lock);
-+
- 		      if (foundp == NULL
- 			  || __builtin_expect (*foundp != newp, 0))
- 			/* The insert failed.  */
-@@ -680,7 +693,7 @@ _nl_find_msg (domain_file, domainbinding
-   char *result;
-   size_t resultlen;
- 
--  if (domain_file->decided == 0)
-+  if (domain_file->decided <= 0)
-     _nl_load_domain (domain_file, domainbinding);
- 
-   if (domain_file->data == NULL)
---- glibc-20040925T0738/intl/finddomain.c	6 Aug 2004 17:48:47 -0000	1.30
-+++ glibc-20040925T0738-fedora/intl/finddomain.c	26 Sep 2004 04:48:47 -0000	1.30.2.1
-@@ -35,6 +35,7 @@
- #include "gettextP.h"
- #ifdef _LIBC
- # include <libintl.h>
-+# include <bits/libc-lock.h>
- #else
- # include "libgnuintl.h"
- #endif
-@@ -78,17 +79,23 @@ _nl_find_domain (dirname, locale, domain
- 		(4) modifier
-    */
- 
-+  /* We need to protect modifying the _NL_LOADED_DOMAINS data.  */
-+  __libc_rwlock_define_initialized (static, lock);
-+  __libc_rwlock_rdlock (lock);
-+
-   /* If we have already tested for this locale entry there has to
-      be one data set in the list of loaded domains.  */
-   retval = _nl_make_l10nflist (&_nl_loaded_domains, dirname,
- 			       strlen (dirname) + 1, 0, locale, NULL, NULL,
- 			       NULL, NULL, domainname, 0);
-+  __libc_rwlock_unlock (lock);
-+
-   if (retval != NULL)
-     {
-       /* We know something about this locale.  */
-       int cnt;
- 
--      if (retval->decided == 0)
-+      if (retval->decided <= 0)
- 	_nl_load_domain (retval, domainbinding);
- 
-       if (retval->data != NULL)
-@@ -96,12 +103,13 @@ _nl_find_domain (dirname, locale, domain
- 
-       for (cnt = 0; retval->successor[cnt] != NULL; ++cnt)
- 	{
--	  if (retval->successor[cnt]->decided == 0)
-+	  if (retval->successor[cnt]->decided <= 0)
- 	    _nl_load_domain (retval->successor[cnt], domainbinding);
- 
- 	  if (retval->successor[cnt]->data != NULL)
- 	    break;
- 	}
-+
-       return cnt >= 0 ? retval : NULL;
-       /* NOTREACHED */
-     }
-@@ -132,24 +140,29 @@ _nl_find_domain (dirname, locale, domain
-   mask = _nl_explode_name (locale, &language, &modifier, &territory,
- 			   &codeset, &normalized_codeset);
- 
-+  /* We need to protect modifying the _NL_LOADED_DOMAINS data.  */
-+  __libc_rwlock_wrlock (lock);
-+
-   /* Create all possible locale entries which might be interested in
-      generalization.  */
-   retval = _nl_make_l10nflist (&_nl_loaded_domains, dirname,
- 			       strlen (dirname) + 1, mask, language, territory,
- 			       codeset, normalized_codeset, modifier,
- 			       domainname, 1);
-+  __libc_rwlock_unlock (lock);
-+
-   if (retval == NULL)
-     /* This means we are out of core.  */
-     return NULL;
- 
--  if (retval->decided == 0)
-+  if (retval->decided <= 0)
-     _nl_load_domain (retval, domainbinding);
-   if (retval->data == NULL)
-     {
-       int cnt;
-       for (cnt = 0; retval->successor[cnt] != NULL; ++cnt)
- 	{
--	  if (retval->successor[cnt]->decided == 0)
-+	  if (retval->successor[cnt]->decided <= 0)
- 	    _nl_load_domain (retval->successor[cnt], domainbinding);
- 	  if (retval->successor[cnt]->data != NULL)
- 	    break;
---- glibc-20040925T0738/intl/l10nflist.c	24 Jul 2002 10:07:07 -0000	1.30
-+++ glibc-20040925T0738-fedora/intl/l10nflist.c	26 Sep 2004 04:48:47 -0000	1.30.2.1
-@@ -1,4 +1,4 @@
--/* Copyright (C) 1995-1999, 2000, 2001, 2002 Free Software Foundation, Inc.
-+/* Copyright (C) 1995-2002, 2004 Free Software Foundation, Inc.
-    This file is part of the GNU C Library.
-    Contributed by Ulrich Drepper <drepper@gnu.ai.mit.edu>, 1995.
- 
-@@ -273,10 +273,14 @@ _nl_make_l10nflist (l10nfile_list, dirli
-     return NULL;
- 
-   retval->filename = abs_filename;
-+  /* If more than one directory is in the list this is a pseudo-entry
-+     which just references others.  We do not try to load data for it,
-+     ever.  */
-   retval->decided = (__argz_count (dirlist, dirlist_len) != 1
- 		     || ((mask & XPG_CODESET) != 0
- 			 && (mask & XPG_NORM_CODESET) != 0));
-   retval->data = NULL;
-+  __libc_lock_init_recursive (retval->lock);
- 
-   if (last == NULL)
-     {
---- glibc-20040925T0738/intl/loadinfo.h	8 Jan 2003 06:35:09 -0000	1.18
-+++ glibc-20040925T0738-fedora/intl/loadinfo.h	26 Sep 2004 04:48:47 -0000	1.18.2.1
-@@ -1,4 +1,4 @@
--/* Copyright (C) 1996-2000, 2002, 2003 Free Software Foundation, Inc.
-+/* Copyright (C) 1996-2000, 2002, 2003, 2004 Free Software Foundation, Inc.
-    This file is part of the GNU C Library.
-    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1996.
- 
-@@ -20,6 +20,8 @@
- #ifndef _LOADINFO_H
- #define _LOADINFO_H	1
- 
-+#include <bits/libc-lock.h>
-+
- /* Declarations of locale dependent catalog lookup functions.
-    Implemented in
- 
-@@ -61,6 +63,7 @@ struct loaded_l10nfile
- {
-   const char *filename;
-   int decided;
-+  __libc_lock_define_recursive (, lock);
- 
-   const void *data;
- 
---- glibc-20040925T0738/intl/loadmsgcat.c	6 Aug 2004 17:49:24 -0000	1.53
-+++ glibc-20040925T0738-fedora/intl/loadmsgcat.c	26 Sep 2004 04:48:47 -0000	1.53.2.1
-@@ -899,7 +899,7 @@ _nl_load_domain (domain_file, domainbind
-      struct loaded_l10nfile *domain_file;
-      struct binding *domainbinding;
- {
--  int fd;
-+  int fd = -1;
-   size_t size;
- #ifdef _LIBC
-   struct stat64 st;
-@@ -912,7 +912,24 @@ _nl_load_domain (domain_file, domainbind
-   int revision;
-   const char *nullentry;
- 
--  domain_file->decided = 1;
-+  __libc_lock_lock_recursive (domain_file->lock);
-+  if (domain_file->decided != 0)
-+    {
-+      /* There are two possibilities:
-+
-+         + is is the same thread calling again during this
-+	   initialization via _nl_init_domain_conv and _nl_find_msg.  We
-+	   have initialized everything this call needs.
-+
-+	 + this is another thread which tried to initialize this object.
-+           Not necessary anymore since if the lock is available this
-+	   is finished.
-+      */
-+      __libc_lock_unlock_recursive (domain_file->lock);
-+      return;
-+    }
-+
-+  domain_file->decided = -1;
-   domain_file->data = NULL;
- 
-   /* Note that it would be useless to store domainbinding in domain_file
-@@ -924,12 +941,12 @@ _nl_load_domain (domain_file, domainbind
-      specification the locale file name is different for XPG and CEN
-      syntax.  */
-   if (domain_file->filename == NULL)
--    return;
-+    goto out;
- 
-   /* Try to open the addressed file.  */
-   fd = open (domain_file->filename, O_RDONLY);
-   if (fd == -1)
--    return;
-+    goto out;
- 
-   /* We must know about the size of the file.  */
-   if (
-@@ -940,11 +957,8 @@ _nl_load_domain (domain_file, domainbind
- #endif
-       || __builtin_expect ((size = (size_t) st.st_size) != st.st_size, 0)
-       || __builtin_expect (size < sizeof (struct mo_file_header), 0))
--    {
--      /* Something went wrong.  */
--      close (fd);
--      return;
--    }
-+    /* Something went wrong.  */
-+    goto out;;
- 
- #ifdef HAVE_MMAP
-   /* Now we are ready to load the file.  If mmap() is available we try
-@@ -952,45 +966,42 @@ _nl_load_domain (domain_file, domainbind
-   data = (struct mo_file_header *) mmap (NULL, size, PROT_READ,
- 					 MAP_PRIVATE, fd, 0);
- 
--  if (__builtin_expect (data != (struct mo_file_header *) -1, 1))
-+  if (__builtin_expect (data != MAP_FAILED, 1))
-     {
-       /* mmap() call was successful.  */
-       close (fd);
-+      fd = -1;
-       use_mmap = 1;
-     }
- #endif
- 
-   /* If the data is not yet available (i.e. mmap'ed) we try to load
-      it manually.  */
--  if (data == (struct mo_file_header *) -1)
-+  if (data == MAP_FAILED)
-     {
-       size_t to_read;
-       char *read_ptr;
- 
-       data = (struct mo_file_header *) malloc (size);
-       if (data == NULL)
--	return;
-+	goto out;
- 
-       to_read = size;
-       read_ptr = (char *) data;
-       do
- 	{
--	  long int nb = (long int) read (fd, read_ptr, to_read);
-+	  long int nb = (long int) TEMP_FAILURE_RETRY (read (fd, read_ptr,
-+							     to_read));
- 	  if (nb <= 0)
--	    {
--#ifdef EINTR
--	      if (nb == -1 && errno == EINTR)
--		continue;
--#endif
--	      close (fd);
--	      return;
--	    }
-+	    goto out;
-+
- 	  read_ptr += nb;
- 	  to_read -= nb;
- 	}
-       while (to_read > 0);
- 
-       close (fd);
-+      fd = -1;
-     }
- 
-   /* Using the magic number we can test whether it really is a message
-@@ -1005,12 +1016,12 @@ _nl_load_domain (domain_file, domainbind
-       else
- #endif
- 	free (data);
--      return;
-+      goto out;
-     }
- 
-   domain = (struct loaded_domain *) malloc (sizeof (struct loaded_domain));
-   if (domain == NULL)
--    return;
-+    goto out;
-   domain_file->data = domain;
- 
-   domain->data = (char *) data;
-@@ -1372,7 +1383,7 @@ _nl_load_domain (domain_file, domainbind
- 	free (data);
-       free (domain);
-       domain_file->data = NULL;
--      return;
-+      goto out;
-     }
- 
-   /* Now initialize the character set converter from the character set
-@@ -1382,6 +1393,14 @@ _nl_load_domain (domain_file, domainbind
- 
-   /* Also look for a plural specification.  */
-   EXTRACT_PLURAL_EXPRESSION (nullentry, &domain->plural, &domain->nplurals);
-+
-+ out:
-+  if (fd != -1)
-+    close (fd);
-+
-+  domain_file->decided = 1;
-+
-+  __libc_lock_unlock_recursive (domain_file->lock);
- }
- 
- 
---- glibc-20040925T0738/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
-+++ glibc-20040925T0738-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
+--- glibc-20040926T0823/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
++++ glibc-20040926T0823-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
 @@ -58,8 +58,6 @@ korean		ko_KR.eucKR
  korean.euc 	ko_KR.eucKR
  ko_KR		ko_KR.eucKR
@@ -887,8 +518,8 @@
  norwegian       nb_NO.ISO-8859-1
  nynorsk		nn_NO.ISO-8859-1
  polish          pl_PL.ISO-8859-2
---- glibc-20040925T0738/libio/stdio.h	23 Jul 2004 07:07:41 -0000	1.78
-+++ glibc-20040925T0738-fedora/libio/stdio.h	22 Sep 2004 21:20:54 -0000	1.78.2.1
+--- glibc-20040926T0823/libio/stdio.h	23 Jul 2004 07:07:41 -0000	1.78
++++ glibc-20040926T0823-fedora/libio/stdio.h	22 Sep 2004 21:20:54 -0000	1.78.2.1
 @@ -142,10 +142,12 @@ typedef _G_fpos64_t fpos64_t;
  extern struct _IO_FILE *stdin;		/* Standard input stream.  */
  extern struct _IO_FILE *stdout;		/* Standard output stream.  */
@@ -902,19 +533,9 @@
  
  __BEGIN_NAMESPACE_STD
  /* Remove file FILENAME.  */
---- glibc-20040925T0738/linuxthreads/ChangeLog	25 Sep 2004 03:32:21 -0000	1.818
-+++ glibc-20040925T0738-fedora/linuxthreads/ChangeLog	25 Sep 2004 11:28:39 -0000	1.817.2.3
-@@ -1,3 +1,9 @@
-+2004-09-25  Roland McGrath  <roland@redhat.com>
-+
-+	[BZ #406]
-+	* sysdeps/i386/i686/pt-machine.h: Don't #include "../useldt.h" if
-+	[_TLS_H], since sysdeps/i386/tls.h includes it after including us.
-+
- 2004-09-24  Roland McGrath  <roland@redhat.com>
- 
- 	[BZ #406]
-@@ -630,6 +636,12 @@
+--- glibc-20040926T0823/linuxthreads/ChangeLog	25 Sep 2004 10:04:29 -0000	1.819
++++ glibc-20040926T0823-fedora/linuxthreads/ChangeLog	25 Sep 2004 11:28:39 -0000	1.817.2.3
+@@ -636,6 +636,12 @@
  	(pthread_barrierattr_setpshared): Return EINVAL if pshared
  	is neither PTHREAD_PROCESS_PRIVATE nor PTHREAD_PROCESS_SHARED.
  
@@ -927,7 +548,7 @@
  2003-09-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/unix/sysv/linux/i386/dl-sysdep.h
-@@ -762,6 +774,34 @@
+@@ -768,6 +774,34 @@
  
  2003-07-22  Jakub Jelinek  <jakub@redhat.com>
  
@@ -962,8 +583,8 @@
  	* descr.h (struct _pthread_descr_struct): Provide p_res member
  	even if USE_TLS && HAVE___THREAD.
  	* sysdeps/pthread/res-state.c (__res_state): Return __resp
---- glibc-20040925T0738/linuxthreads/Makefile	20 Sep 2004 22:10:55 -0000	1.94
-+++ glibc-20040925T0738-fedora/linuxthreads/Makefile	22 Sep 2004 21:20:54 -0000	1.94.2.1
+--- glibc-20040926T0823/linuxthreads/Makefile	20 Sep 2004 22:10:55 -0000	1.94
++++ glibc-20040926T0823-fedora/linuxthreads/Makefile	22 Sep 2004 21:20:54 -0000	1.94.2.1
 @@ -254,15 +254,18 @@ $(addprefix $(objpfx), \
    $(filter-out $(tests-static) $(tests-reverse) unload, \
      $(tests) $(test-srcs))): $(objpfx)libpthread.so \
@@ -985,8 +606,8 @@
  else
  $(addprefix $(objpfx),$(tests) $(test-srcs)): $(objpfx)libpthread.a
  $(addprefix $(objpfx),$(librt-tests)): $(common-objpfx)rt/librt.a
---- glibc-20040925T0738/linuxthreads/cancel.c	22 Feb 2003 00:55:21 -0000	1.23
-+++ glibc-20040925T0738-fedora/linuxthreads/cancel.c	22 Sep 2004 21:20:55 -0000	1.23.2.1
+--- glibc-20040926T0823/linuxthreads/cancel.c	22 Feb 2003 00:55:21 -0000	1.23
++++ glibc-20040926T0823-fedora/linuxthreads/cancel.c	22 Sep 2004 21:20:55 -0000	1.23.2.1
 @@ -230,5 +230,6 @@ void __pthread_perform_cleanup(char *cur
      }
  
@@ -994,8 +615,8 @@
 +  THREAD_SETMEM (self, p_cancelstate, PTHREAD_CANCEL_DISABLE);
    __libc_thread_freeres ();
  }
---- glibc-20040925T0738/linuxthreads/lockfile.c	18 Dec 2002 01:16:46 -0000	1.10
-+++ glibc-20040925T0738-fedora/linuxthreads/lockfile.c	22 Sep 2004 21:20:55 -0000	1.10.2.1
+--- glibc-20040926T0823/linuxthreads/lockfile.c	18 Dec 2002 01:16:46 -0000	1.10
++++ glibc-20040926T0823-fedora/linuxthreads/lockfile.c	22 Sep 2004 21:20:55 -0000	1.10.2.1
 @@ -74,7 +74,11 @@ __fresetlockfiles (void)
    __pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE_NP);
  
@@ -1009,8 +630,8 @@
  
    __pthread_mutexattr_destroy (&attr);
  
---- glibc-20040925T0738/linuxthreads/semaphore.h	17 Apr 2004 23:01:39 -0000	1.13
-+++ glibc-20040925T0738-fedora/linuxthreads/semaphore.h	22 Sep 2004 21:20:55 -0000	1.13.2.1
+--- glibc-20040926T0823/linuxthreads/semaphore.h	17 Apr 2004 23:01:39 -0000	1.13
++++ glibc-20040926T0823-fedora/linuxthreads/semaphore.h	22 Sep 2004 21:20:55 -0000	1.13.2.1
 @@ -21,6 +21,7 @@
  # define __need_timespec
  # include <time.h>
@@ -1019,8 +640,8 @@
  
  #ifndef _PTHREAD_DESCR_DEFINED
  /* Thread descriptors.  Needed for `sem_t' definition.  */
---- glibc-20040925T0738/linuxthreads/tst-tls1.h	2 Sep 2003 00:29:30 -0000	1.1
-+++ glibc-20040925T0738-fedora/linuxthreads/tst-tls1.h	22 Sep 2004 21:20:55 -0000	1.1.2.1
+--- glibc-20040926T0823/linuxthreads/tst-tls1.h	2 Sep 2003 00:29:30 -0000	1.1
++++ glibc-20040926T0823-fedora/linuxthreads/tst-tls1.h	22 Sep 2004 21:20:55 -0000	1.1.2.1
 @@ -2,7 +2,7 @@
  #include <stdlib.h>
  #include <tls.h>
@@ -1030,8 +651,8 @@
  
  struct tls_obj
  {
---- glibc-20040925T0738/linuxthreads/sysdeps/alpha/tls.h	30 Jan 2003 21:03:40 -0000	1.5
-+++ glibc-20040925T0738-fedora/linuxthreads/sysdeps/alpha/tls.h	22 Sep 2004 21:20:55 -0000	1.5.2.1
+--- glibc-20040926T0823/linuxthreads/sysdeps/alpha/tls.h	30 Jan 2003 21:03:40 -0000	1.5
++++ glibc-20040926T0823-fedora/linuxthreads/sysdeps/alpha/tls.h	22 Sep 2004 21:20:55 -0000	1.5.2.1
 @@ -53,54 +53,76 @@ typedef struct
  #  include <sysdep.h>
  
@@ -1121,8 +742,8 @@
  
  /* Get the thread descriptor definition.  */
  #  include <linuxthreads/descr.h>
---- glibc-20040925T0738/linuxthreads/sysdeps/i386/tls.h	25 Sep 2004 03:32:13 -0000	1.36
-+++ glibc-20040925T0738-fedora/linuxthreads/sysdeps/i386/tls.h	25 Sep 2004 07:55:41 -0000	1.35.2.2
+--- glibc-20040926T0823/linuxthreads/sysdeps/i386/tls.h	25 Sep 2004 03:32:13 -0000	1.36
++++ glibc-20040926T0823-fedora/linuxthreads/sysdeps/i386/tls.h	26 Sep 2004 08:45:21 -0000	1.35.2.3
 @@ -81,7 +81,14 @@ typedef struct
  #  define TLS_INIT_TCB_ALIGN __alignof__ (tcbhead_t)
  
@@ -1139,29 +760,32 @@
  
  /* Alignment requirements for the TCB.  */
  #  define TLS_TCB_ALIGN __alignof__ (struct _pthread_descr_struct)
---- glibc-20040925T0738/linuxthreads/sysdeps/i386/i686/pt-machine.h	31 Jul 2003 19:15:43 -0000	1.22
-+++ glibc-20040925T0738-fedora/linuxthreads/sysdeps/i386/i686/pt-machine.h	25 Sep 2004 11:28:41 -0000	1.22.2.1
-@@ -1,6 +1,6 @@
- /* Machine-dependent pthreads configuration and inline functions.
-    i686 version.
--   Copyright (C) 1996-2001, 2002, 2003 Free Software Foundation, Inc.
-+   Copyright (C) 1996-2001, 2002, 2003, 2004 Free Software Foundation, Inc.
-    This file is part of the GNU C Library.
-    Contributed by Richard Henderson <rth@tamu.edu>.
+@@ -113,7 +120,9 @@ typedef struct
+ #   define TLS_LOAD_EBX
+ #  endif
  
-@@ -69,7 +69,9 @@ __compare_and_swap (long int *p, long in
+-#  include "useldt.h"		/* For the structure.  */
++#  ifndef THREAD_SELF
++#   include "useldt.h"		/* For the structure.  */
++#  endif
+ #  if __ASSUME_LDT_WORKS > 0
+ #   define TLS_DO_MODIFY_LDT_KERNEL_CHECK(doit) (doit) /* Nothing to check.  */
+ #  else
+--- glibc-20040926T0823/linuxthreads/sysdeps/i386/i686/pt-machine.h	25 Sep 2004 10:04:15 -0000	1.23
++++ glibc-20040926T0823-fedora/linuxthreads/sysdeps/i386/i686/pt-machine.h	26 Sep 2004 08:45:22 -0000	1.22.2.2
+@@ -69,9 +69,7 @@ __compare_and_swap (long int *p, long in
  }
  #endif
  
--#if __ASSUME_LDT_WORKS > 0
-+/* If tls.h was included, it will include useldt.h after defining USE_TLS.
-+   We don't want to include it here first when tls.h includes us.  */
-+#if __ASSUME_LDT_WORKS > 0 && !defined _TLS_H
+-/* If tls.h was included, it will include useldt.h after defining USE_TLS.
+-   We don't want to include it here first when tls.h includes us.  */
+-#if __ASSUME_LDT_WORKS > 0 && !defined _TLS_H
++#if __ASSUME_LDT_WORKS > 0
  #include "../useldt.h"
  #endif
  
---- glibc-20040925T0738/linuxthreads/sysdeps/ia64/tls.h	8 Jul 2004 21:20:57 -0000	1.9
-+++ glibc-20040925T0738-fedora/linuxthreads/sysdeps/ia64/tls.h	22 Sep 2004 21:20:55 -0000	1.9.2.1
+--- glibc-20040926T0823/linuxthreads/sysdeps/ia64/tls.h	8 Jul 2004 21:20:57 -0000	1.9
++++ glibc-20040926T0823-fedora/linuxthreads/sysdeps/ia64/tls.h	22 Sep 2004 21:20:55 -0000	1.9.2.1
 @@ -60,7 +60,14 @@ typedef struct
  #  define TLS_TCB_SIZE sizeof (tcbhead_t)
  
@@ -1178,8 +802,8 @@
  
  /* Alignment requirements for the TCB.  */
  #  define TLS_TCB_ALIGN __alignof__ (struct _pthread_descr_struct)
---- glibc-20040925T0738/linuxthreads/sysdeps/powerpc/tls.h	9 Apr 2004 19:09:42 -0000	1.8
-+++ glibc-20040925T0738-fedora/linuxthreads/sysdeps/powerpc/tls.h	22 Sep 2004 21:20:55 -0000	1.8.2.1
+--- glibc-20040926T0823/linuxthreads/sysdeps/powerpc/tls.h	9 Apr 2004 19:09:42 -0000	1.8
++++ glibc-20040926T0823-fedora/linuxthreads/sysdeps/powerpc/tls.h	22 Sep 2004 21:20:55 -0000	1.8.2.1
 @@ -64,11 +64,19 @@ typedef struct
  #  define TLS_TCB_ALIGN		__alignof__ (struct _pthread_descr_struct)
  
@@ -1202,8 +826,8 @@
     TCB + 0x7000 (per the ABI).  This implies that TCB address is
     TP - 0x7000.  As we define TLS_DTV_AT_TP we can
     assume that the pthread_descr is allocated immediately ahead of the
---- glibc-20040925T0738/linuxthreads/sysdeps/pthread/Makefile	14 Aug 2003 00:14:22 -0000	1.7
-+++ glibc-20040925T0738-fedora/linuxthreads/sysdeps/pthread/Makefile	22 Sep 2004 21:20:56 -0000	1.7.2.1
+--- glibc-20040926T0823/linuxthreads/sysdeps/pthread/Makefile	14 Aug 2003 00:14:22 -0000	1.7
++++ glibc-20040926T0823-fedora/linuxthreads/sysdeps/pthread/Makefile	22 Sep 2004 21:20:56 -0000	1.7.2.1
 @@ -12,3 +12,15 @@ endif
  ifeq ($(subdir),posix)
  CFLAGS-confstr.c += -DLIBPTHREAD_VERSION="\"$(shell sed 's/\(.*\) by .*/\1/' ../linuxthreads/Banner)\""
@@ -1220,8 +844,8 @@
 +	@echo '#define NPTL_STRUCT_PTHREAD_SIZE 0' > $@
 +endif
 +endif
---- glibc-20040925T0738/linuxthreads/sysdeps/pthread/nptl-struct-pthread.sym 1 Jan 1970 00:00:00 -0000
-+++ glibc-20040925T0738-fedora/linuxthreads/sysdeps/pthread/nptl-struct-pthread.sym	22 Sep 2004 21:20:56 -0000	1.1.2.1
+--- glibc-20040926T0823/linuxthreads/sysdeps/pthread/nptl-struct-pthread.sym 1 Jan 1970 00:00:00 -0000
++++ glibc-20040926T0823-fedora/linuxthreads/sysdeps/pthread/nptl-struct-pthread.sym	22 Sep 2004 21:20:56 -0000	1.1.2.1
 @@ -0,0 +1,13 @@
 +#ifdef HAVE_TLS_SUPPORT
 +# ifndef HAVE_FORCED_UNWIND
@@ -1236,8 +860,8 @@
 +#ifdef HAVE_TLS_SUPPORT
 +NPTL_STRUCT_PTHREAD_SIZE	sizeof (struct pthread)
 +#endif
---- glibc-20040925T0738/linuxthreads/sysdeps/s390/tls.h	30 Jan 2003 18:34:11 -0000	1.3
-+++ glibc-20040925T0738-fedora/linuxthreads/sysdeps/s390/tls.h	22 Sep 2004 21:20:56 -0000	1.3.2.1
+--- glibc-20040926T0823/linuxthreads/sysdeps/s390/tls.h	30 Jan 2003 18:34:11 -0000	1.3
++++ glibc-20040926T0823-fedora/linuxthreads/sysdeps/s390/tls.h	22 Sep 2004 21:20:56 -0000	1.3.2.1
 @@ -72,7 +72,14 @@ typedef struct
  #  define TLS_INIT_TCB_ALIGN __alignof__ (tcbhead_t)
  
@@ -1254,8 +878,8 @@
  
  /* Alignment requirements for the TCB.  */
  #  define TLS_TCB_ALIGN __alignof__ (struct _pthread_descr_struct)
---- glibc-20040925T0738/linuxthreads/sysdeps/sh/tls.h	2 Mar 2003 11:44:20 -0000	1.9
-+++ glibc-20040925T0738-fedora/linuxthreads/sysdeps/sh/tls.h	22 Sep 2004 21:20:57 -0000	1.9.2.1
+--- glibc-20040926T0823/linuxthreads/sysdeps/sh/tls.h	2 Mar 2003 11:44:20 -0000	1.9
++++ glibc-20040926T0823-fedora/linuxthreads/sysdeps/sh/tls.h	22 Sep 2004 21:20:57 -0000	1.9.2.1
 @@ -64,7 +64,14 @@ typedef struct
  #  define TLS_TCB_SIZE sizeof (tcbhead_t)
  
@@ -1272,8 +896,8 @@
  
  /* Alignment requirements for the TCB.  */
  #  define TLS_TCB_ALIGN __alignof__ (struct _pthread_descr_struct)
---- glibc-20040925T0738/linuxthreads/sysdeps/sparc/tls.h	4 Feb 2003 20:41:02 -0000	1.3
-+++ glibc-20040925T0738-fedora/linuxthreads/sysdeps/sparc/tls.h	22 Sep 2004 21:20:57 -0000	1.3.2.1
+--- glibc-20040926T0823/linuxthreads/sysdeps/sparc/tls.h	4 Feb 2003 20:41:02 -0000	1.3
++++ glibc-20040926T0823-fedora/linuxthreads/sysdeps/sparc/tls.h	22 Sep 2004 21:20:57 -0000	1.3.2.1
 @@ -64,7 +64,14 @@ typedef struct
  #  define TLS_INIT_TCB_ALIGN __alignof__ (tcbhead_t)
  
@@ -1290,8 +914,8 @@
  
  /* Alignment requirements for the TCB.  */
  #  define TLS_TCB_ALIGN __alignof__ (struct _pthread_descr_struct)
---- glibc-20040925T0738/linuxthreads/sysdeps/x86_64/tls.h	18 Apr 2004 02:32:25 -0000	1.6
-+++ glibc-20040925T0738-fedora/linuxthreads/sysdeps/x86_64/tls.h	22 Sep 2004 21:20:57 -0000	1.6.2.1
+--- glibc-20040926T0823/linuxthreads/sysdeps/x86_64/tls.h	18 Apr 2004 02:32:25 -0000	1.6
++++ glibc-20040926T0823-fedora/linuxthreads/sysdeps/x86_64/tls.h	22 Sep 2004 21:20:57 -0000	1.6.2.1
 @@ -66,7 +66,14 @@ typedef struct
  #  define TLS_INIT_TCB_ALIGN __alignof__ (tcbhead_t)
  
@@ -1308,8 +932,8 @@
  
  /* Alignment requirements for the TCB.  */
  #  define TLS_TCB_ALIGN __alignof__ (struct _pthread_descr_struct)
---- glibc-20040925T0738/locale/iso-4217.def	10 Aug 2004 05:10:38 -0000	1.15
-+++ glibc-20040925T0738-fedora/locale/iso-4217.def	22 Sep 2004 21:20:57 -0000	1.15.2.1
+--- glibc-20040926T0823/locale/iso-4217.def	10 Aug 2004 05:10:38 -0000	1.15
++++ glibc-20040926T0823-fedora/locale/iso-4217.def	22 Sep 2004 21:20:57 -0000	1.15.2.1
 @@ -8,6 +8,7 @@
   *
   * !!! The list has to be sorted !!!
@@ -1401,8 +1025,8 @@
  DEFINE_INT_CURR("PYG")		/* Paraguay Guarani  */
  DEFINE_INT_CURR("QAR")		/* Qatar Rial  */
  DEFINE_INT_CURR("ROL")		/* Romanian Leu  */
---- glibc-20040925T0738/locale/programs/3level.h	13 Jun 2003 20:45:38 -0000	1.5
-+++ glibc-20040925T0738-fedora/locale/programs/3level.h	22 Sep 2004 21:20:58 -0000	1.5.2.1
+--- glibc-20040926T0823/locale/programs/3level.h	13 Jun 2003 20:45:38 -0000	1.5
++++ glibc-20040926T0823-fedora/locale/programs/3level.h	22 Sep 2004 21:20:58 -0000	1.5.2.1
 @@ -204,6 +204,42 @@ CONCAT(TABLE,_iterate) (struct TABLE *t,
  	}
      }
@@ -1446,8 +1070,8 @@
  #endif
  
  #ifndef NO_FINALIZE
---- glibc-20040925T0738/localedata/Makefile	7 Aug 2004 23:38:13 -0000	1.101
-+++ glibc-20040925T0738-fedora/localedata/Makefile	22 Sep 2004 21:20:58 -0000	1.101.2.1
+--- glibc-20040926T0823/localedata/Makefile	7 Aug 2004 23:38:13 -0000	1.101
++++ glibc-20040926T0823-fedora/localedata/Makefile	22 Sep 2004 21:20:58 -0000	1.101.2.1
 @@ -222,6 +222,7 @@ $(INSTALL-SUPPORTED-LOCALES): install-lo
  	echo -n '...'; \
  	input=`echo $$locale | sed 's/\([^.]*\)[^@]*\(.*\)/\1\2/'`; \
@@ -1456,8 +1080,8 @@
  		     -i locales/$$input -c -f charmaps/$$charset \
  		     $(addprefix --prefix=,$(install_root)) $$locale; \
  	echo ' done'; \
---- glibc-20040925T0738/localedata/SUPPORTED	17 May 2004 18:51:41 -0000	1.71
-+++ glibc-20040925T0738-fedora/localedata/SUPPORTED	22 Sep 2004 21:20:58 -0000	1.71.2.1
+--- glibc-20040926T0823/localedata/SUPPORTED	17 May 2004 18:51:41 -0000	1.71
++++ glibc-20040926T0823-fedora/localedata/SUPPORTED	22 Sep 2004 21:20:58 -0000	1.71.2.1
 @@ -64,6 +64,7 @@ cy_GB.UTF-8/UTF-8 \
  cy_GB/ISO-8859-14 \
  da_DK.UTF-8/UTF-8 \
@@ -1499,8 +1123,8 @@
  ta_IN/UTF-8 \
  te_IN/UTF-8 \
  tg_TJ/KOI8-T \
---- glibc-20040925T0738/localedata/locales/cy_GB	23 Mar 2004 07:36:58 -0000	1.3
-+++ glibc-20040925T0738-fedora/localedata/locales/cy_GB	22 Sep 2004 21:21:01 -0000	1.3.2.1
+--- glibc-20040926T0823/localedata/locales/cy_GB	23 Mar 2004 07:36:58 -0000	1.3
++++ glibc-20040926T0823-fedora/localedata/locales/cy_GB	22 Sep 2004 21:21:01 -0000	1.3.2.1
 @@ -248,8 +248,11 @@ mon         "<U0049><U006F><U006E><U0061
  d_t_fmt     "<U0044><U0079><U0064><U0064><U0020><U0025><U0041><U0020><U0025><U0064><U0020><U0061><U0020><U0076><U0069><U007A><U0020><U0025><U0042><U0020><U0025><U0059><U0020><U0025><U0054><U0020><U0025><U005A>"
  d_fmt       "<U0025><U0064><U002E><U0025><U006D><U002E><U0025><U0079>"
@@ -1515,8 +1139,8 @@
  END LC_TIME
  
  LC_MESSAGES
---- glibc-20040925T0738/localedata/locales/en_GB	4 Dec 2003 04:49:58 -0000	1.10
-+++ glibc-20040925T0738-fedora/localedata/locales/en_GB	22 Sep 2004 21:21:01 -0000	1.10.2.1
+--- glibc-20040926T0823/localedata/locales/en_GB	4 Dec 2003 04:49:58 -0000	1.10
++++ glibc-20040926T0823-fedora/localedata/locales/en_GB	22 Sep 2004 21:21:01 -0000	1.10.2.1
 @@ -112,8 +112,8 @@ mon         "<U004A><U0061><U006E><U0075
  d_t_fmt     "<U0025><U0061><U0020><U0025><U0064><U0020><U0025><U0062><U0020><U0025><U0059><U0020><U0025><U0054><U0020><U0025><U005A>"
  d_fmt       "<U0025><U0064><U002F><U0025><U006D><U002F><U0025><U0079>"
@@ -1528,8 +1152,8 @@
  date_fmt	"<U0025><U0061><U0020><U0025><U0062><U0020><U0025><U0065>/
  <U0020><U0025><U0048><U003A><U0025><U004D><U003A><U0025><U0053><U0020>/
  <U0025><U005A><U0020><U0025><U0059>"
---- glibc-20040925T0738/localedata/locales/en_US	5 Dec 2003 09:48:09 -0000	1.7
-+++ glibc-20040925T0738-fedora/localedata/locales/en_US	22 Sep 2004 21:21:01 -0000	1.7.2.1
+--- glibc-20040926T0823/localedata/locales/en_US	5 Dec 2003 09:48:09 -0000	1.7
++++ glibc-20040926T0823-fedora/localedata/locales/en_US	22 Sep 2004 21:21:01 -0000	1.7.2.1
 @@ -100,7 +100,6 @@ mon	"<U004A><U0061><U006E><U0075><U0061>
  	"<U004F><U0063><U0074><U006F><U0062><U0065><U0072>";/
  	"<U004E><U006F><U0076><U0065><U006D><U0062><U0065><U0072>";/
@@ -1538,8 +1162,8 @@
  % Appropriate date and time representation (%c)
  %	"%a %d %b %Y %r %Z"
  d_t_fmt "<U0025><U0061><U0020><U0025><U0064><U0020><U0025><U0062><U0020><U0025><U0059><U0020><U0025><U0072><U0020><U0025><U005A>"
---- glibc-20040925T0738/localedata/locales/no_NO 1 Jan 1970 00:00:00 -0000
-+++ glibc-20040925T0738-fedora/localedata/locales/no_NO	22 Sep 2004 21:21:01 -0000	1.11.2.1
+--- glibc-20040926T0823/localedata/locales/no_NO 1 Jan 1970 00:00:00 -0000
++++ glibc-20040926T0823-fedora/localedata/locales/no_NO	22 Sep 2004 21:21:01 -0000	1.11.2.1
 @@ -0,0 +1,69 @@
 +escape_char	/
 +comment_char    %
@@ -1610,8 +1234,8 @@
 +LC_ADDRESS
 +copy "nb_NO"
 +END LC_ADDRESS
---- glibc-20040925T0738/localedata/locales/zh_TW	28 Sep 2002 05:25:36 -0000	1.5
-+++ glibc-20040925T0738-fedora/localedata/locales/zh_TW	22 Sep 2004 21:21:01 -0000	1.5.2.1
+--- glibc-20040926T0823/localedata/locales/zh_TW	28 Sep 2002 05:25:36 -0000	1.5
++++ glibc-20040926T0823-fedora/localedata/locales/zh_TW	22 Sep 2004 21:21:01 -0000	1.5.2.1
 @@ -1,7 +1,7 @@
  comment_char %
  escape_char /
@@ -1639,8 +1263,8 @@
  revision   "0.2"
  date       "2000-08-02"
  %
---- glibc-20040925T0738/malloc/malloc.c	23 Sep 2004 04:44:08 -0000	1.128
-+++ glibc-20040925T0738-fedora/malloc/malloc.c	25 Sep 2004 07:55:42 -0000	1.127.2.1
+--- glibc-20040926T0823/malloc/malloc.c	23 Sep 2004 04:44:08 -0000	1.128
++++ glibc-20040926T0823-fedora/malloc/malloc.c	25 Sep 2004 07:55:42 -0000	1.127.2.1
 @@ -24,7 +24,7 @@
    Doug Lea and adapted to multiple threads/arenas by Wolfram Gloger.
  
@@ -1650,21 +1274,9 @@
    based on:
    VERSION 2.7.0 Sun Mar 11 14:14:06 2001  Doug Lea  (dl at gee)
  
---- glibc-20040925T0738/nptl/ChangeLog	24 Sep 2004 18:22:04 -0000	1.708
-+++ glibc-20040925T0738-fedora/nptl/ChangeLog	25 Sep 2004 07:55:43 -0000	1.706.2.2
-@@ -1,3 +1,11 @@
-+2004-09-25  Ulrich Drepper  <drepper@redhat.com>
-+
-+	* descr.h (struct pthread): Add stopped_start field.
-+	* sysdeps/pthread/createthread.c (create_thread): Set
-+	start_stopped flag in descriptor for new thread appropriately.
-+	* pthread_create.c (start_thread): Only take lock to be stopped on
-+	startup if stopped_start flag says so.
-+
- 2004-09-24  Ulrich Drepper  <drepper@redhat.com>
- 
- 	* pthread_create.c (__pthread_create_2_1): Remember whether thread
-@@ -135,6 +143,11 @@
+--- glibc-20040926T0823/nptl/ChangeLog	25 Sep 2004 07:39:57 -0000	1.709
++++ glibc-20040926T0823-fedora/nptl/ChangeLog	25 Sep 2004 07:55:43 -0000	1.706.2.2
+@@ -143,6 +143,11 @@
  	Move definition inside libpthread, libc, librt check.  Provide
  	definition for rtld.
  
@@ -1676,7 +1288,7 @@
  2004-09-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/alpha/jmpbuf-unwind.h: Define __libc_unwind_longjmp.
-@@ -2209,6 +2222,11 @@
+@@ -2217,6 +2222,11 @@
  
  	* Makefile [$(build-shared) = yes] (tests): Depend on $(test-modules).
  
@@ -1688,8 +1300,8 @@
  2003-07-25  Jakub Jelinek  <jakub@redhat.com>
  
  	* tst-cancel17.c (do_test): Check if aio_cancel failed.
---- glibc-20040925T0738/nptl/Makefile	20 Sep 2004 22:05:25 -0000	1.157
-+++ glibc-20040925T0738-fedora/nptl/Makefile	22 Sep 2004 21:21:01 -0000	1.157.2.1
+--- glibc-20040926T0823/nptl/Makefile	20 Sep 2004 22:05:25 -0000	1.157
++++ glibc-20040926T0823-fedora/nptl/Makefile	22 Sep 2004 21:21:01 -0000	1.157.2.1
 @@ -503,15 +503,19 @@ $(addprefix $(objpfx), \
      $(tests) $(test-srcs))): $(objpfx)libpthread.so \
  			     $(objpfx)libpthread_nonshared.a
@@ -1712,8 +1324,8 @@
  else
  $(addprefix $(objpfx),$(tests) $(test-srcs)): $(objpfx)libpthread.a
  endif
---- glibc-20040925T0738/nptl/alloca_cutoff.c	26 Nov 2002 22:50:01 -0000	1.1.1.1
-+++ glibc-20040925T0738-fedora/nptl/alloca_cutoff.c	22 Sep 2004 21:21:01 -0000	1.1.1.1.2.1
+--- glibc-20040926T0823/nptl/alloca_cutoff.c	26 Nov 2002 22:50:01 -0000	1.1.1.1
++++ glibc-20040926T0823-fedora/nptl/alloca_cutoff.c	22 Sep 2004 21:21:01 -0000	1.1.1.1.2.1
 @@ -3,16 +3,16 @@
     This file is part of the GNU C Library.
  
@@ -1735,8 +1347,8 @@
     License along with the GNU C Library; see the file COPYING.LIB.  If not,
     write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
     Boston, MA 02111-1307, USA.  */
---- glibc-20040925T0738/nptl/descr.h	25 Sep 2004 07:35:42 -0000	1.24
-+++ glibc-20040925T0738-fedora/nptl/descr.h	25 Sep 2004 07:55:43 -0000	1.23.2.2
+--- glibc-20040926T0823/nptl/descr.h	25 Sep 2004 07:35:42 -0000	1.24
++++ glibc-20040926T0823-fedora/nptl/descr.h	25 Sep 2004 07:55:43 -0000	1.23.2.2
 @@ -27,9 +27,13 @@
  #include <sys/types.h>
  #include <hp-timing.h>
@@ -1751,8 +1363,8 @@
  #include "../nptl_db/thread_db.h"
  #include <tls.h>
  #ifdef HAVE_FORCED_UNWIND
---- glibc-20040925T0738/nptl/pthread_cond_destroy.c	2 Sep 2004 18:45:37 -0000	1.5
-+++ glibc-20040925T0738-fedora/nptl/pthread_cond_destroy.c	22 Sep 2004 21:21:01 -0000	1.5.2.1
+--- glibc-20040926T0823/nptl/pthread_cond_destroy.c	2 Sep 2004 18:45:37 -0000	1.5
++++ glibc-20040926T0823-fedora/nptl/pthread_cond_destroy.c	22 Sep 2004 21:21:01 -0000	1.5.2.1
 @@ -44,15 +44,35 @@ __pthread_cond_destroy (cond)
       broadcasted, but still are using the pthread_cond_t structure,
       pthread_cond_destroy needs to wait for them.  */
@@ -1794,34 +1406,8 @@
      }
  
    return 0;
---- glibc-20040925T0738/nptl/pthread_create.c	24 Sep 2004 18:20:01 -0000	1.36
-+++ glibc-20040925T0738-fedora/nptl/pthread_create.c	25 Sep 2004 07:55:43 -0000	1.34.2.1
-@@ -252,14 +252,17 @@ start_thread (void *arg)
-       /* Store the new cleanup handler info.  */
-       THREAD_SETMEM (pd, cleanup_jmp_buf, &unwind_buf);
- 
--      int oldtype = CANCEL_ASYNC ();
-+      if (__builtin_expect (pd->stopped_start, 0))
-+	{
-+	  int oldtype = CANCEL_ASYNC ();
- 
--      /* Get the lock the parent locked to force synchronization.  */
--      lll_lock (pd->lock);
--      /* And give it up right away.  */
--      lll_unlock (pd->lock);
-+	  /* Get the lock the parent locked to force synchronization.  */
-+	  lll_lock (pd->lock);
-+	  /* And give it up right away.  */
-+	  lll_unlock (pd->lock);
- 
--      CANCEL_RESET (oldtype);
-+	  CANCEL_RESET (oldtype);
-+	}
- 
-       /* Run the code the user provided.  */
- #ifdef CALL_THREAD_FCT
---- glibc-20040925T0738/nptl/tst-unload.c	25 Feb 2004 18:41:32 -0000	1.3
-+++ glibc-20040925T0738-fedora/nptl/tst-unload.c	22 Sep 2004 21:21:01 -0000	1.3.2.1
+--- glibc-20040926T0823/nptl/tst-unload.c	25 Feb 2004 18:41:32 -0000	1.3
++++ glibc-20040926T0823-fedora/nptl/tst-unload.c	22 Sep 2004 21:21:01 -0000	1.3.2.1
 @@ -3,16 +3,16 @@
     Contributed by Ulrich Drepper <drepper@redhat.com>, 2000.
  
@@ -1843,8 +1429,8 @@
     License along with the GNU C Library; see the file COPYING.LIB.  If not,
     write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
     Boston, MA 02111-1307, USA.  */
---- glibc-20040925T0738/nptl/sysdeps/pthread/allocalim.h	26 Nov 2002 22:50:35 -0000	1.1.1.1
-+++ glibc-20040925T0738-fedora/nptl/sysdeps/pthread/allocalim.h	22 Sep 2004 21:21:02 -0000	1.1.1.1.2.1
+--- glibc-20040926T0823/nptl/sysdeps/pthread/allocalim.h	26 Nov 2002 22:50:35 -0000	1.1.1.1
++++ glibc-20040926T0823-fedora/nptl/sysdeps/pthread/allocalim.h	22 Sep 2004 21:21:02 -0000	1.1.1.1.2.1
 @@ -3,16 +3,16 @@
     This file is part of the GNU C Library.
  
@@ -1866,34 +1452,8 @@
     License along with the GNU C Library; see the file COPYING.LIB.  If not,
     write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
     Boston, MA 02111-1307, USA.  */
---- glibc-20040925T0738/nptl/sysdeps/pthread/createthread.c	24 Sep 2004 18:21:18 -0000	1.24
-+++ glibc-20040925T0738-fedora/nptl/sysdeps/pthread/createthread.c	25 Sep 2004 07:55:43 -0000	1.23.2.1
-@@ -186,6 +186,9 @@ create_thread (struct pthread *pd, const
-       if ((_mask & (__nptl_threads_events.event_bits[_idx]
- 		    | pd->eventbuf.eventmask.event_bits[_idx])) != 0)
- 	{
-+	  /* We always must have the thread start stopped.  */
-+	  pd->stopped_start = true;
-+
- 	  /* Create the thread.  We always create the thread stopped
- 	     so that it does not get far before we tell the debugger.  */
- 	  int res = do_clone (pd, attr, clone_flags, start_thread,
-@@ -224,10 +227,11 @@ create_thread (struct pthread *pd, const
-   /* Determine whether the newly created threads has to be started
-      stopped since we have to set the scheduling parameters or set the
-      affinity.  */
--  int stopped = 0;
-+  bool stopped = false;
-   if (attr != NULL && (attr->cpuset != NULL
- 		       || (attr->flags & ATTR_FLAG_NOTINHERITSCHED) != 0))
--    stopped = 1;
-+    stopped = true;
-+  pd->stopped_start = stopped;
- 
-   /* Actually create the thread.  */
-   int res = do_clone (pd, attr, clone_flags, start_thread,
---- glibc-20040925T0738/nptl/sysdeps/pthread/pt-initfini.c	31 Dec 2002 08:46:38 -0000	1.3
-+++ glibc-20040925T0738-fedora/nptl/sysdeps/pthread/pt-initfini.c	22 Sep 2004 21:21:02 -0000	1.3.2.1
+--- glibc-20040926T0823/nptl/sysdeps/pthread/pt-initfini.c	31 Dec 2002 08:46:38 -0000	1.3
++++ glibc-20040926T0823-fedora/nptl/sysdeps/pthread/pt-initfini.c	22 Sep 2004 21:21:02 -0000	1.3.2.1
 @@ -3,11 +3,11 @@
     This file is part of the GNU C Library.
  
@@ -1920,8 +1480,8 @@
     License along with the GNU C Library; see the file COPYING.LIB.  If not,
     write to the Free Software Foundation, 59 Temple Place - Suite 330,
     Boston, MA 02111-1307, USA.  */
---- glibc-20040925T0738/nptl/sysdeps/pthread/bits/libc-lock.h	11 Dec 2003 04:50:49 -0000	1.17
-+++ glibc-20040925T0738-fedora/nptl/sysdeps/pthread/bits/libc-lock.h	22 Sep 2004 21:21:02 -0000	1.17.2.1
+--- glibc-20040926T0823/nptl/sysdeps/pthread/bits/libc-lock.h	11 Dec 2003 04:50:49 -0000	1.17
++++ glibc-20040926T0823-fedora/nptl/sysdeps/pthread/bits/libc-lock.h	22 Sep 2004 21:21:02 -0000	1.17.2.1
 @@ -3,16 +3,16 @@
     This file is part of the GNU C Library.
  
@@ -1943,8 +1503,8 @@
     License along with the GNU C Library; see the file COPYING.LIB.  If not,
     write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
     Boston, MA 02111-1307, USA.  */
---- glibc-20040925T0738/nptl/sysdeps/pthread/bits/sigthread.h	26 Nov 2002 22:50:35 -0000	1.1.1.1
-+++ glibc-20040925T0738-fedora/nptl/sysdeps/pthread/bits/sigthread.h	22 Sep 2004 21:21:02 -0000	1.1.1.1.2.1
+--- glibc-20040926T0823/nptl/sysdeps/pthread/bits/sigthread.h	26 Nov 2002 22:50:35 -0000	1.1.1.1
++++ glibc-20040926T0823-fedora/nptl/sysdeps/pthread/bits/sigthread.h	22 Sep 2004 21:21:02 -0000	1.1.1.1.2.1
 @@ -3,16 +3,16 @@
     This file is part of the GNU C Library.
  
@@ -1966,8 +1526,8 @@
     License along with the GNU C Library; see the file COPYING.LIB.  If not,
     write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
     Boston, MA 02111-1307, USA.  */
---- glibc-20040925T0738/nptl/sysdeps/unix/sysv/linux/kernel-features.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20040925T0738-fedora/nptl/sysdeps/unix/sysv/linux/kernel-features.h	22 Sep 2004 21:21:02 -0000	1.1.2.1
+--- glibc-20040926T0823/nptl/sysdeps/unix/sysv/linux/kernel-features.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20040926T0823-fedora/nptl/sysdeps/unix/sysv/linux/kernel-features.h	22 Sep 2004 21:21:02 -0000	1.1.2.1
 @@ -0,0 +1,6 @@
 +#include_next <kernel-features.h>
 +
@@ -1975,8 +1535,8 @@
 +#ifndef __ASSUME_CLONE_THREAD_FLAGS
 +# define __ASSUME_CLONE_THREAD_FLAGS	1
 +#endif
---- glibc-20040925T0738/nptl/sysdeps/unix/sysv/linux/bits/local_lim.h	13 Apr 2004 02:00:09 -0000	1.6
-+++ glibc-20040925T0738-fedora/nptl/sysdeps/unix/sysv/linux/bits/local_lim.h	22 Sep 2004 21:21:02 -0000	1.6.2.1
+--- glibc-20040926T0823/nptl/sysdeps/unix/sysv/linux/bits/local_lim.h	13 Apr 2004 02:00:09 -0000	1.6
++++ glibc-20040926T0823-fedora/nptl/sysdeps/unix/sysv/linux/bits/local_lim.h	22 Sep 2004 21:21:02 -0000	1.6.2.1
 @@ -3,16 +3,16 @@
     This file is part of the GNU C Library.
  
@@ -1998,8 +1558,8 @@
     License along with the GNU C Library; see the file COPYING.LIB.  If not,
     write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
     Boston, MA 02111-1307, USA.  */
---- glibc-20040925T0738/nptl/sysdeps/unix/sysv/linux/bits/posix_opt.h	13 Apr 2004 02:01:17 -0000	1.8
-+++ glibc-20040925T0738-fedora/nptl/sysdeps/unix/sysv/linux/bits/posix_opt.h	22 Sep 2004 21:21:02 -0000	1.8.2.1
+--- glibc-20040926T0823/nptl/sysdeps/unix/sysv/linux/bits/posix_opt.h	13 Apr 2004 02:01:17 -0000	1.8
++++ glibc-20040926T0823-fedora/nptl/sysdeps/unix/sysv/linux/bits/posix_opt.h	22 Sep 2004 21:21:02 -0000	1.8.2.1
 @@ -3,16 +3,16 @@
     This file is part of the GNU C Library.
  
@@ -2021,8 +1581,8 @@
     License along with the GNU C Library; see the file COPYING.LIB.  If not,
     write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
     Boston, MA 02111-1307, USA.  */
---- glibc-20040925T0738/nptl/sysdeps/unix/sysv/linux/i386/bits/posix_opt.h	13 Apr 2004 02:01:17 -0000	1.7
-+++ glibc-20040925T0738-fedora/nptl/sysdeps/unix/sysv/linux/i386/bits/posix_opt.h	22 Sep 2004 21:21:03 -0000	1.7.2.1
+--- glibc-20040926T0823/nptl/sysdeps/unix/sysv/linux/i386/bits/posix_opt.h	13 Apr 2004 02:01:17 -0000	1.7
++++ glibc-20040926T0823-fedora/nptl/sysdeps/unix/sysv/linux/i386/bits/posix_opt.h	22 Sep 2004 21:21:03 -0000	1.7.2.1
 @@ -3,16 +3,16 @@
     This file is part of the GNU C Library.
  
@@ -2044,8 +1604,8 @@
     License along with the GNU C Library; see the file COPYING.LIB.  If not,
     write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
     Boston, MA 02111-1307, USA.  */
---- glibc-20040925T0738/nscd/Makefile	16 Sep 2004 23:58:55 -0000	1.28
-+++ glibc-20040925T0738-fedora/nscd/Makefile	22 Sep 2004 21:21:03 -0000	1.28.2.1
+--- glibc-20040926T0823/nscd/Makefile	16 Sep 2004 23:58:55 -0000	1.28
++++ glibc-20040926T0823-fedora/nscd/Makefile	22 Sep 2004 21:21:03 -0000	1.28.2.1
 @@ -67,29 +67,34 @@ CFLAGS-nscd_getpw_r.c = -fexceptions
  CFLAGS-nscd_getgr_r.c = -fexceptions
  CFLAGS-nscd_gethst_r.c = -fexceptions
@@ -2102,8 +1662,8 @@
  $(objpfx)nscd: $(addprefix $(objpfx),$(nscd-modules:=.o))
  	$(LINK.o) -pie -Wl,-O1 \
  	  $(sysdep-LDFLAGS) $(config-LDFLAGS) \
---- glibc-20040925T0738/nscd/connections.c	17 Sep 2004 00:01:46 -0000	1.55
-+++ glibc-20040925T0738-fedora/nscd/connections.c	22 Sep 2004 21:21:03 -0000	1.55.2.1
+--- glibc-20040926T0823/nscd/connections.c	17 Sep 2004 00:01:46 -0000	1.55
++++ glibc-20040926T0823-fedora/nscd/connections.c	22 Sep 2004 21:21:03 -0000	1.55.2.1
 @@ -984,7 +984,6 @@ start_threads (void)
    nscd_run ((void *) 0);
  }
@@ -2131,8 +1691,8 @@
 +    prune_cache (&dbs[hstdb], LONG_MAX);
 +}
 +
---- glibc-20040925T0738/nscd/nscd.c	20 Sep 2004 23:15:42 -0000	1.38
-+++ glibc-20040925T0738-fedora/nscd/nscd.c	22 Sep 2004 21:21:03 -0000	1.38.2.1
+--- glibc-20040926T0823/nscd/nscd.c	20 Sep 2004 23:15:42 -0000	1.38
++++ glibc-20040926T0823-fedora/nscd/nscd.c	22 Sep 2004 21:21:03 -0000	1.38.2.1
 @@ -115,9 +115,16 @@ static struct argp argp =
    options, parse_opt, NULL, doc,
  };
@@ -2158,8 +1718,8 @@
    signal (SIGPIPE, SIG_IGN);
  
    /* Cleanup files created by a previous 'bind'.  */
---- glibc-20040925T0738/nscd/nscd.conf	8 Sep 2004 15:45:29 -0000	1.8
-+++ glibc-20040925T0738-fedora/nscd/nscd.conf	22 Sep 2004 21:21:03 -0000	1.8.2.1
+--- glibc-20040926T0823/nscd/nscd.conf	8 Sep 2004 15:45:29 -0000	1.8
++++ glibc-20040926T0823-fedora/nscd/nscd.conf	22 Sep 2004 21:21:03 -0000	1.8.2.1
 @@ -27,8 +27,8 @@
  
  #	logfile			/var/log/nscd.log
@@ -2171,8 +1731,8 @@
  	debug-level		0
  #	reload-count		5
  
---- glibc-20040925T0738/nscd/nscd_conf.c	8 Sep 2004 15:46:10 -0000	1.14
-+++ glibc-20040925T0738-fedora/nscd/nscd_conf.c	22 Sep 2004 21:21:03 -0000	1.14.2.1
+--- glibc-20040926T0823/nscd/nscd_conf.c	8 Sep 2004 15:46:10 -0000	1.14
++++ glibc-20040926T0823-fedora/nscd/nscd_conf.c	22 Sep 2004 21:21:03 -0000	1.14.2.1
 @@ -224,7 +224,10 @@ nscd_parse_file (const char *fname, stru
  		if (strcmp (arg2, "no") == 0)
  		  dbs[cnt].shared = 0;
@@ -2185,8 +1745,8 @@
  		break;
  	      }
  	  if (cnt == lastdb)
---- glibc-20040925T0738/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
-+++ glibc-20040925T0738-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
+--- glibc-20040926T0823/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
++++ glibc-20040926T0823-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
 @@ -36,6 +36,14 @@
  # define add_system_dir(dir) add_dir (dir)
  #endif
@@ -2202,8 +1762,8 @@
  #define CACHEMAGIC "ld.so-1.7.0"
  
  /* libc5 and glibc 2.0/2.1 use the same format.  For glibc 2.2 another
---- glibc-20040925T0738/sysdeps/i386/bits/atomic.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20040925T0738-fedora/sysdeps/i386/bits/atomic.h	22 Sep 2004 21:21:07 -0000	1.1.2.1
+--- glibc-20040926T0823/sysdeps/i386/bits/atomic.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20040926T0823-fedora/sysdeps/i386/bits/atomic.h	22 Sep 2004 21:21:07 -0000	1.1.2.1
 @@ -0,0 +1,393 @@
 +/* Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
 +   This file is part of the GNU C Library.
@@ -2598,8 +2158,8 @@
 +
 +
 +#define atomic_delay() asm ("rep; nop")
---- glibc-20040925T0738/sysdeps/ia64/Makefile	16 Aug 2004 06:46:14 -0000	1.10
-+++ glibc-20040925T0738-fedora/sysdeps/ia64/Makefile	22 Sep 2004 21:21:07 -0000	1.10.2.1
+--- glibc-20040926T0823/sysdeps/ia64/Makefile	16 Aug 2004 06:46:14 -0000	1.10
++++ glibc-20040926T0823-fedora/sysdeps/ia64/Makefile	22 Sep 2004 21:21:07 -0000	1.10.2.1
 @@ -12,8 +12,8 @@ elide-routines.os += hp-timing
  
  ifeq (yes,$(build-shared))
@@ -2611,8 +2171,8 @@
  endif
  endif
  
---- glibc-20040925T0738/sysdeps/ia64/ia64libgcc.S	11 May 2002 05:12:35 -0000	1.2
-+++ glibc-20040925T0738-fedora/sysdeps/ia64/ia64libgcc.S	22 Sep 2004 21:21:07 -0000	1.2.2.1
+--- glibc-20040926T0823/sysdeps/ia64/ia64libgcc.S	11 May 2002 05:12:35 -0000	1.2
++++ glibc-20040926T0823-fedora/sysdeps/ia64/ia64libgcc.S	22 Sep 2004 21:21:07 -0000	1.2.2.1
 @@ -1,350 +0,0 @@
 -/* From the Intel IA-64 Optimization Guide, choose the minimum latency
 -   alternative.  */
@@ -2964,8 +2524,8 @@
 -	.symver	___multi3, __multi3@GLIBC_2.2
 -
 -#endif
---- glibc-20040925T0738/sysdeps/ia64/libgcc-compat.c 1 Jan 1970 00:00:00 -0000
-+++ glibc-20040925T0738-fedora/sysdeps/ia64/libgcc-compat.c	22 Sep 2004 21:21:08 -0000	1.1.2.1
+--- glibc-20040926T0823/sysdeps/ia64/libgcc-compat.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20040926T0823-fedora/sysdeps/ia64/libgcc-compat.c	22 Sep 2004 21:21:08 -0000	1.1.2.1
 @@ -0,0 +1,84 @@
 +/* pre-.hidden libgcc compatibility
 +   Copyright (C) 2002 Free Software Foundation, Inc.
@@ -3051,63 +2611,8 @@
 +symbol_version (INTUSE (__multi3), __multi3, GLIBC_2.2);
 +
 +#endif
---- glibc-20040925T0738/sysdeps/posix/getaddrinfo.c	18 Sep 2004 23:57:15 -0000	1.81
-+++ glibc-20040925T0738-fedora/sysdeps/posix/getaddrinfo.c	26 Sep 2004 04:48:48 -0000	1.81.2.1
-@@ -1561,10 +1561,7 @@ getaddrinfo (const char *name, const cha
- 	  results[i].dest_addr = q;
- 	  results[i].got_source_addr = false;
- 
--	  /* We overwrite the type with SOCK_DGRAM since we do not
--	     want connect() to connect to the other side.  If we
--	     cannot determine the source address remember this
--	     fact.  If we just looked up the address for a different
-+	  /* If we just looked up the address for a different
- 	     protocol, reuse the result.  */
- 	  if (last != NULL && last->ai_addrlen == q->ai_addrlen
- 	      && memcmp (last->ai_addr, q->ai_addr, q->ai_addrlen) == 0)
-@@ -1576,21 +1573,28 @@ getaddrinfo (const char *name, const cha
- 	    }
- 	  else
- 	    {
-+	      /* We overwrite the type with SOCK_DGRAM since we do not
-+		 want connect() to connect to the other side.  If we
-+		 cannot determine the source address remember this
-+		 fact.  */
- 	      int fd = __socket (q->ai_family, SOCK_DGRAM, IPPROTO_IP);
--	      if (fd != -1)
-+	      socklen_t sl = sizeof (results[i].source_addr);
-+	      if (fd != -1
-+		  && __connect (fd, q->ai_addr, q->ai_addrlen) == 0
-+		  && __getsockname (fd,
-+				    (struct sockaddr *) &results[i].source_addr,
-+				    &sl) == 0)
- 		{
--		  socklen_t sl = sizeof (results[i].source_addr);
--		  if (__connect (fd, q->ai_addr, q->ai_addrlen) == 0
--		      && __getsockname (fd,
--					(struct sockaddr *) &results[i].source_addr,
--					&sl) == 0)
--		    {
--		      results[i].source_addr_len = sl;
--		      results[i].got_source_addr = true;
--		    }
--
--		  close_not_cancel_no_status (fd);
-+		  results[i].source_addr_len = sl;
-+		  results[i].got_source_addr = true;
- 		}
-+	      else
-+		/* Just make sure that if we have to process the same
-+		   address again we do not copy any memory.  */
-+		results[i].source_addr_len = 0;
-+
-+	      if (fd != -1)
-+		close_not_cancel_no_status (fd);
- 	    }
- 
- 	  /* Remember the canonical name.  */
---- glibc-20040925T0738/sysdeps/unix/nice.c	28 Sep 2002 19:13:13 -0000	1.6
-+++ glibc-20040925T0738-fedora/sysdeps/unix/nice.c	22 Sep 2004 21:21:08 -0000	1.6.2.1
+--- glibc-20040926T0823/sysdeps/unix/nice.c	28 Sep 2002 19:13:13 -0000	1.6
++++ glibc-20040926T0823-fedora/sysdeps/unix/nice.c	22 Sep 2004 21:21:08 -0000	1.6.2.1
 @@ -41,7 +41,12 @@ nice (int incr)
  	__set_errno (save);
      }
@@ -3122,8 +2627,8 @@
    if (result != -1)
      return getpriority (PRIO_PROCESS, 0);
    else
---- glibc-20040925T0738/sysdeps/unix/sysv/linux/paths.h	15 Nov 2000 23:06:47 -0000	1.11
-+++ glibc-20040925T0738-fedora/sysdeps/unix/sysv/linux/paths.h	22 Sep 2004 21:21:08 -0000	1.11.4.1
+--- glibc-20040926T0823/sysdeps/unix/sysv/linux/paths.h	15 Nov 2000 23:06:47 -0000	1.11
++++ glibc-20040926T0823-fedora/sysdeps/unix/sysv/linux/paths.h	22 Sep 2004 21:21:08 -0000	1.11.4.1
 @@ -61,7 +61,7 @@
  #define	_PATH_TTY	"/dev/tty"
  #define	_PATH_UNIX	"/boot/vmlinux"
@@ -3133,8 +2638,8 @@
  #define _PATH_WTMP	"/var/log/wtmp"
  
  /* Provide trailing slash, since mostly used for building pathnames. */
---- glibc-20040925T0738/sysdeps/unix/sysv/linux/tcsetattr.c	10 Sep 2003 19:16:07 -0000	1.16
-+++ glibc-20040925T0738-fedora/sysdeps/unix/sysv/linux/tcsetattr.c	22 Sep 2004 21:21:08 -0000	1.16.2.1
+--- glibc-20040926T0823/sysdeps/unix/sysv/linux/tcsetattr.c	10 Sep 2003 19:16:07 -0000	1.16
++++ glibc-20040926T0823-fedora/sysdeps/unix/sysv/linux/tcsetattr.c	22 Sep 2004 21:21:08 -0000	1.16.2.1
 @@ -49,6 +49,7 @@ tcsetattr (fd, optional_actions, termios
  {
    struct __kernel_termios k_termios;
@@ -3180,8 +2685,8 @@
 +  return retval;
  }
  libc_hidden_def (tcsetattr)
---- glibc-20040925T0738/sysdeps/unix/sysv/linux/i386/dl-cache.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20040925T0738-fedora/sysdeps/unix/sysv/linux/i386/dl-cache.h	22 Sep 2004 21:21:08 -0000	1.1.2.1
+--- glibc-20040926T0823/sysdeps/unix/sysv/linux/i386/dl-cache.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20040926T0823-fedora/sysdeps/unix/sysv/linux/i386/dl-cache.h	22 Sep 2004 21:21:08 -0000	1.1.2.1
 @@ -0,0 +1,59 @@
 +/* Support for reading /etc/ld.so.cache files written by Linux ldconfig.
 +   Copyright (C) 2004 Free Software Foundation, Inc.
@@ -3242,18 +2747,8 @@
 +  } while (0)
 +
 +#include_next <dl-cache.h>
---- glibc-20040925T0738/sysdeps/unix/sysv/linux/i386/setuid.c	19 Sep 2004 23:44:35 -0000	1.7
-+++ glibc-20040925T0738-fedora/sysdeps/unix/sysv/linux/i386/setuid.c	25 Sep 2004 07:55:45 -0000	1.7.2.1
-@@ -47,7 +47,6 @@ __setuid (uid_t uid)
- # ifdef __NR_setuid32
-   if (__libc_missing_32bit_uids <= 0)
-     {
--      int result;
-       int saved_errno = errno;
- 
-       result = INLINE_SYSCALL (setuid32, 1, uid);
---- glibc-20040925T0738/sysdeps/unix/sysv/linux/ia64/dl-cache.h	6 Jul 2001 04:56:17 -0000	1.2
-+++ glibc-20040925T0738-fedora/sysdeps/unix/sysv/linux/ia64/dl-cache.h	22 Sep 2004 21:21:09 -0000	1.2.4.1
+--- glibc-20040926T0823/sysdeps/unix/sysv/linux/ia64/dl-cache.h	6 Jul 2001 04:56:17 -0000	1.2
++++ glibc-20040926T0823-fedora/sysdeps/unix/sysv/linux/ia64/dl-cache.h	22 Sep 2004 21:21:09 -0000	1.2.4.1
 @@ -22,4 +22,31 @@
  #define _dl_cache_check_flags(flags) \
    ((flags) == _DL_CACHE_DEFAULT_ID)
@@ -3286,75 +2781,32 @@
 +  } while (0)
 +
  #include_next <dl-cache.h>
---- glibc-20040925T0738/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c 1 Jan 1970 00:00:00 -0000
-+++ glibc-20040925T0738-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c	22 Sep 2004 21:21:09 -0000	1.1.2.1
+--- glibc-20040926T0823/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20040926T0823-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c	22 Sep 2004 21:21:09 -0000	1.1.2.1
 @@ -0,0 +1,5 @@
 +#ifdef IS_IN_ldconfig
 +#include <sysdeps/i386/dl-procinfo.c>
 +#else
 +#include <sysdeps/generic/dl-procinfo.c>
 +#endif
---- glibc-20040925T0738/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20040925T0738-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h	22 Sep 2004 21:21:09 -0000	1.1.2.1
+--- glibc-20040926T0823/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20040926T0823-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h	22 Sep 2004 21:21:09 -0000	1.1.2.1
 @@ -0,0 +1,5 @@
 +#ifdef IS_IN_ldconfig
 +#include <sysdeps/unix/sysv/linux/i386/dl-procinfo.h>
 +#else
 +#include <sysdeps/generic/dl-procinfo.h>
 +#endif
---- glibc-20040925T0738/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	17 Jan 2002 06:49:28 -0000	1.2
-+++ glibc-20040925T0738-fedora/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	22 Sep 2004 21:21:09 -0000	1.2.2.1
+--- glibc-20040926T0823/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	17 Jan 2002 06:49:28 -0000	1.2
++++ glibc-20040926T0823-fedora/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	22 Sep 2004 21:21:09 -0000	1.2.2.1
 @@ -1 +1 @@
 -s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 \2\3"_
 +s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 /emul/ia32-linux\2\3"_
---- glibc-20040925T0738/sysdeps/unix/sysv/linux/ia64/sysdep.h	22 Sep 2004 05:10:45 -0000	1.22
-+++ glibc-20040925T0738-fedora/sysdeps/unix/sysv/linux/ia64/sysdep.h	25 Sep 2004 07:55:45 -0000	1.22.2.1
-@@ -165,7 +165,7 @@
- 
- #undef PSEUDO_ERRVAL
- #define	PSEUDO_ERRVAL(name, syscall_name, args)	\
--  ENTRY(name)						\
-+  ENTRY(name)					\
-     DO_CALL (SYS_ify(syscall_name));		\
- 	cmp.eq p6,p0=-1,r10;			\
- (p6)	mov r10=r8;
-@@ -241,14 +241,14 @@
-   DO_INLINE_SYSCALL_NCS (__NR_##name, nr, ##args)
- 
- #undef INLINE_SYSCALL
--#define INLINE_SYSCALL(name, nr, args...)	\
--  ({						\
--    DO_INLINE_SYSCALL_NCS(__NR_##name, nr, args)\
--    if (_r10 == -1)				\
--      {						\
--	__set_errno (_retval);			\
--	_retval = -1;				\
--      }						\
-+#define INLINE_SYSCALL(name, nr, args...)		\
-+  ({							\
-+    DO_INLINE_SYSCALL_NCS (__NR_##name, nr, args)	\
-+    if (_r10 == -1)					\
-+      {							\
-+	__set_errno (_retval);				\
-+	_retval = -1;					\
-+      }							\
-     _retval; })
- 
- #undef INTERNAL_SYSCALL_DECL
-@@ -257,7 +257,7 @@
- #undef INTERNAL_SYSCALL
- #define INTERNAL_SYSCALL_NCS(name, err, nr, args...)	\
-   ({							\
--    DO_INLINE_SYSCALL_NCS(name, nr, args)		\
-+    DO_INLINE_SYSCALL_NCS (name, nr, args)		\
-     err = _r10;						\
-     _retval; })
- #define INTERNAL_SYSCALL(name, err, nr, args...)	\
---- glibc-20040925T0738/sysdeps/unix/sysv/linux/sparc/sparc32/setresgid.c	19 Sep 2004 23:51:19 -0000	1.3
-+++ glibc-20040925T0738-fedora/sysdeps/unix/sysv/linux/sparc/sparc32/setresgid.c 1 Jan 1970 00:00:00 -0000
+--- glibc-20040926T0823/sysdeps/unix/sysv/linux/sparc/sparc32/setresgid.c	19 Sep 2004 23:51:19 -0000	1.3
++++ glibc-20040926T0823-fedora/sysdeps/unix/sysv/linux/sparc/sparc32/setresgid.c 1 Jan 1970 00:00:00 -0000
 @@ -1 +0,0 @@
 -#include <sysdeps/unix/sysv/linux/i386/setresgid.c>
---- glibc-20040925T0738/sysdeps/unix/sysv/linux/sparc/sparc32/setresuid.c	19 Sep 2004 23:51:44 -0000	1.3
-+++ glibc-20040925T0738-fedora/sysdeps/unix/sysv/linux/sparc/sparc32/setresuid.c 1 Jan 1970 00:00:00 -0000
+--- glibc-20040926T0823/sysdeps/unix/sysv/linux/sparc/sparc32/setresuid.c	19 Sep 2004 23:51:44 -0000	1.3
++++ glibc-20040926T0823-fedora/sysdeps/unix/sysv/linux/sparc/sparc32/setresuid.c 1 Jan 1970 00:00:00 -0000
 @@ -1 +0,0 @@
 -#include <sysdeps/unix/sysv/linux/i386/setresuid.c>
