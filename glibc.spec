@@ -1,4 +1,4 @@
-%define glibcrelease 18.7.0.2
+%define glibcrelease 19
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 Summary: The GNU libc libraries.
 Name: glibc
@@ -38,14 +38,18 @@ BuildPreReq: gcc >= 2.96-82
 Conflicts: rpm <= 4.0-0.65
 Conflicts: glibc-devel < 2.2.3
 Patch: glibc-kernel-2.4.patch
-Patch2: glibc-2.2.4.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
 %define enablemask [01].*|2.[0-3]*
 %else
 %define enablekernel 2.2.5
+%ifarch i686
+%define enablekernel2 2.4.1
+%define enablemask [01].*|2.[0-3]*|2.4.0*
+%else
 %define enablemask [01].*|2.[0-1]*|2.2.[0-4]|2.2.[0-4][^0-9]*
+%endif
 %endif
 %define __find_provides %{_builddir}/%{name}-%{version}/find_provides.sh
 
@@ -135,7 +139,6 @@ case `uname -r` in
 %enablemask)
 %patch -p1
 ;; esac
-%patch2 -p1
 
 %ifarch armv4l sparc64 ia64 s390 s390x
 rm -rf glibc-compat
@@ -213,6 +216,35 @@ make install_root=$RPM_BUILD_ROOT install -C build-%{_target_cpu}-linux
 cd build-%{_target_cpu}-linux && \
     make -j$numprocs install_root=$RPM_BUILD_ROOT install-locales -C ../localedata objdir=`pwd` && \
     cd ..
+%endif
+
+%ifarch i686
+rm -rf build-%{_target_cpu}-linux2.4
+mkdir build-%{_target_cpu}-linux2.4 ; cd build-%{_target_cpu}-linux2.4
+GCC=gcc
+BuildFlags=`cat ../BuildFlags`
+EnableKernel="--enable-kernel=%{enablekernel2} --disable-profile"
+CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
+	--enable-add-ons=yes --without-cvs $EnableKernel \
+	%{_target_cpu}-redhat-linux
+if [ -x /usr/bin/getconf ] ; then
+  numprocs=$(/usr/bin/getconf _NPROCESSORS_ONLN)
+  if [ $numprocs -eq 0 ]; then
+    numprocs=1
+  fi
+else
+  numprocs=1
+fi
+make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
+mkdir -p $RPM_BUILD_ROOT/lib/%{_target_cpu}/
+cp -a libc.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libc-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/lib/libc-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libc.so.*`
+cp -a math/libm.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libm-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/lib/libm-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libm.so.*`
+cp -a linuxthreads/libpthread.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libpthread-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/lib/libpthread-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libpthread.so.*`
+strip -R .comment $RPM_BUILD_ROOT/lib/{libc,libm,libpthread}-*.so
+cd ..
 %endif
 
 # compatibility hack: this locale has vanished from glibc, but some other
@@ -418,6 +450,9 @@ rm -f *.filelist*
 
 %files -f rpm.filelist
 %defattr(-,root,root)
+%ifarch i686
+%dir /lib/i686
+%endif
 %verify(not md5 size mtime) %config(noreplace) /etc/localtime
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/ld.so.conf
@@ -444,21 +479,7 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Tue Dec  4 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-18.7.0.2
-- fix glob buffer overflow
-
-* Wed Nov 28 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-18.7.0.1
-- add selected changes from CVS
-  - handle DT_RUNPATH properly (#55865)
-  - fix *scanf nan/inf handling
-  - fix strndup
-  - fix fnmatch - handling at end of bracket expr
-  - allow dlfcn.h to be used in C++
-  - fix IPv6 reverse lookups
-  - avoid SPARC warnings in bits/mathinline.h
-
-* Wed Oct  3 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-18.7.0
-- special rpm for 7.0 without 2.4.1+ kernel requirements on i686
+* Wed Oct  3 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-19
 - fix strsep
 
 * Fri Sep 28 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-18
