@@ -1,7 +1,7 @@
-%define glibcdate 20050208T2213
+%define glibcdate 20050211T0853
 %define glibcname glibc
 %define glibcversion 2.3.4
-%define glibcrelease 7
+%define glibcrelease 8
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -15,10 +15,10 @@ Version: %{glibcversion}
 Release: %{glibcrelease}
 License: LGPL
 Group: System Environment/Libraries
-%define glibcsrcdir %{name}-%{glibcdate}
+%define glibcsrcdir %{glibcname}-%{glibcdate}
 Source0: %{glibcsrcdir}.tar.bz2
-Source1: %{name}-fedora-%{glibcdate}.tar.bz2
-Patch0: %{name}-fedora.patch
+Source1: %{glibcname}-fedora-%{glibcdate}.tar.bz2
+Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-nptl-check.patch
 Patch2: %{name}-ppc-assume.patch
 Patch3: %{name}-ia64-lib64.patch
@@ -1273,6 +1273,14 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb 11 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-8
+- update from CVS
+  - bi-arch <gnu/lib-names.h> (BZ#632)
+  - fix libdl on s390 and maybe other platforms
+  - fix initstate{,_r} (BZ#710)
+  - fix <gnu/stubs.h> generation (BZ#157)
+- define CMSPAR in bits/termios.h (#147533)
+
 * Tue Feb  8 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-7
 - update from CVS
   - fix TLS handling in linuxthreads
