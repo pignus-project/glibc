@@ -1,4 +1,4 @@
-%define glibcrelease 19.3
+%define glibcrelease 19.3m
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 Summary: The GNU libc libraries.
 Name: glibc
@@ -39,6 +39,7 @@ Conflicts: rpm <= 4.0-0.65
 Conflicts: glibc-devel < 2.2.3
 Patch: glibc-kernel-2.4.patch
 Patch2: glibc-2.2.4.patch
+Patch3: glibc-double-close.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
@@ -141,6 +142,7 @@ case `uname -r` in
 %patch -p1
 ;; esac
 %patch2 -p1
+%patch3 -p1
 
 %ifarch armv4l sparc64 ia64 s390 s390x
 rm -rf glibc-compat
