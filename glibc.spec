@@ -1,4 +1,4 @@
-%define glibcrelease 37
+%define glibcrelease 38
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200407160442
+%define glibcdate 200407221119
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -1219,6 +1219,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jul 22 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-38
+- update from CVS
+  - fix res_init leaks
+  - fix newlocale races
+  - fix ppc64 setjmp
+- fix strtold (BZ #274)
+
 * Fri Jul 16 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-37
 - update from CVS
   - allow pthread_cancel in DSO destructors run at exit time
