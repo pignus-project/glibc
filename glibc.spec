@@ -1,7 +1,7 @@
-%define glibcdate 20050303T1335
+%define glibcdate 20050319T1907
 %define glibcname glibc
 %define glibcversion 2.3.4
-%define glibcrelease 14
+%define glibcrelease 15
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -1206,6 +1206,7 @@ rm -f *.filelist*
 %verify(not md5 size mtime) %config(noreplace) /etc/ld.so.conf
 %dir /etc/ld.so.conf.d
 %dir %{_prefix}/libexec/getconf
+%dir %{_prefix}/%{_lib}/gconv
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/ld.so.cache
 %doc README NEWS INSTALL FAQ BUGS NOTES PROJECTS CONFORMANCE
 %doc COPYING COPYING.LIB README.libm LICENSES
@@ -1277,6 +1278,17 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Mar 19 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-15
+- update from CVS
+  - better fix for the dlclose bug (#145810, #150414)
+  - fix regex crash on case insensitive search in zh_CN locale
+    (#151215)
+  - fix malloc_trim (BZ#779)
+  - with -D_FORTIFY_SOURCE=*, avoid defining read and a bunch of others
+    as function-like macros, there are too many broken programs
+    out there
+- add %%dir %{_prefix}/%{_lib}/gconv to glibc's file list (#151372)
+
 * Sun Mar  6 2005 Roland McGrath <roland@redhat.com> 2.3.4-14
 - fix bits/socket2.h macro typos
 

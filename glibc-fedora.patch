@@ -1,30 +1,6 @@
---- glibc-20050303T1335/ChangeLog	3 Mar 2005 08:28:23 -0000	1.9240
-+++ glibc-20050303T1335-fedora/ChangeLog	5 Mar 2005 13:13:04 -0000	1.8782.2.85
-@@ -1,3 +1,15 @@
-+2005-03-05  Jakub Jelinek  <jakub@redhat.com>
-+
-+	* Makerules ($(inst_libdir)/libc.so): Use $(slibdir) instead of
-+	$(inst_slibdir) in AS_NEEDED directive.
-+
-+	* include/bits/unistd.h: New file.
-+	* include/bits/socket2.h: New file.
-+
-+	* sysdeps/i386/dl-machine.h (ELF_MACHINE_NO_RELA): Define
-+	unconditionally to (defined RTLD_BOOTSTRAP).
-+	* sysdeps/arm/dl-machine.h (ELF_MACHINE_NO_RELA): Likewise.
-+
- 2005-03-01  H.J. Lu  <hongjiu.lu@intel.com>
- 
- 	[BZ #776]
-@@ -10,6 +22,7 @@
- 	loader is closed.  Fixes unload3.
- 	* elf/tst-global1.c: New file.
- 	* elf/Makefile (tests): Add tst-global1.
-+	* elf/testobj2.c (p): New function.
- 
- 2005-03-03  Jakub Jelinek  <jakub@redhat.com>
- 
-@@ -529,6 +542,18 @@
+--- glibc-20050319T1907/ChangeLog	19 Mar 2005 17:45:59 -0000	1.9279
++++ glibc-20050319T1907-fedora/ChangeLog	19 Mar 2005 20:17:57 -0000	1.8782.2.86
+@@ -887,6 +887,18 @@
  
  	* scripts/soversions.awk: Fix default version set handling.
  
@@ -43,8 +19,8 @@
  2005-02-10  Roland McGrath  <roland@redhat.com>
  
  	[BZ #157]
---- glibc-20050303T1335/ChangeLog.11	10 Nov 2000 03:31:36 -0000	1.1
-+++ glibc-20050303T1335-fedora/ChangeLog.11	22 Sep 2004 21:20:47 -0000	1.1.4.1
+--- glibc-20050319T1907/ChangeLog.11	10 Nov 2000 03:31:36 -0000	1.1
++++ glibc-20050319T1907-fedora/ChangeLog.11	22 Sep 2004 21:20:47 -0000	1.1.4.1
 @@ -1352,6 +1352,11 @@
  	* sysdeps/unix/sysv/linux/mips/sys/tas.h: Add missing .mips0 at the
  	end of inline assembler code.
@@ -94,8 +70,8 @@
  	* sysdeps/arm/bits/huge_val.h (HUGE_VAL, HUGE_VALF): Add
  	__extension__ to hexadecimal floating constant notation.
  	* sysdeps/i386/bits/huge_val.h (HUGE_VAL, HUGE_VALF, HUGE_VALL):
---- glibc-20050303T1335/ChangeLog.12	16 Aug 2001 05:24:54 -0000	1.1
-+++ glibc-20050303T1335-fedora/ChangeLog.12	22 Sep 2004 21:20:47 -0000	1.1.4.1
+--- glibc-20050319T1907/ChangeLog.12	16 Aug 2001 05:24:54 -0000	1.1
++++ glibc-20050319T1907-fedora/ChangeLog.12	22 Sep 2004 21:20:47 -0000	1.1.4.1
 @@ -7729,6 +7729,13 @@
  
  	* Versions.def [ld]: Add GLIBC_2.2.1.
@@ -122,8 +98,8 @@
  2001-01-02  Franz Sirl	<Franz.Sirl-kernel@lauterbach.com>
  
  	* sysdeps/powerpc/dl-machine.c (__process_machine_rela): Fix typo.
---- glibc-20050303T1335/ChangeLog.15	16 Feb 2005 07:34:17 -0000	1.1
-+++ glibc-20050303T1335-fedora/ChangeLog.15	3 Mar 2005 17:29:57 -0000	1.1.6.2
+--- glibc-20050319T1907/ChangeLog.15	16 Feb 2005 07:34:17 -0000	1.1
++++ glibc-20050319T1907-fedora/ChangeLog.15	3 Mar 2005 17:29:57 -0000	1.1.6.2
 @@ -477,6 +477,14 @@
  
  2004-11-26  Jakub Jelinek  <jakub@redhat.com>
@@ -204,19 +180,8 @@
  2004-08-30  Roland McGrath  <roland@frob.com>
  
  	* scripts/extract-abilist.awk: If `lastversion' variable defined, omit
---- glibc-20050303T1335/Makerules	24 Feb 2005 02:10:30 -0000	1.429
-+++ glibc-20050303T1335-fedora/Makerules	5 Mar 2005 13:13:06 -0000	1.423.2.5
-@@ -972,7 +972,7 @@ $(inst_libdir)/libc.so: $(common-objpfx)
- 	 cat $<; \
- 	 echo 'GROUP ( $(slibdir)/libc.so$(libc.so-version)' \
- 	      '$(libdir)/$(patsubst %,$(libtype.oS),$(libprefix)$(libc-name))'\
--	      ' AS_NEEDED (' $(inst_slibdir)/$(rtld-installed-name) ') )' \
-+	      ' AS_NEEDED (' $(slibdir)/$(rtld-installed-name) ') )' \
- 	) > $@.new
- 	mv -f $@.new $@
- 
---- glibc-20050303T1335/Versions.def	21 Feb 2005 23:06:21 -0000	1.59
-+++ glibc-20050303T1335-fedora/Versions.def	3 Mar 2005 16:52:24 -0000	1.58.2.2
+--- glibc-20050319T1907/Versions.def	21 Feb 2005 23:06:21 -0000	1.59
++++ glibc-20050319T1907-fedora/Versions.def	3 Mar 2005 16:52:24 -0000	1.58.2.2
 @@ -20,7 +20,6 @@ libc {
    GLIBC_2.3.2
    GLIBC_2.3.3
@@ -225,16 +190,16 @@
  %ifdef USE_IN_LIBIO
    HURD_CTHREADS_0.3
  %endif
---- glibc-20050303T1335/version.h	20 Dec 2004 23:37:41 -0000	1.67
-+++ glibc-20050303T1335-fedora/version.h	6 Jan 2005 15:21:51 -0000	1.65.2.3
+--- glibc-20050319T1907/version.h	20 Dec 2004 23:37:41 -0000	1.67
++++ glibc-20050319T1907-fedora/version.h	6 Jan 2005 15:21:51 -0000	1.65.2.3
 @@ -1,4 +1,4 @@
  /* This file just defines the current version number of libc.  */
  
  #define RELEASE "development"
 -#define VERSION "2.3.90"
 +#define VERSION "2.3.4"
---- glibc-20050303T1335/csu/elf-init.c	14 Feb 2005 21:21:36 -0000	1.5
-+++ glibc-20050303T1335-fedora/csu/elf-init.c	3 Mar 2005 13:33:53 -0000	1.3.2.3
+--- glibc-20050319T1907/csu/elf-init.c	14 Feb 2005 21:21:36 -0000	1.5
++++ glibc-20050319T1907-fedora/csu/elf-init.c	3 Mar 2005 13:33:53 -0000	1.3.2.3
 @@ -44,6 +44,24 @@ extern void (*__init_array_start []) (vo
  extern void (*__init_array_end []) (void) attribute_hidden;
  extern void (*__fini_array_start []) (void) attribute_hidden;
@@ -260,8 +225,8 @@
  #endif
  
  /* These function symbols are provided for the .init/.fini section entry
---- glibc-20050303T1335/debug/Versions	1 Mar 2005 00:12:31 -0000	1.6
-+++ glibc-20050303T1335-fedora/debug/Versions	3 Mar 2005 16:52:26 -0000	1.3.4.3
+--- glibc-20050319T1907/debug/Versions	1 Mar 2005 00:12:31 -0000	1.6
++++ glibc-20050319T1907-fedora/debug/Versions	3 Mar 2005 16:52:26 -0000	1.3.4.3
 @@ -18,10 +18,4 @@ libc {
      __printf_chk; __fprintf_chk; __vprintf_chk; __vfprintf_chk;
      __gets_chk;
@@ -273,8 +238,8 @@
 -    __recv_chk; __recvfrom_chk;
 -  }
  }
---- glibc-20050303T1335/debug/fgets_chk.c	21 Feb 2005 22:53:35 -0000	1.1
-+++ glibc-20050303T1335-fedora/debug/fgets_chk.c	3 Mar 2005 16:52:26 -0000	1.1.2.2
+--- glibc-20050319T1907/debug/fgets_chk.c	21 Feb 2005 22:53:35 -0000	1.1
++++ glibc-20050319T1907-fedora/debug/fgets_chk.c	3 Mar 2005 16:52:26 -0000	1.1.2.2
 @@ -30,6 +30,7 @@
  #include <stdio.h>
  #include <sys/param.h>
@@ -288,8 +253,8 @@
    return result;
  }
 +#endif
---- glibc-20050303T1335/debug/fgets_u_chk.c	21 Feb 2005 22:53:35 -0000	1.1
-+++ glibc-20050303T1335-fedora/debug/fgets_u_chk.c	3 Mar 2005 16:52:26 -0000	1.1.2.2
+--- glibc-20050319T1907/debug/fgets_u_chk.c	21 Feb 2005 22:53:35 -0000	1.1
++++ glibc-20050319T1907-fedora/debug/fgets_u_chk.c	3 Mar 2005 16:52:26 -0000	1.1.2.2
 @@ -30,6 +30,7 @@
  #include <stdio.h>
  #include <sys/param.h>
@@ -303,8 +268,8 @@
    return result;
  }
 +#endif
---- glibc-20050303T1335/debug/getcwd_chk.c	1 Mar 2005 00:42:41 -0000	1.2
-+++ glibc-20050303T1335-fedora/debug/getcwd_chk.c	3 Mar 2005 16:52:26 -0000	1.2.2.2
+--- glibc-20050319T1907/debug/getcwd_chk.c	1 Mar 2005 00:42:41 -0000	1.2
++++ glibc-20050319T1907-fedora/debug/getcwd_chk.c	3 Mar 2005 16:52:26 -0000	1.2.2.2
 @@ -20,7 +20,7 @@
  #include <unistd.h>
  #include <sys/param.h>
@@ -319,8 +284,8 @@
    return __getcwd (buf, size);
  }
 +#endif
---- glibc-20050303T1335/debug/getwd_chk.c	21 Feb 2005 22:53:35 -0000	1.1
-+++ glibc-20050303T1335-fedora/debug/getwd_chk.c	3 Mar 2005 16:52:26 -0000	1.1.2.2
+--- glibc-20050319T1907/debug/getwd_chk.c	21 Feb 2005 22:53:35 -0000	1.1
++++ glibc-20050319T1907-fedora/debug/getwd_chk.c	3 Mar 2005 16:52:26 -0000	1.1.2.2
 @@ -20,7 +20,7 @@
  #include <unistd.h>
  #include <sys/param.h>
@@ -335,8 +300,8 @@
  link_warning (getwd,
  	      "the `getwd' function is dangerous and should not be used.")
 +#endif
---- glibc-20050303T1335/debug/pread64_chk.c	1 Mar 2005 01:00:11 -0000	1.3
-+++ glibc-20050303T1335-fedora/debug/pread64_chk.c	3 Mar 2005 16:52:26 -0000	1.3.2.2
+--- glibc-20050319T1907/debug/pread64_chk.c	19 Mar 2005 00:08:11 -0000	1.4
++++ glibc-20050319T1907-fedora/debug/pread64_chk.c	19 Mar 2005 20:18:00 -0000	1.3.2.3
 @@ -19,7 +19,7 @@
  #include <unistd.h>
  #include <sys/param.h>
@@ -348,11 +313,11 @@
  {
 @@ -28,3 +28,4 @@ __pread64_chk (int fd, void *buf, size_t
  
-   return __pread64 (fd, buf, offset, nbytes);
+   return __pread64 (fd, buf, nbytes, offset);
  }
 +#endif
---- glibc-20050303T1335/debug/pread_chk.c	1 Mar 2005 00:59:33 -0000	1.3
-+++ glibc-20050303T1335-fedora/debug/pread_chk.c	3 Mar 2005 16:52:26 -0000	1.3.2.2
+--- glibc-20050319T1907/debug/pread_chk.c	19 Mar 2005 00:07:31 -0000	1.4
++++ glibc-20050319T1907-fedora/debug/pread_chk.c	19 Mar 2005 20:18:00 -0000	1.3.2.3
 @@ -19,7 +19,7 @@
  #include <unistd.h>
  #include <sys/param.h>
@@ -364,11 +329,11 @@
  {
 @@ -28,3 +28,4 @@ __pread_chk (int fd, void *buf, size_t n
  
-   return __pread (fd, buf, offset, nbytes);
+   return __pread (fd, buf, nbytes, offset);
  }
 +#endif
---- glibc-20050303T1335/debug/read_chk.c	1 Mar 2005 00:35:58 -0000	1.4
-+++ glibc-20050303T1335-fedora/debug/read_chk.c	3 Mar 2005 16:52:26 -0000	1.4.2.2
+--- glibc-20050319T1907/debug/read_chk.c	1 Mar 2005 00:35:58 -0000	1.4
++++ glibc-20050319T1907-fedora/debug/read_chk.c	3 Mar 2005 16:52:26 -0000	1.4.2.2
 @@ -23,7 +23,7 @@
  # include <sysdep.h>
  #endif
@@ -383,8 +348,8 @@
  #endif
  }
 +#endif
---- glibc-20050303T1335/debug/readlink_chk.c	1 Mar 2005 00:41:15 -0000	1.3
-+++ glibc-20050303T1335-fedora/debug/readlink_chk.c	3 Mar 2005 16:52:26 -0000	1.3.2.2
+--- glibc-20050319T1907/debug/readlink_chk.c	1 Mar 2005 00:41:15 -0000	1.3
++++ glibc-20050319T1907-fedora/debug/readlink_chk.c	3 Mar 2005 16:52:26 -0000	1.3.2.2
 @@ -23,7 +23,7 @@
  # include <sysdep.h>
  #endif
@@ -399,8 +364,8 @@
  #endif
  }
 +#endif
---- glibc-20050303T1335/debug/recv_chk.c	21 Feb 2005 22:53:35 -0000	1.1
-+++ glibc-20050303T1335-fedora/debug/recv_chk.c	3 Mar 2005 16:52:26 -0000	1.1.2.2
+--- glibc-20050319T1907/debug/recv_chk.c	6 Mar 2005 21:24:42 -0000	1.2
++++ glibc-20050319T1907-fedora/debug/recv_chk.c	19 Mar 2005 20:18:00 -0000	1.1.2.3
 @@ -19,7 +19,7 @@
  #include <sys/param.h>
  #include <sys/socket.h>
@@ -410,13 +375,13 @@
  ssize_t
  __recv_chk (int fd, void *buf, size_t n, size_t buflen, int flags)
  {
-@@ -31,3 +31,4 @@ __recv_chk (int fd, void *buf, size_t n,
-     __chk_fail ();
-   return nrecv;
+@@ -28,3 +28,4 @@ __recv_chk (int fd, void *buf, size_t n,
+ 
+   return __recv (fd, buf, n, flags);
  }
 +#endif
---- glibc-20050303T1335/debug/recvfrom_chk.c	21 Feb 2005 22:53:35 -0000	1.1
-+++ glibc-20050303T1335-fedora/debug/recvfrom_chk.c	3 Mar 2005 16:52:26 -0000	1.1.2.2
+--- glibc-20050319T1907/debug/recvfrom_chk.c	6 Mar 2005 21:24:16 -0000	1.2
++++ glibc-20050319T1907-fedora/debug/recvfrom_chk.c	19 Mar 2005 20:18:00 -0000	1.1.2.3
 @@ -19,7 +19,7 @@
  #include <sys/param.h>
  #include <sys/socket.h>
@@ -426,14 +391,24 @@
  ssize_t
  __recvfrom_chk (int fd, void *buf, size_t n, size_t buflen, int flags,
  		__SOCKADDR_ARG addr, socklen_t *addr_len)
-@@ -33,3 +33,4 @@ __recvfrom_chk (int fd, void *buf, size_
-     __chk_fail ();
-   return nrecv;
+@@ -29,3 +29,4 @@ __recvfrom_chk (int fd, void *buf, size_
+ 
+   return __recvfrom (fd, buf, n, flags, addr, addr_len);
  }
 +#endif
---- glibc-20050303T1335/debug/tst-chk1.c	21 Feb 2005 23:09:07 -0000	1.6
-+++ glibc-20050303T1335-fedora/debug/tst-chk1.c	3 Mar 2005 13:33:53 -0000	1.1.2.8
-@@ -213,7 +213,7 @@ do_test (void)
+--- glibc-20050319T1907/debug/tst-chk1.c	19 Mar 2005 00:09:08 -0000	1.7
++++ glibc-20050319T1907-fedora/debug/tst-chk1.c	19 Mar 2005 21:04:10 -0000	1.1.2.10
+@@ -17,6 +17,9 @@
+    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+    02111-1307 USA.  */
+ 
++/* Hack: make sure GCC doesn't know __chk_fail () will not return.  */
++#define __noreturn__
++
+ #include <fcntl.h>
+ #include <paths.h>
+ #include <setjmp.h>
+@@ -215,7 +218,7 @@ do_test (void)
    if (memcmp (a.buf1, "aabcdabcjj", 10))
      FAIL ();
  
@@ -442,7 +417,7 @@
    /* The following tests are supposed to crash with -D_FORTIFY_SOURCE=2
       and sufficient GCC support, as the string operations overflow
       from a.buf1 into a.buf2.  */
-@@ -312,7 +312,7 @@ do_test (void)
+@@ -314,7 +317,7 @@ do_test (void)
    memset (a.buf1 + 9, 'j', l0 + 2);
    CHK_FAIL_END
  
@@ -451,8 +426,17 @@
  # define O 0
  #else
  # define O 1
---- glibc-20050303T1335/elf/dl-support.c	6 Nov 2004 00:24:49 -0000	1.87
-+++ glibc-20050303T1335-fedora/elf/dl-support.c	10 Nov 2004 09:02:46 -0000	1.84.2.4
+@@ -768,7 +771,7 @@ do_test (void)
+ 	      || strcmp (getcwdbuf + 1, fname) != 0)
+ 	    FAIL ();
+ 
+-#if __USE_FORTIFY_LEVEL >= 1
++#if 0 && __USE_FORTIFY_LEVEL >= 1
+ 	  CHK_FAIL_START
+ 	  if (getwd (getcwdbuf + 2) != getcwdbuf + 2)
+ 	    FAIL ();
+--- glibc-20050319T1907/elf/dl-support.c	6 Nov 2004 00:24:49 -0000	1.87
++++ glibc-20050319T1907-fedora/elf/dl-support.c	10 Nov 2004 09:02:46 -0000	1.84.2.4
 @@ -281,6 +281,11 @@ _dl_non_dynamic_init (void)
    if (_dl_platform != NULL)
      _dl_platformlen = strlen (_dl_platform);
@@ -465,8 +449,8 @@
    /* Scan for a program header telling us the stack is nonexecutable.  */
    if (_dl_phdr != NULL)
      for (uint_fast16_t i = 0; i < _dl_phnum; ++i)
---- glibc-20050303T1335/elf/ldconfig.c	12 Jan 2005 23:39:52 -0000	1.48
-+++ glibc-20050303T1335-fedora/elf/ldconfig.c	8 Feb 2005 10:04:03 -0000	1.47.2.2
+--- glibc-20050319T1907/elf/ldconfig.c	12 Jan 2005 23:39:52 -0000	1.48
++++ glibc-20050319T1907-fedora/elf/ldconfig.c	8 Feb 2005 10:04:03 -0000	1.47.2.2
 @@ -944,17 +944,19 @@ search_dirs (void)
  
  
@@ -548,9 +532,9 @@
      }
  
    search_dirs ();
---- glibc-20050303T1335/elf/rtld.c	12 Feb 2005 23:15:39 -0000	1.348
-+++ glibc-20050303T1335-fedora/elf/rtld.c	12 Feb 2005 10:01:55 -0000	1.330.2.14
-@@ -1223,6 +1223,53 @@ ld.so does not support TLS, but program 
+--- glibc-20050319T1907/elf/rtld.c	18 Mar 2005 11:10:26 -0000	1.349
++++ glibc-20050319T1907-fedora/elf/rtld.c	19 Mar 2005 20:18:00 -0000	1.330.2.15
+@@ -1252,6 +1252,53 @@ ld.so does not support TLS, but program 
    ++GL(dl_ns)[LM_ID_BASE]._ns_nloaded;
    ++GL(dl_load_adds);
  
@@ -604,11 +588,10 @@
    /* If LD_USE_LOAD_BIAS env variable has not been seen, default
       to not using bias for non-prelinked PIEs and libraries
       and using it for executables or prelinked PIEs or libraries.  */
-@@ -1594,6 +1641,67 @@ ERROR: ld.so: object '%s' from %s cannot
+@@ -1590,6 +1637,57 @@ ERROR: ld.so: object '%s' cannot be load
  	}
      }
  
-+
 +#if defined(__i386__) || defined(__alpha__) || (defined(__sparc__) && !defined(__arch64__))
 +  /*
 +   * Modifications by Red Hat Software
@@ -650,42 +633,21 @@
 +      if (test_fd >= 0) /* open did no fail.. */
 +	  __close(test_fd); /* avoid fd leaks */
 +
-+      if (can_load != 0) {
-+	  struct link_map *new_map;
-+	  new_map = _dl_map_object (main_map, LIB_NOVERSION,
-+				    1, lt_library, 0, 0, LM_ID_BASE);
-+	  if (++new_map->l_opencount == 1) {
-+	      /* It is no duplicate.  */
-+	      ++npreloads;
-+/* 	      _dl_sysdep_message(" DONE\n", NULL); */
-+	  } else {
-+/* 	      _dl_sysdep_message(" FAILED\n", NULL); */
-+	  }
-+      }
-+	  
++      if (can_load != 0)
++	npreloads += do_preload (LIB_NOVERSION, main_map,
++				 "nonversioned binary");
++
 +      HP_TIMING_NOW (stop);
 +      HP_TIMING_DIFF (diff, start, stop);
 +      HP_TIMING_ACCUM_NT (load_time, diff);
 +    }
 +#endif
 +
-   if (__builtin_expect (npreloads, 0) != 0)
+   if (__builtin_expect (GL(dl_rtld_map).l_next != NULL, 0))
      {
        /* Set up PRELOADS with a vector of the preloaded libraries.  */
---- glibc-20050303T1335/elf/testobj2.c	15 Dec 2000 16:02:24 -0000	1.5
-+++ glibc-20050303T1335-fedora/elf/testobj2.c	3 Mar 2005 17:48:04 -0000	1.5.4.1
-@@ -23,3 +23,9 @@ preload (int a)
-     return fp (a) + 10;
-   return 10;
- }
-+
-+void
-+p (void)
-+{
-+  puts ("hello world");
-+}
---- glibc-20050303T1335/elf/tst-tls10.h	17 Apr 2003 19:19:01 -0000	1.1
-+++ glibc-20050303T1335-fedora/elf/tst-tls10.h	22 Sep 2004 21:20:48 -0000	1.1.2.1
+--- glibc-20050319T1907/elf/tst-tls10.h	17 Apr 2003 19:19:01 -0000	1.1
++++ glibc-20050319T1907-fedora/elf/tst-tls10.h	22 Sep 2004 21:20:48 -0000	1.1.2.1
 @@ -1,8 +1,8 @@
  #include <tls.h>
  #include <stdlib.h>
@@ -697,8 +659,8 @@
  # define USE_TLS__THREAD
  
  struct A
---- glibc-20050303T1335/iconv/iconvconfig.c	3 Mar 2005 08:28:02 -0000	1.23
-+++ glibc-20050303T1335-fedora/iconv/iconvconfig.c	3 Mar 2005 14:03:15 -0000	1.19.2.4
+--- glibc-20050319T1907/iconv/iconvconfig.c	3 Mar 2005 08:28:02 -0000	1.23
++++ glibc-20050319T1907-fedora/iconv/iconvconfig.c	3 Mar 2005 14:03:15 -0000	1.19.2.4
 @@ -1013,6 +1013,34 @@ next_prime (uint32_t seed)
                                module name offset
                           (following last entry with step count 0)
@@ -775,8 +737,8 @@
    /* Open the output file.  */
    if (output_file == NULL)
      {
---- glibc-20050303T1335/include/features.h	17 Feb 2005 01:10:58 -0000	1.38
-+++ glibc-20050303T1335-fedora/include/features.h	3 Mar 2005 14:03:16 -0000	1.35.2.7
+--- glibc-20050319T1907/include/features.h	17 Feb 2005 01:10:58 -0000	1.38
++++ glibc-20050319T1907-fedora/include/features.h	3 Mar 2005 14:03:16 -0000	1.35.2.7
 @@ -262,7 +262,13 @@
  # define __USE_REENTRANT	1
  #endif
@@ -801,16 +763,8 @@
  
  #define __GLIBC_PREREQ(maj, min) \
  	((__GLIBC__ << 16) + __GLIBC_MINOR__ >= ((maj) << 16) + (min))
---- glibc-20050303T1335/include/bits/socket2.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20050303T1335-fedora/include/bits/socket2.h	5 Mar 2005 13:04:47 -0000	1.1.2.1
-@@ -0,0 +1 @@
-+#include <socket/bits/socket2.h>
---- glibc-20050303T1335/include/bits/unistd.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20050303T1335-fedora/include/bits/unistd.h	5 Mar 2005 13:04:47 -0000	1.1.2.1
-@@ -0,0 +1 @@
-+#include <posix/bits/unistd.h>
---- glibc-20050303T1335/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
-+++ glibc-20050303T1335-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
+--- glibc-20050319T1907/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
++++ glibc-20050319T1907-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
 @@ -58,8 +58,6 @@ korean		ko_KR.eucKR
  korean.euc 	ko_KR.eucKR
  ko_KR		ko_KR.eucKR
@@ -820,8 +774,8 @@
  norwegian       nb_NO.ISO-8859-1
  nynorsk		nn_NO.ISO-8859-1
  polish          pl_PL.ISO-8859-2
---- glibc-20050303T1335/libio/stdio.h	7 Jan 2005 19:30:00 -0000	1.81
-+++ glibc-20050303T1335-fedora/libio/stdio.h	8 Feb 2005 10:04:09 -0000	1.78.2.4
+--- glibc-20050319T1907/libio/stdio.h	7 Jan 2005 19:30:00 -0000	1.81
++++ glibc-20050319T1907-fedora/libio/stdio.h	8 Feb 2005 10:04:09 -0000	1.78.2.4
 @@ -142,10 +142,12 @@ typedef _G_fpos64_t fpos64_t;
  extern struct _IO_FILE *stdin;		/* Standard input stream.  */
  extern struct _IO_FILE *stdout;		/* Standard output stream.  */
@@ -835,8 +789,8 @@
  
  __BEGIN_NAMESPACE_STD
  /* Remove file FILENAME.  */
---- glibc-20050303T1335/libio/bits/stdio2.h	21 Feb 2005 23:09:53 -0000	1.2
-+++ glibc-20050303T1335-fedora/libio/bits/stdio2.h	3 Mar 2005 16:52:27 -0000	1.1.2.4
+--- glibc-20050319T1907/libio/bits/stdio2.h	19 Mar 2005 00:14:58 -0000	1.4
++++ glibc-20050319T1907-fedora/libio/bits/stdio2.h	19 Mar 2005 20:18:03 -0000	1.1.2.5
 @@ -61,14 +61,25 @@ extern int __vfprintf_chk (FILE *__restr
  extern int __vprintf_chk (int __flag, __const char *__restrict __format,
  			  _G_va_list __ap);
@@ -867,42 +821,49 @@
  
  #endif
  
-@@ -77,13 +88,17 @@ extern char *__gets_chk (char *__str, si
-   ((__bos (__str) == (size_t) -1)					      \
-    ? gets (__str) : __gets_chk (__str, __bos (__str)))
+@@ -83,8 +94,7 @@ gets (char *__str)
+   return __gets_alias (__str);
+ }
  
--extern char *__fgets_chk (char *s, size_t size, int n, FILE *stream);
-+extern void __chk_fail (void) __attribute__((noreturn));
- #define fgets(__str, __n, __fp) \
--  ((__bos (__str) == (size_t) -1)					      \
--   ? fgets (__str, __n, __fp) : __fgets_chk (__str, __bos (__str), __n, __fp))
-+  (__extension__							      \
-+    ({ size_t __n_val = (__n);				  		      \
-+       if (__bos (__str) != (size_t) -1 && __bos (__str) < __n_val)	      \
-+         __chk_fail ();							      \
-+       fgets (__str, __n_val, __fp); }))
+-extern char *__fgets_chk (char *__restrict __s, size_t __size, int __n,
+-			  FILE *__restrict __stream) __wur;
++extern void __chk_fail (void) __attribute__((__noreturn__));
+ extern char *__REDIRECT (__fgets_alias,
+ 			 (char *__restrict __s, int __n,
+ 			  FILE *__restrict __stream), fgets) __wur;
+@@ -92,15 +102,12 @@ extern char *__REDIRECT (__fgets_alias,
+ extern __always_inline __wur char *
+ fgets (char *__restrict __s, int __n, FILE *__restrict __stream)
+ {
+-  if (__bos (__s) != (size_t) -1
+-      && (!__builtin_constant_p (__n) || (size_t) __n > __bos (__s)))
+-    return __fgets_chk (__s, __bos (__s), __n, __stream);
++  if (__bos (__s) != (size_t) -1 && (size_t) __n > __bos (__s))
++    __chk_fail ();
+   return __fgets_alias (__s, __n, __stream);
+ }
  
--extern char *__fgets_unlocked_chk (char *s, size_t size, int n, FILE *stream);
- #define fgets_unlocked(__str, __n, __fp) \
--  ((__bos (__str) == (size_t) -1)					      \
--   ? fgets_unlocked (__str, __n, __fp)					      \
--   : __fgets_unlocked_chk (__str, __bos (__str), __n, __fp))
-+  (__extension__							      \
-+    ({ size_t __n_val = (__n);				  		      \
-+       if (__bos (__str) != (size_t) -1 && __bos (__str) < __n_val)	      \
-+         __chk_fail ();							      \
-+       fgets_unlocked (__str, __n_val, __fp); }))
---- glibc-20050303T1335/linuxthreads/ChangeLog	10 Feb 2005 07:16:22 -0000	1.837
-+++ glibc-20050303T1335-fedora/linuxthreads/ChangeLog	5 Mar 2005 13:03:34 -0000	1.817.2.18
-@@ -1,3 +1,7 @@
-+2005-03-05  Jakub Jelinek  <jakub@redhat.com>
-+
-+	* sysdeps/powerpc/tcb-offsets.sym (thread_offsetof): Rework for GCC 4.
-+
- 2005-02-09  Daniel Jacobowitz  <dan@codesourcery.com>
- 
- 	* descr.h (__pthread_find_self, thread_self): Mark as pure
-@@ -766,6 +770,12 @@
+ #ifdef __USE_GNU
+-extern char *__fgets_unlocked_chk (char *__restrict __s, size_t __size,
+-				   int __n, FILE *__restrict __stream) __wur;
+ extern char *__REDIRECT (__fgets_unlocked_alias,
+ 			 (char *__restrict __s, int __n,
+ 			  FILE *__restrict __stream), fgets_unlocked) __wur;
+@@ -108,9 +115,8 @@ extern char *__REDIRECT (__fgets_unlocke
+ extern __always_inline __wur char *
+ fgets_unlocked (char *__restrict __s, int __n, FILE *__restrict __stream)
+ {
+-  if (__bos (__s) != (size_t) -1
+-      && (!__builtin_constant_p (__n) || (size_t) __n > __bos (__s)))
+-    return __fgets_unlocked_chk (__s, __bos (__s), __n, __stream);
++  if (__bos (__s) != (size_t) -1 && (size_t) __n > __bos (__s))
++    __chk_fail ();
+   return __fgets_unlocked_alias (__s, __n, __stream);
+ }
+ #endif
+--- glibc-20050319T1907/linuxthreads/ChangeLog	6 Mar 2005 00:16:10 -0000	1.840
++++ glibc-20050319T1907-fedora/linuxthreads/ChangeLog	19 Mar 2005 20:18:03 -0000	1.817.2.19
+@@ -781,6 +781,12 @@
  	(pthread_barrierattr_setpshared): Return EINVAL if pshared
  	is neither PTHREAD_PROCESS_PRIVATE nor PTHREAD_PROCESS_SHARED.
  
@@ -915,7 +876,7 @@
  2003-09-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/unix/sysv/linux/i386/dl-sysdep.h
-@@ -898,6 +908,34 @@
+@@ -913,6 +919,34 @@
  
  2003-07-22  Jakub Jelinek  <jakub@redhat.com>
  
@@ -950,8 +911,8 @@
  	* descr.h (struct _pthread_descr_struct): Provide p_res member
  	even if USE_TLS && HAVE___THREAD.
  	* sysdeps/pthread/res-state.c (__res_state): Return __resp
---- glibc-20050303T1335/linuxthreads/Makefile	7 Feb 2005 19:30:03 -0000	1.98
-+++ glibc-20050303T1335-fedora/linuxthreads/Makefile	8 Feb 2005 10:04:10 -0000	1.94.2.5
+--- glibc-20050319T1907/linuxthreads/Makefile	7 Feb 2005 19:30:03 -0000	1.98
++++ glibc-20050319T1907-fedora/linuxthreads/Makefile	8 Feb 2005 10:04:10 -0000	1.94.2.5
 @@ -245,15 +245,18 @@ $(addprefix $(objpfx), \
    $(filter-out $(tests-static) $(tests-reverse) unload, \
      $(tests) $(test-srcs))): $(objpfx)libpthread.so \
@@ -973,8 +934,8 @@
  else
  $(addprefix $(objpfx),$(tests) $(test-srcs)): $(objpfx)libpthread.a
  $(addprefix $(objpfx),$(librt-tests)): $(common-objpfx)rt/librt.a
---- glibc-20050303T1335/linuxthreads/cancel.c	22 Feb 2003 00:55:21 -0000	1.23
-+++ glibc-20050303T1335-fedora/linuxthreads/cancel.c	22 Sep 2004 21:20:55 -0000	1.23.2.1
+--- glibc-20050319T1907/linuxthreads/cancel.c	22 Feb 2003 00:55:21 -0000	1.23
++++ glibc-20050319T1907-fedora/linuxthreads/cancel.c	22 Sep 2004 21:20:55 -0000	1.23.2.1
 @@ -230,5 +230,6 @@ void __pthread_perform_cleanup(char *cur
      }
  
@@ -982,8 +943,8 @@
 +  THREAD_SETMEM (self, p_cancelstate, PTHREAD_CANCEL_DISABLE);
    __libc_thread_freeres ();
  }
---- glibc-20050303T1335/linuxthreads/lockfile.c	18 Dec 2002 01:16:46 -0000	1.10
-+++ glibc-20050303T1335-fedora/linuxthreads/lockfile.c	22 Sep 2004 21:20:55 -0000	1.10.2.1
+--- glibc-20050319T1907/linuxthreads/lockfile.c	18 Dec 2002 01:16:46 -0000	1.10
++++ glibc-20050319T1907-fedora/linuxthreads/lockfile.c	22 Sep 2004 21:20:55 -0000	1.10.2.1
 @@ -74,7 +74,11 @@ __fresetlockfiles (void)
    __pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE_NP);
  
@@ -997,8 +958,8 @@
  
    __pthread_mutexattr_destroy (&attr);
  
---- glibc-20050303T1335/linuxthreads/semaphore.h	17 Apr 2004 23:01:39 -0000	1.13
-+++ glibc-20050303T1335-fedora/linuxthreads/semaphore.h	22 Sep 2004 21:20:55 -0000	1.13.2.1
+--- glibc-20050319T1907/linuxthreads/semaphore.h	17 Apr 2004 23:01:39 -0000	1.13
++++ glibc-20050319T1907-fedora/linuxthreads/semaphore.h	22 Sep 2004 21:20:55 -0000	1.13.2.1
 @@ -21,6 +21,7 @@
  # define __need_timespec
  # include <time.h>
@@ -1007,8 +968,8 @@
  
  #ifndef _PTHREAD_DESCR_DEFINED
  /* Thread descriptors.  Needed for `sem_t' definition.  */
---- glibc-20050303T1335/linuxthreads/tst-tls1.h	2 Sep 2003 00:29:30 -0000	1.1
-+++ glibc-20050303T1335-fedora/linuxthreads/tst-tls1.h	22 Sep 2004 21:20:55 -0000	1.1.2.1
+--- glibc-20050319T1907/linuxthreads/tst-tls1.h	2 Sep 2003 00:29:30 -0000	1.1
++++ glibc-20050319T1907-fedora/linuxthreads/tst-tls1.h	22 Sep 2004 21:20:55 -0000	1.1.2.1
 @@ -2,7 +2,7 @@
  #include <stdlib.h>
  #include <tls.h>
@@ -1018,8 +979,8 @@
  
  struct tls_obj
  {
---- glibc-20050303T1335/linuxthreads/sysdeps/alpha/tls.h	9 Jan 2005 20:01:12 -0000	1.6
-+++ glibc-20050303T1335-fedora/linuxthreads/sysdeps/alpha/tls.h	8 Feb 2005 10:04:11 -0000	1.5.2.2
+--- glibc-20050319T1907/linuxthreads/sysdeps/alpha/tls.h	9 Jan 2005 20:01:12 -0000	1.6
++++ glibc-20050319T1907-fedora/linuxthreads/sysdeps/alpha/tls.h	8 Feb 2005 10:04:11 -0000	1.5.2.2
 @@ -58,54 +58,76 @@ typedef struct
  #  include <sysdep.h>
  
@@ -1109,8 +1070,8 @@
  
  /* Get the thread descriptor definition.  */
  #  include <linuxthreads/descr.h>
---- glibc-20050303T1335/linuxthreads/sysdeps/i386/tls.h	9 Jan 2005 20:01:13 -0000	1.38
-+++ glibc-20050303T1335-fedora/linuxthreads/sysdeps/i386/tls.h	8 Feb 2005 10:04:12 -0000	1.35.2.5
+--- glibc-20050319T1907/linuxthreads/sysdeps/i386/tls.h	9 Jan 2005 20:01:13 -0000	1.38
++++ glibc-20050319T1907-fedora/linuxthreads/sysdeps/i386/tls.h	8 Feb 2005 10:04:12 -0000	1.35.2.5
 @@ -86,7 +86,14 @@ typedef struct
  #  define TLS_INIT_TCB_ALIGN __alignof__ (tcbhead_t)
  
@@ -1127,8 +1088,8 @@
  
  /* Alignment requirements for the TCB.  */
  #  define TLS_TCB_ALIGN __alignof__ (struct _pthread_descr_struct)
---- glibc-20050303T1335/linuxthreads/sysdeps/ia64/tls.h	9 Jan 2005 20:01:13 -0000	1.10
-+++ glibc-20050303T1335-fedora/linuxthreads/sysdeps/ia64/tls.h	8 Feb 2005 10:04:14 -0000	1.9.2.2
+--- glibc-20050319T1907/linuxthreads/sysdeps/ia64/tls.h	9 Jan 2005 20:01:13 -0000	1.10
++++ glibc-20050319T1907-fedora/linuxthreads/sysdeps/ia64/tls.h	8 Feb 2005 10:04:14 -0000	1.9.2.2
 @@ -65,7 +65,14 @@ typedef struct
  #  define TLS_TCB_SIZE sizeof (tcbhead_t)
  
@@ -1145,19 +1106,8 @@
  
  /* Alignment requirements for the TCB.  */
  #  define TLS_TCB_ALIGN __alignof__ (struct _pthread_descr_struct)
---- glibc-20050303T1335/linuxthreads/sysdeps/powerpc/tcb-offsets.sym	13 Jan 2004 21:30:17 -0000	1.7
-+++ glibc-20050303T1335-fedora/linuxthreads/sysdeps/powerpc/tcb-offsets.sym	5 Mar 2005 13:03:35 -0000	1.7.2.1
-@@ -8,7 +8,7 @@
- -- Abuse tls.h macros to derive offsets relative to the thread register.
- #  undef __thread_register
- #  define __thread_register	((void *) 0)
--#  define thread_offsetof(mem)	((void *) &THREAD_SELF->p_##mem - (void *) 0)
-+#  define thread_offsetof(mem)	((ptrdiff_t) THREAD_SELF + offsetof (struct _pthread_descr_struct, p_##mem))
- 
- # else
- 
---- glibc-20050303T1335/linuxthreads/sysdeps/powerpc/tls.h	9 Jan 2005 20:01:14 -0000	1.9
-+++ glibc-20050303T1335-fedora/linuxthreads/sysdeps/powerpc/tls.h	8 Feb 2005 10:04:14 -0000	1.8.2.2
+--- glibc-20050319T1907/linuxthreads/sysdeps/powerpc/tls.h	9 Jan 2005 20:01:14 -0000	1.9
++++ glibc-20050319T1907-fedora/linuxthreads/sysdeps/powerpc/tls.h	8 Feb 2005 10:04:14 -0000	1.8.2.2
 @@ -69,11 +69,19 @@ typedef struct
  #  define TLS_TCB_ALIGN		__alignof__ (struct _pthread_descr_struct)
  
@@ -1180,8 +1130,8 @@
     TCB + 0x7000 (per the ABI).  This implies that TCB address is
     TP - 0x7000.  As we define TLS_DTV_AT_TP we can
     assume that the pthread_descr is allocated immediately ahead of the
---- glibc-20050303T1335/linuxthreads/sysdeps/pthread/Makefile	14 Aug 2003 00:14:22 -0000	1.7
-+++ glibc-20050303T1335-fedora/linuxthreads/sysdeps/pthread/Makefile	22 Sep 2004 21:20:56 -0000	1.7.2.1
+--- glibc-20050319T1907/linuxthreads/sysdeps/pthread/Makefile	14 Aug 2003 00:14:22 -0000	1.7
++++ glibc-20050319T1907-fedora/linuxthreads/sysdeps/pthread/Makefile	22 Sep 2004 21:20:56 -0000	1.7.2.1
 @@ -12,3 +12,15 @@ endif
  ifeq ($(subdir),posix)
  CFLAGS-confstr.c += -DLIBPTHREAD_VERSION="\"$(shell sed 's/\(.*\) by .*/\1/' ../linuxthreads/Banner)\""
@@ -1198,8 +1148,8 @@
 +	@echo '#define NPTL_STRUCT_PTHREAD_SIZE 0' > $@
 +endif
 +endif
---- glibc-20050303T1335/linuxthreads/sysdeps/pthread/nptl-struct-pthread.sym 1 Jan 1970 00:00:00 -0000
-+++ glibc-20050303T1335-fedora/linuxthreads/sysdeps/pthread/nptl-struct-pthread.sym	22 Sep 2004 21:20:56 -0000	1.1.2.1
+--- glibc-20050319T1907/linuxthreads/sysdeps/pthread/nptl-struct-pthread.sym 1 Jan 1970 00:00:00 -0000
++++ glibc-20050319T1907-fedora/linuxthreads/sysdeps/pthread/nptl-struct-pthread.sym	22 Sep 2004 21:20:56 -0000	1.1.2.1
 @@ -0,0 +1,13 @@
 +#ifdef HAVE_TLS_SUPPORT
 +# ifndef HAVE_FORCED_UNWIND
@@ -1214,8 +1164,8 @@
 +#ifdef HAVE_TLS_SUPPORT
 +NPTL_STRUCT_PTHREAD_SIZE	sizeof (struct pthread)
 +#endif
---- glibc-20050303T1335/linuxthreads/sysdeps/s390/tls.h	9 Jan 2005 20:01:14 -0000	1.4
-+++ glibc-20050303T1335-fedora/linuxthreads/sysdeps/s390/tls.h	8 Feb 2005 10:04:15 -0000	1.3.2.2
+--- glibc-20050319T1907/linuxthreads/sysdeps/s390/tls.h	9 Jan 2005 20:01:14 -0000	1.4
++++ glibc-20050319T1907-fedora/linuxthreads/sysdeps/s390/tls.h	8 Feb 2005 10:04:15 -0000	1.3.2.2
 @@ -77,7 +77,14 @@ typedef struct
  #  define TLS_INIT_TCB_ALIGN __alignof__ (tcbhead_t)
  
@@ -1232,8 +1182,8 @@
  
  /* Alignment requirements for the TCB.  */
  #  define TLS_TCB_ALIGN __alignof__ (struct _pthread_descr_struct)
---- glibc-20050303T1335/linuxthreads/sysdeps/sh/tls.h	9 Jan 2005 20:01:15 -0000	1.10
-+++ glibc-20050303T1335-fedora/linuxthreads/sysdeps/sh/tls.h	8 Feb 2005 10:04:15 -0000	1.9.2.2
+--- glibc-20050319T1907/linuxthreads/sysdeps/sh/tls.h	9 Jan 2005 20:01:15 -0000	1.10
++++ glibc-20050319T1907-fedora/linuxthreads/sysdeps/sh/tls.h	8 Feb 2005 10:04:15 -0000	1.9.2.2
 @@ -69,7 +69,14 @@ typedef struct
  #  define TLS_TCB_SIZE sizeof (tcbhead_t)
  
@@ -1250,8 +1200,8 @@
  
  /* Alignment requirements for the TCB.  */
  #  define TLS_TCB_ALIGN __alignof__ (struct _pthread_descr_struct)
---- glibc-20050303T1335/linuxthreads/sysdeps/sparc/tls.h	9 Jan 2005 20:01:15 -0000	1.4
-+++ glibc-20050303T1335-fedora/linuxthreads/sysdeps/sparc/tls.h	8 Feb 2005 10:04:16 -0000	1.3.2.2
+--- glibc-20050319T1907/linuxthreads/sysdeps/sparc/tls.h	9 Jan 2005 20:01:15 -0000	1.4
++++ glibc-20050319T1907-fedora/linuxthreads/sysdeps/sparc/tls.h	8 Feb 2005 10:04:16 -0000	1.3.2.2
 @@ -69,7 +69,14 @@ typedef struct
  #  define TLS_INIT_TCB_ALIGN __alignof__ (tcbhead_t)
  
@@ -1268,8 +1218,8 @@
  
  /* Alignment requirements for the TCB.  */
  #  define TLS_TCB_ALIGN __alignof__ (struct _pthread_descr_struct)
---- glibc-20050303T1335/linuxthreads/sysdeps/x86_64/tls.h	9 Jan 2005 20:01:15 -0000	1.7
-+++ glibc-20050303T1335-fedora/linuxthreads/sysdeps/x86_64/tls.h	8 Feb 2005 10:04:16 -0000	1.6.2.2
+--- glibc-20050319T1907/linuxthreads/sysdeps/x86_64/tls.h	9 Jan 2005 20:01:15 -0000	1.7
++++ glibc-20050319T1907-fedora/linuxthreads/sysdeps/x86_64/tls.h	8 Feb 2005 10:04:16 -0000	1.6.2.2
 @@ -71,7 +71,14 @@ typedef struct
  #  define TLS_INIT_TCB_ALIGN __alignof__ (tcbhead_t)
  
@@ -1286,8 +1236,8 @@
  
  /* Alignment requirements for the TCB.  */
  #  define TLS_TCB_ALIGN __alignof__ (struct _pthread_descr_struct)
---- glibc-20050303T1335/locale/iso-4217.def	10 Aug 2004 05:10:38 -0000	1.15
-+++ glibc-20050303T1335-fedora/locale/iso-4217.def	22 Sep 2004 21:20:57 -0000	1.15.2.1
+--- glibc-20050319T1907/locale/iso-4217.def	10 Aug 2004 05:10:38 -0000	1.15
++++ glibc-20050319T1907-fedora/locale/iso-4217.def	22 Sep 2004 21:20:57 -0000	1.15.2.1
 @@ -8,6 +8,7 @@
   *
   * !!! The list has to be sorted !!!
@@ -1379,8 +1329,8 @@
  DEFINE_INT_CURR("PYG")		/* Paraguay Guarani  */
  DEFINE_INT_CURR("QAR")		/* Qatar Rial  */
  DEFINE_INT_CURR("ROL")		/* Romanian Leu  */
---- glibc-20050303T1335/locale/programs/3level.h	13 Jun 2003 20:45:38 -0000	1.5
-+++ glibc-20050303T1335-fedora/locale/programs/3level.h	22 Sep 2004 21:20:58 -0000	1.5.2.1
+--- glibc-20050319T1907/locale/programs/3level.h	13 Jun 2003 20:45:38 -0000	1.5
++++ glibc-20050319T1907-fedora/locale/programs/3level.h	22 Sep 2004 21:20:58 -0000	1.5.2.1
 @@ -204,6 +204,42 @@ CONCAT(TABLE,_iterate) (struct TABLE *t,
  	}
      }
@@ -1424,8 +1374,8 @@
  #endif
  
  #ifndef NO_FINALIZE
---- glibc-20050303T1335/localedata/Makefile	7 Aug 2004 23:38:13 -0000	1.101
-+++ glibc-20050303T1335-fedora/localedata/Makefile	22 Sep 2004 21:20:58 -0000	1.101.2.1
+--- glibc-20050319T1907/localedata/Makefile	7 Aug 2004 23:38:13 -0000	1.101
++++ glibc-20050319T1907-fedora/localedata/Makefile	22 Sep 2004 21:20:58 -0000	1.101.2.1
 @@ -222,6 +222,7 @@ $(INSTALL-SUPPORTED-LOCALES): install-lo
  	echo -n '...'; \
  	input=`echo $$locale | sed 's/\([^.]*\)[^@]*\(.*\)/\1\2/'`; \
@@ -1434,9 +1384,9 @@
  		     -i locales/$$input -c -f charmaps/$$charset \
  		     $(addprefix --prefix=,$(install_root)) $$locale; \
  	echo ' done'; \
---- glibc-20050303T1335/localedata/SUPPORTED	31 Oct 2004 20:49:54 -0000	1.72
-+++ glibc-20050303T1335-fedora/localedata/SUPPORTED	2 Nov 2004 12:25:45 -0000	1.71.2.2
-@@ -63,6 +63,7 @@ cy_GB.UTF-8/UTF-8 \
+--- glibc-20050319T1907/localedata/SUPPORTED	18 Mar 2005 19:14:44 -0000	1.73
++++ glibc-20050319T1907-fedora/localedata/SUPPORTED	19 Mar 2005 20:18:04 -0000	1.71.2.3
+@@ -64,6 +64,7 @@ cy_GB.UTF-8/UTF-8 \
  cy_GB/ISO-8859-14 \
  da_DK.UTF-8/UTF-8 \
  da_DK/ISO-8859-1 \
@@ -1444,7 +1394,7 @@
  de_AT.UTF-8/UTF-8 \
  de_AT/ISO-8859-1 \
  de_AT@euro/ISO-8859-15 \
-@@ -89,6 +90,7 @@ en_DK.UTF-8/UTF-8 \
+@@ -90,6 +91,7 @@ en_DK.UTF-8/UTF-8 \
  en_DK/ISO-8859-1 \
  en_GB.UTF-8/UTF-8 \
  en_GB/ISO-8859-1 \
@@ -1452,7 +1402,7 @@
  en_HK.UTF-8/UTF-8 \
  en_HK/ISO-8859-1 \
  en_IE.UTF-8/UTF-8 \
-@@ -103,6 +105,7 @@ en_SG.UTF-8/UTF-8 \
+@@ -104,6 +106,7 @@ en_SG.UTF-8/UTF-8 \
  en_SG/ISO-8859-1 \
  en_US.UTF-8/UTF-8 \
  en_US/ISO-8859-1 \
@@ -1460,7 +1410,7 @@
  en_ZA.UTF-8/UTF-8 \
  en_ZA/ISO-8859-1 \
  en_ZW.UTF-8/UTF-8 \
-@@ -243,6 +246,8 @@ nl_NL/ISO-8859-1 \
+@@ -244,6 +247,8 @@ nl_NL/ISO-8859-1 \
  nl_NL@euro/ISO-8859-15 \
  nn_NO.UTF-8/UTF-8 \
  nn_NO/ISO-8859-1 \
@@ -1469,7 +1419,7 @@
  oc_FR/ISO-8859-1 \
  om_ET/UTF-8 \
  om_KE/ISO-8859-1 \
-@@ -280,6 +285,7 @@ sv_FI/ISO-8859-1 \
+@@ -281,6 +286,7 @@ sv_FI/ISO-8859-1 \
  sv_FI@euro/ISO-8859-15 \
  sv_SE.UTF-8/UTF-8 \
  sv_SE/ISO-8859-1 \
@@ -1477,8 +1427,8 @@
  ta_IN/UTF-8 \
  te_IN/UTF-8 \
  tg_TJ/KOI8-T \
---- glibc-20050303T1335/localedata/locales/cy_GB	28 Sep 2004 04:37:33 -0000	1.4
-+++ glibc-20050303T1335-fedora/localedata/locales/cy_GB	29 Sep 2004 08:48:23 -0000	1.3.2.2
+--- glibc-20050319T1907/localedata/locales/cy_GB	28 Sep 2004 04:37:33 -0000	1.4
++++ glibc-20050319T1907-fedora/localedata/locales/cy_GB	29 Sep 2004 08:48:23 -0000	1.3.2.2
 @@ -248,8 +248,11 @@ mon         "<U0049><U006F><U006E><U0061
  d_t_fmt     "<U0044><U0079><U0064><U0064><U0020><U0025><U0041><U0020><U0025><U0064><U0020><U006d><U0069><U0073><U0020><U0025><U0042><U0020><U0025><U0059><U0020><U0025><U0054><U0020><U0025><U005A>"
  d_fmt       "<U0025><U0064><U002E><U0025><U006D><U002E><U0025><U0079>"
@@ -1493,8 +1443,8 @@
  END LC_TIME
  
  LC_MESSAGES
---- glibc-20050303T1335/localedata/locales/en_GB	31 Oct 2004 23:42:26 -0000	1.12
-+++ glibc-20050303T1335-fedora/localedata/locales/en_GB	2 Nov 2004 12:25:47 -0000	1.10.2.2
+--- glibc-20050319T1907/localedata/locales/en_GB	31 Oct 2004 23:42:26 -0000	1.12
++++ glibc-20050319T1907-fedora/localedata/locales/en_GB	2 Nov 2004 12:25:47 -0000	1.10.2.2
 @@ -112,8 +112,8 @@ mon         "<U004A><U0061><U006E><U0075
  d_t_fmt     "<U0025><U0061><U0020><U0025><U0064><U0020><U0025><U0062><U0020><U0025><U0059><U0020><U0025><U0054><U0020><U0025><U005A>"
  d_fmt       "<U0025><U0064><U002F><U0025><U006D><U002F><U0025><U0079>"
@@ -1506,8 +1456,8 @@
  date_fmt	"<U0025><U0061><U0020><U0025><U0062><U0020><U0025><U0065>/
  <U0020><U0025><U0048><U003A><U0025><U004D><U003A><U0025><U0053><U0020>/
  <U0025><U005A><U0020><U0025><U0059>"
---- glibc-20050303T1335/localedata/locales/en_US	31 Oct 2004 23:42:26 -0000	1.9
-+++ glibc-20050303T1335-fedora/localedata/locales/en_US	2 Nov 2004 12:25:47 -0000	1.7.2.2
+--- glibc-20050319T1907/localedata/locales/en_US	31 Oct 2004 23:42:26 -0000	1.9
++++ glibc-20050319T1907-fedora/localedata/locales/en_US	2 Nov 2004 12:25:47 -0000	1.7.2.2
 @@ -100,7 +100,6 @@ mon	"<U004A><U0061><U006E><U0075><U0061>
  	"<U004F><U0063><U0074><U006F><U0062><U0065><U0072>";/
  	"<U004E><U006F><U0076><U0065><U006D><U0062><U0065><U0072>";/
@@ -1516,8 +1466,8 @@
  % Appropriate date and time representation (%c)
  %	"%a %d %b %Y %r %Z"
  d_t_fmt "<U0025><U0061><U0020><U0025><U0064><U0020><U0025><U0062><U0020><U0025><U0059><U0020><U0025><U0072><U0020><U0025><U005A>"
---- glibc-20050303T1335/localedata/locales/no_NO 1 Jan 1970 00:00:00 -0000
-+++ glibc-20050303T1335-fedora/localedata/locales/no_NO	22 Sep 2004 21:21:01 -0000	1.11.2.1
+--- glibc-20050319T1907/localedata/locales/no_NO 1 Jan 1970 00:00:00 -0000
++++ glibc-20050319T1907-fedora/localedata/locales/no_NO	22 Sep 2004 21:21:01 -0000	1.11.2.1
 @@ -0,0 +1,69 @@
 +escape_char	/
 +comment_char    %
@@ -1588,8 +1538,8 @@
 +LC_ADDRESS
 +copy "nb_NO"
 +END LC_ADDRESS
---- glibc-20050303T1335/localedata/locales/zh_TW	31 Oct 2004 23:42:28 -0000	1.7
-+++ glibc-20050303T1335-fedora/localedata/locales/zh_TW	2 Nov 2004 12:25:57 -0000	1.5.2.2
+--- glibc-20050319T1907/localedata/locales/zh_TW	31 Oct 2004 23:42:28 -0000	1.7
++++ glibc-20050319T1907-fedora/localedata/locales/zh_TW	2 Nov 2004 12:25:57 -0000	1.5.2.2
 @@ -1,7 +1,7 @@
  comment_char %
  escape_char /
@@ -1617,9 +1567,9 @@
  revision   "0.2"
  date       "2000-08-02"
  %
---- glibc-20050303T1335/nptl/ChangeLog	26 Feb 2005 01:34:15 -0000	1.765
-+++ glibc-20050303T1335-fedora/nptl/ChangeLog	3 Mar 2005 13:34:05 -0000	1.706.2.36
-@@ -529,6 +529,11 @@
+--- glibc-20050319T1907/nptl/ChangeLog	13 Mar 2005 03:28:56 -0000	1.766
++++ glibc-20050319T1907-fedora/nptl/ChangeLog	19 Mar 2005 20:18:06 -0000	1.706.2.37
+@@ -533,6 +533,11 @@
  	Move definition inside libpthread, libc, librt check.  Provide
  	definition for rtld.
  
@@ -1631,7 +1581,7 @@
  2004-09-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/alpha/jmpbuf-unwind.h: Define __libc_unwind_longjmp.
-@@ -2603,6 +2608,11 @@
+@@ -2607,6 +2612,11 @@
  
  	* Makefile [$(build-shared) = yes] (tests): Depend on $(test-modules).
  
@@ -1643,8 +1593,8 @@
  2003-07-25  Jakub Jelinek  <jakub@redhat.com>
  
  	* tst-cancel17.c (do_test): Check if aio_cancel failed.
---- glibc-20050303T1335/nptl/Makefile	22 Dec 2004 20:07:09 -0000	1.166
-+++ glibc-20050303T1335-fedora/nptl/Makefile	6 Jan 2005 14:57:04 -0000	1.157.2.9
+--- glibc-20050319T1907/nptl/Makefile	22 Dec 2004 20:07:09 -0000	1.166
++++ glibc-20050319T1907-fedora/nptl/Makefile	6 Jan 2005 14:57:04 -0000	1.157.2.9
 @@ -499,15 +499,19 @@ $(addprefix $(objpfx), \
      $(tests) $(xtests) $(test-srcs))): $(objpfx)libpthread.so \
  				       $(objpfx)libpthread_nonshared.a
@@ -1667,8 +1617,8 @@
  else
  $(addprefix $(objpfx),$(tests) $(test-srcs)): $(objpfx)libpthread.a
  endif
---- glibc-20050303T1335/nptl/descr.h	12 Nov 2004 01:24:24 -0000	1.25
-+++ glibc-20050303T1335-fedora/nptl/descr.h	12 Nov 2004 16:56:12 -0000	1.23.2.3
+--- glibc-20050319T1907/nptl/descr.h	12 Nov 2004 01:24:24 -0000	1.25
++++ glibc-20050319T1907-fedora/nptl/descr.h	12 Nov 2004 16:56:12 -0000	1.23.2.3
 @@ -27,9 +27,13 @@
  #include <sys/types.h>
  #include <hp-timing.h>
@@ -1683,8 +1633,8 @@
  #include "../nptl_db/thread_db.h"
  #include <tls.h>
  #ifdef HAVE_FORCED_UNWIND
---- glibc-20050303T1335/nptl/pthread_cond_destroy.c	2 Sep 2004 18:45:37 -0000	1.5
-+++ glibc-20050303T1335-fedora/nptl/pthread_cond_destroy.c	22 Sep 2004 21:21:01 -0000	1.5.2.1
+--- glibc-20050319T1907/nptl/pthread_cond_destroy.c	2 Sep 2004 18:45:37 -0000	1.5
++++ glibc-20050319T1907-fedora/nptl/pthread_cond_destroy.c	22 Sep 2004 21:21:01 -0000	1.5.2.1
 @@ -44,15 +44,35 @@ __pthread_cond_destroy (cond)
       broadcasted, but still are using the pthread_cond_t structure,
       pthread_cond_destroy needs to wait for them.  */
@@ -1726,8 +1676,8 @@
      }
  
    return 0;
---- glibc-20050303T1335/nptl/sysdeps/unix/sysv/linux/kernel-features.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20050303T1335-fedora/nptl/sysdeps/unix/sysv/linux/kernel-features.h	22 Sep 2004 21:21:02 -0000	1.1.2.1
+--- glibc-20050319T1907/nptl/sysdeps/unix/sysv/linux/kernel-features.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20050319T1907-fedora/nptl/sysdeps/unix/sysv/linux/kernel-features.h	22 Sep 2004 21:21:02 -0000	1.1.2.1
 @@ -0,0 +1,6 @@
 +#include_next <kernel-features.h>
 +
@@ -1735,8 +1685,8 @@
 +#ifndef __ASSUME_CLONE_THREAD_FLAGS
 +# define __ASSUME_CLONE_THREAD_FLAGS	1
 +#endif
---- glibc-20050303T1335/nscd/connections.c	22 Feb 2005 22:52:32 -0000	1.66
-+++ glibc-20050303T1335-fedora/nscd/connections.c	3 Mar 2005 13:34:09 -0000	1.55.2.7
+--- glibc-20050319T1907/nscd/connections.c	22 Feb 2005 22:52:32 -0000	1.66
++++ glibc-20050319T1907-fedora/nscd/connections.c	3 Mar 2005 13:34:09 -0000	1.55.2.7
 @@ -21,6 +21,7 @@
  #include <alloca.h>
  #include <assert.h>
@@ -1827,8 +1777,8 @@
 +    prune_cache (&dbs[hstdb], LONG_MAX);
 +}
 +
---- glibc-20050303T1335/nscd/nscd.c	7 Feb 2005 22:51:22 -0000	1.44
-+++ glibc-20050303T1335-fedora/nscd/nscd.c	8 Feb 2005 10:04:34 -0000	1.38.2.5
+--- glibc-20050319T1907/nscd/nscd.c	7 Feb 2005 22:51:22 -0000	1.44
++++ glibc-20050319T1907-fedora/nscd/nscd.c	8 Feb 2005 10:04:34 -0000	1.38.2.5
 @@ -122,9 +122,16 @@ static struct argp argp =
    options, parse_opt, NULL, doc,
  };
@@ -1854,8 +1804,8 @@
    signal (SIGPIPE, SIG_IGN);
  
    /* Cleanup files created by a previous 'bind'.  */
---- glibc-20050303T1335/nscd/nscd.conf	3 Oct 2004 21:09:23 -0000	1.10
-+++ glibc-20050303T1335-fedora/nscd/nscd.conf	4 Oct 2004 08:56:17 -0000	1.8.2.2
+--- glibc-20050319T1907/nscd/nscd.conf	3 Oct 2004 21:09:23 -0000	1.10
++++ glibc-20050319T1907-fedora/nscd/nscd.conf	4 Oct 2004 08:56:17 -0000	1.8.2.2
 @@ -31,8 +31,8 @@
  #	logfile			/var/log/nscd.log
  #	threads			6
@@ -1867,8 +1817,8 @@
  	debug-level		0
  #	reload-count		5
  	paranoia		no
---- glibc-20050303T1335/nscd/nscd_conf.c	3 Oct 2004 21:10:35 -0000	1.16
-+++ glibc-20050303T1335-fedora/nscd/nscd_conf.c	4 Oct 2004 08:56:17 -0000	1.14.2.2
+--- glibc-20050319T1907/nscd/nscd_conf.c	3 Oct 2004 21:10:35 -0000	1.16
++++ glibc-20050319T1907-fedora/nscd/nscd_conf.c	4 Oct 2004 08:56:17 -0000	1.14.2.2
 @@ -230,7 +230,10 @@ nscd_parse_file (const char *fname, stru
  		if (strcmp (arg2, "no") == 0)
  		  dbs[cnt].shared = 0;
@@ -1881,8 +1831,8 @@
  		break;
  	      }
  	  if (cnt == lastdb)
---- glibc-20050303T1335/posix/Makefile	23 Feb 2005 02:45:27 -0000	1.183
-+++ glibc-20050303T1335-fedora/posix/Makefile	3 Mar 2005 13:34:10 -0000	1.171.2.11
+--- glibc-20050319T1907/posix/Makefile	23 Feb 2005 02:45:27 -0000	1.183
++++ glibc-20050319T1907-fedora/posix/Makefile	3 Mar 2005 13:34:10 -0000	1.171.2.11
 @@ -105,7 +105,8 @@ generated := $(addprefix wordexp-test-re
  	     bug-regex21-mem bug-regex21.mtrace \
  	     tst-rxspencer-mem tst-rxspencer.mtrace tst-getconf.out \
@@ -1916,8 +1866,8 @@
 +	  | sed -n -e '/START_OF_STRINGS/,$${/POSIX_V6_/{s/^[^"]*"//;s/".*$$//;p}}' \
 +	  > $@.new
 +	mv -f $@.new $@
---- glibc-20050303T1335/posix/getconf.speclist.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20050303T1335-fedora/posix/getconf.speclist.h	13 Dec 2004 23:32:37 -0000	1.1.2.2
+--- glibc-20050319T1907/posix/getconf.speclist.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20050319T1907-fedora/posix/getconf.speclist.h	13 Dec 2004 23:32:37 -0000	1.1.2.2
 @@ -0,0 +1,15 @@
 +#include <unistd.h>
 +const char *START_OF_STRINGS =
@@ -1934,62 +1884,71 @@
 +"POSIX_V6_LPBIG_OFFBIG"
 +#endif
 +"";
---- glibc-20050303T1335/posix/bits/unistd.h	1 Mar 2005 21:33:42 -0000	1.3
-+++ glibc-20050303T1335-fedora/posix/bits/unistd.h	3 Mar 2005 16:52:27 -0000	1.3.2.2
-@@ -21,64 +21,44 @@
+--- glibc-20050319T1907/posix/bits/unistd.h	19 Mar 2005 00:13:23 -0000	1.7
++++ glibc-20050319T1907-fedora/posix/bits/unistd.h	19 Mar 2005 20:18:07 -0000	1.3.2.3
+@@ -21,25 +21,19 @@
  # error "Never include <bits/unistd.h> directly; use <unistd.h> instead."
  #endif
  
 -extern ssize_t __read_chk (int __fd, void *__buf, size_t __nbytes,
 -			   size_t __buflen) __wur;
-+extern void __chk_fail (void) __attribute__((noreturn));
- #define read(fd, buf, nbytes) \
--  (__bos0 (buf) != (size_t) -1						      \
--   && (!__builtin_constant_p (nbytes) || (nbytes) > __bos0 (buf))	      \
--   ? __read_chk (fd, buf, nbytes, __bos0 (buf))				      \
--   : read (fd, buf, nbytes))
-+  (__extension__							      \
-+    ({ size_t __nbytes_val = (nbytes);			  		      \
-+       if (__bos0 (buf) != (size_t) -1 && __bos0 (buf) < __nbytes_val)	      \
-+         __chk_fail ();							      \
-+       read (fd, buf, __nbytes_val); }))
++extern void __chk_fail (void) __attribute__((__noreturn__));
+ extern ssize_t __REDIRECT (__read_alias, (int __fd, void *__buf,
+ 					  size_t __nbytes), read) __wur;
+ 
+ extern __always_inline __wur ssize_t
+ read (int __fd, void *__buf, size_t __nbytes)
+ {
+-  if (__bos0 (__buf) != (size_t) -1
+-      && (!__builtin_constant_p (__nbytes) || __nbytes > __bos0 (__buf)))
+-    return __read_chk (__fd, __buf, __nbytes, __bos0 (__buf));
++  if (__bos0 (__buf) != (size_t) -1 && __nbytes > __bos0 (__buf))
++    __chk_fail ();
+   return __read_alias (__fd, __buf, __nbytes);
+ }
  
  #ifdef __USE_UNIX98
 -extern ssize_t __pread_chk (int __fd, void *__buf, size_t __nbytes,
 -			    __off_t __offset, size_t __bufsize) __wur;
 -extern ssize_t __pread64_chk (int __fd, void *__buf, size_t __nbytes,
 -			      __off64_t __offset, size_t __bufsize) __wur;
--# ifndef __USE_FILE_OFFSET64
--#  define pread(fd, buf, nbytes, offset) \
--  (__bos0 (buf) != (size_t) -1						      \
--   && (!__builtin_constant_p (nbytes) || (nbytes) > __bos0 (buf))	      \
--   ? __pread64_chk (fd, buf, nbytes, offset, __bos0 (buf))		      \
--   : pread (fd, buf, offset, nbytes))
--# else
--#  define pread(fd, buf, nbytes, offset) \
--  (__bos0 (buf) != (size_t) -1						      \
--   && (!__builtin_constant_p (nbytes) || (nbytes) > __bos0 (buf))	      \
--   ? __pread_chk (fd, buf, nbytes, offset, __bos0 (buf))		      \
--   : pread (fd, buf, offset, nbytes))
--# endif
-+# define pread(fd, buf, nbytes, offset) \
-+  (__extension__							      \
-+    ({ size_t __nbytes_val = (nbytes);			  		      \
-+       if (__bos0 (buf) != (size_t) -1 && __bos0 (buf) < __nbytes_val)	      \
-+         __chk_fail ();							      \
-+       pread (fd, buf, __nbytes_val, offset); }))
- 
- # ifdef __USE_LARGEFILE64
- #  define pread64(fd, buf, nbytes, offset) \
--  (__bos0 (buf) != (size_t) -1						      \
--   && (!__builtin_constant_p (nbytes) || (nbytes) > __bos0 (buf))	      \
--   ? __pread64_chk (fd, buf, nbytes, offset, __bos0 (buf))		      \
--   : pread64 (fd, buf, offset, nbytes))
-+  (__extension__							      \
-+    ({ size_t __nbytes_val = (nbytes);			  		      \
-+       if (__bos0 (buf) != (size_t) -1 && __bos0 (buf) < __nbytes_val)	      \
-+         __chk_fail ();							      \
-+       pread64 (fd, buf, __nbytes_val, offset); }))
+ extern ssize_t __REDIRECT (__pread_alias,
+ 			   (int __fd, void *__buf, size_t __nbytes,
+ 			    __off_t __offset), pread) __wur;
+@@ -51,18 +45,16 @@ extern ssize_t __REDIRECT (__pread64_ali
+ extern __always_inline __wur ssize_t
+ pread (int __fd, void *__buf, size_t __nbytes, __off_t __offset)
+ {
+-  if (__bos0 (__buf) != (size_t) -1
+-      && (!__builtin_constant_p (__nbytes) || __nbytes > __bos0 (__buf)))
+-    return __pread_chk (__fd, __buf, __nbytes, __offset, __bos0 (__buf));
++  if (__bos0 (__buf) != (size_t) -1 && __nbytes > __bos0 (__buf))
++    __chk_fail ();
+   return __pread_alias (__fd, __buf, __nbytes, __offset);
+ }
+ # else
+ extern __always_inline __wur ssize_t
+ pread (int __fd, void *__buf, size_t __nbytes, __off_t __offset)
+ {
+-  if (__bos0 (__buf) != (size_t) -1
+-      && (!__builtin_constant_p (__nbytes) || __nbytes > __bos0 (__buf)))
+-    return __pread64_chk (__fd, __buf, __nbytes, __offset, __bos0 (__buf));
++  if (__bos0 (__buf) != (size_t) -1 && __nbytes > __bos0 (__buf))
++    __chk_fail ();
+   return __pread64_alias (__fd, __buf, __nbytes, __offset);
+ }
+ # endif
+@@ -71,19 +63,14 @@ pread (int __fd, void *__buf, size_t __n
+ extern __always_inline __wur ssize_t
+ pread64 (int __fd, void *__buf, size_t __nbytes, __off64_t __offset)
+ {
+-  if (__bos0 (__buf) != (size_t) -1
+-      && (!__builtin_constant_p (__nbytes) || __nbytes > __bos0 (__buf)))
+-    return __pread64_chk (__fd, __buf, __nbytes, __offset, __bos0 (__buf));
++  if (__bos0 (__buf) != (size_t) -1 && __nbytes > __bos0 (__buf))
++    __chk_fail ();
+   return __pread64_alias (__fd, __buf, __nbytes, __offset);
+ }
  # endif
  #endif
  
@@ -1998,83 +1957,96 @@
 -			   char *__restrict __buf, size_t __len,
 -			   size_t __buflen)
 -     __THROW __nonnull ((1, 2)) __wur;
- # define readlink(path, buf, len) \
--  (__bos (buf) != (size_t) -1						      \
--   && (!__builtin_constant_p (len) || (len) > __bos (buf))		      \
--   ? __readlink_chk (path, buf, len, __bos (buf))			      \
--   : readlink (path, buf, len))
-+  (__extension__							      \
-+    ({ size_t __len_val = (len);			  		      \
-+       if (__bos (buf) != (size_t) -1 && __bos (buf) < __len_val)	      \
-+         __chk_fail ();							      \
-+       readlink (path, buf, __len_val); }))
+ extern int __REDIRECT_NTH (__readlink_alias,
+ 			   (__const char *__restrict __path,
+ 			    char *__restrict __buf, size_t __len), readlink)
+@@ -93,38 +80,19 @@ extern __always_inline __nonnull ((1, 2)
+ __NTH (readlink (__const char *__restrict __path, char *__restrict __buf,
+ 		 size_t __len))
+ {
+-  if (__bos (__buf) != (size_t) -1
+-      && (!__builtin_constant_p (__len) || __len > __bos (__buf)))
+-    return __readlink_chk (__path, __buf, __len, __bos (__buf));
++  if (__bos (__buf) != (size_t) -1 && __len > __bos (__buf))
++    __chk_fail ();
+   return __readlink_alias (__path, __buf, __len);
+ }
  #endif
  
 -extern char *__getcwd_chk (char *__buf, size_t __size, size_t __buflen)
 -     __THROW __wur;
- #define getcwd(buf, size) \
--  (__bos (buf) != (size_t) -1						      \
--   && (!__builtin_constant_p (size) || (size) > __bos (buf))		      \
--   ? __getcwd_chk (buf, size, buflen) : getcwd (buf, size))
+ extern char *__REDIRECT_NTH (__getcwd_alias,
+ 			     (char *__buf, size_t __size), getcwd) __wur;
+ 
+ extern __always_inline __wur char *
+ __NTH (getcwd (char *__buf, size_t __size))
+ {
+-  if (__bos (__buf) != (size_t) -1
+-      && (!__builtin_constant_p (__size) || __size > __bos (__buf)))
+-    return __getcwd_chk (__buf, __size, __bos (__buf));
++  if (__bos (__buf) != (size_t) -1 && __size > __bos (__buf))
++    __chk_fail ();
+   return __getcwd_alias (__buf, __size);
+ }
 -
 -#if defined __USE_BSD || defined __USE_XOPEN_EXTENDED
 -extern char *__getwd_chk (char *__buf, size_t buflen)
--     __THROW __nonnull ((1)) __attribute_deprecated__ __wur;
--#define getwd(buf) \
--  (__bos (buf) != (size_t) -1 ? __getwd_chk (buf, buflen) : getwd (buf))
+-     __THROW __nonnull ((1)) __wur;
+-extern char *__REDIRECT_NTH (__getwd_alias, (char *__buf), getwd)
+-     __nonnull ((1)) __wur;
+-
+-extern __always_inline __nonnull ((1)) __attribute_deprecated__ __wur char *
+-__NTH (getwd (char *__buf))
+-{
+-  if (__bos (__buf) != (size_t) -1)
+-    return __getwd_chk (__buf, __bos (__buf));
+-  return __getwd_alias (__buf);
+-}
 -#endif
-+  (__extension__							      \
-+    ({ size_t __size_val = (size);			  		      \
-+       if (__bos (buf) != (size_t) -1 && __bos (buf) < __size_val)	      \
-+         __chk_fail ();							      \
-+       getcwd (buf, __size_val); }))
---- glibc-20050303T1335/socket/bits/socket2.h	1 Mar 2005 21:33:39 -0000	1.2
-+++ glibc-20050303T1335-fedora/socket/bits/socket2.h	6 Mar 2005 23:34:29 -0000	1.2.2.4
-@@ -21,18 +21,17 @@
+--- glibc-20050319T1907/socket/bits/socket2.h	19 Mar 2005 00:13:57 -0000	1.5
++++ glibc-20050319T1907-fedora/socket/bits/socket2.h	19 Mar 2005 20:18:08 -0000	1.2.2.5
+@@ -21,24 +21,18 @@
  # error "Never include <bits/socket2.h> directly; use <sys/socket.h> instead."
  #endif
  
 -extern ssize_t __recv_chk (int __fd, void *__buf, size_t __n, size_t __buflen,
 -			   int __flags);
-+extern void __chk_fail (void) __attribute__((noreturn));
- #define recv(fd, buf, n, flags) \
--  (__bos0 (buf) != (size_t) -1						      \
--   ? __recv_chk (fd, buf, n, __bos0 (buf), flags)			      \
--   : recv (fd, buf, n, flags))
-+  (__extension__							      \
-+    ({ size_t __n_val = (n);				  		      \
-+       if (__bos0 (buf) != (size_t) -1 && __bos0 (buf) < __n_val)	      \
-+         __chk_fail ();							      \
-+       recv ((fd), (buf), __n_val, (flags)); }))
++extern void __chk_fail (void) __attribute__((__noreturn__));
+ extern ssize_t __REDIRECT (__recv_alias, (int __fd, void *__buf, size_t __n,
+ 					  int __flags), recv);
+ 
+ extern __always_inline ssize_t
+ recv (int __fd, void *__buf, size_t __n, int __flags)
+ {
+-  if (__bos0 (__buf) != (size_t) -1
+-      && (!__builtin_constant_p (__n) || __n > __bos0 (__buf)))
+-    return __recv_chk (__fd, __buf, __n, __bos0 (__buf), __flags);
++  if (__bos0 (__buf) != (size_t) -1 && __n > __bos0 (__buf))
++    __chk_fail ();
+   return __recv_alias (__fd, __buf, __n, __flags);
+ }
  
 -extern ssize_t __recvfrom_chk (int __fd, void *__restrict __buf, size_t __n,
 -			       size_t __buflen, int __flags,
 -			       __SOCKADDR_ARG __addr,
 -			       socklen_t *__restrict __addr_len);
- #define recvfrom(fd, buf, n, flags, addr, addr_len) \
--  (__bos0 (buf) != (size_t) -1						      \
--   ? __recvfrom_chk (fd, buf, n, __bos0 (buf), flags, addr, addr_len)	      \
--   : recvfrom (fd, buf, n, flags, addr, addr_len))
-+  (__extension__							      \
-+    ({ size_t __n_val = (n);				  		      \
-+       if (__bos0 (buf) != (size_t) -1 && __bos0 (buf) < __n_val)	      \
-+         __chk_fail ();							      \
-+       recvfrom ((fd), (buf), __n_val, (flags), (addr), (addr_len)); }))
---- glibc-20050303T1335/sysdeps/arm/dl-machine.h	1 Mar 2005 20:34:40 -0000	1.50
-+++ glibc-20050303T1335-fedora/sysdeps/arm/dl-machine.h	5 Mar 2005 13:03:35 -0000	1.48.2.3
-@@ -353,9 +353,7 @@ elf_machine_plt_value (struct link_map *
- 
- /* ARM never uses Elf32_Rela relocations for the dynamic linker.
-    Prelinked libraries may use Elf32_Rela though.  */
--#ifdef RTLD_BOOTSTRAP
--# define ELF_MACHINE_NO_RELA 1
--#endif
-+#define ELF_MACHINE_NO_RELA (defined RTLD_BOOTSTRAP)
- 
- #ifdef RESOLVE
- 
---- glibc-20050303T1335/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
-+++ glibc-20050303T1335-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
+ extern ssize_t __REDIRECT (__recvfrom_alias,
+ 			   (int __fd, void *__restrict __buf, size_t __n,
+ 			    int __flags, __SOCKADDR_ARG __addr,
+@@ -48,9 +42,7 @@ extern __always_inline ssize_t
+ recvfrom (int __fd, void *__buf, size_t __n, int __flags,
+ 	  __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len)
+ {
+-  if (__bos0 (__buf) != (size_t) -1
+-      && (!__builtin_constant_p (__n) || __n > __bos0 (__buf)))
+-    return __recvfrom_chk (__fd, __buf, __n, __bos0 (__buf), __flags,
+-			   __addr, __addr_len);
++  if (__bos0 (__buf) != (size_t) -1 && __n > __bos0 (__buf))
++    __chk_fail ();
+   return __recvfrom_alias (__fd, __buf, __n, __flags, __addr, __addr_len);
+ }
+--- glibc-20050319T1907/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
++++ glibc-20050319T1907-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
 @@ -36,6 +36,14 @@
  # define add_system_dir(dir) add_dir (dir)
  #endif
@@ -2090,21 +2062,8 @@
  #define CACHEMAGIC "ld.so-1.7.0"
  
  /* libc5 and glibc 2.0/2.1 use the same format.  For glibc 2.2 another
---- glibc-20050303T1335/sysdeps/i386/dl-machine.h	17 Feb 2005 01:16:33 -0000	1.133
-+++ glibc-20050303T1335-fedora/sysdeps/i386/dl-machine.h	5 Mar 2005 13:03:35 -0000	1.127.2.4
-@@ -301,9 +301,7 @@ elf_machine_plt_value (struct link_map *
- 
- /* The i386 never uses Elf32_Rela relocations for the dynamic linker.
-    Prelinked libraries may use Elf32_Rela though.  */
--#ifdef RTLD_BOOTSTRAP
--# define ELF_MACHINE_NO_RELA 1
--#endif
-+#define ELF_MACHINE_NO_RELA (defined RTLD_BOOTSTRAP)
- 
- #ifdef RESOLVE_MAP
- 
---- glibc-20050303T1335/sysdeps/i386/bits/atomic.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20050303T1335-fedora/sysdeps/i386/bits/atomic.h	5 Oct 2004 12:09:44 -0000	1.1.2.3
+--- glibc-20050319T1907/sysdeps/i386/bits/atomic.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20050319T1907-fedora/sysdeps/i386/bits/atomic.h	5 Oct 2004 12:09:44 -0000	1.1.2.3
 @@ -0,0 +1,410 @@
 +/* Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
 +   This file is part of the GNU C Library.
@@ -2516,15 +2475,15 @@
 +
 +
 +#define atomic_delay() asm ("rep; nop")
---- glibc-20050303T1335/sysdeps/i386/i486/Makefile 1 Jan 1970 00:00:00 -0000
-+++ glibc-20050303T1335-fedora/sysdeps/i386/i486/Makefile	5 Mar 2005 13:03:35 -0000	1.1.2.1
+--- glibc-20050319T1907/sysdeps/i386/i486/Makefile 1 Jan 1970 00:00:00 -0000
++++ glibc-20050319T1907-fedora/sysdeps/i386/i486/Makefile	5 Mar 2005 13:03:35 -0000	1.1.2.1
 @@ -0,0 +1,4 @@
 +# Temporary workaround for GCC4 PR debug/19345
 +ifeq ($(subdir),string)
 +CFLAGS-string-inlines.c += -g0
 +endif
---- glibc-20050303T1335/sysdeps/ia64/Makefile	16 Aug 2004 06:46:14 -0000	1.10
-+++ glibc-20050303T1335-fedora/sysdeps/ia64/Makefile	22 Sep 2004 21:21:07 -0000	1.10.2.1
+--- glibc-20050319T1907/sysdeps/ia64/Makefile	16 Aug 2004 06:46:14 -0000	1.10
++++ glibc-20050319T1907-fedora/sysdeps/ia64/Makefile	22 Sep 2004 21:21:07 -0000	1.10.2.1
 @@ -12,8 +12,8 @@ elide-routines.os += hp-timing
  
  ifeq (yes,$(build-shared))
@@ -2536,8 +2495,8 @@
  endif
  endif
  
---- glibc-20050303T1335/sysdeps/ia64/ia64libgcc.S	11 May 2002 05:12:35 -0000	1.2
-+++ glibc-20050303T1335-fedora/sysdeps/ia64/ia64libgcc.S	22 Sep 2004 21:21:07 -0000	1.2.2.1
+--- glibc-20050319T1907/sysdeps/ia64/ia64libgcc.S	11 May 2002 05:12:35 -0000	1.2
++++ glibc-20050319T1907-fedora/sysdeps/ia64/ia64libgcc.S	22 Sep 2004 21:21:07 -0000	1.2.2.1
 @@ -1,350 +0,0 @@
 -/* From the Intel IA-64 Optimization Guide, choose the minimum latency
 -   alternative.  */
@@ -2889,8 +2848,8 @@
 -	.symver	___multi3, __multi3@GLIBC_2.2
 -
 -#endif
---- glibc-20050303T1335/sysdeps/ia64/libgcc-compat.c 1 Jan 1970 00:00:00 -0000
-+++ glibc-20050303T1335-fedora/sysdeps/ia64/libgcc-compat.c	22 Sep 2004 21:21:08 -0000	1.1.2.1
+--- glibc-20050319T1907/sysdeps/ia64/libgcc-compat.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20050319T1907-fedora/sysdeps/ia64/libgcc-compat.c	22 Sep 2004 21:21:08 -0000	1.1.2.1
 @@ -0,0 +1,84 @@
 +/* pre-.hidden libgcc compatibility
 +   Copyright (C) 2002 Free Software Foundation, Inc.
@@ -2976,8 +2935,8 @@
 +symbol_version (INTUSE (__multi3), __multi3, GLIBC_2.2);
 +
 +#endif
---- glibc-20050303T1335/sysdeps/unix/nice.c	28 Sep 2002 19:13:13 -0000	1.6
-+++ glibc-20050303T1335-fedora/sysdeps/unix/nice.c	22 Sep 2004 21:21:08 -0000	1.6.2.1
+--- glibc-20050319T1907/sysdeps/unix/nice.c	28 Sep 2002 19:13:13 -0000	1.6
++++ glibc-20050319T1907-fedora/sysdeps/unix/nice.c	22 Sep 2004 21:21:08 -0000	1.6.2.1
 @@ -41,7 +41,12 @@ nice (int incr)
  	__set_errno (save);
      }
@@ -2992,8 +2951,8 @@
    if (result != -1)
      return getpriority (PRIO_PROCESS, 0);
    else
---- glibc-20050303T1335/sysdeps/unix/sysv/linux/paths.h	15 Nov 2000 23:06:47 -0000	1.11
-+++ glibc-20050303T1335-fedora/sysdeps/unix/sysv/linux/paths.h	22 Sep 2004 21:21:08 -0000	1.11.4.1
+--- glibc-20050319T1907/sysdeps/unix/sysv/linux/paths.h	15 Nov 2000 23:06:47 -0000	1.11
++++ glibc-20050319T1907-fedora/sysdeps/unix/sysv/linux/paths.h	22 Sep 2004 21:21:08 -0000	1.11.4.1
 @@ -61,7 +61,7 @@
  #define	_PATH_TTY	"/dev/tty"
  #define	_PATH_UNIX	"/boot/vmlinux"
@@ -3003,8 +2962,8 @@
  #define _PATH_WTMP	"/var/log/wtmp"
  
  /* Provide trailing slash, since mostly used for building pathnames. */
---- glibc-20050303T1335/sysdeps/unix/sysv/linux/readonly-area.c	18 Oct 2004 04:17:11 -0000	1.1
-+++ glibc-20050303T1335-fedora/sysdeps/unix/sysv/linux/readonly-area.c	20 Oct 2004 11:04:51 -0000	1.1.2.2
+--- glibc-20050319T1907/sysdeps/unix/sysv/linux/readonly-area.c	18 Oct 2004 04:17:11 -0000	1.1
++++ glibc-20050319T1907-fedora/sysdeps/unix/sysv/linux/readonly-area.c	20 Oct 2004 11:04:51 -0000	1.1.2.2
 @@ -33,7 +33,10 @@ __readonly_area (const char *ptr, size_t
  
    FILE *fp = fopen ("/proc/self/maps", "rc");
@@ -3017,8 +2976,8 @@
  
    /* We need no locking.  */
    __fsetlocking (fp, FSETLOCKING_BYCALLER);
---- glibc-20050303T1335/sysdeps/unix/sysv/linux/tcsetattr.c	10 Sep 2003 19:16:07 -0000	1.16
-+++ glibc-20050303T1335-fedora/sysdeps/unix/sysv/linux/tcsetattr.c	22 Sep 2004 21:21:08 -0000	1.16.2.1
+--- glibc-20050319T1907/sysdeps/unix/sysv/linux/tcsetattr.c	10 Sep 2003 19:16:07 -0000	1.16
++++ glibc-20050319T1907-fedora/sysdeps/unix/sysv/linux/tcsetattr.c	22 Sep 2004 21:21:08 -0000	1.16.2.1
 @@ -49,6 +49,7 @@ tcsetattr (fd, optional_actions, termios
  {
    struct __kernel_termios k_termios;
@@ -3064,8 +3023,8 @@
 +  return retval;
  }
  libc_hidden_def (tcsetattr)
---- glibc-20050303T1335/sysdeps/unix/sysv/linux/alpha/bits/termios.h	31 Mar 2004 08:53:28 -0000	1.7
-+++ glibc-20050303T1335-fedora/sysdeps/unix/sysv/linux/alpha/bits/termios.h	11 Feb 2005 09:07:59 -0000	1.7.2.1
+--- glibc-20050319T1907/sysdeps/unix/sysv/linux/alpha/bits/termios.h	31 Mar 2004 08:53:28 -0000	1.7
++++ glibc-20050319T1907-fedora/sysdeps/unix/sysv/linux/alpha/bits/termios.h	11 Feb 2005 09:07:59 -0000	1.7.2.1
 @@ -1,5 +1,5 @@
  /* termios type and macro definitions.  Linux version.
 -   Copyright (C) 1993,1994,1995,1996,1997,1999,2003
@@ -3192,8 +3151,8 @@
  #define IEXTEN	0x00000400
  
  /* Values for the ACTION argument to `tcflow'.  */
---- glibc-20050303T1335/sysdeps/unix/sysv/linux/bits/termios.h	31 Mar 2004 08:53:29 -0000	1.10
-+++ glibc-20050303T1335-fedora/sysdeps/unix/sysv/linux/bits/termios.h	11 Feb 2005 09:08:00 -0000	1.10.2.1
+--- glibc-20050319T1907/sysdeps/unix/sysv/linux/bits/termios.h	31 Mar 2004 08:53:29 -0000	1.10
++++ glibc-20050319T1907-fedora/sysdeps/unix/sysv/linux/bits/termios.h	11 Feb 2005 09:08:00 -0000	1.10.2.1
 @@ -1,5 +1,5 @@
  /* termios type and macro definitions.  Linux version.
 -   Copyright (C) 1993,1994,1995,1996,1997,1998,1999,2003
@@ -3209,8 +3168,8 @@
  # define CRTSCTS  020000000000		/* flow control */
  #endif
  
---- glibc-20050303T1335/sysdeps/unix/sysv/linux/i386/dl-cache.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20050303T1335-fedora/sysdeps/unix/sysv/linux/i386/dl-cache.h	22 Sep 2004 21:21:08 -0000	1.1.2.1
+--- glibc-20050319T1907/sysdeps/unix/sysv/linux/i386/dl-cache.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20050319T1907-fedora/sysdeps/unix/sysv/linux/i386/dl-cache.h	22 Sep 2004 21:21:08 -0000	1.1.2.1
 @@ -0,0 +1,59 @@
 +/* Support for reading /etc/ld.so.cache files written by Linux ldconfig.
 +   Copyright (C) 2004 Free Software Foundation, Inc.
@@ -3271,8 +3230,8 @@
 +  } while (0)
 +
 +#include_next <dl-cache.h>
---- glibc-20050303T1335/sysdeps/unix/sysv/linux/ia64/dl-cache.h	6 Jul 2001 04:56:17 -0000	1.2
-+++ glibc-20050303T1335-fedora/sysdeps/unix/sysv/linux/ia64/dl-cache.h	22 Sep 2004 21:21:09 -0000	1.2.4.1
+--- glibc-20050319T1907/sysdeps/unix/sysv/linux/ia64/dl-cache.h	6 Jul 2001 04:56:17 -0000	1.2
++++ glibc-20050319T1907-fedora/sysdeps/unix/sysv/linux/ia64/dl-cache.h	22 Sep 2004 21:21:09 -0000	1.2.4.1
 @@ -22,4 +22,31 @@
  #define _dl_cache_check_flags(flags) \
    ((flags) == _DL_CACHE_DEFAULT_ID)
@@ -3305,29 +3264,29 @@
 +  } while (0)
 +
  #include_next <dl-cache.h>
---- glibc-20050303T1335/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c 1 Jan 1970 00:00:00 -0000
-+++ glibc-20050303T1335-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c	22 Sep 2004 21:21:09 -0000	1.1.2.1
+--- glibc-20050319T1907/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20050319T1907-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c	22 Sep 2004 21:21:09 -0000	1.1.2.1
 @@ -0,0 +1,5 @@
 +#ifdef IS_IN_ldconfig
 +#include <sysdeps/i386/dl-procinfo.c>
 +#else
 +#include <sysdeps/generic/dl-procinfo.c>
 +#endif
---- glibc-20050303T1335/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20050303T1335-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h	22 Sep 2004 21:21:09 -0000	1.1.2.1
+--- glibc-20050319T1907/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20050319T1907-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h	22 Sep 2004 21:21:09 -0000	1.1.2.1
 @@ -0,0 +1,5 @@
 +#ifdef IS_IN_ldconfig
 +#include <sysdeps/unix/sysv/linux/i386/dl-procinfo.h>
 +#else
 +#include <sysdeps/generic/dl-procinfo.h>
 +#endif
---- glibc-20050303T1335/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	17 Jan 2002 06:49:28 -0000	1.2
-+++ glibc-20050303T1335-fedora/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	22 Sep 2004 21:21:09 -0000	1.2.2.1
+--- glibc-20050319T1907/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	17 Jan 2002 06:49:28 -0000	1.2
++++ glibc-20050319T1907-fedora/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	22 Sep 2004 21:21:09 -0000	1.2.2.1
 @@ -1 +1 @@
 -s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 \2\3"_
 +s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 /emul/ia32-linux\2\3"_
---- glibc-20050303T1335/sysdeps/unix/sysv/linux/powerpc/bits/termios.h	13 May 2004 02:17:03 -0000	1.12
-+++ glibc-20050303T1335-fedora/sysdeps/unix/sysv/linux/powerpc/bits/termios.h	11 Feb 2005 09:08:01 -0000	1.12.2.1
+--- glibc-20050319T1907/sysdeps/unix/sysv/linux/powerpc/bits/termios.h	13 May 2004 02:17:03 -0000	1.12
++++ glibc-20050319T1907-fedora/sysdeps/unix/sysv/linux/powerpc/bits/termios.h	11 Feb 2005 09:08:01 -0000	1.12.2.1
 @@ -1,4 +1,4 @@
 -/* Copyright (C) 1997,1999,2001,2003,2004 Free Software Foundation, Inc.
 +/* Copyright (C) 1997,1999,2001,2003,2004,2005 Free Software Foundation, Inc.
@@ -3452,8 +3411,8 @@
  #define IEXTEN	0x00000400
  
  /* Values for the ACTION argument to `tcflow'.  */
---- glibc-20050303T1335/sysdeps/unix/sysv/linux/sparc/bits/termios.h	31 Mar 2004 08:53:30 -0000	1.10
-+++ glibc-20050303T1335-fedora/sysdeps/unix/sysv/linux/sparc/bits/termios.h	11 Feb 2005 09:08:01 -0000	1.10.2.1
+--- glibc-20050319T1907/sysdeps/unix/sysv/linux/sparc/bits/termios.h	31 Mar 2004 08:53:30 -0000	1.10
++++ glibc-20050319T1907-fedora/sysdeps/unix/sysv/linux/sparc/bits/termios.h	11 Feb 2005 09:08:01 -0000	1.10.2.1
 @@ -1,5 +1,6 @@
  /* termios type and macro definitions.  Linux/SPARC version.
 -   Copyright (C) 1993, 1994, 1995, 1996, 1997, 2000 Free Software Foundation, Inc.
