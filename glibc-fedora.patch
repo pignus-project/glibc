@@ -2029,7 +2029,7 @@
 +         __chk_fail ();							      \
 +       getcwd (buf, __size_val); }))
 --- glibc-20050303T1335/socket/bits/socket2.h	1 Mar 2005 21:33:39 -0000	1.2
-+++ glibc-20050303T1335-fedora/socket/bits/socket2.h	6 Mar 2005 20:54:57 -0000	1.2.2.3
++++ glibc-20050303T1335-fedora/socket/bits/socket2.h	6 Mar 2005 23:34:29 -0000	1.2.2.4
 @@ -21,18 +21,17 @@
  # error "Never include <bits/socket2.h> directly; use <sys/socket.h> instead."
  #endif
@@ -2059,7 +2059,7 @@
 +    ({ size_t __n_val = (n);				  		      \
 +       if (__bos0 (buf) != (size_t) -1 && __bos0 (buf) < __n_val)	      \
 +         __chk_fail ();							      \
-+       recvfrom ((fd, (buf), __n_val, (flags), (addr), (addr_len)); }))
++       recvfrom ((fd), (buf), __n_val, (flags), (addr), (addr_len)); }))
 --- glibc-20050303T1335/sysdeps/arm/dl-machine.h	1 Mar 2005 20:34:40 -0000	1.50
 +++ glibc-20050303T1335-fedora/sysdeps/arm/dl-machine.h	5 Mar 2005 13:03:35 -0000	1.48.2.3
 @@ -353,9 +353,7 @@ elf_machine_plt_value (struct link_map *
