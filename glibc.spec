@@ -1,4 +1,4 @@
-%define glibcrelease 43
+%define glibcrelease 45
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200408121345
+%define glibcdate 200408191746
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -32,9 +32,9 @@ Obsoletes: libc
 %endif
 # Require libgcc in case some program calls pthread_cancel in its %%post
 Prereq: basesystem, libgcc
-# This is for building auxiliary programs like memusage
+# This is for building auxiliary programs like memusage, nscd
 # For initial glibc bootstraps it can be commented out
-BuildPreReq: gd-devel libpng-devel zlib-devel texinfo
+BuildPreReq: gd-devel libpng-devel zlib-devel texinfo, libselinux-devel >= 1.15.7-1
 %ifarch %{prelinkarches}
 BuildPreReq: prelink >= 0.2.0-5
 %endif
@@ -179,6 +179,7 @@ libraries, as well as national language (locale) support.
 Summary: A Name Service Caching Daemon (nscd).
 Group: System Environment/Daemons
 Conflicts: kernel < 2.2.0
+Requires: libselinux >= 1.15.7-1
 Prereq: /sbin/chkconfig, /usr/sbin/useradd, /usr/sbin/userdel, sh-utils
 Autoreq: true
 
@@ -1221,6 +1222,18 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Aug 19 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-45
+- update from CVS
+  - fix nss_compat's initgroups handling (#130363)
+  - fix getaddrinfo ai_canonname setting
+
+* Thu Aug 19 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-44
+- update from CVS
+  - add ip6-dotint resolv.conf option, make
+    no-ip6-dotint the default
+- BuildPrereq libselinux-devel (#129946)
+- on ppc64, build without dot symbols
+
 * Thu Aug 12 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-43
 - update from CVS
   - remove debugging printout (#129747)
