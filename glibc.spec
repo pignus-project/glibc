@@ -1,4 +1,4 @@
-%define glibcrelease 101.5
+%define glibcrelease 1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,10 +6,10 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200310271512
+%define glibcdate 200312011225
 Summary: The GNU libc libraries.
 Name: glibc
-Version: 2.3.2
+Version: 2.3.3
 Release: %{glibcrelease}
 Copyright: LGPL
 Group: System Environment/Libraries
@@ -19,63 +19,6 @@ Patch0: %{name}-redhat.patch
 Patch1: %{name}-nptl-check.patch
 Patch2: %{name}-ppc-assume.patch
 Patch3: %{name}-execstack-disable.patch
-Patch4: glibc-ftw.patch
-Patch5: glibc-ifaddrs.patch
-Patch6: glibc-lt-sigaction.patch
-Patch7: glibc-nptl-cleanups.patch
-Patch8: glibc-nptl-stdio-lock.patch
-Patch9: glibc-stdio-compat.patch
-Patch10: glibc-uselocale.patch
-Patch12: glibc-regex-update.patch
-Patch13: glibc-regex-empty-group.patch
-Patch14: glibc-atan2.patch
-Patch15: glibc-nextafter.patch
-Patch16: glibc-amd64-syscall.patch
-Patch17: glibc-memalign-trace.patch
-Patch18: glibc-linuxthreads-memleak.patch
-Patch19: glibc-linuxthreads-throw.patch
-Patch20: glibc-nptl-pthread-exit.patch
-Patch21: glibc-nptl-pshared-condvar.patch
-Patch22: glibc-nptl-attr-destroy.patch
-Patch23: glibc-nptl-configure.patch
-Patch24: glibc-nptl-fork-dlopen.patch
-Patch25: glibc-nptl-unregister-atfork.patch
-Patch26: glibc-nptl-ia64-defaultstacksize.patch
-Patch27: glibc-nptl-altstk-unwind.patch
-Patch28: glibc-nptl-cancelstate-disabled.patch
-Patch29: glibc-nptl-odd-stacklimit.patch
-Patch30: glibc-regex-leaks.patch
-Patch31: glibc-amd64-ldouble.patch
-Patch32: glibc-ia64-gas-bug.patch
-Patch33: glibc-ld-use-load-bias.patch
-Patch34: glibc-execstack-fix.patch
-Patch35: glibc-regex-bkref.patch
-Patch36: glibc-pmap-set.patch
-Patch37: glibc-regex-update2.patch
-Patch38: glibc-amd64-backtrace.patch
-Patch39: glibc-amd64-bugfixes.patch
-Patch40: glibc-intl-fixes.patch
-Patch41: glibc-ipv6-nibble.patch
-Patch42: glibc-iso6937.patch
-Patch43: glibc-inttypes.patch
-Patch44: glibc-readahead.patch
-Patch45: glibc-catgets.patch
-Patch46: glibc-obstack.patch
-Patch47: glibc-ia64-siginfo.patch
-Patch48: glibc-translation-update.patch
-Patch49: glibc-lround1.patch
-Patch50: glibc-ppc32-cacheflush.patch
-Patch51: glibc-xent-locking.patch
-Patch52: glibc-printf-size.patch
-Patch53: glibc-fclrexcpt.patch
-Patch54: glibc-exit-flush.patch
-Patch55: glibc-tzset-cap.patch
-Patch56: glibc-setenv-alloca.patch
-Patch57: glibc-regex-update3.patch
-Patch58: glibc-lround2.patch
-Patch59: glibc-lround3.patch
-Patch60: glibc-execstack-fix2.patch
-Patch61: glibc-nptl-condtimedwait.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -315,63 +258,6 @@ gcc*\ 3.2.3*)
 %patch3 -p1
   ;; esac ;;
 esac
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
-%patch19 -p1
-%patch20 -p1
-%patch21 -p1
-%patch22 -p1
-%patch23 -p1
-%patch24 -p1
-%patch25 -p1
-%patch26 -p1
-%patch27 -p1
-%patch28 -p1
-%patch29 -p1
-%patch30 -p1
-%patch31 -p1
-%patch32 -p1
-%patch33 -p1
-%patch34 -p1
-%patch35 -p1
-%patch36 -p1
-%patch37 -p1
-%patch38 -p1
-%patch39 -p1
-%patch40 -p1
-%patch41 -p1
-%patch42 -p1
-%patch43 -p1
-%patch44 -p1
-%patch45 -p1
-%patch46 -p1
-%patch47 -p1
-%patch48 -p1
-%patch49 -p1
-%patch50 -p1
-%patch51 -p1
-%patch52 -p1
-%patch53 -p1
-%patch54 -p1
-%patch55 -p1
-%patch56 -p1
-%patch57 -p1
-%patch58 -p1
-%patch59 -p1
-%patch60 -p1
-%patch61 -p1
 
 %ifnarch %{ix86} alpha alphaev6 sparc sparcv9
 rm -rf glibc-compat
@@ -796,6 +682,8 @@ rm -f $RPM_BUILD_ROOT/etc/localtime
 cp -f $RPM_BUILD_ROOT%{_prefix}/share/zoneinfo/US/Eastern $RPM_BUILD_ROOT/etc/localtime
 #ln -sf ..%{_prefix}/share/zoneinfo/US/Eastern $RPM_BUILD_ROOT/etc/localtime
 
+rm -rf $RPM_BUILD_ROOT%{_prefix}/share/zoneinfo
+
 cd redhat
 $GCC -Os -static -o build-locale-archive build-locale-archive.c \
   ../build-%{_target_cpu}-linux/locale/locarchive.o \
@@ -1119,73 +1007,29 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri Feb 13 2004 Jakub Jelinek <jakub@redhat.com> 2.3.2-101.5
-- assorted AMD64 bugfixes
-- %I format directive fixes
-- IPv6 resolver now uses two-nibble format by default again
-- ISO_6937-2 conversion fixes
-- PRI*FAST* macro fix in <inttypes.h>
-- readahead prototypes in <fcntl.h>
-- IA-64 <bits/siginfo.h> fixes
-- updated be, nl, ja and pl translations
-- {,l}lr{ound,int}* fixes
-- *ent{,_r} locking fixes
-- don't acquire stdio lock on exit
-- cap TZ env var hours to 24, not 23
-- avoid using too much stack in setenv
-- another round of regex updates
-- fix backtrace in threads on AMD64
-- pthread_cond_timedwait bugfix
-- protect _dl_make_stack_executable with a special challenge
-
-* Tue Jan  6 2004 Jakub Jelinek <jakub@redhat.com> 2.3.2-101.4
-- some further regex speedups
-- fix re.translate handling in regex (#112869)
-- change regfree to match old regex behaviour (what is freed
-  and clearing of freed pointers)
-
-* Tue Dec 30 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-101.3
-- fix pmap_set fd and memory leak (#112726)
-- fix backreference handling in regex
-
-* Tue Dec 30 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-101.2
-- fix to make pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, )
-  really disable cancellation (#112512)
-- lots of regex fixes and speedups (#110401)
-- fix nextafter*/nexttoward*
-- handle 6th syscall(3) argument on AMD64
-- handle memalign/posix_memalign in mtrace
-- fix linuxthreads memory leak (#112208)
-- remove throw () from cancellation points in linuxthreads (#112602)
-- fix NPTL unregister_atfork
-- fix unwinding through alternate signal stacks
-- fix atan2
-- fix pshared condvars in NPTL
-- fix pthread_attr_destroy for attributes created with
-  pthread_attr_init@GLIBC_2.0
+* Mon Dec  1 2003 Jakub Jelinek <jakub@redhat.com> 2.3.3-1
+- lots of regex fixes and speedups
+- for the time being, include both nb_NO* and no_NO* as locales
+  so that the distribution can catch up with the no_NO->nb_NO
+  transition
 - add BuildPrereq texinfo (#110252)
-- fix ceill/floorl on AMD64
-- work around IA64 gas bug with unwind info and .align
-- fix NPTL configure
-- allow dlopen after fork () in threaded programs
-- compute IA-64 default thread stack size correctly
-- fix thread stacks with ulimit -s not a multiple of a page size
-- randomize PIE shared libraries, honor LD_USE_LOAD_BIAS env variable
-- fix execstack handling on kernels without exec-shield
 
-* Tue Nov 11 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-101.1
-- fix getifaddrs (CAN-2003-0859)
-- fix ftw fd leak
-- fix linuxthreads sigaction (#108634)
-- fix glibc 2.0 stdio compatibility
-- fix uselocale (LC_GLOBAL_LOCALE)
-- speed up stdio locking in non-threaded programs on IA-32
-- try to maintain correct order of cleanups between those
-  registered with __attribute__((cleanup))
-  and with LinuxThreads style pthread_cleanup_push/pop (#108631)
-- fix segfault in regex (#109606)
-- fix RE_ICASE multi-byte handling in regex
-- fix pthread_exit in libpthread.a (#109790)
+* Tue Nov 18 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-102
+- update from CVS
+  - fix getifaddrs (CAN-2003-0859)
+  - fix ftw fd leak
+  - fix linuxthreads sigaction (#108634)
+  - fix glibc 2.0 stdio compatibility
+  - fix uselocale (LC_GLOBAL_LOCALE)
+  - speed up stdio locking in non-threaded programs on IA-32
+  - try to maintain correct order of cleanups between those
+    registered with __attribute__((cleanup))
+    and with LinuxThreads style pthread_cleanup_push/pop (#108631)
+  - fix segfault in regex (#109606)
+  - fix RE_ICASE multi-byte handling in regex
+  - fix pthread_exit in libpthread.a (#109790)
+  - FTW_ACTIONRETVAL support
+  - lots of regex fixes and speedups
 
 * Mon Oct 27 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-101
 - update from CVS
