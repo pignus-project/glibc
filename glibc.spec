@@ -1,4 +1,4 @@
-%define glibcrelease 36
+%define glibcrelease 39
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches i686 athlon alpha alphaev6
 %define prelinkdate 20020617
@@ -33,6 +33,10 @@ Conflicts: rpm <= 4.0-0.65
 Conflicts: glibc-devel < 2.2.3
 Patch: glibc-kernel-2.4.patch
 Patch2: glibc-2.2.5.patch
+Patch3: glibc-2.2.5-security.patch
+Patch4: glibc-2.2.5-getdents.patch
+Patch5: glibc-2.2.5-xdr_array.patch
+Patch6: glibc-2.2.5-calloc.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
@@ -186,6 +190,10 @@ case `uname -r` in
 %patch -p1
 ;; esac
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
 
 %ifarch %{prelinkarches}
 mkdir prelink
@@ -654,7 +662,21 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Tue Jun 18 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-35
+* Wed Aug  7 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-39
+- fix the calloc patch so that calloc (131072, 0) doesn't
+  crash
+
+* Thu Aug  1 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-38
+- fix xdr_array buffer overflow
+- fix calloc overflow (both patches by Solar Designer)
+- getdents fix for LSB conformance
+
+* Tue Jul  9 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-37
+- fix buffer overflows in getnetby* (if nsswitch.conf
+  network: line includes dns) and gethostby* for apps compiled
+  against glibc 2.0.
+
+* Tue Jun 18 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-36
 - fix nice return value
 - fix __moddi3 (#65612, #65695)
 - export get*ent_r@@GLIBC_2.1.2 symbols (#66278)
