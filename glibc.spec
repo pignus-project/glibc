@@ -1,4 +1,4 @@
-%define glibcrelease 28
+%define glibcrelease 29
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -19,6 +19,7 @@ Patch0: %{name}-redhat.patch
 Patch1: %{name}-nptl-check.patch
 Patch2: %{name}-ppc-assume.patch
 Patch3: %{name}-execstack-disable.patch
+Patch4: %{name}-ia64-lib64.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -250,6 +251,11 @@ gcc*\ 3.2.3*)
 %patch3 -p1
   ;; esac ;;
 esac
+%ifarch ia64
+%if "%{_lib}" == "lib64"
+%patch4 -p1
+%endif
+%endif
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir asm
@@ -889,6 +895,13 @@ gzip -9n documentation/ChangeLog*
 mkdir -p $RPM_BUILD_ROOT/lib
 ln -sf /%{_lib}/ld64.so.1 $RPM_BUILD_ROOT/lib/ld64.so.1
 %endif
+%ifarch ia64
+%if "%{_lib}" == "lib64"
+# Compatibility symlink
+mkdir -p $RPM_BUILD_ROOT/lib
+ln -sf /%{_lib}/ld-linux-ia64.so.2 $RPM_BUILD_ROOT/lib/ld-linux-ia64.so.2
+%endif
+%endif
 
 # Increase timeouts
 perl -pi -e 's/alarm \(TIMEOUT\)/alarm (TIMEOUT * 15 * '$numprocs' < 600 ? TIMEOUT * 15 * '$numprocs' : 600)/' \
@@ -1138,6 +1151,12 @@ rm -f *.filelist*
 %dir /lib
 /lib/ld64.so.1
 %endif
+%ifarch ia64
+%if "%{_lib}" == "lib64"
+%dir /lib
+/lib/ld-linux-ia64.so.2
+%endif
+%endif
 %verify(not md5 size mtime) %config(noreplace) /etc/localtime
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/ld.so.conf
@@ -1200,6 +1219,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu May 20 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-29
+- use lib64 instead of lib on ia64 if %%{_lib} is defined to lib64
+
 * Wed May 19 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-28
 - update from CVS
   - FUTEX_REQUEUE fixes (#115349)
