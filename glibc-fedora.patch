@@ -2997,3 +2997,22 @@
  
    /* No threads reading this stream.  */
    __fsetlocking (f, FSETLOCKING_BYCALLER);
+--- glibc-20040929T0821/sysdeps/unix/sysv/linux/ia64/bits/siginfo.h	29 Sep 2004 08:48:32 -0000	1.14.2.1
++++ glibc-20040929T0821-fedora/sysdeps/unix/sysv/linux/ia64/bits/siginfo.h	30 Jan 2004 20:43:10 -0000	1.14
+@@ -93,7 +93,7 @@ typedef struct siginfo
+ 	  {
+ 	    void *si_addr;	/* Faulting insn/memory ref.  */
+ 	    int _si_imm;
+-	    unsigned int _si_flags;
++	    int _si_pad0;
+ 	    unsigned long int _si_isr;
+ 	  } _sigfault;
+ 
+@@ -124,7 +124,6 @@ typedef struct siginfo
+ 
+ #ifdef __USE_GNU
+ #  define si_imm	_sifields._sigfault._si_imm
+-#  define si_flags	_sifields._sigfault._si_flags
+ #  define si_isr	_sifields._sigfault._si_isr
+ #endif
+ 
