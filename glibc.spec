@@ -1,5 +1,5 @@
 %define linux24 0
-%define glibcrelease 5.1
+%define glibcrelease 9
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.2
@@ -11,7 +11,6 @@ Release: %{glibcrelease}
 Copyright: LGPL
 Group: System Environment/Libraries
 Source: %{name}-%{version}.tar.gz
-Patch1: strcpy.patch
 # In the source tarball the file diff-CYGNUS-to-REDHAT.patch contains all
 # diffs applied by Red Hat to the current CVS version of glibc
 Buildroot: /var/tmp/glibc-%{PACKAGE_VERSION}-root
@@ -34,18 +33,14 @@ ExcludeArch: ia64
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
 %else
-%ifarch ia64
-Conflicts: kernel < 2.4.0
-%define enablekernel 2.4.0
-%else
-%ifarch sparc64
+%ifarch ia64 sparc64
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
 %else
 %define enablekernel 2.2.5
 %endif
 %endif
-%endif
+%define auxarches i586 i686 athlon sparcv9 alphaev6
 
 %description
 The glibc package contains standard libraries which are used by
@@ -125,8 +120,6 @@ case `uname -r` in
 %patch -p1
 ;; esac
 %endif
-
-%patch1 -p0
  
 %ifarch armv4l sparc64 ia64
 rm -rf glibc-compat
@@ -137,17 +130,24 @@ find . -type f -size 0 -o -name "*.orig" -exec rm -f {} \;
 %build
 rm -rf build-%{_target_cpu}-linux
 mkdir build-%{_target_cpu}-linux ; cd build-%{_target_cpu}-linux
+GCC=gcc
 %ifarch %{ix86}
 BuildFlags="-march=%{_target_cpu} -D__USE_STRING_INLINES -fstrict-aliasing"
 %endif
 %ifarch alphaev6
 BuildFlags="-mcpu=ev6"
 %endif
+%ifarch sparc
+BuildFlags="-fcall-used-g7"
+GCC="gcc -m32"
+%endif
 %ifarch sparcv9
 BuildFlags="-mcpu=ultrasparc -fcall-used-g7"
+GCC="gcc -m32"
 %endif
 %ifarch sparc64
 BuildFlags="-mcpu=ultrasparc -mvis -fcall-used-g7"
+GCC="gcc -m64"
 %endif
 # Temporarily don't do this on ia64
 %ifnarch ia64
@@ -157,11 +157,11 @@ EnableKernel="--enable-kernel=%{enablekernel}"
 %if %{linux24}
 EnableKernel="$EnableKernel --disable-profile"
 %else
-%ifarch i586 i686 athlon sparcv9 alphaev6 ia64
+%ifarch %{auxarches} ia64
 EnableKernel="$EnableKernel --disable-profile"
 %endif
 %endif
-CC=gcc CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
+CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
 	--enable-add-ons=yes --without-cvs $EnableKernel \
 	%{_target_cpu}-redhat-linux
 if [ -x /usr/bin/getconf ] ; then
@@ -243,7 +243,7 @@ find $RPM_BUILD_ROOT -type f -or -type l |
 	sed -e 's|.*/etc|%config &|' -e 's|.*/gconv/gconv-modules|%config &|' > rpm.filelist.in
 for n in %{_prefix}/share %{_prefix}/include %{_prefix}/lib/locale; do 
     find ${RPM_BUILD_ROOT}${n} -type d | \
-	grep -v '^%{_prefix}/share$' | \
+	grep -v '%{_prefix}/share$' | \
 	sed "s/^/%dir /" >> rpm.filelist.in
 done
 
@@ -346,7 +346,7 @@ rm -f *.filelist*
 %doc hesiod/README.hesiod
 
 %if !%{linux24}
-%ifnarch sparcv9 i586 i686 athlon alphaev6
+%ifnarch %{auxarches}
 %files -f devel.filelist devel
 %defattr(-,root,root)
 
@@ -364,8 +364,26 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Wed Dec  6 2000 Bill Nottingham <notting@redhat.com>
-- fix strcpy on ia64 (random SIGILLs)
+* Fri Dec 15 2000 Jakub Jelinek <jakub@redhat.com>
+- fix ftw and nftw
+
+* Wed Dec 13 2000 Jakub Jelinek <jakub@redhat.com>
+- fix fcvt (#22184)
+- ldd /lib/ld-linux.so.2 is not crashing any longer again (#22197)
+- fix gencat
+
+* Mon Dec 11 2000 Jakub Jelinek <jakub@redhat.com>
+- fix alpha htonl and alphaev6 stpcpy
+
+* Sat Dec  9 2000 Jakub Jelinek <jakub@redhat.com>
+- update to CVS to:
+  - fix getnameinfo (#21934)
+  - don't stomp on memory in rpath handling (#21544)
+  - fix setlocale (#21507)
+- fix libNoVersion.so.1 loading code (#21579)
+- use auxarches define in spec file for auxiliary
+  architectures (#21219)
+- remove /usr/share directory from filelist (#21218)
 
 * Sun Nov 19 2000 Jakub Jelinek <jakub@redhat.com>
 - update to CVS to fix getaddrinfo
