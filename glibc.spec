@@ -1,4 +1,4 @@
-%define glibcrelease 43
+%define glibcrelease 44
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches i686 athlon alpha alphaev6
 %define prelinkdate 20020617
@@ -42,6 +42,7 @@ Patch8: glibc-2.2.5-wprintf.patch
 Patch9: glibc-2.2.5-maxpacket.patch
 Patch10: glibc-2.2.5-setrlimit.patch
 Patch11: glibc-2.2.5-xdrmem.patch
+Patch12: glibc-2.2.5-getgrouplist.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
@@ -204,6 +205,7 @@ case `uname -r` in
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
+%patch12 -p1
 
 perl -pi -e 'm/PACKET.*1024/ and s/1024/65536/' \
   `find resolv glibc-compat -name \*.c`
@@ -675,6 +677,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov  5 2003 Jakub Jelinek <jakub@redhat.com> 2.2.4-44
+- fix getgrouplist (#101691)
+
 * Wed Mar  5 2003 Jakub Jelinek <jakub@redhat.com> 2.2.5-43
 - fix overflows in xdrmem (Paul Eggert, Roland McGrath)
 
