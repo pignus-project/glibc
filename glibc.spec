@@ -1,4 +1,4 @@
-%define glibcrelease 16c
+%define glibcrelease 18.7.0.2
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 Summary: The GNU libc libraries.
 Name: glibc
@@ -38,20 +38,14 @@ BuildPreReq: gcc >= 2.96-82
 Conflicts: rpm <= 4.0-0.65
 Conflicts: glibc-devel < 2.2.3
 Patch: glibc-kernel-2.4.patch
-Patch1: glibc-2.2.4-gb18030.patch
-Patch2: glibc-2.2.4-sc.patch
+Patch2: glibc-2.2.4.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
 %define enablemask [01].*|2.[0-3]*
 %else
 %define enablekernel 2.2.5
-%ifarch i686
-%define enablekernel2 2.4.1
-%define enablemask [01].*|2.[0-3]*|2.4.0*
-%else
 %define enablemask [01].*|2.[0-1]*|2.2.[0-4]|2.2.[0-4][^0-9]*
-%endif
 %endif
 %define __find_provides %{_builddir}/%{name}-%{version}/find_provides.sh
 
@@ -134,8 +128,6 @@ performance with NIS+ and may help with DNS as well.
 
 %prep
 %setup -q
-%patch1 -p1
-%patch2 -p1
 # If we are building enablekernel 2.x.y glibc on older kernel,
 # we have to make sure no binaries compiled against that glibc
 # are ever run
@@ -143,10 +135,14 @@ case `uname -r` in
 %enablemask)
 %patch -p1
 ;; esac
+%patch2 -p1
 
 %ifarch armv4l sparc64 ia64 s390 s390x
 rm -rf glibc-compat
 %endif
+
+# Waiting for explanation...
+rm -f sysdeps/powerpc/memset.S
 
 find . -type f -size 0 -o -name "*.orig" -exec rm -f {} \;
 cat > find_provides.sh <<EOF
@@ -219,35 +215,6 @@ cd build-%{_target_cpu}-linux && \
     cd ..
 %endif
 
-%ifarch i686
-rm -rf build-%{_target_cpu}-linux2.4
-mkdir build-%{_target_cpu}-linux2.4 ; cd build-%{_target_cpu}-linux2.4
-GCC=gcc
-BuildFlags=`cat ../BuildFlags`
-EnableKernel="--enable-kernel=%{enablekernel2} --disable-profile"
-CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
-	--enable-add-ons=yes --without-cvs $EnableKernel \
-	%{_target_cpu}-redhat-linux
-if [ -x /usr/bin/getconf ] ; then
-  numprocs=$(/usr/bin/getconf _NPROCESSORS_ONLN)
-  if [ $numprocs -eq 0 ]; then
-    numprocs=1
-  fi
-else
-  numprocs=1
-fi
-make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
-mkdir -p $RPM_BUILD_ROOT/lib/%{_target_cpu}/
-cp -a libc.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libc-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/lib/libc-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libc.so.*`
-cp -a math/libm.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libm-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/lib/libm-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libm.so.*`
-cp -a linuxthreads/libpthread.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libpthread-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/lib/libpthread-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libpthread.so.*`
-strip -R .comment $RPM_BUILD_ROOT/lib/{libc,libm,libpthread}-*.so
-cd ..
-%endif
-
 # compatibility hack: this locale has vanished from glibc, but some other
 # programs are still using it. Normally we would handle it in the %pre
 # section but with glibc that is simply not an option
@@ -258,6 +225,19 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libNoVersion*
 %ifarch sparc64 ia64 s390 s390x
 rm -f $RPM_BUILD_ROOT/%{_lib}/libNoVersion*
 %endif
+
+# If librt.so is a symlink, change it into linker script
+if [ -L $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so ]; then
+  rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so
+  LIBRTSO=`cd $RPM_BUILD_ROOT/%{_lib}; echo librt.so.*`
+  LIBPTHREADSO=`cd $RPM_BUILD_ROOT/%{_lib}; echo libpthread.so.*`
+  cat > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so <<EOF
+/* GNU ld script
+   librt.so.1 needs libpthread.so.0 to come before libc.so.6*
+   in search scope.  */
+GROUP ( /%{_lib}/$LIBPTHREADSO /%{_lib}/$LIBRTSO )
+EOF
+fi
 
 # the man pages for the linuxthreads require special attention
 make -C linuxthreads/man
@@ -397,22 +377,6 @@ gzip -9 documentation/ChangeLog*
 
 %postun -p /sbin/ldconfig
 
-%post common
-# Create symlink to share GB2312 and GB18030 LC_MESSAGES
-if [ ! -d /usr/share/locale ]; then
-  mkdir -p /usr/share/locale
-fi
-
-if [ -d /usr/share/locale/zh_CN.GB18030/LC_MESSAGES ] && [ ! -h /usr/share/locale/zh_CN.GB18030 ]; then
-  cp /usr/share/locale/zh_CN.GB18030/LC_MESSAGES/* /usr/share/locale/zh_CN.GB2312/LC_MESSAGES/
-fi
-
-rm -rf /usr/share/locale/zh_CN.GB18030 2> /dev/null
-
-if [ ! -h /usr/share/locale/zh_CN.GB18030 ] || [ ! -d /usr/share/locale/zh_CN.GB18030 ]; then 
-  ln -s /usr/share/locale/zh_CN.GB2312 /usr/share/locale/zh_CN.GB18030
-fi
-
 %post devel
 /sbin/install-info %{_infodir}/libc.info.gz %{_infodir}/dir
 
@@ -454,9 +418,6 @@ rm -f *.filelist*
 
 %files -f rpm.filelist
 %defattr(-,root,root)
-%ifarch i686
-%dir /lib/i686
-%endif
 %verify(not md5 size mtime) %config(noreplace) /etc/localtime
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/ld.so.conf
@@ -483,10 +444,50 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri Nov 30 2001 Leon Ho <llch@redhat.com> 2.2.4-16c
-- Add symlink to /usr/share/locale/GB18030
-- reapply yshao@redhat.com's glibc-2.2.4-gb18030.patch
-- reapply llch@redhat.com's glibc-2.2.4-sc.patch
+* Tue Dec  4 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-18.7.0.2
+- fix glob buffer overflow
+
+* Wed Nov 28 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-18.7.0.1
+- add selected changes from CVS
+  - handle DT_RUNPATH properly (#55865)
+  - fix *scanf nan/inf handling
+  - fix strndup
+  - fix fnmatch - handling at end of bracket expr
+  - allow dlfcn.h to be used in C++
+  - fix IPv6 reverse lookups
+  - avoid SPARC warnings in bits/mathinline.h
+
+* Wed Oct  3 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-18.7.0
+- special rpm for 7.0 without 2.4.1+ kernel requirements on i686
+- fix strsep
+
+* Fri Sep 28 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-18
+- fix a ld.so bug with duplicate searchlists in l_scope
+- fix erfcl(-inf)
+- turn /usr/lib/librt.so into linker script
+
+* Wed Sep 26 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-17
+- fix a ld.so lookup bug after lots of dlopen calls
+- fix CMSG_DATA for non-gcc non-ISOC99 compilers (#53984)
+- prelinking support for Sparc64
+
+* Fri Sep 21 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-16
+- update from CVS to fix DT_SYMBOLIC
+- prelinking support for Alpha and Sparc
+
+* Tue Sep 18 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-15
+- update from CVS
+  - linuxthreads now retries if -1/EINTR is returned from
+    reading or writing to thread manager pipe (#43742)
+- use DT_FILTER in librt.so (#53394)
+  - update glibc prelink patch so that it handles filters
+- fix timer_* with SIGEV_NONE (#53494)
+- make glibc_post_upgrade work on PPC (patch from Franz Sirl)
+
+* Mon Sep 10 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-14
+- fix build on sparc32
+- 2.2.4-13 build for some reason missed some locales
+  on alpha/ia64
 
 * Mon Sep  3 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-13
 - fix iconvconfig
