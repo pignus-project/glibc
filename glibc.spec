@@ -1,8 +1,8 @@
-%define linux24 1
-%define glibcrelease 14
+%define linux24 0
+%define glibcrelease 2
 Summary: The GNU libc libraries.
 Name: glibc
-Version: 2.1.92
+Version: 2.1.93
 %if %{linux24}
 Release: %{glibcrelease}.2.4
 %else
@@ -27,13 +27,23 @@ Obsoletes: libc
 %endif
 Prereq: basesystem
 Conflicts: rpm <= 4.0-0.65
-ExcludeArch: ia64
 Patch: glibc-kernel-2.4.patch
 %if %{linux24}
+ExcludeArch: ia64
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
 %else
+%ifarch ia64
+Conflicts: kernel < 2.4.0
+%define enablekernel 2.4.0
+%else
+%ifarch sparc64
+Conflicts: kernel < 2.3.40
+%define enablekernel 2.3.40
+%else
 %define enablekernel 2.2.5
+%endif
+%endif
 %endif
 
 %description
@@ -127,16 +137,26 @@ mkdir build-%{_target_cpu}-linux ; cd build-%{_target_cpu}-linux
 %ifarch %{ix86}
 BuildFlags="-march=%{_target_cpu} -D__USE_STRING_INLINES -fstrict-aliasing"
 %endif
+%ifarch alphaev6
+BuildFlags="-mcpu=ev6"
+%endif
 %ifarch sparcv9
 BuildFlags="-mcpu=ultrasparc -fcall-used-g7"
 %endif
 %ifarch sparc64
 BuildFlags="-mcpu=ultrasparc -mvis -fcall-used-g7"
 %endif
+# Temporarily don't do this on ia64
+%ifnarch ia64
 BuildFlags="$BuildFlags -freorder-blocks -DNDEBUG=1"
+%endif
 EnableKernel="--enable-kernel=%{enablekernel}"
 %if %{linux24}
 EnableKernel="$EnableKernel --disable-profile"
+%else
+%ifarch i586 i686 athlon sparcv9 alphaev6 ia64
+EnableKernel="$EnableKernel --disable-profile"
+%endif
 %endif
 CC=gcc CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
 	--enable-add-ons=yes --without-cvs $EnableKernel \
@@ -150,6 +170,7 @@ else
   numprocs=1
 fi
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
+gcc -Os ../redhat/glibc_post_upgrade.c -o glibc_post_upgrade
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -204,6 +225,9 @@ rm -f $RPM_BUILD_ROOT/etc/ld.so.cache
 > $RPM_BUILD_ROOT/etc/ld.so.conf
 chmod 644 $RPM_BUILD_ROOT/etc/ld.so.conf
 
+# Install the upgrade program
+install -m 700 build-%{_target_cpu}-linux/glibc_post_upgrade $RPM_BUILD_ROOT/usr/sbin/glibc_post_upgrade
+
 # Strip binaries
 strip -R .comment $RPM_BUILD_ROOT/sbin/* || :
 strip -R .comment $RPM_BUILD_ROOT%{_prefix}/bin/* || :
@@ -227,9 +251,7 @@ sed "s|$RPM_BUILD_ROOT||" < rpm.filelist.in |
 	grep -v '/etc/ld.so.conf'  | \
 	sort > rpm.filelist
 
-%if !%{linux24}
-grep '%{_prefix}/%{_lib}/lib.*_p\.a' < rpm.filelist > profile.filelist
-%endif
+grep '%{_prefix}/%{_lib}/lib.*_p\.a' < rpm.filelist > profile.filelist || :
 egrep "(%{_prefix}/include)|(%{_infodir})" < rpm.filelist | 
 	grep -v %{_infodir}/dir > devel.filelist
 
@@ -267,7 +289,7 @@ cp timezone/README documentation/README.timezone
 cp ChangeLog* documentation
 gzip -9 documentation/ChangeLog*
 
-%post -p /sbin/ldconfig
+%post -p /usr/sbin/glibc_post_upgrade
 
 %postun -p /sbin/ldconfig
 
@@ -321,12 +343,14 @@ rm -f *.filelist*
 %doc hesiod/README.hesiod
 
 %if !%{linux24}
-%ifnarch sparcv9 i586 i686 athlon
+%ifnarch sparcv9 i586 i686 athlon alphaev6
 %files -f devel.filelist devel
 %defattr(-,root,root)
 
+%ifnarch ia64
 %files -f profile.filelist profile
 %defattr(-,root,root)
+%endif
 
 %files -n nscd
 %defattr(-,root,root)
