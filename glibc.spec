@@ -13,7 +13,7 @@ Summary: The GNU libc libraries.
 Name: glibc
 Version: %{glibcversion}
 Release: %{glibcrelease}
-Copyright: LGPL
+License: LGPL
 Group: System Environment/Libraries
 %define glibcsrcdir %{name}-%{glibcdate}
 Source0: %{glibcsrcdir}.tar.bz2
