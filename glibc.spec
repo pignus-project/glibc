@@ -1,4 +1,4 @@
-%define glibcrelease 19
+%define glibcrelease 19a
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 Summary: The GNU libc libraries.
 Name: glibc
@@ -38,6 +38,7 @@ BuildPreReq: gcc >= 2.96-82
 Conflicts: rpm <= 4.0-0.65
 Conflicts: glibc-devel < 2.2.3
 Patch: glibc-kernel-2.4.patch
+Patch1: glibc-2.2.4-s390-ibm1.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
@@ -139,6 +140,9 @@ case `uname -r` in
 %enablemask)
 %patch -p1
 ;; esac
+%ifarch s390 s390x
+%patch1 -p1
+%endif
 
 %ifarch armv4l sparc64 ia64 s390 s390x
 rm -rf glibc-compat
@@ -479,6 +483,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Oct 23 2001 Karsten Hopp <karsten@redhat.de>
+- add IBM patch for S/390
+
 * Wed Oct  3 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-19
 - fix strsep
 
