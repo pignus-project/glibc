@@ -1,6 +1,6 @@
-%define glibcdate 20041215T0847
+%define glibcdate 20041217T0906
 %define glibcversion 2.3.3
-%define glibcrelease 93
+%define glibcrelease 97
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -1267,6 +1267,21 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Dec 17 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-97
+- update from CVS
+  - fix ppc64 getcontext and swapcontext (BZ#610)
+  - sparc/sparc64 fixes
+
+* Wed Dec 15 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-96
+- update from CVS
+  - fix i686 __USE_STRING_INLINES strncat
+  - make sure ppc/ppc64 maintain correct stack alignment
+    across clone
+
+* Wed Dec 15 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-95
+- export nis_domain_of_r from libnsl.so again which was
+  unintentionally lost
+
 * Wed Dec 15 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-93
 - update from CVS
   - ppc/ppc64 clone without CLONE_THREAD getpid () adjustement
