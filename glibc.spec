@@ -1,6 +1,6 @@
-%define glibcdate 20041006T0900
+%define glibcdate 20041012T1128
 %define glibcversion 2.3.3
-%define glibcrelease 66
+%define glibcrelease 67
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -1241,6 +1241,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Oct 12 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-67
+- update from CVS
+  - use non-blocking sockets in resolver (#135234)
+  - reset pd->res options on thread exit, so that threads
+    reusing cached stacks get resolver state properly initialized
+    (BZ #434)
+
 * Wed Oct  6 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-66
 - update from CVS
 - avoid using perl in the spec file, buildrequire sed >= 3.95
