@@ -1,12 +1,15 @@
-%define glibcrelease 32
+%define glibcrelease 34
 %define auxarches i586 i686 athlon sparcv9 alphaev6
+%define prelinkarches i686 athlon alpha alphaev6
+%define prelinkdate 20020326
 Summary: The GNU libc libraries.
 Name: glibc
-Version: 2.2.4
+Version: 2.2.5
 Release: %{glibcrelease}
 Copyright: LGPL
 Group: System Environment/Libraries
 Source: %{name}-%{version}.tar.bz2
+Source2: ftp://people.redhat.com/jakub/prelink/prelink-%{prelinkdate}.tar.bz2
 # In the source tarball the file diff-CYGNUS-to-REDHAT.patch contains all
 # diffs applied by Red Hat to the current CVS version of glibc
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
@@ -15,10 +18,6 @@ Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
 Provides: ldconfig
 Autoreq: false
 Requires: glibc-common = %{version}-%{release}
-%ifarch alpha
-Provides: ld.so.2
-%else
-%endif
 %ifarch sparc
 Obsoletes: libc
 %endif
@@ -26,40 +25,20 @@ Prereq: basesystem
 # This is for building auxiliary programs like memusage
 # For initial glibc bootstraps it can be commented out
 BuildPreReq: gd-devel libpng-devel zlib-devel
-%ifarch ix86 sparc sparcv9 alpha alphaev6
+BuildPreReq: libelf >= 0.7.0-2
 # This is to ensure that __frame_state_for exported by glibc
 # will be compatible with egcs 1.x.y
 BuildPreReq: gcc >= 2.96-84
-%endif
-%ifarch ia64
-# Earlier gcc's die compiling glibc
-BuildPreReq: gcc >= 2.96-82
-%endif
 Conflicts: rpm <= 4.0-0.65
 Conflicts: glibc-devel < 2.2.3
 Patch: glibc-kernel-2.4.patch
-Patch2: glibc-2.2.4.patch
-Patch3: glibc-2.2.4-fixes.patch
-Patch4: glibc-2.2.4-s390.patch
-Patch5: glibc-2.2.4-i386-postupgrade.patch
-Patch6: glibc-2.2.4-s390-2.patch
-Patch7: glibc-2.2.4-security.patch
-Patch8: glibc-2.2.4-ia64-strncpy.patch
-Patch9: glibc-2.2.4-sunrpc.patch
-Patch10: glibc-2.2.4-collate.patch
-Patch11: glibc-2.2.4-xdr_array.patch
-Patch12: glibc-2.2.4-calloc.patch
-Patch13: glibc-2.2.4-onexit-process.patch
-Patch14: glibc-2.2.4-maxpacket.patch
-Patch15: glibc-2.2.4-setrlimit.patch
-Patch16: glibc-2.2.4-xdrmem.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
 %define enablemask [01].*|2.[0-3]*
 %else
 %define enablekernel 2.2.5
-%ifarch i686
+%ifarch i686 athlon
 %define enablekernel2 2.4.1
 %define enablemask [01].*|2.[0-3]*|2.4.0*
 %else
@@ -83,7 +62,6 @@ Group: Development/Libraries
 Conflicts: texinfo < 3.11
 Prereq: /sbin/install-info
 Obsoletes: libc-debug, libc-headers, libc-devel, linuxthreads-devel
-Obsoletes: glibc-debug
 Prereq: kernel-headers
 Requires: kernel-headers >= 2.2.1, %{name} = %{version}
 %ifarch x86
@@ -96,7 +74,7 @@ Autoreq: true
 %description devel
 The glibc-devel package contains the header and object files necessary
 for developing programs which use the standard C libraries (which are
-used by nearly all programs). If you are developing programs which
+used by nearly all programs).  If you are developing programs which
 will use the standard C libraries, your system needs to have these
 standard header and object files available in order to create the
 executables.
@@ -112,18 +90,18 @@ Autoreq: true
 
 %description profile
 The glibc-profile package includes the GNU libc libraries and support
-for profiling using the gprof program. Profiling is analyzing a
+for profiling using the gprof program.  Profiling is analyzing a
 program's functions to see how much CPU time they use and determining
-which functions are calling other functions during execution. To use
+which functions are calling other functions during execution.  To use
 gprof to profile a program, your program needs to use the GNU libc
 libraries included in glibc-profile (instead of the standard GNU libc
 libraries included in the glibc package).
 
 If you are going to use the gprof program to profile a program, you'll
-need to install the glibc-profile program.
+need to install the glibc-profile package.
 
 %package common
-Summary: Common binaries and locale data for glibc.
+Summary: Common binaries and locale data for glibc
 Conflicts: %{name} < %{version}
 Conflicts: %{name} > %{version} 
 Autoreq: false
@@ -142,8 +120,60 @@ Prereq: /sbin/chkconfig, /usr/sbin/useradd, /usr/sbin/userdel, sh-utils
 Autoreq: true
 
 %description -n nscd
-Nscd caches name service lookups. It can dramatically improve
-performance with NIS+ and may help with DNS as well.
+Nscd caches name service lookups and can dramatically improve
+performance with NIS+, and may help with DNS as well. Note that you
+can't use nscd with 2.0 kernels because of bugs in the kernel-side
+thread support. Unfortunately, nscd happens to hit these bugs
+particularly hard.
+
+%package debug
+Summary: Shared standard C libraries with debugging information
+Group: Development/Libraries
+Requires: glibc = %{version}-%{release}, glibc-devel = %{version}-%{release}
+Autoreq: false
+
+%description debug
+The glibc-debug package contains shared standard C libraries
+with debugging information.  You need this only if you want to step into
+C library routines during debugging.
+To use these libraries, you need to set LD_LIBRARY_PATH=%{_prefix}/%{_lib}/debug
+in your environment before starting debugger.
+If you want to see glibc source files during debugging, you should
+rpm -i glibc-%{version}-%{release}.src.rpm
+rpm -bp %{_specdir}/glibc.spec
+
+If unsure if you need this, don't install this package.
+
+%package debug-static
+Summary: Static standard C libraries with debugging information
+Group: Development/Libraries
+Requires: glibc = %{version}-%{release}, glibc-devel = %{version}-%{release}
+Autoreq: true
+
+%description debug-static
+The glibc-debug-static package contains static standard C libraries
+with debugging information.  You need this only if you want to step into
+C library routines during debugging programs statically linked against
+one or more of the standard C libraries.
+To use this debugging information, you need to link binaries
+with -L%{_prefix}/%{_lib}/debug compiler option.
+If you want to see glibc source files during debugging, you should
+rpm -i glibc-%{version}-%{release}.src.rpm
+rpm -bp %{_specdir}/glibc.spec
+
+If unsure if you need this, don't install this package.
+
+%package utils
+Summary: Development utilities from GNU C library
+Group: Development/Tools
+Requires: glibc = %{version}-%{release}
+
+%description utils
+The glibc-utils package contains memusage, a memory usage profiler,
+mtrace, a memory leak tracer and xtrace, a function call tracer
+which can be helpful during program debugging.
+
+If unsure if you need this, don't install this package.
 
 %prep
 %setup -q
@@ -154,26 +184,11 @@ case `uname -r` in
 %enablemask)
 %patch -p1
 ;; esac
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%ifarch s390 s390x
-%patch6 -p1
-%endif
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
 
-perl -pi -e 'm/PACKET.*1024/ and s/1024/65536/' \
-  `find resolv glibc-compat -name \*.c`
+%ifarch %{prelinkarches}
+mkdir prelink
+tar x --bzip2 -C prelink -f %{SOURCE2}
+%endif
 
 %ifarch armv4l sparc64 ia64 s390 s390x
 rm -rf glibc-compat
@@ -185,7 +200,8 @@ rm -f sysdeps/powerpc/memset.S
 find . -type f -size 0 -o -name "*.orig" -exec rm -f {} \;
 cat > find_provides.sh <<EOF
 #!/bin/sh
-/usr/lib/rpm/find-provides | grep -v GLIBC_2.2.5
+/usr/lib/rpm/find-provides | grep -v GLIBC_PRIVATE
+exit 0
 EOF
 chmod +x find_provides.sh
 
@@ -194,7 +210,7 @@ rm -rf build-%{_target_cpu}-linux
 mkdir build-%{_target_cpu}-linux ; cd build-%{_target_cpu}-linux
 GCC=gcc
 %ifarch %{ix86}
-BuildFlags="-march=%{_target_cpu} -D__USE_STRING_INLINES -fstrict-aliasing"
+BuildFlags="-march=%{_target_cpu}"
 %endif
 %ifarch alphaev6
 BuildFlags="-mcpu=ev6"
@@ -211,11 +227,13 @@ GCC="gcc -m32"
 BuildFlags="-mcpu=ultrasparc -mvis -fcall-used-g7"
 GCC="gcc -m64"
 %endif
-# Temporarily don't do this on ia64 and s390
 %ifnarch ia64 s390 s390x
 BuildFlags="$BuildFlags -freorder-blocks"
 %endif
 BuildFlags="$BuildFlags -DNDEBUG=1"
+if gcc -v | grep -q 'gcc version 3'; then
+  BuildFlags="$BuildFlags -finline-limit=2000"
+fi
 EnableKernel="--enable-kernel=%{enablekernel}"
 %ifarch %{auxarches}
 EnableKernel="$EnableKernel --disable-profile"
@@ -257,7 +275,7 @@ cd build-%{_target_cpu}-linux && \
     cd ..
 %endif
 
-%ifarch i686
+%ifarch i686 athlon
 rm -rf build-%{_target_cpu}-linux2.4
 mkdir build-%{_target_cpu}-linux2.4 ; cd build-%{_target_cpu}-linux2.4
 GCC=gcc
@@ -275,15 +293,23 @@ else
   numprocs=1
 fi
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
-mkdir -p $RPM_BUILD_ROOT/lib/%{_target_cpu}/
-cp -a libc.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libc-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/lib/libc-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libc.so.*`
-cp -a math/libm.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libm-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/lib/libm-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libm.so.*`
-cp -a linuxthreads/libpthread.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libpthread-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/lib/libpthread-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libpthread.so.*`
+mkdir -p $RPM_BUILD_ROOT/lib/i686/
+cp -a libc.so $RPM_BUILD_ROOT/lib/i686/`basename $RPM_BUILD_ROOT/lib/libc-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/lib/libc-*.so` $RPM_BUILD_ROOT/lib/i686/`basename $RPM_BUILD_ROOT/lib/libc.so.*`
+cp -a math/libm.so $RPM_BUILD_ROOT/lib/i686/`basename $RPM_BUILD_ROOT/lib/libm-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/lib/libm-*.so` $RPM_BUILD_ROOT/lib/i686/`basename $RPM_BUILD_ROOT/lib/libm.so.*`
+cp -a linuxthreads/libpthread.so $RPM_BUILD_ROOT/lib/i686/`basename $RPM_BUILD_ROOT/lib/libpthread-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/lib/libpthread-*.so` $RPM_BUILD_ROOT/lib/i686/`basename $RPM_BUILD_ROOT/lib/libpthread.so.*`
 strip -R .comment $RPM_BUILD_ROOT/lib/{libc,libm,libpthread}-*.so
 cd ..
+%endif
+
+%ifarch %{prelinkarches}
+# Build prelink
+cd prelink/prelink-%{prelinkdate}
+%configure
+make
+cd ../..
 %endif
 
 # compatibility hack: this locale has vanished from glibc, but some other
@@ -358,6 +384,67 @@ strip -R .comment $RPM_BUILD_ROOT%{_prefix}/sbin/* || :
 strip -R .comment $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown || :
 strip -R .comment $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/* || :
 
+mkdir $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug
+cp -a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/
+rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/*_p.a
+cp -a $RPM_BUILD_ROOT/%{_lib}/lib*.so* $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/
+# Now strip debugging info from all static and shared libraries but
+# those which will be in glibc-debug subpackage
+pushd $RPM_BUILD_ROOT%{_prefix}/%{_lib}/
+for i in *.a; do
+  if [ -f $i ]; then
+    case "$i" in
+    *_p.a) ;;
+    *) strip -g -R .comment $i ;;
+    esac
+  fi
+done
+popd
+%ifarch i686 athlon
+rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/{libc,libm,libpthread}[-.]*.so*
+cp -a $RPM_BUILD_ROOT/%{_lib}/i686/lib*.so* $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/
+%endif
+pushd $RPM_BUILD_ROOT/%{_lib}
+for i in *.so*; do
+  if [ -f $i -a ! -L $i ]; then
+    if [ "$i" = libc.so -o "$i" = librt.so ]; then
+      :
+%ifarch i686 athlon
+    elif [ -f i686/$i ]; then
+      strip -g -R .comment i686/$i
+%endif
+    else
+      strip -g -R .comment $i
+    fi
+  fi
+done
+popd
+
+%ifarch i686 athlon
+# Prelink ld.so and libc.so
+cd prelink
+> prelink.conf
+# For now disable prelinking of ld.so, as it breaks statically linked
+# binaries built against non-NDEBUG old glibcs (assert unknown dynamic tag)
+# prelink-%{prelinkdate}/src/prelink -c ./prelink.conf -C ./prelink.cache \
+#  --mmap-region-start=0x40000000 $RPM_BUILD_ROOT/%{_lib}/ld-*.so
+prelink-%{prelinkdate}/src/prelink --reloc-only=0x42000000 \
+  $RPM_BUILD_ROOT/%{_lib}/i686/libc-*.so
+cd ..
+%endif
+%ifarch alpha alphaev6
+# Prelink ld.so and libc.so
+cd prelink
+> prelink.conf
+# For now disable prelinking of ld.so, as it breaks statically linked
+# binaries built against non-NDEBUG old glibcs (assert unknown dynamic tag)
+# prelink-%{prelinkdate}/src/prelink -c ./prelink.conf -C ./prelink.cache \
+#  --mmap-region-start=0x0000020000000000 $RPM_BUILD_ROOT/%{_lib}/ld-*.so
+prelink-%{prelinkdate}/src/prelink --reloc-only=0x0000020010000000 \
+  $RPM_BUILD_ROOT/%{_lib}/libc-*.so
+cd ..
+%endif
+
 # rquota.x and rquota.h are now provided by quota
 rm -f $RPM_BUILD_ROOT%{_prefix}/include/rpcsvc/rquota.[hx]
 
@@ -371,7 +458,8 @@ build-%{_target_cpu}-linux/hardlink -vc $RPM_BUILD_ROOT%{_prefix}/lib/locale
 find $RPM_BUILD_ROOT -type f -or -type l |
 	sed -e 's|.*/etc|%config &|' \
 	    -e 's|.*/gconv/gconv-modules$|%verify(not md5 size mtime) %config(noreplace) &|' \
-	    -e 's|.*/gconv/gconv-modules.cache|%verify(not md5 size mtime) &|' > rpm.filelist.in
+	    -e 's|.*/gconv/gconv-modules.cache|%verify(not md5 size mtime) &|' \
+	    -e '/debug/d' > rpm.filelist.in
 for n in %{_prefix}/share %{_prefix}/include %{_prefix}/lib/locale; do 
     find ${RPM_BUILD_ROOT}${n} -type d | \
 	grep -v '%{_prefix}/share$' | \
@@ -384,12 +472,22 @@ SHARE_LANG='s|.*/share/locale/\([^/_]\+\).*/LC_MESSAGES/.*\.mo|%lang(\1) &|'
 LIB_LANG='s|.*/lib/locale/\([^/_]\+\)|%lang(\1) &|'
 # rpm does not handle %lang() tagged files hardlinked together accross
 # languages very well, temporarily disable
-LIB_LANG=''
+# LIB_LANG=''
 sed -e "s|$RPM_BUILD_ROOT||" -e "$LIB_LANG" -e "$SHARE_LANG" < rpm.filelist.in |
-	grep -v '/etc/localtime'  | \
-	grep -v '/etc/nsswitch.conf'  | \
-	grep -v '/etc/ld.so.conf'  | \
+	grep -v '/etc/\(localtime\|nsswitch.conf\|ld.so.conf\)'  | \
+	grep -v '/%{_lib}/lib\(pcprofile\|memusage\).so' | \
+	grep -v 'bin/\(memusage\|mtrace\|xtrace\|pcprofiledump\)' | \
 	sort > rpm.filelist
+
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/%{_lib}
+mv -f $RPM_BUILD_ROOT/%{_lib}/lib{pcprofile,memusage}.so $RPM_BUILD_ROOT%{_prefix}/%{_lib}
+for i in $RPM_BUILD_ROOT%{_prefix}/bin/{xtrace,memusage}; do
+  cp -a $i $i.tmp
+  sed -e 's~=/%{_lib}/libpcprofile.so~=%{_prefix}/%{_lib}/libpcprofile.so~' \
+      -e 's~=/%{_lib}/libmemusage.so~=%{_prefix}/%{_lib}/libmemusage.so~' \
+    $i.tmp > $i
+  chmod 755 $i; rm -f $i.tmp
+done
 
 grep '%{_prefix}/%{_lib}/lib.*_p\.a' < rpm.filelist > profile.filelist || :
 egrep "(%{_prefix}/include)|(%{_infodir})" < rpm.filelist | 
@@ -474,6 +572,10 @@ if [ "$1" = 0 ]; then
     /sbin/install-info --delete %{_infodir}/libc.info.gz %{_infodir}/dir
 fi
 
+%post utils -p /sbin/ldconfig
+
+%postun utils -p /sbin/ldconfig
+
 %pre -n nscd
 /usr/sbin/useradd -M -o -r -d / -s /bin/false \
 	-c "NSCD Daemon" -u 28 nscd > /dev/null 2>&1 || :
@@ -501,15 +603,20 @@ rm -f *.filelist*
 
 %files -f rpm.filelist
 %defattr(-,root,root)
-%ifarch i686
+%ifarch i686 athlon
 %dir /lib/i686
 %endif
 %verify(not md5 size mtime) %config(noreplace) /etc/localtime
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/ld.so.conf
 %doc README NEWS INSTALL FAQ BUGS NOTES PROJECTS CONFORMANCE
-%doc COPYING COPYING.LIB README.template README.libm
+%doc COPYING COPYING.LIB README.libm
 %doc hesiod/README.hesiod
+
+%files debug
+%defattr(-,root,root)
+%dir %{_prefix}/%{_lib}/debug
+%{_prefix}/%{_lib}/debug/*.so*
 
 %ifnarch %{auxarches}
 %files -f common.filelist common
@@ -522,6 +629,21 @@ rm -f *.filelist*
 %files -f profile.filelist profile
 %defattr(-,root,root)
 
+%files utils
+%defattr(-,root,root)
+%{_prefix}/%{_lib}/libmemusage.so
+%{_prefix}/%{_lib}/libpcprofile.so
+%{_prefix}/bin/memusage
+%{_prefix}/bin/memusagestat
+%{_prefix}/bin/mtrace
+%{_prefix}/bin/pcprofiledump
+%{_prefix}/bin/xtrace
+
+%files debug-static
+%defattr(-,root,root)
+%dir %{_prefix}/%{_lib}/debug
+%{_prefix}/%{_lib}/debug/*.a
+
 %files -n nscd
 %defattr(-,root,root)
 %config(noreplace) /etc/nscd.conf
@@ -530,71 +652,112 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Wed Mar  5 2003 Jakub Jelinek <jakub@redhat.com> 2.2.4-32
-- fix overflows in xdrmem (Paul Eggert, Roland McGrath)
+* Mon Apr 15 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-34
+- add relocation dependencies even for weak symbols (#63422)
+- stricter check_fds check for suid/sgid binaries
+- run make check at %%install time
 
-* Thu Oct 12 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-31
-- use malloc instead of alloca for get*by* functions, so that
-  they work even with extremely low stack sizes (#75128, #75616)
-- don't muck with RLIMIT_STACK in FLOATING_STACKS linuxthreads
+* Sat Apr 13 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-33
+- handle Dec 31 1969 in mktime for timezones west of GMT (#63369)
+- back out do-lookup.h change (#63261, #63305)
+- use "memory" clobber instead all the fancy stuff in i386/i686/bits/string.h
+  since lots of compilers break on it
+- fix sparc build with gcc 3.1
+- fix spec file for athlon
 
-* Mon Sep  9 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-30
-- fix resolver buffer overflows
-- don't call free in pthread_onexit_process
+* Tue Apr  9 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-32
+- fix debugging of threaded apps (#62804)
+- fix DST for Estonia (#61494)
+- document that pthread_mutexattr_?etkind_np are deprecated
+  and pthread_mutexattr_?ettype should be used instead in man
+  pages (#61485)
+- fix libSegFault.so undefined externals
 
-* Wed Aug  7 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-29
-- fix the calloc patch so that calloc (131072, 0) doesn't
-  crash
+* Fri Apr  5 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-31
+- temporarily disable prelinking ld.so, as some statically linked
+  binaries linked against debugging versions of old glibcs die on it
+  (#62352)
+- fix <semaphore.h> for -std=c99 (#62516)
+- fix ether_ntohost segfault (#62397)
+- remove in glibc_post_upgrade on i386 all /lib/i686/libc-*.so,
+  /lib/i686/libm-*.so and /lib/i686/libpthread-*.so, not just current
+  version (#61633)
+- prelink -r on alpha too
 
-* Thu Aug  1 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-28
-- fix xdr_array buffer overflow
-- fix calloc overflow (both patches by Solar Designer)
+* Thu Mar 28 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-30
+- update GB18030 iconv module (Yu Shao)
 
-* Mon Jul 22 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-27
-- use uninterposable sendto/recvfrom/recvmsg in RPC when
-  working on sockets opened through uninterposable socket (#63382)
-- fix zh_TW sorting (#63692)
-- run make check during build process
+* Tue Mar 26 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-29
+- features.h fix
 
-* Tue Jul  9 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-26
-- fix IA-64 strncpy (David Mosberger)
+* Tue Mar 26 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-28
+- update from CVS
+  - fix nscd with huge groups
+  - fix nis to not close fds it shouldn't
+- rebuilt against newer glibc-kernheaders to use the correct
+  PATH_MAX
+- handle .athlon.rpm glibc the same way as .i686.rpm
+- add a couple of .ISO-8859-15 locales (#61922)
+- readd temporarily currencies which were superceeded by Euro
+  into the list of accepted currencies by localedef to make
+  standard conformance testsuites happy
+- temporarily moved __libc_waitpid back to make Sun JDK happy
+- use old malloc code
+- prelink i686/athlon ld.so and prelink -r i686/athlon libc.so
 
-* Tue Jul  9 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-25
-- fix buffer overflows in getnetby* (if nsswitch.conf
-  network: line includes dns) and gethostby* for apps compiled
-  against glibc 2.0.
-
-* Tue Apr  2 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-24
-- remove nice(2) return value fix - too many apps broken,
-  so it is not appropriate for errata
-- add an s390 fix
-
-* Fri Mar 29 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-23
-- bug fixes from CVS HEAD, including
-  - fix nis from closing already closed fd (#61492)
-  - fix mutexes on IA-64 (#60674)
+* Thu Mar 14 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-27
+- update from CVS
+  - fix DST handling for southern hemisphere (#60747)
+  - fix daylight setting for tzset (#59951)
   - fix ftime (#60350)
-  - fix tzset (#59951, #60747)
-- rebuilt with gcc-2.96-108.1 to fix accesses bellow sp on ia32
-  (#60763, #60745)
+  - fix nice return value
+  - fix a malloc segfault
+- temporarily moved __libc_wait, __libc_fork and __libc_stack_end
+  back to what they used to be exported at
+- censorship (#60758)
+
+* Thu Feb 28 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-26
+- update from CVS
+- use __attribute__((visibility(...))) if supported, use _rtld_local
+  for ld.so only objects
+- provide libc's own __{,u}{div,mod}di3
+
+* Wed Feb 27 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-25
+- switch back to 2.2.5, mmap stdio needs work
+
+* Mon Feb 25 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-8
+- fix two other mmap stdio bugs (#60228)
+
+* Thu Feb 21 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-7
+- fix yet another mmap stdio bug (#60145)
+
+* Tue Feb 19 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-6
+- fix mmap stdio bug (seen on ld as File truncated error, #60043)
+- apply Andreas Schwab's fix for pthread sigwait
 - remove /lib/i686/ libraries in glibc_post_upgrade when
   performing i386 glibc install
 
-* Sat Dec  8 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-19.3
-- fix inttypes.h typo (#57268)
+* Thu Feb 14 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-5
+- update to CVS
+- added glibc-utils subpackage
+- disable autoreq in glibc-debug
+- readd %%lang() to locale files
 
-* Tue Dec  4 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-19.2
-- fix glob buffer overflow
+* Fri Feb  7 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-4
+- update to CVS
+- move glibc private symbols to GLIBC_PRIVATE symbol version
 
-* Wed Nov 28 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-19.1
-- add selected changes from CVS
-  - handle DT_RUNPATH properly (#55865)
-  - fix *scanf nan/inf handling
-  - fix strndup
-  - fix fnmatch - handling at end of bracket expr
-  - allow dlfcn.h to be used in C++
-  - fix IPv6 reverse lookups
-  - avoid SPARC warnings in bits/mathinline.h
+* Wed Jan  9 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-3
+- fix a sqrt bug on alpha which caused SHN_UNDEF $__full_ieee754_sqrt..ng
+  symbol in libm
+
+* Tue Jan  8 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-2
+- add debug-static package
+
+* Mon Dec 31 2001 Jakub Jelinek <jakub@redhat.com> 2.2.90-1
+- update from CVS
+- remove -D__USE_STRING_INLINES
+- add debug subpackage to trim glibc and glibc-devel size
 
 * Wed Oct  3 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-19
 - fix strsep
