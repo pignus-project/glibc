@@ -1,6 +1,6 @@
 %define glibcdate 20041021T0701
 %define glibcversion 2.3.3
-%define glibcrelease 72
+%define glibcrelease 73
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -1258,6 +1258,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Oct 21 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-73
+- remove setaltroot and key{_add,_request,ctl} also from Versions
+- back out _sys_errlist changes
+
 * Thu Oct 21 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-72
 - back out setaltroot and key{_add,_request,ctl} addition
 - fix severe x86-64 symbol versioning regressions that breaks
