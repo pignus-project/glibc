@@ -1,9 +1,9 @@
-%define glibcrelease 24
+%define glibcrelease 24.2
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.2.4
-Release: %{glibcrelease}
+Release: %{glibcrelease}s.1
 Copyright: LGPL
 Group: System Environment/Libraries
 Source: %{name}-%{version}.tar.bz2
@@ -43,6 +43,8 @@ Patch3: glibc-2.2.4-fixes.patch
 Patch4: glibc-2.2.4-s390.patch
 Patch5: glibc-2.2.4-i386-postupgrade.patch
 Patch6: glibc-2.2.4-s390-2.patch
+Patch7: glibc-2.2.4-s390-3.patch
+Patch8: glibc-2.2.4-bigendian.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
@@ -151,6 +153,8 @@ case `uname -r` in
 %ifarch s390 s390x
 %patch6 -p1
 %endif
+%patch7 -p1
+%patch8 -p1
 
 %ifarch armv4l sparc64 ia64 s390 s390x
 rm -rf glibc-compat
@@ -495,6 +499,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Mar 18 2003 D. Marlin <dmarlin@redhat.com>
+- new s390 release number and rebuild for s390 (bug #85960)
+
+* Tue Apr 16 2002 Phil Knirsch <pknirsch@redhat.com>
+- Fixed 64bit bigendian problem in sunrpc code.
+
+* Sat Apr 13 2002 Florian La Roche <Florian.LaRoche@redhat.de>
+- add missing s390/s390x patches
+
 * Tue Apr  2 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-24
 - remove nice(2) return value fix - too many apps broken,
   so it is not appropriate for errata
