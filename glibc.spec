@@ -1,6 +1,6 @@
-%define glibcdate 20041126T1318
+%define glibcdate 20041203T0935
 %define glibcversion 2.3.3
-%define glibcrelease 85
+%define glibcrelease 87
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -251,7 +251,7 @@ package or when debugging this package.
 
 %prep
 %setup -q -n %{glibcsrcdir} -a1
-%patch0 -p1
+%patch0 -E -p1
 case "`gcc --version | head -1`" in
 gcc*\ 3.[34]*)
 %ifarch %{nptlarches}
@@ -1260,6 +1260,24 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Dec  3 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-87
+- update from CVS
+  - build libpthread_nonshared.a objects with -fPIC on s390/s390x
+  - fix mktime with < 0 or > 59 tm_sec on entry
+  - remove nonnull attribute for realpath
+  - add $(make-target-directory) for errlist-compat.c rule
+    (hopefully fix #141404)
+- add testcase for ungetc bug
+- define _POSIX_{,THREAD_}CPUTIME to 0 on all Linux arches
+
+* Tue Nov 30 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-86
+- update from CVS
+  - some posix_opt.h fixes
+- fix strtold use of unitialized memory (#141000)
+- some more bugfixes for bugs detected by valgrind
+- rebuilt with GCC >= 3.4.3-5 to avoid packed stack layout
+  on s390{,x} (#139678)
+
 * Fri Nov 26 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-85
 - update from CVS
   - support -v specification in getconf
