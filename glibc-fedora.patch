@@ -557,14 +557,14 @@
    assert (GCONV_MODULES_CACHE[0] == '/');
    strcpy (stpcpy (mempcpy (tmpfname, prefix, prefix_len), GCONV_MODULES_CACHE),
 --- glibc-20041014T0548/include/errno.h	4 Oct 2004 20:59:37 -0000	1.12
-+++ glibc-20041014T0548-fedora/include/errno.h	14 Oct 2004 09:57:38 -0000	1.11.2.2
++++ glibc-20041014T0548-fedora/include/errno.h	14 Oct 2004 12:33:58 -0000	1.11.2.3
 @@ -36,7 +36,11 @@ extern __thread int errno attribute_tls_
  # define __set_errno(val) (errno = (val))
  
  # ifndef __ASSEMBLER__
 -extern int *__errno_location (void) __THROW __attribute__ ((__const__));
 +extern int *__errno_location (void) __THROW __attribute__ ((__const__))
-+#  ifdef RTLD_PRIVATE_ERRNO
++#  if RTLD_PRIVATE_ERRNO
 +     attribute_hidden
 +#  endif
 +;
