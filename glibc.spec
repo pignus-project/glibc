@@ -1,4 +1,4 @@
-%define glibcrelease 27
+%define glibcrelease 28
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200405070341
+%define glibcdate 200405190641
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -1200,6 +1200,18 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed May 19 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-28
+- update from CVS
+  - FUTEX_REQUEUE fixes (#115349)
+  - SPARC GCC 3.4 build fix
+  - fix handling of undefined TLS symbols on IA32 (RELA only),
+    SPARC and SH
+  - regex translate fix
+  - speed up sprintf
+  - x86_64 makecontext alignment fix
+  - make POSIX sigpause the default sigpause, unless BSD sigpause
+    requested
+
 * Tue May 11 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-27
 - remove /lib64/tls/librtkaio-2.3.[23].so in glibc_post_upgrade
   on x86-64, s390x and ppc64 instead of /lib/tls/librtkaio-2.3.[23].so
