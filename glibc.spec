@@ -1,12 +1,12 @@
-%define glibcrelease 18
+%define glibcrelease 27
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
-%define rtkaioarches i686 athlon x86_64 ia64 s390 s390x ppc ppc64
+%define rtkaioarches noarch
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200403181017
+%define glibcdate 200405070341
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -41,6 +41,9 @@ BuildPreReq: prelink >= 0.2.0-5
 BuildPreReq: gcc >= 3.2
 Conflicts: rpm <= 4.0-0.65
 Conflicts: glibc-devel < 2.2.3
+# Earlier shadow-utils packages had too restrictive permissions on
+# /etc/default
+Conflicts: shadow-utils < 2:4.0.3-20
 %ifarch ia64 sparc64 s390x x86_64
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
@@ -83,6 +86,7 @@ Conflicts: texinfo < 3.11
 Conflicts: binutils < 2.13.90.0.16-5
 Prereq: /sbin/install-info
 Obsoletes: libc-debug, libc-headers, libc-devel, linuxthreads-devel
+Obsoletes: glibc-debug
 Prereq: %{name}-headers
 Requires: %{name}-headers = %{version}, %{name} = %{version}
 %ifarch %{ix86}
@@ -183,25 +187,6 @@ can't use nscd with 2.0 kernels because of bugs in the kernel-side
 thread support. Unfortunately, nscd happens to hit these bugs
 particularly hard.
 
-%package debug
-Summary: Static standard C libraries with debugging information
-Group: Development/Libraries
-Requires: glibc = %{version}-%{release}, glibc-devel = %{version}-%{release}
-Obsoletes: glibc-debug-static
-Autoreq: true
-
-%description debug
-The glibc-debug package contains static standard C libraries
-with debugging information.  You need this only if you want to step into
-C library routines during debugging programs statically linked against
-one or more of the standard C libraries.
-To use this debugging information, you need to link binaries
-with -L%{_prefix}/%{_lib}/debug compiler option.
-If you want to see glibc source files during debugging, you should
-install glibc-debuginfo package.
-
-If unsure if you need this, don't install this package.
-
 %package utils
 Summary: Development utilities from GNU C library
 Group: Development/Tools
@@ -228,6 +213,13 @@ Requires: glibc-debuginfo-common = %{version}-%{release}
 This package provides debug information for package %{name}.
 Debug information is useful when developing applications that use this
 package or when debugging this package.
+
+This package also contains static standard C libraries with
+debugging information.  You need this only if you want to step into
+C library routines during debugging programs statically linked against
+one or more of the standard C libraries.
+To use this debugging information, you need to link binaries
+with -static -L%{_prefix}/lib/debug%{_prefix}/%{_lib} compiler options.
 
 %ifarch %{debuginfocommonarches}
 
@@ -258,6 +250,162 @@ gcc*\ 3.2.3*)
 %patch3 -p1
   ;; esac ;;
 esac
+
+# Hack till glibc-kernheaders get updated, argh
+mkdir asm
+cat > asm/unistd.h <<EOF
+#ifndef _HACK_ASM_UNISTD_H
+#include_next <asm/unistd.h>
+%ifarch alpha
+#ifndef __NR_stat64
+#define __NR_stat64			425
+#define __NR_lstat64			426
+#define __NR_fstat64			427
+#endif
+#ifndef __NR_mq_open
+#define __NR_mq_open			432
+#define __NR_mq_unlink			433
+#define __NR_mq_timedsend		434
+#define __NR_mq_timedreceive		435
+#define __NR_mq_notify			436
+#define __NR_mq_getsetattr		437
+#endif
+%endif
+%ifarch %{ix86}
+#ifndef __NR_mq_open
+#define __NR_mq_open 		277
+#define __NR_mq_unlink		(__NR_mq_open+1)
+#define __NR_mq_timedsend	(__NR_mq_open+2)
+#define __NR_mq_timedreceive	(__NR_mq_open+3)
+#define __NR_mq_notify		(__NR_mq_open+4)
+#define __NR_mq_getsetattr	(__NR_mq_open+5)
+#endif
+%endif
+%ifarch ia64
+#ifndef __NR_timer_create
+#define __NR_timer_create		1248
+#define __NR_timer_settime		1249
+#define __NR_timer_gettime		1250
+#define __NR_timer_getoverrun		1251
+#define __NR_timer_delete		1252
+#define __NR_clock_settime		1253
+#define __NR_clock_gettime		1254
+#define __NR_clock_getres		1255
+#define __NR_clock_nanosleep		1256
+#endif
+#ifndef __NR_mq_open
+#define __NR_mq_open			1262
+#define __NR_mq_unlink			1263
+#define __NR_mq_timedsend		1264
+#define __NR_mq_timedreceive		1265
+#define __NR_mq_notify			1266
+#define __NR_mq_getsetattr		1267
+#endif
+%endif
+%ifarch ppc
+#ifndef __NR_utimes
+#define __NR_utimes		251
+#endif
+#ifndef __NR_statfs64
+#define __NR_statfs64		252
+#define __NR_fstatfs64		253
+#endif
+#ifndef __NR_fadvise64_64
+#define __NR_fadvise64_64	254
+#endif
+#ifndef __NR_mq_open
+#define __NR_mq_open		262
+#define __NR_mq_unlink		263
+#define __NR_mq_timedsend	264
+#define __NR_mq_timedreceive	265
+#define __NR_mq_notify		266
+#define __NR_mq_getsetattr	267
+#endif
+%endif
+%ifarch ppc64
+#ifndef __NR_utimes
+#define __NR_utimes		251
+#endif
+#ifndef __NR_mq_open
+#define __NR_mq_open		262
+#define __NR_mq_unlink		263
+#define __NR_mq_timedsend	264
+#define __NR_mq_timedreceive	265
+#define __NR_mq_notify		266
+#define __NR_mq_getsetattr	267
+#endif
+%endif
+%ifarch s390
+#ifndef __NR_timer_create
+#define __NR_timer_create	254
+#define __NR_timer_settime	(__NR_timer_create+1)
+#define __NR_timer_gettime	(__NR_timer_create+2)
+#define __NR_timer_getoverrun	(__NR_timer_create+3)
+#define __NR_timer_delete	(__NR_timer_create+4)
+#define __NR_clock_settime	(__NR_timer_create+5)
+#define __NR_clock_gettime	(__NR_timer_create+6)
+#define __NR_clock_getres	(__NR_timer_create+7)
+#define __NR_clock_nanosleep	(__NR_timer_create+8)
+#endif
+#ifndef __NR_fadvise64_64
+#define __NR_fadvise64_64	264
+#endif
+#ifndef __NR_statfs64
+#define __NR_statfs64		265
+#define __NR_fstatfs64		266
+#endif
+#ifndef __NR_mq_open
+#define __NR_mq_open		271
+#define __NR_mq_unlink		272
+#define __NR_mq_timedsend	273
+#define __NR_mq_timedreceive	274
+#define __NR_mq_notify		275
+#define __NR_mq_getsetattr	276
+#endif
+%endif
+%ifarch s390x
+#ifndef __NR_timer_create
+#define __NR_timer_create	254
+#define __NR_timer_settime	(__NR_timer_create+1)
+#define __NR_timer_gettime	(__NR_timer_create+2)
+#define __NR_timer_getoverrun	(__NR_timer_create+3)
+#define __NR_timer_delete	(__NR_timer_create+4)
+#define __NR_clock_settime	(__NR_timer_create+5)
+#define __NR_clock_gettime	(__NR_timer_create+6)
+#define __NR_clock_getres	(__NR_timer_create+7)
+#define __NR_clock_nanosleep	(__NR_timer_create+8)
+#endif
+#ifndef __NR_mq_open
+#define __NR_mq_open		271
+#define __NR_mq_unlink		272
+#define __NR_mq_timedsend	273
+#define __NR_mq_timedreceive	274
+#define __NR_mq_notify		275
+#define __NR_mq_getsetattr	276
+#endif
+%endif
+%ifarch sparc sparc64
+#ifndef __NR_mq_open
+#define __NR_mq_open		273
+#define __NR_mq_unlink		274
+#define __NR_mq_timedsend	275
+#define __NR_mq_timedreceive	276
+#define __NR_mq_notify		277
+#define __NR_mq_getsetattr	278
+#endif
+%endif
+%ifarch x86_64
+#ifndef __NR_mq_open
+#define __NR_mq_open		240
+#define __NR_mq_unlink		241
+#define __NR_mq_timedsend	242
+#define __NR_mq_timedreceive	243
+#define __NR_mq_notify		244
+#define __NR_mq_getsetattr	245
+#endif
+%endif
+#endif
+EOF
 
 %ifnarch %{ix86} alpha alphaev6 sparc sparcv9
 rm -rf glibc-compat
@@ -343,12 +491,67 @@ $GCC -static -L. -Os ../redhat/glibc_post_upgrade.c -o glibc_post_upgrade \
     -DARCH_386 '-DVERSION="%{version}"' \
     '-DPVERSION="'`sed 's/^linuxthreads-\([0-9.]*\) .*$/\1/' ../linuxthreads/Banner`'"' \
 %endif
+%ifarch %{nptlarches}
+    '-DLIBTLS="/%{_lib}/tls/"' \
+%endif
     '-DGCONV_MODULES_CACHE="%{_prefix}/%{_lib}/gconv/gconv-modules.cache"'
 mkdir sed
 cd sed
 CC="$GCC" CFLAGS="$BuildFlags -g -O2" ../../redhat/sed-3.02/configure
 make -j$numprocs
 cd ..
+cd ..
+
+# hack
+unset LD_ASSUME_KERNEL || :
+
+%ifarch %{rtkaioarches}
+AddOns=,rtkaio$AddOns
+%endif
+
+%ifarch i686 athlon
+rm -rf build-%{_target_cpu}-linuxltfs
+mkdir build-%{_target_cpu}-linuxltfs ; cd build-%{_target_cpu}-linuxltfs
+EnableKernel="--enable-kernel=%{enablekernelltfs} --disable-profile"
+Pthreads=linuxthreads
+%ifarch %{withtlsarches}
+WithTls="--with-tls --without-__thread"
+%else
+WithTls="--without-tls --without-__thread"
+%endif
+CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
+	--enable-add-ons=$Pthreads$AddOns --without-cvs $EnableKernel \
+	--with-headers=%{_prefix}/include --enable-bind-now \
+	$WithTls --build %{_target_cpu}-redhat-linux --host %{_target_cpu}-redhat-linux
+make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
+
+mkdir sed
+cd sed
+CFLAGS="$BuildFlags -g -O2" ../../redhat/sed-3.02/configure
+make -j$numprocs
+cd ..
+cd ..
+%endif
+
+%ifarch %{nptlarches}
+rm -rf build-%{_target_cpu}-linuxnptl
+mkdir build-%{_target_cpu}-linuxnptl ; cd build-%{_target_cpu}-linuxnptl
+EnableKernel="--enable-kernel=%{enablekernelnptl} --disable-profile"
+Pthreads=nptl
+WithTls="--with-tls --with-__thread"
+CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
+	--enable-add-ons=$Pthreads$AddOns --without-cvs $EnableKernel \
+	--with-headers=%{_prefix}/include --enable-bind-now \
+	$WithTls --build %{_target_cpu}-redhat-linux --host %{_target_cpu}-redhat-linux
+make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
+
+mkdir sed
+cd sed
+CFLAGS="$BuildFlags -g -O2" ../../redhat/sed-3.02/configure
+make -j$numprocs
+cd ..
+cd ..
+%endif
 
 %install
 # hack
@@ -382,21 +585,9 @@ cd build-%{_target_cpu}-linux && \
 SubDir=
 
 %ifarch i686 athlon
-rm -rf build-%{_target_cpu}-linuxltfs
-mkdir build-%{_target_cpu}-linuxltfs ; cd build-%{_target_cpu}-linuxltfs
-EnableKernel="--enable-kernel=%{enablekernelltfs} --disable-profile"
+cd build-%{_target_cpu}-linuxltfs
 Pthreads=linuxthreads
 SubDir=i686
-%ifarch %{withtlsarches}
-WithTls="--with-tls --without-__thread"
-%else
-WithTls="--without-tls --without-__thread"
-%endif
-CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
-	--enable-add-ons=$Pthreads$AddOns --without-cvs $EnableKernel \
-	--with-headers=%{_prefix}/include --enable-bind-now \
-	$WithTls --build %{_target_cpu}-redhat-linux --host %{_target_cpu}-redhat-linux
-make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
 mkdir -p $RPM_BUILD_ROOT/lib/$SubDir/
 cp -a libc.so $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libc-*.so`
 ln -sf `basename $RPM_BUILD_ROOT/lib/libc-*.so` $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libc.so.*`
@@ -414,26 +605,13 @@ cp -a rt/librt.so $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libr
 ln -sf `basename $RPM_BUILD_ROOT/lib/librt-*.so` $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/librt.so.*`
 %endif
 
-mkdir sed
-cd sed
-CFLAGS="$BuildFlags -g -O2" ../../redhat/sed-3.02/configure
-make -j$numprocs
-cd ..
 cd ..
 %endif
 
 %ifarch %{nptlarches}
-rm -rf build-%{_target_cpu}-linuxnptl
-mkdir build-%{_target_cpu}-linuxnptl ; cd build-%{_target_cpu}-linuxnptl
-EnableKernel="--enable-kernel=%{enablekernelnptl} --disable-profile"
+cd build-%{_target_cpu}-linuxnptl
 Pthreads=nptl
-WithTls="--with-tls --with-__thread"
 SubDir=tls
-CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
-	--enable-add-ons=$Pthreads$AddOns --without-cvs $EnableKernel \
-	--with-headers=%{_prefix}/include --enable-bind-now \
-	$WithTls --build %{_target_cpu}-redhat-linux --host %{_target_cpu}-redhat-linux
-make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/$SubDir/
 cp -a libc.so $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/libc-*.so`
 ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libc-*.so` $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/libc.so.*`
@@ -482,11 +660,6 @@ pushd $RPM_BUILD_ROOT/nptl%{_prefix}/include
 popd
 rm -rf $RPM_BUILD_ROOT/nptl
 
-mkdir sed
-cd sed
-CFLAGS="$BuildFlags -g -O2" ../../redhat/sed-3.02/configure
-make -j$numprocs
-cd ..
 cd ..
 %endif
 
@@ -519,6 +692,9 @@ ln -sf libbsd-compat.a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libbsd.a
 
 install -m 644 redhat/nsswitch.conf $RPM_BUILD_ROOT/etc/nsswitch.conf
 
+mkdir -p $RPM_BUILD_ROOT/etc/default
+install -m 644 nis/nss $RPM_BUILD_ROOT/etc/default/nss
+
 # Take care of setuids
 # -- new security review sez that this shouldn't be needed anymore
 #chmod 755 $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown
@@ -534,7 +710,7 @@ rm -f $RPM_BUILD_ROOT/etc/ld.so.cache
 # Include ld.so.conf
 echo 'include ld.so.conf.d/*.conf' > $RPM_BUILD_ROOT/etc/ld.so.conf
 chmod 644 $RPM_BUILD_ROOT/etc/ld.so.conf
-mkdir $RPM_BUILD_ROOT/etc/ld.so.conf.d
+mkdir -p $RPM_BUILD_ROOT/etc/ld.so.conf.d
 
 # Include %{_prefix}/%{_lib}/gconv/gconv-modules.cache
 > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
@@ -545,9 +721,10 @@ install -m 700 build-%{_target_cpu}-linux/glibc_post_upgrade $RPM_BUILD_ROOT/usr
 
 strip -g $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.o
 
-mkdir $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug
-cp -a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/
-rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/*_p.a
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}
+cp -a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.a \
+  $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/
+rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/*_p.a
 # Now strip debugging info from static libraries
 pushd $RPM_BUILD_ROOT%{_prefix}/%{_lib}/
 for i in *.a; do
@@ -595,7 +772,7 @@ find $RPM_BUILD_ROOT -type f -or -type l |
 	sed -e 's|.*/etc|%config &|' \
 	    -e 's|.*/gconv/gconv-modules$|%verify(not md5 size mtime) %config(noreplace) &|' \
 	    -e 's|.*/gconv/gconv-modules.cache|%verify(not md5 size mtime) &|' \
-	    -e '/%{_lib}\/debug/d' > rpm.filelist.in
+	    -e '/lib\/debug/d' > rpm.filelist.in
 for n in %{_prefix}/share %{_prefix}/include %{_prefix}/lib/locale; do 
     find ${RPM_BUILD_ROOT}${n} -type d | \
 	grep -v '%{_prefix}/share$' | \
@@ -610,7 +787,7 @@ LIB_LANG='s|.*/lib/locale/\([^/_]\+\)|%lang(\1) &|'
 # languages very well, temporarily disable
 # LIB_LANG=''
 sed -e "s|$RPM_BUILD_ROOT||" -e "$LIB_LANG" -e "$SHARE_LANG" < rpm.filelist.in |
-	grep -v '/etc/\(localtime\|nsswitch.conf\|ld.so.conf\)'  | \
+	grep -v '/etc/\(localtime\|nsswitch.conf\|ld.so.conf\|default\)'  | \
 	grep -v '/%{_lib}/lib\(pcprofile\|memusage\).so' | \
 	grep -v 'bin/\(memusage\|mtrace\|xtrace\|pcprofiledump\)' | \
 	sort > rpm.filelist
@@ -766,6 +943,12 @@ for i in `sed -n 's|^.*\*\*\* \[\([^]]*\.out\)\].*$|\1|p' build-%{_target_cpu}-l
   echo ============
 done
 echo ====================TESTING END=====================
+PLTCMD='/^Relocation section .*\(\.rela\?\.plt\|\.rela\.IA_64\.pltoff\)/,/^$/p'
+echo ====================PLT RELOCS LD.SO================
+readelf -Wr $RPM_BUILD_ROOT/%{_lib}/ld-*.so | sed -n -e "$PLTCMD"
+echo ====================PLT RELOCS LIBC.SO==============
+readelf -Wr $RPM_BUILD_ROOT/%{_lib}/$SubDir/libc-*.so | sed -n -e "$PLTCMD"
+echo ====================PLT RELOCS END==================
 
 %if "%{_enable_debug_packages}" == "1"
 
@@ -959,6 +1142,8 @@ rm -f *.filelist*
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/ld.so.conf
 %dir /etc/ld.so.conf.d
+%dir %attr(755,root,root) /etc/default
+%verify(not md5 size mtime) %config(noreplace) /etc/default/nss
 %doc README NEWS INSTALL FAQ BUGS NOTES PROJECTS CONFORMANCE
 %doc COPYING COPYING.LIB README.libm LICENSES
 %doc hesiod/README.hesiod
@@ -981,11 +1166,6 @@ rm -f *.filelist*
 %files -f utils.filelist utils
 %defattr(-,root,root)
 
-%files debug
-%defattr(-,root,root)
-%dir %{_prefix}/%{_lib}/debug
-%{_prefix}/%{_lib}/debug/*.a
-
 %files -f nscd.filelist -n nscd
 %defattr(-,root,root)
 %config(noreplace) /etc/nscd.conf
@@ -1002,16 +1182,104 @@ rm -f *.filelist*
 %if "%{_enable_debug_packages}" == "1"
 %files debuginfo -f debuginfo.filelist
 %defattr(-,root,root)
-
 %ifarch %{debuginfocommonarches}
 %ifnarch %{auxarches}
 %files debuginfo-common -f debuginfocommon.filelist
 %defattr(-,root,root)
+%dir %{_prefix}/lib/debug
+%dir %{_prefix}/lib/debug/%{_prefix}
+%dir %{_prefix}/lib/debug/%{_prefix}/%{_lib}
+%{_prefix}/lib/debug/%{_prefix}/%{_lib}/*.a
 %endif
+%else
+%dir %{_prefix}/lib/debug
+%dir %{_prefix}/lib/debug/%{_prefix}
+%dir %{_prefix}/lib/debug/%{_prefix}/%{_lib}
+%{_prefix}/lib/debug/%{_prefix}/%{_lib}/*.a
 %endif
 %endif
 
 %changelog
+* Tue May 11 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-27
+- remove /lib64/tls/librtkaio-2.3.[23].so in glibc_post_upgrade
+  on x86-64, s390x and ppc64 instead of /lib/tls/librtkaio-2.3.[23].so
+- build mq_{send,receive} with -fexceptions
+
+* Fri May  7 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-26
+- update from CVS
+  - fix <tgmath.h>
+  - fix memory leaks in nis, getifaddrs, etc. caused by incorrect
+    use of realloc
+- remove /lib/{tls,i686}/librtkaio-2.3.[23].so in glibc_post_upgrade
+  and rerun ldconfig if needed, otherwise after glibc upgrade librt.so.1
+  might be a stale symlink
+
+* Wed May  5 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-25
+- update from CVS
+- disable FUTEX_REQUEUE (work around #115349)
+- mq for sparc/sparc64/ia64
+
+* Tue May  4 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-24
+- update from CVS
+  - define S_ISSOCK in -D_XOPEN_SOURCE=600 and S_I[FS]SOCK
+    plus F_[SG]ETOWN also in -D_XOPEN_SOURCE=500 (both
+    included already in XNS5)
+  - reorder dlopen checks, so that dlopening ET_REL objects
+    complains about != ET_DYN != ET_EXEC, not about phentsize
+    (#121606)
+  - fix strpbrk macro for GCC 3.4+ (BZ #130)
+  - fix <sys/sysctl.h> (BZ #140)
+  - sched_[gs]etaffinity documentation fix (BZ #131)
+  - fix sparc64 build (BZ #139)
+  - change linuxthreads back to use non-cancellable writes
+    to manager pipes etc.
+  - fix sem_timedwait return value in linuxthreads (BZ #133)
+  - ia64 unnecessary PLT relocs removal
+
+* Thu Apr 22 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-23
+- update from CVS
+  - fix *scanf
+  - fix shm_unlink, sem_unlink and mq_unlink errno values
+  - avoid memory leaks in error
+  - execstack fixes on s390
+
+* Mon Apr 19 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-22
+- update from CVS
+  - mq and timer fixes
+- rebuilt with binutils >= 2.15.90.0.3-2 to fix IA-64 statically
+  linked binaries
+- fix linuxthreads librt.so on s390{,x}, so it is no longer DT_TEXTREL
+
+* Sat Apr 17 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-21
+- disable rtkaio
+- update from CVS
+  - POSIX message passing support
+  - fixed SIGEV_THREAD support for POSIX timers
+  - fix free on non-malloced memory in syslog
+  - fix ffsl on some 64-bit arches
+  - fix sched_setaffinity on x86-64, ia64
+  - fix ppc64 umount
+  - NETID_AUTHORITATIVE, SERVICES_AUTHORITATIVE support
+  - various NIS speedups
+  - fix fwrite with > 2GB sizes on 64-bit arches
+  - fix pthread_getattr_np guardsize reporting in NPTL
+- report PLT relocations in ld.so and libc.so during the build
+
+* Fri Mar 25 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-20
+- update from CVS
+  - change NPTL PTHREAD_MUTEX_ADAPTIVE_NP mutexes to spin on SMP
+  - strtol speed optimization
+  - don't try to use certainly unimplemented syscalls on ppc64
+- kill -debug subpackage, move the libs to glibc-debuginfo{,-common}
+  into /usr/lib/debug/usr/%{_lib}/ directory
+- fix c_stubs with gcc 3.4
+- move all the up to 3 builds into %%build scriptlet and
+  leave only installation in the %%install scriptlet
+
+* Mon Mar 22 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-19
+- update from CVS
+  - affinity API changes
+
 * Thu Mar 18 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-18
 - update from CVS
   - fix ia64 iopl (#118591)
