@@ -1,7 +1,7 @@
-%define glibcdate 20050208T0948
+%define glibcdate 20050208T2213
 %define glibcname glibc
 %define glibcversion 2.3.4
-%define glibcrelease 6
+%define glibcrelease 7
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -269,7 +269,6 @@ esac
 %patch3 -p1
 %endif
 %endif
-rm -f sysdeps/powerpc/powerpc64/dl-lookupcfg.h
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir asm
@@ -1274,6 +1273,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Feb  8 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-7
+- update from CVS
+  - fix TLS handling in linuxthreads
+
 * Tue Feb  8 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-6
 - update from CVS
   - ld.so auditing
