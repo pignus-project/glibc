@@ -1,6 +1,6 @@
-%define glibcdate 20041217T0906
+%define glibcdate 20041218T2312
 %define glibcversion 2.3.3
-%define glibcrelease 97
+%define glibcrelease 99
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -519,7 +519,7 @@ else
   numprocs=1
 fi
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
-$GCC -static -L. -Os ../fedora/glibc_post_upgrade.c -o glibc_post_upgrade \
+$GCC -static -L. -Os ../fedora/glibc_post_upgrade.c -o glibc_post_upgrade.%{_target_cpu} \
 %ifarch i386
     -DARCH_386 \
 %endif
@@ -746,7 +746,8 @@ mkdir -p $RPM_BUILD_ROOT/etc/ld.so.conf.d
 chmod 644 $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
 
 # Install the upgrade program
-install -m 700 build-%{_target_cpu}-linux/glibc_post_upgrade $RPM_BUILD_ROOT/usr/sbin/glibc_post_upgrade
+install -m 700 build-%{_target_cpu}-linux/glibc_post_upgrade.%{_target_cpu} \
+  $RPM_BUILD_ROOT/usr/sbin/glibc_post_upgrade.%{_target_cpu}
 
 strip -g $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.o
 
@@ -1001,7 +1002,7 @@ csf=debugcommonsources.list
 echo -n > $sf
 echo -n > $csf
 
-strip $RPM_BUILD_ROOT/{sbin/ldconfig,usr/sbin/glibc_post_upgrade,usr/sbin/build-locale-archive}
+strip $RPM_BUILD_ROOT/{sbin/ldconfig,usr/sbin/glibc_post_upgrade.%{_target_cpu},usr/sbin/build-locale-archive}
 
 # Strip ELF binaries
 for f in `grep -v '%%\(dir\|lang\|config\|verify\)' rpm.filelist`; do
@@ -1120,7 +1121,7 @@ touch $RPM_BUILD_ROOT/var/run/nscd/{socket,nscd.pid}
 
 touch $RPM_BUILD_ROOT/%{_prefix}/lib/locale/locale-archive
 
-%post -p /usr/sbin/glibc_post_upgrade
+%post -p /usr/sbin/glibc_post_upgrade.%{_target_cpu}
 
 %postun -p /sbin/ldconfig
 
@@ -1267,6 +1268,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Dec 19 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-99
+- rebuilt
+
+* Sat Dec 18 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-98
+- add .%%{_target_cpu} to glibc_post_upgrade, only run telinit u
+  if /sbin/init is the same ELF class and machine as
+  glibc_post_upgrade.%%{_target_cpu} and similarly with
+  condrestarting sshd (#143046)
+
 * Fri Dec 17 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-97
 - update from CVS
   - fix ppc64 getcontext and swapcontext (BZ#610)
