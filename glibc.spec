@@ -1,4 +1,4 @@
-%define glibcrelease 101.3
+%define glibcrelease 101.4
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -51,6 +51,7 @@ Patch33: glibc-ld-use-load-bias.patch
 Patch34: glibc-execstack-fix.patch
 Patch35: glibc-regex-bkref.patch
 Patch36: glibc-pmap-set.patch
+Patch37: glibc-regex-update2.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -322,6 +323,7 @@ esac
 %patch34 -p1
 %patch35 -p1
 %patch36 -p1
+%patch37 -p1
 
 %ifnarch %{ix86} alpha alphaev6 sparc sparcv9
 rm -rf glibc-compat
@@ -1069,6 +1071,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jan  6 2004 Jakub Jelinek <jakub@redhat.com> 2.3.2-101.4
+- some further regex speedups
+- fix re.translate handling in regex (#112869)
+- change regfree to match old regex behaviour (what is freed
+  and clearing of freed pointers)
+
 * Tue Dec 30 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-101.3
 - fix pmap_set fd and memory leak (#112726)
 - fix backreference handling in regex
