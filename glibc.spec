@@ -1,5 +1,5 @@
 %define linux24 0
-%define glibcrelease 5
+%define glibcrelease 5.1
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.2
@@ -11,6 +11,7 @@ Release: %{glibcrelease}
 Copyright: LGPL
 Group: System Environment/Libraries
 Source: %{name}-%{version}.tar.gz
+Patch1: strcpy.patch
 # In the source tarball the file diff-CYGNUS-to-REDHAT.patch contains all
 # diffs applied by Red Hat to the current CVS version of glibc
 Buildroot: /var/tmp/glibc-%{PACKAGE_VERSION}-root
@@ -124,6 +125,8 @@ case `uname -r` in
 %patch -p1
 ;; esac
 %endif
+
+%patch1 -p0
  
 %ifarch armv4l sparc64 ia64
 rm -rf glibc-compat
@@ -361,6 +364,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Dec  6 2000 Bill Nottingham <notting@redhat.com>
+- fix strcpy on ia64 (random SIGILLs)
+
 * Sun Nov 19 2000 Jakub Jelinek <jakub@redhat.com>
 - update to CVS to fix getaddrinfo
 
