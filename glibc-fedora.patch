@@ -1,7 +1,10 @@
 --- glibc-20041005T0745/ChangeLog	4 Oct 2004 23:30:29 -0000	1.8863
-+++ glibc-20041005T0745-fedora/ChangeLog	5 Oct 2004 08:25:01 -0000	1.8782.2.14
-@@ -1,3 +1,17 @@
++++ glibc-20041005T0745-fedora/ChangeLog	5 Oct 2004 11:23:13 -0000	1.8782.2.15
+@@ -1,3 +1,20 @@
 +2004-10-05  Jakub Jelinek  <jakub@redhat.com>
++
++	* sysdeps/unix/sysv/linux/s390/s390-32/sysdep.h: Include dl-sysdep.h.
++	* sysdeps/unix/sysv/linux/s390/s390-64/sysdep.h: Likewise.
 +
 +	* sysdeps/unix/sysv/linux/i386/sysconf.c: Include hp-timing.h.
 +	(__sysconf): Return -1 for _SC_CPUTIME or _SC_THREAD_CPUTIME if
@@ -18,7 +21,7 @@
  2004-10-04  Ulrich Drepper  <drepper@redhat.com>
  
  	* nscd/gai.c: Define __no_netlink_support if NEED_NETLINK is
-@@ -479,6 +493,22 @@
+@@ -479,6 +496,22 @@
  	* string/string.h: Add __nonnull annotations.
  	* stdlib/stdlib.h: Likewise.
  
@@ -41,7 +44,7 @@
  2004-09-20  H.J. Lu  <hongjiu.lu@intel.com>
  
  	* sysdeps/unix/sysv/linux/ia64/sysdep.h (DO_INLINE_SYSCALL):
-@@ -1208,6 +1238,23 @@
+@@ -1208,6 +1241,23 @@
  	before return type.
  	* locale/localename.c (__current_locale_name): Likewise.
  
@@ -65,7 +68,7 @@
  2004-08-30  Roland McGrath  <roland@frob.com>
  
  	* scripts/extract-abilist.awk: If `lastversion' variable defined, omit
-@@ -1364,6 +1411,22 @@
+@@ -1364,6 +1414,22 @@
  	* resolv/nss_dns/dns-canon.c (_nss_dns_getcanonname_r): Initialize
  	status to NSS_STATUS_UNAVAIL.
  
@@ -88,7 +91,7 @@
  2004-08-19  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/posix/getaddrinfo.c (gaih_inet): Use h->h_name in the
-@@ -1668,6 +1731,12 @@
+@@ -1668,6 +1734,12 @@
  
  	* iconvdata/testdata/ISO-2022-JP-3: Regenerated.
  
@@ -434,6 +437,118 @@
  # define USE_TLS__THREAD
  
  struct A
+--- glibc-20041005T0745/grp/compat-initgroups.c	30 Sep 2004 01:29:38 -0000	1.1
++++ glibc-20041005T0745-fedora/grp/compat-initgroups.c	5 Oct 2004 11:23:17 -0000	1.1.2.2
+@@ -58,31 +58,42 @@ compat_call (service_user *nip, const ch
+           for (m = grpbuf.gr_mem; *m != NULL; ++m)
+             if (strcmp (*m, user) == 0)
+               {
+-                /* Matches user.  Insert this group.  */
+-                if (__builtin_expect (*start == *size, 0))
+-                  {
+-                    /* Need a bigger buffer.  */
+-		    gid_t *newgroups;
+-		    long int newsize;
+-
+-		    if (limit > 0 && *size == limit)
+-		      /* We reached the maximum.  */
+-		      goto done;
+-
+-		    if (limit <= 0)
+-		      newsize = 2 * *size;
+-		    else
+-		      newsize = MIN (limit, 2 * *size);
+-
+-                    newgroups = realloc (groups, newsize * sizeof (*groups));
+-                    if (newgroups == NULL)
+-                      goto done;
+-		    *groupsp = groups = newgroups;
+-                    *size = newsize;
+-                  }
+-
+-                groups[*start] = grpbuf.gr_gid;
+-                *start += 1;
++		/* Check whether the group is already on the list.  */
++		long int cnt;
++		for (cnt = 0; cnt < *start; ++cnt)
++		  if (groups[cnt] == grpbuf.gr_gid)
++		    break;
++
++		if (cnt == *start)
++		  {
++		    /* Matches user and not yet on the list.  Insert
++		       this group.  */
++		    if (__builtin_expect (*start == *size, 0))
++		      {
++			/* Need a bigger buffer.  */
++			gid_t *newgroups;
++			long int newsize;
++
++			if (limit > 0 && *size == limit)
++			  /* We reached the maximum.  */
++			  goto done;
++
++			if (limit <= 0)
++			  newsize = 2 * *size;
++			else
++			  newsize = MIN (limit, 2 * *size);
++
++			newgroups = realloc (groups,
++					     newsize * sizeof (*groups));
++			if (newgroups == NULL)
++			  goto done;
++			*groupsp = groups = newgroups;
++			*size = newsize;
++		      }
++
++		    groups[*start] = grpbuf.gr_gid;
++		    *start += 1;
++		  }
+ 
+                 break;
+               }
+--- glibc-20041005T0745/grp/initgroups.c	30 Sep 2004 02:14:32 -0000	1.32
++++ glibc-20041005T0745-fedora/grp/initgroups.c	5 Oct 2004 11:23:17 -0000	1.31.2.2
+@@ -73,7 +73,7 @@ internal_getgrouplist (const char *user,
+   /* Start is one, because we have the first group as parameter.  */
+   long int start = 1;
+ 
+-  *groupsp[0] = group;
++  (*groupsp)[0] = group;
+ 
+   if (__nss_group_database != NULL)
+     {
+@@ -86,6 +86,8 @@ internal_getgrouplist (const char *user,
+ 
+   while (! no_more)
+     {
++      long int prev_start = start;
++
+       fct = __nss_lookup_function (nip, "initgroups_dyn");
+ 
+       if (fct == NULL)
+@@ -100,6 +102,21 @@ internal_getgrouplist (const char *user,
+ 	status = DL_CALL_FCT (fct, (user, group, &start, size, groupsp,
+ 				    limit, &errno));
+ 
++      /* Remove duplicates.  */
++      long int cnt = prev_start;
++      while (cnt < start)
++	{
++	  long int inner;
++	  for (inner = 0; inner < prev_start; ++inner)
++	    if ((*groupsp)[inner] == (*groups)[cnt])
++	      break;
++
++	  if (inner < prev_start)
++	    ++cnt;
++	  else
++	    (*groupsp)[cnt] = (*groupsp)[--start];
++	}
++
+       /* This is really only for debugging.  */
+       if (NSS_STATUS_TRYAGAIN > status || status > NSS_STATUS_RETURN)
+ 	__libc_fatal ("illegal status in internal_getgrouplist");
 --- glibc-20041005T0745/iconv/iconvconfig.c	24 Sep 2004 17:09:04 -0000	1.20
 +++ glibc-20041005T0745-fedora/iconv/iconvconfig.c	22 Sep 2004 21:20:51 -0000	1.19.2.1
 @@ -989,6 +989,34 @@ next_prime (uint32_t seed)
@@ -1795,6 +1910,38 @@
 +    prune_cache (&dbs[hstdb], LONG_MAX);
 +}
 +
+--- glibc-20041005T0745/nscd/initgrcache.c	30 Sep 2004 02:18:04 -0000	1.1
++++ glibc-20041005T0745-fedora/nscd/initgrcache.c	5 Oct 2004 11:23:18 -0000	1.1.2.2
+@@ -117,6 +117,7 @@ addinitgroupsX (struct database_dyn *db,
+   /* Nothing added yet.  */
+   while (! no_more)
+     {
++      long int prev_start = start;
+       enum nss_status status;
+       initgroups_dyn_function fct;
+       fct = __nss_lookup_function (nip, "initgroups_dyn");
+@@ -133,6 +134,21 @@ addinitgroupsX (struct database_dyn *db,
+ 	status = DL_CALL_FCT (fct, (key, -1, &start, &size, &groups,
+ 				    limit, &errno));
+ 
++      /* Remove duplicates.  */
++      long int cnt = prev_start;
++      while (cnt < start)
++	{
++	  long int inner;
++	  for (inner = 0; inner < prev_start; ++inner)
++	    if ((*groupsp)[inner] == (*groups)[cnt])
++	      break;
++
++	  if (inner < prev_start)
++	    ++cnt;
++	  else
++	    (*groupsp)[cnt] = (*groupsp)[--start];
++	}
++
+       if (status != NSS_STATUS_TRYAGAIN)
+ 	all_tryagain = false;
+ 
 --- glibc-20041005T0745/nscd/nscd.c	4 Oct 2004 16:14:31 -0000	1.42
 +++ glibc-20041005T0745-fedora/nscd/nscd.c	5 Oct 2004 08:25:25 -0000	1.38.2.4
 @@ -122,9 +122,16 @@ static struct argp argp =
@@ -2960,6 +3107,26 @@
 @@ -1 +1 @@
 -s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 \2\3"_
 +s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 /emul/ia32-linux\2\3"_
+--- glibc-20041005T0745/sysdeps/unix/sysv/linux/s390/s390-32/sysdep.h	4 Oct 2004 20:59:35 -0000	1.14
++++ glibc-20041005T0745-fedora/sysdeps/unix/sysv/linux/s390/s390-32/sysdep.h	5 Oct 2004 11:23:18 -0000	1.12.2.3
+@@ -22,6 +22,7 @@
+ 
+ #include <sysdeps/s390/s390-32/sysdep.h>
+ #include <sysdeps/unix/sysdep.h>
++#include <dl-sysdep.h>	/* For RTLD_PRIVATE_ERRNO.  */
+ 
+ /* For Linux we can use the system call table in the header file
+ 	/usr/include/asm/unistd.h
+--- glibc-20041005T0745/sysdeps/unix/sysv/linux/s390/s390-64/sysdep.h	4 Oct 2004 20:59:34 -0000	1.16
++++ glibc-20041005T0745-fedora/sysdeps/unix/sysv/linux/s390/s390-64/sysdep.h	5 Oct 2004 11:23:19 -0000	1.14.2.3
+@@ -23,6 +23,7 @@
+ 
+ #include <sysdeps/s390/s390-64/sysdep.h>
+ #include <sysdeps/unix/sysdep.h>
++#include <dl-sysdep.h>	/* For RTLD_PRIVATE_ERRNO.  */
+ 
+ /* For Linux we can use the system call table in the header file
+ 	/usr/include/asm/unistd.h
 --- glibc-20041005T0745/sysdeps/unix/sysv/linux/sparc/sparc32/setresgid.c	19 Sep 2004 23:51:19 -0000	1.3
 +++ glibc-20041005T0745-fedora/sysdeps/unix/sysv/linux/sparc/sparc32/setresgid.c 1 Jan 1970 00:00:00 -0000
 @@ -1 +0,0 @@
