@@ -1,12 +1,12 @@
-%define glibcrelease 47
+%define glibcrelease 49
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
-%define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
+%define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
 %define rtkaioarches noarch
-%define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
+%define withtlsarches i386 i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200408310938
+%define glibcdate 200409040813
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -62,6 +62,13 @@ Conflicts: kernel < 2.4.19
 %endif
 %ifarch %{nptlarches}
 %define enablekernelnptl 2.4.20
+%ifarch i386
+%define nptl_target_cpu i486
+%define tls_subdir tls/i486
+%else
+%define nptl_target_cpu %{_target_cpu}
+%define tls_subdir tls
+%endif
 %endif
 BuildRequires: binutils >= 2.13.90.0.16-5
 BuildRequires: gcc >= 3.2.1-5
@@ -289,6 +296,9 @@ cat > asm/unistd.h <<EOF
 #define __NR_mq_notify		(__NR_mq_open+4)
 #define __NR_mq_getsetattr	(__NR_mq_open+5)
 #endif
+#ifndef __NR_waitid
+#define __NR_waitid		284
+#endif
 %endif
 %ifarch ia64
 #ifndef __NR_timer_create
@@ -402,6 +412,9 @@ cat > asm/unistd.h <<EOF
 #define __NR_mq_notify		277
 #define __NR_mq_getsetattr	278
 #endif
+#ifndef __NR_waitid
+#define __NR_waitid		279
+#endif
 %endif
 %ifarch x86_64
 #ifndef __NR_mq_open
@@ -411,6 +424,9 @@ cat > asm/unistd.h <<EOF
 #define __NR_mq_timedreceive	243
 #define __NR_mq_notify		244
 #define __NR_mq_getsetattr	245
+#endif
+#ifndef __NR_waitid
+#define __NR_waitid		253
 #endif
 %endif
 #endif
@@ -497,8 +513,7 @@ fi
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
 $GCC -static -L. -Os ../redhat/glibc_post_upgrade.c -o glibc_post_upgrade \
 %ifarch i386
-    -DARCH_386 '-DVERSION="%{version}"' \
-    '-DPVERSION="'`sed 's/^linuxthreads-\([0-9.]*\) .*$/\1/' ../linuxthreads/Banner`'"' \
+    -DARCH_386 \
 %endif
 %ifarch %{nptlarches}
     '-DLIBTLS="/%{_lib}/tls/"' \
@@ -544,15 +559,15 @@ cd ..
 %endif
 
 %ifarch %{nptlarches}
-rm -rf build-%{_target_cpu}-linuxnptl
-mkdir build-%{_target_cpu}-linuxnptl ; cd build-%{_target_cpu}-linuxnptl
+rm -rf build-%{nptl_target_cpu}-linuxnptl
+mkdir build-%{nptl_target_cpu}-linuxnptl ; cd build-%{nptl_target_cpu}-linuxnptl
 EnableKernel="--enable-kernel=%{enablekernelnptl} --disable-profile"
 Pthreads=nptl
 WithTls="--with-tls --with-__thread"
 CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
 	--enable-add-ons=$Pthreads$AddOns --without-cvs $EnableKernel \
 	--with-headers=%{_prefix}/include --enable-bind-now \
-	$WithTls --build %{_target_cpu}-redhat-linux --host %{_target_cpu}-redhat-linux
+	$WithTls --build %{nptl_target_cpu}-redhat-linux --host %{nptl_target_cpu}-redhat-linux
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
 
 mkdir sed
@@ -619,9 +634,9 @@ cd ..
 %endif
 
 %ifarch %{nptlarches}
-cd build-%{_target_cpu}-linuxnptl
+cd build-%{nptl_target_cpu}-linuxnptl
 Pthreads=nptl
-SubDir=tls
+SubDir=%{tls_subdir}
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/$SubDir/
 cp -a libc.so $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/libc-*.so`
 ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libc-*.so` $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/libc.so.*`
@@ -671,6 +686,16 @@ popd
 rm -rf $RPM_BUILD_ROOT/nptl
 
 cd ..
+
+%ifarch i386
+for i in i586 i686; do
+  mkdir $RPM_BUILD_ROOT/%{_lib}/tls/$i
+  pushd $RPM_BUILD_ROOT/%{_lib}/tls/$i
+    ln -sf ../i486/*.so .
+    cp -a ../i486/*.so.* .
+  popd
+done
+%endif
 %endif
 
 # compatibility hack: this locale has vanished from glibc, but some other
@@ -925,13 +950,13 @@ cd ..
 %endif
 %ifarch %{nptlarches}
 echo ====================TESTING NPTL====================
-cd build-%{_target_cpu}-linuxnptl
+cd build-%{nptl_target_cpu}-linuxnptl
 make -j$numprocs -k check PARALLELMFLAGS=-s 2>&1 | tee check.log || :
 make -j$numprocs -C sed check || :
 cd ..
 %endif
 echo ====================TESTING DETAILS=================
-for i in `sed -n 's|^.*\*\*\* \[\([^]]*\.out\)\].*$|\1|p' build-%{_target_cpu}-linux*/check.log`; do
+for i in `sed -n 's|^.*\*\*\* \[\([^]]*\.out\)\].*$|\1|p' build-*-linux*/check.log`; do
   echo =====$i=====
   cat $i || :
   echo ============
@@ -947,7 +972,7 @@ cd ..
 %endif
 %ifarch %{nptlarches}
 echo ====================TESTING NPTL LD.SO==============
-cd build-%{_target_cpu}-linuxnptl
+cd build-%{nptl_target_cpu}-linuxnptl
 mv elf/ld.so elf/ld.so.orig
 cp -a ../build-%{_target_cpu}-linux/elf/ld.so elf/ld.so
 find . -name \*.out -exec mv -f '{}' '{}'.origldso \;
@@ -955,7 +980,7 @@ make -j$numprocs -k check PARALLELMFLAGS=-s 2>&1 | tee check2.log || :
 cd ..
 %endif
 echo ====================TESTING DETAILS=================
-for i in `sed -n 's|^.*\*\*\* \[\([^]]*\.out\)\].*$|\1|p' build-%{_target_cpu}-linux*/check2.log`; do
+for i in `sed -n 's|^.*\*\*\* \[\([^]]*\.out\)\].*$|\1|p' build-*-linux*/check2.log`; do
   echo =====$i=====
   cat $i || :
   echo ============
@@ -1147,7 +1172,11 @@ rm -f *.filelist*
 %files -f rpm.filelist
 %defattr(-,root,root)
 %ifarch %{nptlarches}
-%dir /%{_lib}/tls
+%dir /%{_lib}/%{tls_subdir}
+%ifarch i386
+%dir /%{_lib}/tls/i586
+%dir /%{_lib}/tls/i686
+%endif
 %endif
 %ifarch i686 athlon
 %dir /lib/i686
@@ -1225,6 +1254,18 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Sep  3 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-49
+- update from CVS
+- fix linuxthreads tst-cancel{[45],-static}
+
+* Fri Sep  3 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-48
+- update from CVS
+  - fix pthread_cond_destroy (BZ #342)
+  - fix fnmatch without FNM_NOESCAPE (BZ #361)
+  - fix ppc32 setcontext (BZ #357)
+- add NPTL support for i386 glibc (only if run on i486 or higher CPU)
+- add __NR_waitid defines for i386, x86_64 and sparc*
+
 * Tue Aug 31 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-47
 - update from CVS
   - persistent nscd caching
