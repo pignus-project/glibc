@@ -1,4 +1,4 @@
-%define linux24 0
+%define linux24 1
 %define glibcrelease 14
 Summary: The GNU libc libraries.
 Name: glibc
