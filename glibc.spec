@@ -1,6 +1,6 @@
-%define glibcdate 20040930T0838
+%define glibcdate 20041001T1134
 %define glibcversion 2.3.3
-%define glibcrelease 61
+%define glibcrelease 62
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -1241,6 +1241,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Oct  1 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-62
+- update from CVS
+  - fix NPTL pthread_mutex_timedwait on i386/x86_64 (BZ #417)
+
 * Thu Sep 30 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-61
 - update from CVS
   - some nscd fixes (#134193)
