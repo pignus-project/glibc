@@ -693,7 +693,9 @@ pushd $RPM_BUILD_ROOT/nptl%{_prefix}/include
     if ! [ -f $RPM_BUILD_ROOT%{_prefix}/include/$i ] \
        || ! cmp -s $i $RPM_BUILD_ROOT%{_prefix}/include/$i; then
       mkdir -p $RPM_BUILD_ROOT%{_prefix}/include/linuxthreads/`dirname $i`
-      cp -a $RPM_BUILD_ROOT%{_prefix}/include/{,linuxthreads/}$i
+      if [ -f $RPM_BUILD_ROOT%{_prefix}/include/$i ]; then
+        cp -a $RPM_BUILD_ROOT%{_prefix}/include/{,linuxthreads/}$i
+      fi
       cp -a $i $RPM_BUILD_ROOT%{_prefix}/include/$i
     fi
   done
