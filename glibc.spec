@@ -1,4 +1,4 @@
-%define glibcrelease 46
+%define glibcrelease 47
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200408210835
+%define glibcdate 200408310938
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -503,7 +503,8 @@ $GCC -static -L. -Os ../redhat/glibc_post_upgrade.c -o glibc_post_upgrade \
 %ifarch %{nptlarches}
     '-DLIBTLS="/%{_lib}/tls/"' \
 %endif
-    '-DGCONV_MODULES_CACHE="%{_prefix}/%{_lib}/gconv/gconv-modules.cache"'
+    '-DGCONV_MODULES_CACHE="%{_prefix}/%{_lib}/gconv/gconv-modules.cache"' \
+    '-DLD_SO_CONF="/etc/ld.so.conf"'
 mkdir sed
 cd sed
 CC="$GCC" CFLAGS="$BuildFlags -g -O2" ../../redhat/sed-3.02/configure
@@ -718,6 +719,7 @@ rm -f $RPM_BUILD_ROOT/etc/ld.so.cache
 
 # Include ld.so.conf
 echo 'include ld.so.conf.d/*.conf' > $RPM_BUILD_ROOT/etc/ld.so.conf
+touch $RPM_BUILD_ROOT/etc/ld.so.cache
 chmod 644 $RPM_BUILD_ROOT/etc/ld.so.conf
 mkdir -p $RPM_BUILD_ROOT/etc/ld.so.conf.d
 
@@ -796,7 +798,7 @@ LIB_LANG='s|.*/lib/locale/\([^/_]\+\)|%lang(\1) &|'
 # languages very well, temporarily disable
 # LIB_LANG=''
 sed -e "s|$RPM_BUILD_ROOT||" -e "$LIB_LANG" -e "$SHARE_LANG" < rpm.filelist.in |
-	grep -v '/etc/\(localtime\|nsswitch.conf\|ld.so.conf\|default\)'  | \
+	grep -v '/etc/\(localtime\|nsswitch.conf\|ld.so.conf\|ld.so.cache\|default\)'  | \
 	grep -v '/%{_lib}/lib\(pcprofile\|memusage\).so' | \
 	grep -v 'bin/\(memusage\|mtrace\|xtrace\|pcprofiledump\)' | \
 	sort > rpm.filelist
@@ -1164,6 +1166,7 @@ rm -f *.filelist*
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/ld.so.conf
 %dir /etc/ld.so.conf.d
+%attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/ld.so.cache
 %dir %attr(755,root,root) /etc/default
 %verify(not md5 size mtime) %config(noreplace) /etc/default/nss
 %doc README NEWS INSTALL FAQ BUGS NOTES PROJECTS CONFORMANCE
@@ -1222,6 +1225,16 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Aug 31 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-47
+- update from CVS
+  - persistent nscd caching
+  - ppc64 32-bit atomicity fix
+  - fix x86-64 nptl-devel headers for -m32 compilation
+- %%ghost /etc/ld.so.cache (#130597)
+- edit /etc/ld.so.conf in glibc_post_upgrade if
+  include ld.so.conf.d/*.conf line is missing (#120588)
+- ugly hacks for the IA-64 /emul braindamage (#124996, #128267)
+
 * Sat Aug 21 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-46
 - update from CVS
 
