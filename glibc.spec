@@ -1,7 +1,7 @@
 %define glibcdate 20050211T1037
 %define glibcname glibc
 %define glibcversion 2.3.4
-%define glibcrelease 9
+%define glibcrelease 10
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -844,7 +844,7 @@ done
 
 grep '%{_prefix}/%{_lib}/lib.*_p\.a' < rpm.filelist > profile.filelist || :
 grep '%{_infodir}' < rpm.filelist | grep -v '%{_infodir}/dir' > devel.filelist
-grep '%{_prefix}/include/gnu/stubs-[32164]\+\.h' < rpm.filelist >> devel.filelist || :
+grep '%{_prefix}/include/gnu/stubs-[32164]\+\.h' < rpm.filelist >> devel.filelist
 
 grep '%{_prefix}/include' < rpm.filelist |
 	egrep -v '%{_prefix}/include/(nptl|gnu/stubs-[32164]+\.h)' \
@@ -1272,10 +1272,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Feb 12 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-10
+- hopefully fix interaction with prelink (#147655)
+
 * Fri Feb 11 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-9
 - update from CVS
   - bi-arch <gnu/stubs.h> (BZ#715)
-- hopefully fix interaction with prelink (#147655)
 
 * Fri Feb 11 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-8
 - update from CVS
