@@ -547,8 +547,18 @@
  __BEGIN_NAMESPACE_STD
  /* Remove file FILENAME.  */
 --- glibc-20040925T0738/linuxthreads/ChangeLog	25 Sep 2004 03:32:21 -0000	1.818
-+++ glibc-20040925T0738-fedora/linuxthreads/ChangeLog	25 Sep 2004 07:55:40 -0000	1.817.2.2
-@@ -630,6 +630,12 @@
++++ glibc-20040925T0738-fedora/linuxthreads/ChangeLog	25 Sep 2004 11:28:39 -0000	1.817.2.3
+@@ -1,3 +1,9 @@
++2004-09-25  Roland McGrath  <roland@redhat.com>
++
++	[BZ #406]
++	* sysdeps/i386/i686/pt-machine.h: Don't #include "../useldt.h" if
++	[_TLS_H], since sysdeps/i386/tls.h includes it after including us.
++
+ 2004-09-24  Roland McGrath  <roland@redhat.com>
+ 
+ 	[BZ #406]
+@@ -630,6 +636,12 @@
  	(pthread_barrierattr_setpshared): Return EINVAL if pshared
  	is neither PTHREAD_PROCESS_PRIVATE nor PTHREAD_PROCESS_SHARED.
  
@@ -561,7 +571,7 @@
  2003-09-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/unix/sysv/linux/i386/dl-sysdep.h
-@@ -762,6 +768,34 @@
+@@ -762,6 +774,34 @@
  
  2003-07-22  Jakub Jelinek  <jakub@redhat.com>
  
@@ -773,32 +783,27 @@
  
  /* Alignment requirements for the TCB.  */
  #  define TLS_TCB_ALIGN __alignof__ (struct _pthread_descr_struct)
---- glibc-20040925T0738/linuxthreads/sysdeps/i386/useldt.h	20 Apr 2003 08:23:23 -0000	1.26
-+++ glibc-20040925T0738-fedora/linuxthreads/sysdeps/i386/useldt.h	25 Sep 2004 08:04:28 -0000	1.26.2.1
+--- glibc-20040925T0738/linuxthreads/sysdeps/i386/i686/pt-machine.h	31 Jul 2003 19:15:43 -0000	1.22
++++ glibc-20040925T0738-fedora/linuxthreads/sysdeps/i386/i686/pt-machine.h	25 Sep 2004 11:28:41 -0000	1.22.2.1
 @@ -1,6 +1,6 @@
- /* Special definitions for ix86 machine using segment register based
-    thread descriptor.
--   Copyright (C) 1998, 2000, 2001, 2002 Free Software Foundation, Inc.
-+   Copyright (C) 1998, 2000, 2001, 2002, 2004 Free Software Foundation, Inc.
+ /* Machine-dependent pthreads configuration and inline functions.
+    i686 version.
+-   Copyright (C) 1996-2001, 2002, 2003 Free Software Foundation, Inc.
++   Copyright (C) 1996-2001, 2002, 2003, 2004 Free Software Foundation, Inc.
     This file is part of the GNU C Library.
-    Contributed by Ulrich Drepper <drepper@cygnus.com>.
+    Contributed by Richard Henderson <rth@tamu.edu>.
  
-@@ -19,6 +19,9 @@
-    write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-    Boston, MA 02111-1307, USA.	*/
- 
-+#ifndef __USELDT_H
-+#define __USELDT_H 1
-+
- #ifndef __ASSEMBLER__
- #include <stddef.h>	/* For offsetof.  */
- #include <stdlib.h>	/* For abort().	 */
-@@ -312,3 +315,5 @@ extern int __have_no_set_thread_area;
- /* Maximum size of the stack if the rlimit is unlimited.  */
- #define ARCH_STACK_MAX_SIZE	8*1024*1024
+@@ -69,7 +69,9 @@ __compare_and_swap (long int *p, long in
+ }
  #endif
-+
-+#endif
+ 
+-#if __ASSUME_LDT_WORKS > 0
++/* If tls.h was included, it will include useldt.h after defining USE_TLS.
++   We don't want to include it here first when tls.h includes us.  */
++#if __ASSUME_LDT_WORKS > 0 && !defined _TLS_H
+ #include "../useldt.h"
+ #endif
+ 
 --- glibc-20040925T0738/linuxthreads/sysdeps/ia64/tls.h	8 Jul 2004 21:20:57 -0000	1.9
 +++ glibc-20040925T0738-fedora/linuxthreads/sysdeps/ia64/tls.h	22 Sep 2004 21:20:55 -0000	1.9.2.1
 @@ -60,7 +60,14 @@ typedef struct
