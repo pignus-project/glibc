@@ -1,5 +1,5 @@
 %define linux24 0
-%define glibcrelease 1
+%define glibcrelease 2
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.1.95
@@ -360,8 +360,11 @@ rm -f *.filelist*
 %endif
 %endif
 
-%define date    %(echo `LC_ALL="C" date +"%a %b %d %Y"`)
-
 %changelog
-* %{date} Jakub Jelinek <jakub@redhat.com>
-- build from CVS archive
+* Thu Oct 19 2000 Jakub Jelinek <jakub@redhat.com>
+- fix alpha semctl (#19199)
+- update to CVS, including:
+  - fix glibc headers for Compaq non-gcc compilers
+  - fix locale alias handling code (#18832)
+  - fix rexec on little endian machines (#18886)
+- started writing changelog again
