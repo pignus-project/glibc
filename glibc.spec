@@ -1,6 +1,6 @@
-%define glibcdate 20041112T1640
+%define glibcdate 20041115T0915
 %define glibcversion 2.3.3
-%define glibcrelease 77
+%define glibcrelease 78
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -1258,6 +1258,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Nov 15 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-78
+- update from CVS
+  - fix LD_DEBUG=statistics
+  - issue error message before aborting in __chk_fail ()
+  - some more free () checking
+
 * Fri Nov 12 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-77
 - update from CVS
   - speedup regex on palindromes (BZ #429)
