@@ -1,4 +1,4 @@
-%define glibcrelease 10
+%define glibcrelease 11
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 Summary: The GNU libc libraries.
 Name: glibc
@@ -36,10 +36,10 @@ BuildPreReq: gcc >= 2.96-84
 BuildPreReq: gcc >= 2.96-82
 %endif
 Conflicts: rpm <= 4.0-0.65
+Conflicts: glibc-devel < 2.2.3
 Patch: glibc-kernel-2.4.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
-Conflicts: glibc-devel < 2.2.3
 %define enablekernel 2.4.0
 %define enablemask [01].*|2.[0-3]*
 %else
@@ -437,6 +437,14 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jun  6 2001 Jakub Jelinek <jakub@redhat.com>
+- fix a bunch of math bugs (#43210, #43345, #43346, #43347, #43348, #43355)
+- make rpc headers -ansi compilable (#42390)
+- remove alphaev6 optimized memcpy, since there are still far too many
+  broken apps which call memcpy where they should call memmove
+- update from CVS to (among other things):
+  - fix tanhl bug (#43352)
+
 * Tue May 22 2001 Jakub Jelinek <jakub@redhat.com>
 - fix #include <signal.h> with -D_XOPEN_SOURCE=500 on ia64 (#35968)
 - fix a dlclose reldeps handling bug
