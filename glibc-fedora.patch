@@ -189,6 +189,29 @@
  #endif
  
  /* These function symbols are provided for the .init/.fini section entry
+--- glibc-20041014T0548/dlfcn/dlinfo.c	14 Oct 2004 01:48:22 -0000	1.3
++++ glibc-20041014T0548-fedora/dlfcn/dlinfo.c	14 Oct 2004 12:00:34 -0000	1.2.2.2
+@@ -39,13 +39,15 @@ dlinfo_doit (void *argsblock)
+ #if 0
+   if (args->handle == RTLD_SELF)
+     {
++      Lmid_t nsid;
+ 
+       /* Find the highest-addressed object that CALLER is not below.  */
+-      for (l = GL(dl_loaded); l != NULL; l = l->l_next)
+-	if (caller >= l->l_map_start && caller < l->l_map_end)
+-	  /* There must be exactly one DSO for the range of the virtual
+-	     memory.  Otherwise something is really broken.  */
+-	  break;
++      for (nsid = 0; nsid < DL_NNS; ++nsid)
++	for (l = GL(dl_ns)[nsid]._ns_loaded; l != NULL; l = l->l_next)
++	  if (caller >= l->l_map_start && caller < l->l_map_end)
++	    /* There must be exactly one DSO for the range of the virtual
++	       memory.  Otherwise something is really broken.  */
++	    break;
+ 
+       if (l == NULL)
+ 	GLRO(dl_signal_error) (0, NULL, NULL, N_("\
 --- glibc-20041014T0548/elf/dl-close.c	14 Oct 2004 02:00:27 -0000	1.106
 +++ glibc-20041014T0548-fedora/elf/dl-close.c	14 Oct 2004 09:57:38 -0000	1.104.2.2
 @@ -237,7 +237,7 @@ _dl_close (void *_map)
@@ -2747,6 +2770,97 @@
 +symbol_version (INTUSE (__multi3), __multi3, GLIBC_2.2);
 +
 +#endif
+--- glibc-20041014T0548/sysdeps/mips/dl-machine.h	25 Aug 2004 05:57:35 -0000	1.75
++++ glibc-20041014T0548-fedora/sysdeps/mips/dl-machine.h	14 Oct 2004 12:00:36 -0000	1.75.2.1
+@@ -231,10 +231,11 @@ elf_machine_runtime_link_map (ElfW(Addr)
+ 	}
+     }
+ 
+-    {
+-      struct link_map *l = GL(dl_loaded);
++    struct link_map *l;
++    Lmid_t nsid;
+ 
+-      while (l)
++    for (nsid = 0; nsid < DL_NNS; ++nsid)
++      for (l = GL(dl_ns)[nsid]._ns_loaded; l != NULL; l = l->l_next)
+ 	{
+ 	  ElfW(Addr) base, limit;
+ 	  const ElfW(Phdr) *p = l->l_phdr;
+@@ -250,9 +251,7 @@ elf_machine_runtime_link_map (ElfW(Addr)
+ 		    return l;
+ 		}
+ 	    }
+-	  l = l->l_next;
+ 	}
+-    }
+ 
+   _dl_signal_error (0, NULL, NULL, "cannot find runtime link map");
+   return NULL;
+--- glibc-20041014T0548/sysdeps/powerpc/powerpc32/dl-machine.c	5 Mar 2004 10:23:44 -0000	1.9
++++ glibc-20041014T0548-fedora/sysdeps/powerpc/powerpc32/dl-machine.c	14 Oct 2004 12:00:36 -0000	1.9.2.1
+@@ -106,6 +106,7 @@ __elf_preferred_address(struct link_map 
+ {
+   ElfW(Addr) low, high;
+   struct link_map *l;
++  Lmid_t nsid;
+ 
+   /* If the object has a preference, load it there!  */
+   if (mapstartpref != 0)
+@@ -117,29 +118,30 @@ __elf_preferred_address(struct link_map 
+      be superceded by the program's load address).  */
+   low =  0x0003FFFF;
+   high = 0x70000000;
+-  for (l = GL(dl_loaded); l; l = l->l_next)
+-    {
+-      ElfW(Addr) mapstart, mapend;
+-      mapstart = l->l_map_start & ~(GLRO(dl_pagesize) - 1);
+-      mapend = l->l_map_end | (GLRO(dl_pagesize) - 1);
+-      assert (mapend > mapstart);
+-
+-      /* Prefer gaps below the main executable, note that l ==
+-	 _dl_loaded does not work for static binaries loading
+-	 e.g. libnss_*.so.  */
+-      if ((mapend >= high || l->l_type == lt_executable)
+-	  && high >= mapstart)
+-	high = mapstart;
+-      else if (mapend >= low && low >= mapstart)
+-	low = mapend;
+-      else if (high >= mapend && mapstart >= low)
+-	{
+-	  if (high - mapend >= mapstart - low)
+-	    low = mapend;
+-	  else
+-	    high = mapstart;
+-	}
+-    }
++  for (nsid = 0; nsid < DL_NNS; ++nsid)
++    for (l = GL(dl_ns)[nsid]._ns_loaded; l; l = l->l_next)
++      {
++	ElfW(Addr) mapstart, mapend;
++	mapstart = l->l_map_start & ~(GLRO(dl_pagesize) - 1);
++	mapend = l->l_map_end | (GLRO(dl_pagesize) - 1);
++	assert (mapend > mapstart);
++
++	/* Prefer gaps below the main executable, note that l ==
++	   _dl_loaded does not work for static binaries loading
++	   e.g. libnss_*.so.  */
++	if ((mapend >= high || l->l_type == lt_executable)
++  	    && high >= mapstart)
++	  high = mapstart;
++	else if (mapend >= low && low >= mapstart)
++	  low = mapend;
++	else if (high >= mapend && mapstart >= low)
++	  {
++	    if (high - mapend >= mapstart - low)
++	      low = mapend;
++	    else
++	      high = mapstart;
++	  }
++      }
+ 
+   high -= 0x10000; /* Allow some room between objects.  */
+   maplength = (maplength | (GLRO(dl_pagesize) - 1)) + 1;
 --- glibc-20041014T0548/sysdeps/sparc/fpu/bits/mathinline.h	30 Sep 2004 06:16:29 -0000	1.15
 +++ glibc-20041014T0548-fedora/sysdeps/sparc/fpu/bits/mathinline.h	14 Oct 2004 09:57:42 -0000	1.14.2.2
 @@ -112,7 +112,7 @@
