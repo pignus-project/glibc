@@ -671,9 +671,9 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libpthread.so
 sed "s| /%{_lib}/| /%{_lib}/$SubDir/|" $RPM_BUILD_ROOT%{_prefix}/%{_lib}/linuxthreads/libc.so \
   > $RPM_BUILD_ROOT/%{_lib}/tls/libc.so
 ln -sf /%{_lib}/tls/libc.so $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libc.so
-sed "s|^GROUP (.*)|GROUP ( /%{_lib}/$SubDir/"`basename $RPM_BUILD_ROOT/%{_lib}/libpthread.so.*`' %{_prefix}/%{_lib}/nptl/libpthread_nonshared.a )|' \
+sed "s|^GROUP (.*)|GROUP ( /%{_lib}/$SubDir/"`basename $RPM_BUILD_ROOT/%{_lib}/libpthread.so.*`' %{_prefix}/%{_lib}/libpthread_nonshared.a )|' \
   $RPM_BUILD_ROOT%{_prefix}/%{_lib}/linuxthreads/libc.so \
-  > $RPM_BUILD_ROOT%{_lib}/tls/libpthread.so
+  > $RPM_BUILD_ROOT/%{_lib}/tls/libpthread.so
 ln -sf /%{_lib}/tls/libpthread.so $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libpthread.so
 %ifarch %{rtkaioarches}
 ln -sf /%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed 's/librt-/librtkaio-/'` \
