@@ -1,7 +1,7 @@
-%define glibcrelease 34.1
+%define glibcrelease 36
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches i686 athlon alpha alphaev6
-%define prelinkdate 20020326
+%define prelinkdate 20020617
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.2.5
@@ -28,11 +28,11 @@ BuildPreReq: gd-devel libpng-devel zlib-devel
 BuildPreReq: libelf >= 0.7.0-2
 # This is to ensure that __frame_state_for exported by glibc
 # will be compatible with egcs 1.x.y
+BuildPreReq: gcc >= 2.96-84
 Conflicts: rpm <= 4.0-0.65
 Conflicts: glibc-devel < 2.2.3
 Patch: glibc-kernel-2.4.patch
-Patch1: glibc-2.2.4-s390-2.patch
-Patch2: glibc-2.2.4-s390-3.patch
+Patch2: glibc-2.2.5.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
@@ -185,7 +185,6 @@ case `uname -r` in
 %enablemask)
 %patch -p1
 ;; esac
-%patch1 -p1
 %patch2 -p1
 
 %ifarch %{prelinkarches}
@@ -309,7 +308,7 @@ cd ..
 
 %ifarch %{prelinkarches}
 # Build prelink
-cd prelink/prelink-%{prelinkdate}
+cd prelink/prelink
 %configure
 make
 cd ../..
@@ -429,9 +428,9 @@ cd prelink
 > prelink.conf
 # For now disable prelinking of ld.so, as it breaks statically linked
 # binaries built against non-NDEBUG old glibcs (assert unknown dynamic tag)
-# prelink-%{prelinkdate}/src/prelink -c ./prelink.conf -C ./prelink.cache \
+# prelink/src/prelink -c ./prelink.conf -C ./prelink.cache \
 #  --mmap-region-start=0x40000000 $RPM_BUILD_ROOT/%{_lib}/ld-*.so
-prelink-%{prelinkdate}/src/prelink --reloc-only=0x42000000 \
+prelink/src/prelink --reloc-only=0x42000000 \
   $RPM_BUILD_ROOT/%{_lib}/i686/libc-*.so
 cd ..
 %endif
@@ -441,9 +440,9 @@ cd prelink
 > prelink.conf
 # For now disable prelinking of ld.so, as it breaks statically linked
 # binaries built against non-NDEBUG old glibcs (assert unknown dynamic tag)
-# prelink-%{prelinkdate}/src/prelink -c ./prelink.conf -C ./prelink.cache \
+# prelink/src/prelink -c ./prelink.conf -C ./prelink.cache \
 #  --mmap-region-start=0x0000020000000000 $RPM_BUILD_ROOT/%{_lib}/ld-*.so
-prelink-%{prelinkdate}/src/prelink --reloc-only=0x0000020010000000 \
+prelink/src/prelink --reloc-only=0x0000020010000000 \
   $RPM_BUILD_ROOT/%{_lib}/libc-*.so
 cd ..
 %endif
@@ -655,6 +654,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jun 18 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-35
+- fix nice return value
+- fix __moddi3 (#65612, #65695)
+- export get*ent_r@@GLIBC_2.1.2 symbols (#66278)
+- update prelink to fix prelink -r on alpha
+
 * Mon Apr 15 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-34
 - add relocation dependencies even for weak symbols (#63422)
 - stricter check_fds check for suid/sgid binaries
