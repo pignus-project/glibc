@@ -1,15 +1,21 @@
-%define glibcrelease 1
+%define glibcrelease 32
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches i686 athlon alpha alphaev6
+%define nptlarches i686 athlon
+%define withtlsarches i686 athlon x86_64
+%define _unpackaged_files_terminate_build 0
+%define glibcdate 20030107
 Summary: The GNU libc libraries.
 Name: glibc
-Version: 2.3
+Version: 2.3.1
 Release: %{glibcrelease}
 Copyright: LGPL
 Group: System Environment/Libraries
-Source: %{name}-%{version}.tar.bz2
-# In the source tarball the file diff-CYGNUS-to-REDHAT.patch contains all
-# diffs applied by Red Hat to the current CVS version of glibc
+Source0: %{name}-%{version}-%{glibcdate}.tar.bz2
+Source1: %{name}-redhat-%{glibcdate}.tar.bz2
+Source2: nptl-%{glibcdate}.tar.bz2
+Patch0: %{name}-redhat.patch
+Patch1: glibc-fix.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -26,26 +32,27 @@ BuildPreReq: gd-devel libpng-devel zlib-devel
 %ifarch %{prelinkarches}
 BuildPreReq: prelink >= 0.2.0-5
 %endif
-# This is to ensure that __frame_state_for exported by glibc
+# This is to ensure that __frame_state_for is exported by glibc
 # will be compatible with egcs 1.x.y
-BuildPreReq: gcc >= 2.96-84
+BuildPreReq: gcc >= 3.2
 Conflicts: rpm <= 4.0-0.65
 Conflicts: glibc-devel < 2.2.3
-Patch: glibc-kernel-2.4.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
-%define enablemask [01].*|2.[0-3]*
 %else
 %define enablekernel 2.2.5
 %ifarch i686 athlon
-%define enablekernel2 2.4.1
-%define enablemask [01].*|2.[0-3]*|2.4.0*
+%ifarch %{nptlarches}
+%define enablekernel2 2.4.20
+BuildRequires: binutils >= 2.13.90.0.16-3
+BuildRequires: gcc >= 3.2.1-1
 %else
-%define enablemask [01].*|2.[0-1]*|2.2.[0-4]|2.2.[0-4][^0-9]*
+%define enablekernel2 2.4.1
 %endif
 %endif
-%define __find_provides %{_builddir}/%{name}-%{version}/find_provides.sh
+%endif
+%define __find_provides %{_builddir}/%{name}-%{version}-%{glibcdate}/find_provides.sh
 
 %description
 The glibc package contains standard libraries which are used by
@@ -81,6 +88,17 @@ executables.
 
 Install glibc-devel if you are going to develop programs which will
 use the standard C libraries.
+
+%package -n nptl-devel
+Summary: Header files and static libraries for development using NPTL library.
+Group: Development/Libraries
+Requires: glibc-devel = %{version}-%{release}
+Autoreq: true
+
+%description -n nptl-devel
+The nptl-devel package contains the header and object files necessary
+for developing programs which use the NPTL library (and either need
+NPTL specific header files or want to link against NPTL statically).
 
 %package profile
 Summary: The GNU libc libraries, including support for gprof profiling.
@@ -127,31 +145,14 @@ thread support. Unfortunately, nscd happens to hit these bugs
 particularly hard.
 
 %package debug
-Summary: Shared standard C libraries with debugging information
-Group: Development/Libraries
-Requires: glibc = %{version}-%{release}, glibc-devel = %{version}-%{release}
-Autoreq: false
-
-%description debug
-The glibc-debug package contains shared standard C libraries
-with debugging information.  You need this only if you want to step into
-C library routines during debugging.
-To use these libraries, you need to set LD_LIBRARY_PATH=%{_prefix}/%{_lib}/debug
-in your environment before starting debugger.
-If you want to see glibc source files during debugging, you should
-rpm -i glibc-%{version}-%{release}.src.rpm
-rpm -bp %{_specdir}/glibc.spec
-
-If unsure if you need this, don't install this package.
-
-%package debug-static
 Summary: Static standard C libraries with debugging information
 Group: Development/Libraries
 Requires: glibc = %{version}-%{release}, glibc-devel = %{version}-%{release}
+Obsoletes: glibc-debug
 Autoreq: true
 
-%description debug-static
-The glibc-debug-static package contains static standard C libraries
+%description debug
+The glibc-debug package contains static standard C libraries
 with debugging information.  You need this only if you want to step into
 C library routines during debugging programs statically linked against
 one or more of the standard C libraries.
@@ -176,14 +177,9 @@ which can be helpful during program debugging.
 If unsure if you need this, don't install this package.
 
 %prep
-%setup -q
-# If we are building enablekernel 2.x.y glibc on older kernel,
-# we have to make sure no binaries compiled against that glibc
-# are ever run
-case `uname -r` in
-%enablemask)
-%patch -p1
-;; esac
+%setup -q -n %{name}-%{version}-%{glibcdate} -a1 -a2
+%patch0 -p1
+%patch1 -p1
 
 %ifnarch %{ix86} alpha alphaev6 sparc sparcv9
 rm -rf glibc-compat
@@ -237,9 +233,15 @@ EnableKernel="--enable-kernel=%{enablekernel}"
 EnableKernel="$EnableKernel --disable-profile"
 %endif
 echo "$BuildFlags" > ../BuildFlags
+Pthreads=linuxthreads
+%ifarch %{withtlsarches}
+WithTls="--with-tls --without-__thread"
+%else
+WithTls="--without-tls --without-__thread"
+%endif
 CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
-	--enable-add-ons=yes --without-cvs $EnableKernel \
-	--without-tls %{_target_cpu}-redhat-linux
+	--enable-add-ons=$Pthreads --without-cvs $EnableKernel \
+	$WithTls --build %{_target_cpu}-redhat-linux --host %{_target_cpu}-redhat-linux
 if [ -x /usr/bin/getconf ] ; then
   numprocs=$(/usr/bin/getconf _NPROCESSORS_ONLN)
   if [ $numprocs -eq 0 ]; then
@@ -254,6 +256,11 @@ gcc -static -Os ../redhat/glibc_post_upgrade.c -o glibc_post_upgrade \
     -DARCH_386 '-DVERSION="%{version}"' '-DPVERSION="0.9"' \
 %endif
     '-DGCONV_MODULES_CACHE="%{_prefix}/%{_lib}/gconv/gconv-modules.cache"'
+mkdir sed
+cd sed
+CFLAGS="$BuildFlags -g -O2" ../../redhat/sed-3.02/configure
+make -j$numprocs
+cd ..
 
 %install
 if [ -x /usr/bin/getconf ] ; then
@@ -273,15 +280,45 @@ cd build-%{_target_cpu}-linux && \
     cd ..
 %endif
 
+# If librt.so is a symlink, change it into linker script
+if [ -L $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so ]; then
+  rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so
+  LIBRTSO=`cd $RPM_BUILD_ROOT/%{_lib}; echo librt.so.*`
+  LIBPTHREADSO=`cd $RPM_BUILD_ROOT/%{_lib}; echo libpthread.so.*`
+  cat > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so <<EOF
+/* GNU ld script
+   librt.so.1 needs libpthread.so.0 to come before libc.so.6*
+   in search scope.  */
+EOF
+  grep OUTPUT_FORMAT $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libc.so \
+    >> $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so
+  echo "GROUP ( /%{_lib}/$LIBPTHREADSO /%{_lib}/$LIBRTSO )" \
+    >> $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so
+fi
+
 %ifarch i686 athlon
 rm -rf build-%{_target_cpu}-linux2.4
 mkdir build-%{_target_cpu}-linux2.4 ; cd build-%{_target_cpu}-linux2.4
 GCC=gcc
 BuildFlags=`cat ../BuildFlags`
 EnableKernel="--enable-kernel=%{enablekernel2} --disable-profile"
+Pthreads=linuxthreads
+%ifarch %{nptlarches}
+Pthreads=nptl
+WithTls="--with-tls --with-__thread"
+SubDir=tls
+%else
+%ifarch %{withtlsarches}
+WithTls="--with-tls --without-__thread"
+SubDir=tls
+%else
+WithTls="--without-tls --without-__thread"
+SubDir=i686
+%endif
+%endif
 CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
-	--enable-add-ons=yes --without-cvs $EnableKernel \
-	--without-tls %{_target_cpu}-redhat-linux
+	--enable-add-ons=$Pthreads --without-cvs $EnableKernel \
+	$WithTls --build %{_target_cpu}-redhat-linux --host %{_target_cpu}-redhat-linux
 if [ -x /usr/bin/getconf ] ; then
   numprocs=$(/usr/bin/getconf _NPROCESSORS_ONLN)
   if [ $numprocs -eq 0 ]; then
@@ -291,14 +328,46 @@ else
   numprocs=1
 fi
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
-mkdir -p $RPM_BUILD_ROOT/lib/i686/
-cp -a libc.so $RPM_BUILD_ROOT/lib/i686/`basename $RPM_BUILD_ROOT/lib/libc-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/lib/libc-*.so` $RPM_BUILD_ROOT/lib/i686/`basename $RPM_BUILD_ROOT/lib/libc.so.*`
-cp -a math/libm.so $RPM_BUILD_ROOT/lib/i686/`basename $RPM_BUILD_ROOT/lib/libm-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/lib/libm-*.so` $RPM_BUILD_ROOT/lib/i686/`basename $RPM_BUILD_ROOT/lib/libm.so.*`
-cp -a linuxthreads/libpthread.so $RPM_BUILD_ROOT/lib/i686/`basename $RPM_BUILD_ROOT/lib/libpthread-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/lib/libpthread-*.so` $RPM_BUILD_ROOT/lib/i686/`basename $RPM_BUILD_ROOT/lib/libpthread.so.*`
-strip -R .comment $RPM_BUILD_ROOT/lib/{libc,libm,libpthread}-*.so
+mkdir -p $RPM_BUILD_ROOT/lib/$SubDir/
+cp -a libc.so $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libc-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/lib/libc-*.so` $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libc.so.*`
+cp -a math/libm.so $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libm-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/lib/libm-*.so` $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libm.so.*`
+cp -a $Pthreads/libpthread.so $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libpthread-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/lib/libpthread-*.so` $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libpthread.so.*`
+%ifarch %{nptlarches}
+cp -a ${Pthreads}_db/libthread_db.so $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libthread_db-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/lib/libthread_db-*.so` $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libthread_db.so.*`
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/%{_lib}/nptl
+cp -a libc.a nptl/libpthread.a nptl/libpthread_nonshared.a \
+  $RPM_BUILD_ROOT%{_prefix}/%{_lib}/nptl/
+sed "s| /lib/| /lib/$SubDir/|" $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libc.so \
+  > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/nptl/libc.so
+sed "s|^GROUP (.*)|GROUP ( /lib/$SubDir/"`basename $RPM_BUILD_ROOT/lib/libpthread.so.*`' %{_prefix}/%{_lib}/nptl/libpthread_nonshared.a )|' \
+  $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libc.so \
+  > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/nptl/libpthread.so
+sed "s| /lib/\([^ ]*\) | /lib/$SubDir/\1 %{_prefix}/%{_lib}/nptl/libpthread_nonshared.a |" \
+  $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so \
+  > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/nptl/librt.so
+strip -g $RPM_BUILD_ROOT%{_prefix}/%{_lib}/nptl/*.a
+mkdir -p $RPM_BUILD_ROOT/nptl $RPM_BUILD_ROOT%{_prefix}/include/nptl
+make install_root=$RPM_BUILD_ROOT/nptl install-headers
+pushd $RPM_BUILD_ROOT/nptl%{_prefix}/include
+  for i in `find . -type f`; do
+    if ! [ -f $RPM_BUILD_ROOT%{_prefix}/include/$i ] \
+       || ! cmp -s $i $RPM_BUILD_ROOT%{_prefix}/include/$i; then
+      mkdir -p $RPM_BUILD_ROOT%{_prefix}/include/nptl/`dirname $i`
+      cp -a $i $RPM_BUILD_ROOT%{_prefix}/include/nptl/$i
+    fi
+  done
+popd
+rm -rf $RPM_BUILD_ROOT/nptl
+%endif
+mkdir sed
+cd sed
+CFLAGS="$BuildFlags -g -O2" ../../redhat/sed-3.02/configure
+make -j$numprocs
+cd ..
 cd ..
 %endif
 
@@ -312,19 +381,6 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libNoVersion*
 %ifarch sparc64 ia64 s390 s390x
 rm -f $RPM_BUILD_ROOT/%{_lib}/libNoVersion*
 %endif
-
-# If librt.so is a symlink, change it into linker script
-if [ -L $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so ]; then
-  rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so
-  LIBRTSO=`cd $RPM_BUILD_ROOT/%{_lib}; echo librt.so.*`
-  LIBPTHREADSO=`cd $RPM_BUILD_ROOT/%{_lib}; echo libpthread.so.*`
-  cat > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so <<EOF
-/* GNU ld script
-   librt.so.1 needs libpthread.so.0 to come before libc.so.6*
-   in search scope.  */
-GROUP ( /%{_lib}/$LIBPTHREADSO /%{_lib}/$LIBRTSO )
-EOF
-fi
 
 # the man pages for the linuxthreads require special attention
 make -C linuxthreads/man
@@ -367,19 +423,10 @@ chmod 644 $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
 # Install the upgrade program
 install -m 700 build-%{_target_cpu}-linux/glibc_post_upgrade $RPM_BUILD_ROOT/usr/sbin/glibc_post_upgrade
 
-# Strip binaries
-strip -R .comment $RPM_BUILD_ROOT/sbin/* || :
-strip -R .comment $RPM_BUILD_ROOT%{_prefix}/bin/* || :
-strip -R .comment $RPM_BUILD_ROOT%{_prefix}/sbin/* || :
-strip -R .comment $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown || :
-strip -R .comment $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/* || :
-
 mkdir $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug
 cp -a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/
 rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/*_p.a
-cp -a $RPM_BUILD_ROOT/%{_lib}/lib*.so* $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/
-# Now strip debugging info from all static and shared libraries but
-# those which will be in glibc-debug subpackage
+# Now strip debugging info from static libraries
 pushd $RPM_BUILD_ROOT%{_prefix}/%{_lib}/
 for i in *.a; do
   if [ -f $i ]; then
@@ -387,25 +434,6 @@ for i in *.a; do
     *_p.a) ;;
     *) strip -g -R .comment $i ;;
     esac
-  fi
-done
-popd
-%ifarch i686 athlon
-rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/{libc,libm,libpthread}[-.]*.so*
-cp -a $RPM_BUILD_ROOT/%{_lib}/i686/lib*.so* $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/
-%endif
-pushd $RPM_BUILD_ROOT/%{_lib}
-for i in *.so*; do
-  if [ -f $i -a ! -L $i ]; then
-    if [ "$i" = libc.so -o "$i" = librt.so ]; then
-      :
-%ifarch i686 athlon
-    elif [ -f i686/$i ]; then
-      strip -g -R .comment i686/$i
-%endif
-    else
-      strip -g -R .comment $i
-    fi
   fi
 done
 popd
@@ -417,7 +445,7 @@ popd
 # binaries built against non-NDEBUG old glibcs (assert unknown dynamic tag)
 # /usr/sbin/prelink -c ./prelink.conf -C ./prelink.cache \
 #  --mmap-region-start=0x40000000 $RPM_BUILD_ROOT/%{_lib}/ld-*.so
-/usr/sbin/prelink --reloc-only=0x42000000 $RPM_BUILD_ROOT/%{_lib}/i686/libc-*.so
+/usr/sbin/prelink --reloc-only=0x42000000 $RPM_BUILD_ROOT/%{_lib}/$SubDir/libc-*.so
 %endif
 %ifarch alpha alphaev6
 # Prelink ld.so and libc.so
@@ -475,6 +503,7 @@ done
 
 grep '%{_prefix}/%{_lib}/lib.*_p\.a' < rpm.filelist > profile.filelist || :
 egrep "(%{_prefix}/include)|(%{_infodir})" < rpm.filelist | 
+	grep -v %{_prefix}/include/nptl |
 	grep -v %{_infodir}/dir > devel.filelist
 
 mv rpm.filelist rpm.filelist.full
@@ -490,6 +519,7 @@ mv rpm.filelist rpm.filelist.full
 grep -v '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist.full |
 	grep -v '%{_prefix}/%{_lib}/.*\.o' |
 	grep -v '%{_prefix}/%{_lib}/lib.*\.so'|
+	grep -v '%{_prefix}/%{_lib}/nptl' |
 	grep -v '%{_mandir}' | 
 	grep -v 'nscd' > rpm.filelist
 
@@ -519,7 +549,6 @@ gcc -Os -static -o build-locale-archive build-locale-archive.c \
   ../build-%{_target_cpu}-linux/locale/md5.o \
   -DDATADIR=\"%{_datadir}\" -DPREFIX=\"%{_prefix}\" \
   -L../build-%{_target_cpu}-linux
-strip build-locale-archive
 install -m 700 build-locale-archive $RPM_BUILD_ROOT/usr/sbin/build-locale-archive
 cd ..
 
@@ -539,11 +568,13 @@ gzip -9 documentation/ChangeLog*
 echo ====================TESTING=========================
 cd build-%{_target_cpu}-linux
 make -j$numprocs -k check PARALLELMFLAGS=-s || :
+make -j$numprocs -C sed check || :
 cd ..
 %ifarch i686 athlon
 echo ====================TESTING OPTIMIZED===============
 cd build-%{_target_cpu}-linux2.4
 make -j$numprocs -k check PARALLELMFLAGS=-s || :
+make -j$numprocs -C sed check || :
 cd ..
 %endif
 echo ====================TESTING END=====================
@@ -600,7 +631,11 @@ rm -f *.filelist*
 %files -f rpm.filelist
 %defattr(-,root,root)
 %ifarch i686 athlon
+%ifarch %{nptlarches}
+%dir /lib/tls
+%else
 %dir /lib/i686
+%endif
 %endif
 %verify(not md5 size mtime) %config(noreplace) /etc/localtime
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
@@ -608,11 +643,6 @@ rm -f *.filelist*
 %doc README NEWS INSTALL FAQ BUGS NOTES PROJECTS CONFORMANCE
 %doc COPYING COPYING.LIB README.libm LICENSES
 %doc hesiod/README.hesiod
-
-%files debug
-%defattr(-,root,root)
-%dir %{_prefix}/%{_lib}/debug
-%{_prefix}/%{_lib}/debug/*.so*
 
 %ifnarch %{auxarches}
 %files -f common.filelist common
@@ -638,7 +668,7 @@ rm -f *.filelist*
 %{_prefix}/bin/pcprofiledump
 %{_prefix}/bin/xtrace
 
-%files debug-static
+%files debug
 %defattr(-,root,root)
 %dir %{_prefix}/%{_lib}/debug
 %{_prefix}/%{_lib}/debug/*.a
@@ -650,7 +680,182 @@ rm -f *.filelist*
 %{_prefix}/sbin/nscd
 %endif
 
+%ifarch %{nptlarches}
+%files -n nptl-devel
+%defattr(-,root,root)
+%{_prefix}/include/nptl
+%{_prefix}/%{_lib}/nptl
+%endif
+
 %changelog
+* Tue Jan  7 2003 Jakub Jelinek <jakub@redhat.com> 2.3.1-32
+- update from CVS
+- don't use TLS libs if kernel doesn't set AT_SYSINFO
+  (#80921, #81212)
+- add ntp_adjtime on alpha (#79996)
+- fix nptl_db (#81116)
+
+* Sun Jan  5 2003 Jakub Jelinek <jakub@redhat.com> 2.3.1-31
+- update from CVS
+- support all architectures again
+
+* Fri Jan  3 2003 Jakub Jelinek <jakub@redhat.com> 2.3.1-30
+- fix condvar compatibility wrappers
+- add ugly hack to use non-TLS libs if a binary is seen
+  to have errno, h_errno or _res symbols in .dynsym
+
+* Fri Jan  3 2003 Jakub Jelinek <jakub@redhat.com> 2.3.1-29
+- update from CVS
+  - fixes for new condvar
+
+* Thu Jan  2 2003 Jakub Jelinek <jakub@redhat.com> 2.3.1-28
+- new NPTL condvar implementation plus related linuxthreads
+  symbol versioning updates
+
+* Thu Jan  2 2003 Jakub Jelinek <jakub@redhat.com> 2.3.1-27
+- update from CVS
+- fix #include <sys/stat.h> with -D_BSD_SOURCE or without
+  feature set macros
+- make *sigaction, sigwait and raise the same between
+  -lpthread -lc and -lc -lpthread in linuxthreads builds
+
+* Tue Dec 31 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-26
+- fix dlclose
+
+* Sun Dec 29 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-25
+- enable sysenter by default for now
+- fix endless loop in ldconfig
+
+* Sat Dec 28 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-24
+- update from CVS
+
+* Fri Dec 27 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-23
+- update from CVS
+  - fix ptmalloc_init after clearenv (#80370)
+
+* Sun Dec 22 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-22
+- update from CVS
+- add IA-64 back
+- move TLS libraries from /lib/i686 to /lib/tls
+
+* Thu Dec 19 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-21
+- system(3) fix for linuxthreads
+- don't segfault in pthread_attr_init from libc.so
+- add cancellation tests from nptl to linuxthreads
+
+* Wed Dec 18 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-20
+- fix up lists of exported symbols + their versions
+  from the libraries
+
+* Wed Dec 18 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-19
+- fix --with-tls --enable-kernel=2.2.5 libc on IA-32
+
+* Wed Dec 18 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-18
+- update from CVS
+  - fix NPTL hanging mozilla
+  - initialize malloc in mALLOPt (fixes problems with squid, #79957)
+  - make linuxthreads work with dl_dynamic_weak 0
+  - clear dl_dynamic_weak everywhere
+
+* Tue Dec 17 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-17
+- update from CVS
+  - NPTL socket fixes, flockfile/ftrylockfile/funlockfile fix
+  - kill -debug sub-package, rename -debug-static to -debug
+  - clear dl_dynamic_weak for NPTL
+
+* Mon Dec 16 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-16
+- fix <bits/mathinline.h> and <bits/nan.h> for C++
+- automatically generate NPTL libpthread wrappers
+
+* Mon Dec 16 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-15
+- update from CVS
+  - all functions which need cancellation should now be cancellable
+    both in libpthread.so and libc.so
+  - removed @@GLIBC_2.3.2 cancellation wrappers
+
+* Fri Dec 13 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-14
+- update from CVS
+  - replace __libc_lock_needed@GOTOFF(%ebx) with
+    %gs:offsetof(tcbhead_t, multiple_threads)
+  - start of new NPTL cancellation wrappers
+
+* Thu Dec 12 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-13
+- update from CVS
+- use inline locks in malloc
+
+* Tue Dec 10 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-12
+- update from CVS
+  - support LD_ASSUME_KERNEL=2.2.5 in statically linked programs
+
+* Mon Dec  9 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-11
+- update from CVS
+- rebuilt with gcc-3.2.1-2
+
+* Fri Dec  6 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-10
+- update from CVS
+- non-nptl --with-tls --without-__thread FLOATING_STACKS libpthread
+  should work now
+- faster libc locking when using nptl
+- add OUTPUT_FORMAT to linker scripts
+- fix x86_64 sendfile (#79111)
+
+* Wed Dec  4 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-9
+- update from CVS
+  - RUSCII support (#78906)
+- for nptl builds add BuildRequires
+- fix byteswap.h for non-gcc (#77689)
+- add nptl-devel package
+
+* Tue Dec  3 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-8
+- update from CVS
+  - make --enable-kernel=2.2.5 --with-tls --without-__thread
+    ld.so load nptl and other --with-__thread libs
+- disable nptl by default for now
+
+* Wed Nov 27 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-7
+- update from CVS
+- restructured redhat/Makefile and spec, so that src.rpm contains
+  glibc-<date>.tar.bz2, glibc-redhat-<date>.tar.bz2 and glibc-redhat.patch
+- added nptl
+
+* Fri Nov  8 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-6
+- update from CVS
+  - even more regex fixes
+- run sed testsuite to check glibc regex
+
+* Thu Oct 24 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-5
+- fix LD_DEBUG=statistics and LD_TRACE_PRELINKING in programs
+  using libpthread.so.
+
+* Thu Oct 24 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-4
+- update from CVS
+  - fixed %a and %A in *printf (#75821)
+  - fix re_comp memory leaking (#76594)
+
+* Tue Oct 22 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-3
+- update from CVS
+  - some more regex fixes
+- fix libpthread.a (#76484)
+- fix locale-archive enlarging
+
+* Fri Oct 18 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-2
+- update from CVS
+  - don't need to use 128K of stacks for DNS lookups
+  - regex fixes
+  - updated timezone data e.g. for this year's Brasil DST
+    changes
+  - expand ${LIB} in RPATH/RUNPATH/dlopen filenames
+
+* Fri Oct 11 2002 Jakub Jelinek <jakub@redhat.com> 2.3.1-1
+- update to 2.3.1 final
+  - support really low thread stack sizes (#74073)
+- tzdata update
+
+* Wed Oct  9 2002 Jakub Jelinek <jakub@redhat.com> 2.3-2
+- update from CVS
+  - handle low stack limits
+  - move s390x into */lib64
+
 * Thu Oct  3 2002 Jakub Jelinek <jakub@redhat.com> 2.3-1
 - update to 2.3 final
   - fix freopen on libstdc++ <= 2.96 stdin/stdout/stderr (#74800)
