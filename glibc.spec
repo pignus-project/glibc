@@ -1,4 +1,4 @@
-%define glibcrelease 6
+%define glibcrelease 7
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200401211454
+%define glibcdate 200401270958
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -19,7 +19,7 @@ Patch0: %{name}-redhat.patch
 Patch1: %{name}-nptl-check.patch
 Patch2: %{name}-ppc-assume.patch
 Patch3: %{name}-execstack-disable.patch
-Patch4: glibc-relro.patch
+Patch4: %{name}-relro.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -1009,6 +1009,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jan 27 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-7
+- update from CVS
+  - dl_iterate_phdr extension to signal number of added/removed
+    libraries
+- fix PT_GNU_RELRO support on ppc* with prelinking
+
 * Fri Jan 23 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-6
 - rebuilt with fixed GCC on IA-64
 
