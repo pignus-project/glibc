@@ -1,4 +1,4 @@
-%define glibcrelease 50
+%define glibcrelease 51
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i386 i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200409090540
+%define glibcdate 200409100629
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -1254,6 +1254,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Sep 10 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-51
+- update from CVS
+  - disable one of the malloc double free checks for non-contiguous
+    arenas where it doesn't have to be true even for non-broken
+    apps
+
 * Thu Sep  9 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-50
 - update from CVS
   - pwd/grp/host loops with nscd speed up by sharing the
