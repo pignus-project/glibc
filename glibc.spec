@@ -1,4 +1,4 @@
-%define glibcrelease 31
+%define glibcrelease 31.1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -1219,6 +1219,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jun 09 2004 Elliot Lee <sopwith@redhat.com> 2.3.3-31.1
+- rebuild with gcc 3.4
+
 * Fri May 28 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-31
 - update from CVS
 - <bits/string2.h> and <bits/mathinline.h> changes for GCC 3.{2,4,5}+
