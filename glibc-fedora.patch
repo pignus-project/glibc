@@ -2336,7 +2336,7 @@
  
    return 0;
 --- glibc-20041207T1331/nptl/tst-getpid1.c	5 Dec 2004 07:46:02 -0000	1.1
-+++ glibc-20041207T1331-fedora/nptl/tst-getpid1.c	7 Dec 2004 14:20:57 -0000	1.1.2.2
++++ glibc-20041207T1331-fedora/nptl/tst-getpid1.c	7 Dec 2004 14:20:57 -0000	1.1.2.3
 @@ -5,6 +5,10 @@
  #include <sys/types.h>
  #include <sys/wait.h>
@@ -2348,13 +2348,14 @@
  static int sig;
  
  static int
-@@ -35,8 +39,15 @@ do_test (void)
+@@ -35,8 +39,16 @@ do_test (void)
        return 1;
      }
  
 +#ifdef __ia64__
 +  extern int __clone2 (int (*__fn) (void *__arg), void *__child_stack_base,
-+                       size_t __child_stack_size, int __flags, void *__arg);
++		       size_t __child_stack_size, int __flags,
++		       void *__arg, ...);
 +  char st[256 * 1024];
 +  pid_t p = __clone2 (f, st, sizeof (st), TEST_CLONE_FLAGS, 0);
 +#else
