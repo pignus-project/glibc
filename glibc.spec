@@ -1252,7 +1252,7 @@ rm -f *.filelist*
 %files -f headers.filelist headers
 %defattr(-,root,root)
 %ifarch %{nptlarches}
-%{_prefix}/include/nptl
+%{_prefix}/include/linuxthreads
 %endif
 
 %files -f profile.filelist profile
@@ -1304,7 +1304,7 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri Apr  1 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-19
+* Sat Apr  2 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-19
 - update from CVS
   - fix nextafterl and several other libm routines on ia64
   - fix initgroups (BZ#661)
