@@ -1,4 +1,4 @@
-%define glibcrelease 51
+%define glibcrelease 52
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i386 i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200409100629
+%define glibcdate 200409140320
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -34,7 +34,7 @@ Obsoletes: libc
 Prereq: basesystem, libgcc
 # This is for building auxiliary programs like memusage, nscd
 # For initial glibc bootstraps it can be commented out
-BuildPreReq: gd-devel libpng-devel zlib-devel texinfo, libselinux-devel >= 1.15.7-1
+BuildPreReq: gd-devel libpng-devel zlib-devel texinfo, libselinux-devel >= 1.17.10-1
 %ifarch %{prelinkarches}
 BuildPreReq: prelink >= 0.2.0-5
 %endif
@@ -46,6 +46,7 @@ Conflicts: glibc-devel < 2.2.3
 # Earlier shadow-utils packages had too restrictive permissions on
 # /etc/default
 Conflicts: shadow-utils < 2:4.0.3-20
+Conflicts: nscd < 2.3.3-52
 %ifarch ia64 sparc64 s390x x86_64
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
@@ -186,7 +187,7 @@ libraries, as well as national language (locale) support.
 Summary: A Name Service Caching Daemon (nscd).
 Group: System Environment/Daemons
 Conflicts: kernel < 2.2.0
-Requires: libselinux >= 1.15.7-1
+Requires: libselinux >= 1.17.10-1
 Prereq: /sbin/chkconfig, /usr/sbin/useradd, /usr/sbin/userdel, sh-utils
 Autoreq: true
 
@@ -265,7 +266,7 @@ esac
 %patch4 -p1
 %endif
 %endif
-#%patch5 -p1
+%patch5 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir asm
@@ -803,6 +804,11 @@ gcc -O2 -o build-%{_target_cpu}-linux/hardlink redhat/hardlink.c
 build-%{_target_cpu}-linux/hardlink -vc $RPM_BUILD_ROOT%{_prefix}/lib/locale
 %endif
 
+%ifarch %{ix86} alpha alphaev6 sparc sparcv9
+rm -f ${RPM_BUILD_ROOT}/%{_lib}/libnss1-*
+rm -f ${RPM_BUILD_ROOT}/%{_lib}/libnss-*.so.1
+%endif
+
 # BUILD THE FILE LIST
 find $RPM_BUILD_ROOT -type f -or -type l |
 	sed -e 's|.*/etc|%config &|' \
@@ -1254,6 +1260,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Sep 14 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-52
+- update from CVS
+  - nscd bi-arch fix
+  - restore old definition of __P() macro, remove all uses from
+    glibc
+- update and reenable nscd SELinux patch
+- remove libnss1* and libnss*.so.1 compatibility NSS modules
+  on IA-32, SPARC and Alpha
+
 * Fri Sep 10 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-51
 - update from CVS
   - disable one of the malloc double free checks for non-contiguous
