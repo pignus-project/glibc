@@ -1,10 +1,11 @@
-%define glibcrelease 4.80.8
+%define glibcrelease 5
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches i686 athlon alpha alphaev6
-%define nptlarches noarch
-%define withtlsarches noarch
+%define nptlarches i686 athlon
+%define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9
+%define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 20030312
+%define glibcdate 20030227
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.2
@@ -15,48 +16,6 @@ Source0: %{name}-%{version}-%{glibcdate}.tar.bz2
 Source1: %{name}-redhat-%{glibcdate}.tar.bz2
 Source2: nptl-%{glibcdate}.tar.bz2
 Patch0: %{name}-redhat.patch
-Patch1: glibc-Versions.patch
-Patch2: glibc-compat.patch
-Patch3: glibc-add-ons.patch
-Patch4: glibc-dl-i686.patch
-Patch5: glibc-__fork.patch
-Patch6: glibc-i386-uid32.patch
-Patch7: glibc-sshd-condrestart.patch
-Patch8: glibc-notls.patch
-Patch9: glibc-pthread-sigsuspend.patch
-Patch10: glibc-lt-pthread-atfork.patch
-Patch11: glibc-errno-plt.patch
-Patch12: glibc-pthread-version.patch
-Patch13: glibc-misc.patch
-Patch14: glibc-getgrouplist.patch
-Patch15: glibc-nscd-lockup.patch
-Patch16: glibc-ua-collation.patch
-Patch17: glibc-perror.patch
-Patch18: glibc-ldconfig-whitespace.patch
-Patch19: glibc-strxfrm.patch
-Patch20: glibc-localedef-time.patch
-Patch21: glibc-getaddrinfo.patch
-Patch22: glibc-libio-compat.patch
-Patch23: glibc-cxa-finalize.patch
-Patch24: glibc-sprintf.patch
-Patch25: glibc-seteuid.patch
-Patch26: glibc-ldconfig-order.patch
-Patch27: glibc-i686-i386-upgrade.patch
-Patch28: glibc-errno-stderr.patch
-Patch29: glibc-i386-sysdep-cancel.patch
-Patch30: glibc-important-hwcaps.patch
-Patch31: glibc-dlopen-exec.patch
-Patch32: glibc-glob-lnk.patch
-Patch33: glibc-glob-brace-escape.patch
-Patch34: glibc-reverse-ipv6.patch
-Patch35: glibc-sprof.patch
-Patch36: glibc-locale-be64.patch
-Patch37: glibc-pthread-cond-timedwait.patch
-Patch38: glibc-lt-sigaction.patch
-Patch39: glibc-stdio-compat.patch
-Patch40: glibc-uselocale.patch
-Patch41: glibc-ftw.patch
-
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -89,6 +48,8 @@ Conflicts: kernel < 2.4.0
 %endif
 %ifarch %{nptlarches}
 %define enablekernelnptl 2.4.20
+%endif
+%ifarch %{tlsarches}
 BuildRequires: binutils >= 2.13.90.0.16-5
 BuildRequires: gcc >= 3.2.1-5
 %endif
@@ -97,7 +58,6 @@ BuildPreReq: elfutils >= 0.72
 BuildPreReq: rpm >= 4.2-0.56
 %endif
 %define __find_provides %{_builddir}/%{name}-%{version}-%{glibcdate}/find_provides.sh
-%define __find_requires %{_builddir}/%{name}-%{version}-%{glibcdate}/find_requires.sh
 
 %description
 The glibc package contains standard libraries which are used by
@@ -112,7 +72,7 @@ Linux system will not function.
 Summary: Header and object files for development using standard C libraries.
 Group: Development/Libraries
 Conflicts: texinfo < 3.11
-Conflicts: binutils < 2.13.90.0.2-2
+Conflicts: binutils < 2.13.90.0.16-5
 Prereq: /sbin/install-info
 Obsoletes: libc-debug, libc-headers, libc-devel, linuxthreads-devel
 Prereq: kernel-headers
@@ -191,32 +151,14 @@ thread support. Unfortunately, nscd happens to hit these bugs
 particularly hard.
 
 %package debug
-Summary: Shared standard C libraries with debugging information
-Group: Development/Libraries
-Requires: glibc = %{version}-%{release}, glibc-devel = %{version}-%{release}
-Autoreq: false
-Autoprov: false
-
-%description debug
-The glibc-debug package contains shared standard C libraries
-with debugging information.  You need this only if you want to step into
-C library routines during debugging.
-To use these libraries, you need to set LD_LIBRARY_PATH=%{_prefix}/%{_lib}/debug
-in your environment before starting debugger.
-If you want to see glibc source files during debugging, you should
-rpm -i glibc-%{version}-%{release}.src.rpm
-rpm -bp /usr/src/redhat/SPECS/glibc.spec
-
-If unsure if you need this, don't install this package.
-
-%package debug-static
 Summary: Static standard C libraries with debugging information
 Group: Development/Libraries
 Requires: glibc = %{version}-%{release}, glibc-devel = %{version}-%{release}
+Obsoletes: glibc-debug-static
 Autoreq: true
 
-%description debug-static
-The glibc-debug-static package contains static standard C libraries
+%description debug
+The glibc-debug package contains static standard C libraries
 with debugging information.  You need this only if you want to step into
 C library routines during debugging programs statically linked against
 one or more of the standard C libraries.
@@ -224,7 +166,7 @@ To use this debugging information, you need to link binaries
 with -L%{_prefix}/%{_lib}/debug compiler option.
 If you want to see glibc source files during debugging, you should
 rpm -i glibc-%{version}-%{release}.src.rpm
-rpm -bp /usr/src/redhat/SPECS/glibc.spec
+rpm -bp %{_specdir}/glibc.spec
 
 If unsure if you need this, don't install this package.
 
@@ -240,52 +182,38 @@ which can be helpful during program debugging.
 
 If unsure if you need this, don't install this package.
 
+%if "%{_enable_debug_packages}" == "1"
 %define debug_package %{nil}
+
+%package debuginfo
+Summary: Debug information for package %{name}
+Group: Development/Debug
+%ifarch %{debuginfocommonarches}
+Requires: glibc-debuginfo-common = %{version}-%{release}
+%endif
+
+%description debuginfo
+This package provides debug information for package %{name}.
+Debug information is useful when developing applications that use this
+package or when debugging this package.
+
+%ifarch %{debuginfocommonarches}
+
+%package debuginfo-common
+Summary: Debug information for package %{name}
+Group: Development/Debug
+
+%description debuginfo-common
+This package provides debug information for package %{name}.
+Debug information is useful when developing applications that use this
+package or when debugging this package.
+
+%endif
+%endif
 
 %prep
 %setup -q -n %{name}-%{version}-%{glibcdate} -a1 -a2
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
-%patch19 -p1
-%patch20 -p1
-%patch21 -p1
-%patch22 -p1
-%patch23 -p1
-%patch24 -p1
-%patch25 -p1
-%patch26 -p1
-%patch27 -p1
-%patch28 -p1
-%patch29 -p1
-%patch30 -p1
-%patch31 -p1
-%patch32 -p1
-%patch33 -p1
-%patch34 -p1
-%patch35 -p1
-%patch36 -p1
-%patch37 -p1
-%patch38 -p1
-%patch39 -p1
-%patch40 -p1
-%patch41 -p1
 
 %ifnarch %{ix86} alpha alphaev6 sparc sparcv9
 rm -rf glibc-compat
@@ -296,11 +224,6 @@ rm -rf glibc-compat
 # all.
 rm -f sysdeps/alpha/alphaev6/memcpy.S
 
-# For 8.0 errata glibc, don't support {INIT,PREINIT,FINI}_ARRAY,
-# because that requires a newer binutils
-perl -pi -e 's/libc_cv_initfinit_array=yes/libc_cv_initfinit_array=no/' \
-  configure.in configure
-
 find . -type f -size 0 -o -name "*.orig" -exec rm -f {} \;
 cat > find_provides.sh <<EOF
 #!/bin/sh
@@ -308,12 +231,6 @@ cat > find_provides.sh <<EOF
 exit 0
 EOF
 chmod +x find_provides.sh
-cat > find_requires.sh <<EOF
-#!/bin/sh
-/usr/lib/rpm/find-requires | grep -v GLIBC_PRIVATE
-exit 0
-EOF
-chmod +x find_requires.sh
 touch `find . -name configure`
 
 %build
@@ -344,8 +261,6 @@ if gcc -v 2>&1 | grep -q 'gcc version 3'; then
 fi
 EnableKernel="--enable-kernel=%{enablekernel}"
 echo "$BuildFlags" > ../BuildFlags
-AddOns=`cd .. && echo */configure | sed -e 's!/configure!!g;s!\(linuxthreads\|nptl\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
-echo "$AddOns" > ../AddOns
 Pthreads=linuxthreads
 %ifarch %{withtlsarches}
 WithTls="--with-tls --without-__thread"
@@ -353,8 +268,7 @@ WithTls="--with-tls --without-__thread"
 WithTls="--without-tls --without-__thread"
 %endif
 CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
-	--enable-add-ons=$Pthreads$AddOns --without-cvs $EnableKernel \
-	--with-headers=%{_prefix}/include \
+	--enable-add-ons=$Pthreads --without-cvs $EnableKernel \
 	$WithTls --build %{_target_cpu}-redhat-linux --host %{_target_cpu}-redhat-linux
 if [ -x /usr/bin/getconf ] ; then
   numprocs=$(/usr/bin/getconf _NPROCESSORS_ONLN)
@@ -365,11 +279,7 @@ else
   numprocs=1
 fi
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
-gcc -static -L. -Os ../redhat/glibc_post_upgrade.c -o glibc_post_upgrade \
-%ifarch i386
-    -DARCH_386 '-DVERSION="%{version}"' \
-    '-DPVERSION="'`sed 's/^linuxthreads-\([0-9.]*\) .*$/\1/' ../linuxthreads/Banner`'"' \
-%endif
+gcc -static -Os ../redhat/glibc_post_upgrade.c -o glibc_post_upgrade \
     '-DGCONV_MODULES_CACHE="%{_prefix}/%{_lib}/gconv/gconv-modules.cache"'
 mkdir sed
 cd sed
@@ -398,14 +308,27 @@ cd build-%{_target_cpu}-linux && \
     cd ..
 %endif
 
-SubDir=
+# If librt.so is a symlink, change it into linker script
+if [ -L $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so ]; then
+  rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so
+  LIBRTSO=`cd $RPM_BUILD_ROOT/%{_lib}; echo librt.so.*`
+  LIBPTHREADSO=`cd $RPM_BUILD_ROOT/%{_lib}; echo libpthread.so.*`
+  cat > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so <<EOF
+/* GNU ld script
+   librt.so.1 needs libpthread.so.0 to come before libc.so.6*
+   in search scope.  */
+EOF
+  grep OUTPUT_FORMAT $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libc.so \
+    >> $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so
+  echo "GROUP ( /%{_lib}/$LIBPTHREADSO /%{_lib}/$LIBRTSO )" \
+    >> $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so
+fi
 
 %ifarch i686 athlon
 rm -rf build-%{_target_cpu}-linuxltfs
 mkdir build-%{_target_cpu}-linuxltfs ; cd build-%{_target_cpu}-linuxltfs
 GCC=gcc
 BuildFlags=`cat ../BuildFlags`
-AddOns=`cat ../AddOns`
 EnableKernel="--enable-kernel=%{enablekernelltfs} --disable-profile"
 Pthreads=linuxthreads
 SubDir=i686
@@ -415,9 +338,16 @@ WithTls="--with-tls --without-__thread"
 WithTls="--without-tls --without-__thread"
 %endif
 CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
-	--enable-add-ons=$Pthreads,$AddOns --without-cvs $EnableKernel \
-	--with-headers=%{_prefix}/include \
+	--enable-add-ons=$Pthreads --without-cvs $EnableKernel \
 	$WithTls --build %{_target_cpu}-redhat-linux --host %{_target_cpu}-redhat-linux
+if [ -x /usr/bin/getconf ] ; then
+  numprocs=$(/usr/bin/getconf _NPROCESSORS_ONLN)
+  if [ $numprocs -eq 0 ]; then
+    numprocs=1
+  fi
+else
+  numprocs=1
+fi
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
 mkdir -p $RPM_BUILD_ROOT/lib/$SubDir/
 cp -a libc.so $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libc-*.so`
@@ -427,8 +357,6 @@ ln -sf `basename $RPM_BUILD_ROOT/lib/libm-*.so` $RPM_BUILD_ROOT/lib/$SubDir/`bas
 cp -a $Pthreads/libpthread.so $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libpthread-*.so`
 pushd $RPM_BUILD_ROOT/lib/$SubDir
 ln -sf libpthread-*.so `basename $RPM_BUILD_ROOT/lib/libpthread.so.*`
-strip -R .comment $RPM_BUILD_ROOT/lib/{libc,libm}-*.so
-strip -g -R .comment $RPM_BUILD_ROOT/lib/libpthread-*.so
 popd
 
 mkdir sed
@@ -444,22 +372,33 @@ rm -rf build-%{_target_cpu}-linuxnptl
 mkdir build-%{_target_cpu}-linuxnptl ; cd build-%{_target_cpu}-linuxnptl
 GCC=gcc
 BuildFlags=`cat ../BuildFlags`
-AddOns=`cat ../AddOns`
 EnableKernel="--enable-kernel=%{enablekernelnptl} --disable-profile"
+Pthreads=linuxthreads
 Pthreads=nptl
 WithTls="--with-tls --with-__thread"
 SubDir=tls
 CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
-	--enable-add-ons=$Pthreads$AddOns --without-cvs $EnableKernel \
-	--with-headers=%{_prefix}/include \
+	--enable-add-ons=$Pthreads --without-cvs $EnableKernel \
 	$WithTls --build %{_target_cpu}-redhat-linux --host %{_target_cpu}-redhat-linux
+if [ -x /usr/bin/getconf ] ; then
+  numprocs=$(/usr/bin/getconf _NPROCESSORS_ONLN)
+  if [ $numprocs -eq 0 ]; then
+    numprocs=1
+  fi
+else
+  numprocs=1
+fi
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
 mkdir -p $RPM_BUILD_ROOT/lib/$SubDir/
 cp -a libc.so $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libc-*.so`
 ln -sf `basename $RPM_BUILD_ROOT/lib/libc-*.so` $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libc.so.*`
 cp -a math/libm.so $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libm-*.so`
 ln -sf `basename $RPM_BUILD_ROOT/lib/libm-*.so` $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libm.so.*`
+%ifarch %{nptlarches}
 cp -a $Pthreads/libpthread.so $RPM_BUILD_ROOT/lib/$SubDir/libpthread-`awk '{ print $2 }' ../$Pthreads/Banner`.so
+%else
+cp -a $Pthreads/libpthread.so $RPM_BUILD_ROOT/lib/$SubDir/`basename $RPM_BUILD_ROOT/lib/libpthread-*.so`
+%endif
 pushd $RPM_BUILD_ROOT/lib/$SubDir
 ln -sf libpthread-*.so `basename $RPM_BUILD_ROOT/lib/libpthread.so.*`
 popd
@@ -474,6 +413,9 @@ sed "s| /lib/| /lib/$SubDir/|" $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libc.so \
 sed "s|^GROUP (.*)|GROUP ( /lib/$SubDir/"`basename $RPM_BUILD_ROOT/lib/libpthread.so.*`' %{_prefix}/%{_lib}/nptl/libpthread_nonshared.a )|' \
   $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libc.so \
   > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/nptl/libpthread.so
+sed "s| /lib/\([^ ]*\) | /lib/$SubDir/\1 %{_prefix}/%{_lib}/nptl/libpthread_nonshared.a |" \
+  $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so \
+  > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/nptl/librt.so
 strip -g $RPM_BUILD_ROOT%{_prefix}/%{_lib}/nptl/*.a
 mkdir -p $RPM_BUILD_ROOT/nptl $RPM_BUILD_ROOT%{_prefix}/include/nptl
 make -j1 install_root=$RPM_BUILD_ROOT/nptl install-headers PARALLELMFLAGS=-s
@@ -548,19 +490,10 @@ chmod 644 $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
 # Install the upgrade program
 install -m 700 build-%{_target_cpu}-linux/glibc_post_upgrade $RPM_BUILD_ROOT/usr/sbin/glibc_post_upgrade
 
-# Strip binaries
-strip -R .comment $RPM_BUILD_ROOT/sbin/* || :
-strip -R .comment $RPM_BUILD_ROOT%{_prefix}/bin/* || :
-strip -R .comment $RPM_BUILD_ROOT%{_prefix}/sbin/* || :
-strip -R .comment $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown || :
-strip -R .comment $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/* || :
-
 mkdir $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug
 cp -a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/
 rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/*_p.a
-cp -a $RPM_BUILD_ROOT/%{_lib}/lib*.so* $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/
-# Now strip debugging info from all static and shared libraries but
-# those which will be in glibc-debug subpackage
+# Now strip debugging info from static libraries
 pushd $RPM_BUILD_ROOT%{_prefix}/%{_lib}/
 for i in *.a; do
   if [ -f $i ]; then
@@ -568,25 +501,6 @@ for i in *.a; do
     *_p.a) ;;
     *) strip -g -R .comment $i ;;
     esac
-  fi
-done
-popd
-%ifarch i686 athlon
-rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/{libc,libm,libpthread}[-.]*.so*
-cp -a $RPM_BUILD_ROOT/%{_lib}/i686/lib*.so* $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug/
-%endif
-pushd $RPM_BUILD_ROOT/%{_lib}
-for i in *.so*; do
-  if [ -f $i -a ! -L $i ]; then
-    if [ "$i" = libc.so -o "$i" = libpthread.so ]; then
-      :
-%ifarch i686 athlon
-    elif [ -f i686/$i ]; then
-      strip -g -R .comment i686/$i
-%endif
-    else
-      strip -g -R .comment $i
-    fi
   fi
 done
 popd
@@ -606,8 +520,8 @@ popd
 # For now disable prelinking of ld.so, as it breaks statically linked
 # binaries built against non-NDEBUG old glibcs (assert unknown dynamic tag)
 # /usr/sbin/prelink -c ./prelink.conf -C ./prelink.cache \
-# --mmap-region-start=0x0000020000000000 $RPM_BUILD_ROOT/%{_lib}/ld-*.so
-/usr/sbin/prelink --reloc-only=0x0000020010000000 $RPM_BUILD_ROOT/%{_lib}/$SubDir/libc-*.so
+#  --mmap-region-start=0x0000020000000000 $RPM_BUILD_ROOT/%{_lib}/ld-*.so
+/usr/sbin/prelink --reloc-only=0x0000020010000000 $RPM_BUILD_ROOT/%{_lib}/libc-*.so
 %endif
 
 # rquota.x and rquota.h are now provided by quota
@@ -756,6 +670,125 @@ cd ..
 %endif
 echo ====================TESTING END=====================
 
+%if "%{_enable_debug_packages}" == "1"
+
+case "$-" in *x*) save_trace=yes;; esac
+set +x
+echo Building debuginfo subpackage...
+
+blf=debugfiles.list
+sf=debugsources.list
+cblf=debugcommonfiles.list
+csf=debugcommonsources.list
+
+echo -n > $sf
+echo -n > $csf
+
+# Strip ELF binaries
+for f in `grep -v '%%\(dir\|lang\|config\|verify\)' rpm.filelist`; do
+  bf=$RPM_BUILD_ROOT$f
+  if [ -f $bf -a -x $bf -a ! -h $bf ]; then
+    if `file $bf 2>/dev/null | grep 'ELF.*, not stripped' | grep -vq 'statically linked'`; then
+      bd=`dirname $f`
+      outd=$RPM_BUILD_ROOT/usr/lib/debug$bd
+      mkdir -p $outd
+      echo extracting debug info from $f
+      /usr/lib/rpm/debugedit -b $RPM_BUILD_DIR -d /usr/src/debug -l $sf $bf
+      bn=`basename $f`
+      case $f in
+        /%{_lib}/*) eu-strip -g -f $outd/$bn.debug $bf || :;;
+        *) eu-strip -f $outd/$bn.debug $bf || :;;
+      esac
+      if [ -f $outd/$bn.debug ]; then echo /usr/lib/debug$bd/$bn.debug >> $blf; fi
+    fi
+  fi
+done
+
+for f in `cat common.filelist utils.filelist nscd.filelist \
+          | grep -v '%%\(dir\|lang\|config\|verify\)'`; do
+  bf=$RPM_BUILD_ROOT$f
+  if [ -f $bf -a -x $bf -a ! -h $bf ]; then
+    if `file $bf 2>/dev/null | grep 'ELF.*, not stripped' | grep -vq 'statically linked'`; then
+      bd=`dirname $f`
+      outd=$RPM_BUILD_ROOT/usr/lib/debug$bd
+      mkdir -p $outd
+      echo extracting debug info from $f
+      /usr/lib/rpm/debugedit -b $RPM_BUILD_DIR -d /usr/src/debug -l $csf $bf
+      bn=`basename $f`
+      eu-strip -f $outd/$bn.debug $bf || :
+      if [ -f $outd/$bn.debug ]; then echo /usr/lib/debug$bd/$bn.debug >> $cblf; fi
+    fi
+  fi
+done
+
+for f in `find $RPM_BUILD_ROOT/%{_lib} -type l`; do
+  l=`ls -l $f`
+  l=${l#* -> }
+  t=/usr/lib/debug`dirname ${f#$RPM_BUILD_ROOT}`
+  if grep -q "^$t/$l.debug\$" $blf; then
+    ln -sf $l.debug $RPM_BUILD_ROOT$t/`basename $f`.debug
+    echo $t/`basename $f`.debug >> $blf
+  elif grep -q "^$t.debug/$l\$" $cblf; then
+    ln -sf $l.debug $RPM_BUILD_ROOT$t/`basename $f`.debug
+    echo $t/`basename $f`.debug >> $cblf
+  fi
+done
+
+echo Sorting source file lists. Might take a while...
+xargs -0 -n 1 echo < $sf | LANG=C sort -u > $sf.sorted
+xargs -0 -n 1 echo < $csf | LANG=C sort -u > $csf.sorted
+mkdir -p $RPM_BUILD_ROOT/usr/src/debug
+cat $sf.sorted $csf.sorted \
+  | (cd $RPM_BUILD_DIR; LANG=C sort -u | cpio -pdm ${RPM_BUILD_ROOT}/usr/src/debug)
+# stupid cpio creates new directories in mode 0700, fixup
+find $RPM_BUILD_ROOT/usr/src/debug -type d -print | xargs chmod a+rx
+
+%ifarch %{debuginfocommonarches}
+%ifarch %{auxarches}
+%ifarch %{ix86}
+%define basearch i386
+%endif
+%ifarch alpha alphaev6
+%define basearch alpha
+%endif
+%ifarch sparc sparcv9
+%define basearch sparc
+%endif
+cat $blf > debuginfo.filelist
+find $RPM_BUILD_ROOT/usr/src/debug/%{name}-%{version}-%{glibcdate} -type d \
+  | sed "s#^$RPM_BUILD_ROOT#%%dir #" >> debuginfo.filelist
+grep '/generic/\|/linux/\|/%{basearch}/\|^%{name}-%{version}-%{glibcdate}/build' \
+  $sf.sorted | sed 's|^|/usr/src/debug/|' >> debuginfo.filelist
+touch debuginfocommon.filelist
+%else
+( grep ^%{name}-%{version}-%{glibcdate}/build- $csf.sorted || : ) > $csf.sorted.build
+cat $blf > debuginfo.filelist
+cat $cblf > debuginfocommon.filelist
+grep ^%{name}-%{version}-%{glibcdate}/build- $sf.sorted \
+  | sed 's|^|/usr/src/debug/|' >> debuginfo.filelist
+find $RPM_BUILD_ROOT/usr/src/debug/%{name}-%{version}-%{glibcdate} -type d \
+  | sed "s#^$RPM_BUILD_ROOT#%%dir #" >> debuginfocommon.filelist
+( cat $csf.sorted; grep -v -f $csf.sorted.build $sf.sorted ) | LC_ALL=C sort -u \
+  | sed 's|^|/usr/src/debug/|' >> debuginfocommon.filelist
+%endif
+%else
+cat $blf $cblf | LC_ALL=C sort -u > debuginfo.filelist
+echo '/usr/src/debug/%{name}-%{version}-%{glibcdate}' >> debuginfo.filelist
+%endif
+
+[ "x$save_trace" = xyes ] && set -x
+
+%endif
+
+%ifarch %{auxarches}
+echo Cutting down the list of unpackaged files
+for i in `sed '/%%dir/d;/%%config/d;/%%verify/d;s/%%lang([^)]*) //' \
+	  common.filelist devel.filelist profile.filelist utils.filelist \
+	  nscd.filelist`; do
+  [ -f "$RPM_BUILD_ROOT$i" ] && rm -f "$RPM_BUILD_ROOT$i" || :
+done
+%endif
+
 %post -p /usr/sbin/glibc_post_upgrade
 
 %postun -p /sbin/ldconfig
@@ -824,11 +857,6 @@ rm -f *.filelist*
 %doc COPYING COPYING.LIB README.libm LICENSES
 %doc hesiod/README.hesiod
 
-%files debug
-%defattr(-,root,root)
-%dir %{_prefix}/%{_lib}/debug
-%{_prefix}/%{_lib}/debug/*.so*
-
 %ifnarch %{auxarches}
 %files -f common.filelist common
 %defattr(-,root,root)
@@ -843,7 +871,7 @@ rm -f *.filelist*
 %files -f utils.filelist utils
 %defattr(-,root,root)
 
-%files debug-static
+%files debug
 %defattr(-,root,root)
 %dir %{_prefix}/%{_lib}/debug
 %{_prefix}/%{_lib}/debug/*.a
@@ -861,108 +889,19 @@ rm -f *.filelist*
 %{_prefix}/%{_lib}/nptl
 %endif
 
+%if "%{_enable_debug_packages}" == "1"
+%files debuginfo -f debuginfo.filelist
+%defattr(-,root,root)
+
+%ifarch %{debuginfocommonarches}
+%ifnarch %{auxarches}
+%files debuginfo-common -f debuginfocommon.filelist
+%defattr(-,root,root)
+%endif
+%endif
+%endif
+
 %changelog
-* Wed Nov  5 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-4.80.8
-- fix ftw fd leak
-
-* Wed Nov  5 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-4.80.7
-- fix linuxthreads sigaction (#108634)
-- fix uselocale (LC_GLOBAL_LOCALE)
-- fix sprof (#103727)
-- prevent dlopening of executables
-- fix glob with GLOB_BRACE and without GLOB_NOESCAPE
-- fix locale printing of word values on 64-bit big-endian arches
-  (#107846)
-- fix getnameinfo and getaddrinfo with reverse IPv6 lookups
-  (#101261)
-- add pthread_cond_timedwait stubs to libc.so (#102709)
-- fix getgrouplist (#101691)
-- avoid nscd lockups when using LDAP (#54697)
-- fix Ukrainian collation (#83973)
-- fix perror (#85994)
-- allow whitespace in ld.so.conf (#86032)
-- fix strxfrm (#88409)
-- fix LC_CTIME localedef creation (#88978)
-- fix getaddrinfo memory leaks (#89448)
-- fix stdio glibc 2.0 compatibility (#90077)
-- fix __cxa_finalize (#90301)
-- fix sprintf (#90987)
-- fix seteuid/setegid (#91567)
-- search system library directories in ldconfig after ld.so.conf defined
-  ones (#98966)
-- avoid segfaults when "upgrading" from i686 to i386 rpm (#88456)
-- issue warning about broken binaries using errno/h_errno on stderr,
-  not stdout (#97814)
-- fix pause, close and fsync cancel type restoring (#105348)
-- fix important hwcaps computation
-
-* Mon Apr  7 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-4.80.6
-- fix register_printf_function (#88052)
-- fix double free with fopen using ccs= (#88056)
-- fix potential access below $esp in {set,swap}context (#88093)
-- fix buffer underrun in gencat -H (#88099)
-- avoid using unitialized variable in tst-tgmath (#88101)
-- fix gammal (#88104)
-- fix iconv -c
-- fix xdr_string (PR libc/4999)
-
-* Sat Apr  5 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-4.80.5
-- make sure all calls to __errno_location() and __h_errno_location()
-  jump through .plt to make older wine happy
-- fix linuxthreads confstr (_CS_GNU_LIBPTHREAD_VERSION, ...)
-
-* Wed Apr  2 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-4.80.4
-- pthread_mutex_lock etc. should not be cancellation points (#87656)
-- add pthread_atfork to libpthread.a
-- only strip debug info not .symtab/.strtab in /lib/libpthread-*.so
-
-* Fri Mar 28 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-4.80.3
-- if in __i686__ build "" AT_PLATFORM is seen, assume "i686".
-
-* Wed Mar 26 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-4.80.1
-- backout a hwcap fix to work around a kernel bug with AT_PLATFORM (#86359)
-- execute service sshd condrestart in glibc %%post if not inside
-  chroot and initscripts, sshd and bash are already installed (#86339);
-  restarting of all other applications is on the user (easiest is reboot
-  or telinit 1; telinit 5, but this cannot be done from glibc %%post).
-- put __ctype_b etc. back into libc.a for the errata (#86465)
-- export __fork@GLIBC_2.0 from libc.so.6 again (#86437, #86468)
-- fix uid32/gid32 support in LD_ASSUME_KERNEL=2.2.5 libc (#86534)
-- build glibc-compat and c_stubs add-ons, for glibc 2.0 compatibility
-
-* Wed Mar 19 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-4.80
-- build as 8.0 errata
-  - turn compatibility only symbols which are referenced in libc.so's
-    relocations back into @@ symvers, as otherwise statically linked
-    RHL 8 apps segfault when doing NSS or iconv
-  - move __libc_fork, __libc_stack_end, __libc_wait and __libc_waitpid
-    from GLIBC_PRIVATE symver for the errata
-  - remove {INIT,PREINIT,FINI}_ARRAY support, since it requires
-    binutils changes
-  - don't build NPTL libraries
-  - strip libraries and binaries, recreate glibc-debug-static
-    subpackage
-
-* Wed Mar 12 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-10
-- update from CVS
-
-* Tue Mar 11 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-9
-- update from CVS
-- fix glibc-debug description (#85111)
-- make librt.so a symlink again, not linker script
-
-* Tue Mar  4 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-8
-- update from CVS
-- remove the workarounds for broken software accessing GLIBC_PRIVATE
-  symbols
-
-* Mon Mar  3 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-7
-- update from CVS
-
-* Sun Mar  2 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-6
-- fix TLS IE/LE model handling in dlopened libraries
-  on TCB_AT_TP arches
-
 * Thu Feb 25 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-5
 - update from CVS
 
