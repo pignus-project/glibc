@@ -1,4 +1,4 @@
-%define glibcrelease 54
+%define glibcrelease 55
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i386 i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200409170216
+%define glibcdate 200409220152
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -1258,6 +1258,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Sep 22 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-55
+- update from CVS
+  - set{re,e,res}[ug]id now affect the whole process in NPTL
+  - return EAGAIN instead of ENOMEM when not enough memory
+    in pthread_create
+
 * Fri Sep 17 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-54
 - update from CVS
   - nscd getaddrinfo caching
