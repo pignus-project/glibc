@@ -1,4 +1,4 @@
-%define glibcrelease 30
+%define glibcrelease 31
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200405211317
+%define glibcdate 200405280120
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -1219,6 +1219,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri May 28 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-31
+- update from CVS
+- <bits/string2.h> and <bits/mathinline.h> changes for GCC 3.{2,4,5}+
+- make c_stubs buildable even with GCC 3.2.x (#123042)
+
 * Fri May 21 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-30
 - fix pthread_cond_wait on architectures other than IA-32 and
   x86_64
