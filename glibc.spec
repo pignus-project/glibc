@@ -1,4 +1,4 @@
-%define glibcrelease 29
+%define glibcrelease 30
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 Summary: The GNU libc libraries.
 Name: glibc
@@ -49,6 +49,7 @@ Patch9: glibc-2.2.4-sunrpc.patch
 Patch10: glibc-2.2.4-collate.patch
 Patch11: glibc-2.2.4-xdr_array.patch
 Patch12: glibc-2.2.4-calloc.patch
+Patch13: glibc-2.2.4-onexit-process.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
@@ -163,6 +164,10 @@ case `uname -r` in
 %patch10 -p1
 %patch11 -p1
 %patch12 -p1
+%patch13 -p1
+
+perl -pi -e 'm/PACKET.*1024/ and s/1024/65536/' \
+  `find resolv glibc-compat -name \*.c`
 
 %ifarch armv4l sparc64 ia64 s390 s390x
 rm -rf glibc-compat
@@ -519,6 +524,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Sep  9 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-30
+- fix resolver buffer overflows
+- don't call free in pthread_onexit_process
+
 * Wed Aug  7 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-29
 - fix the calloc patch so that calloc (131072, 0) doesn't
   crash
