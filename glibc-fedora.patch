@@ -1692,6 +1692,16 @@
 +#ifndef __ASSUME_CLONE_THREAD_FLAGS
 +# define __ASSUME_CLONE_THREAD_FLAGS	1
 +#endif
+--- glibc-20041102T1153/nptl/sysdeps/unix/sysv/linux/smp.h	24 Oct 2004 22:04:05 -0000	1.2
++++ glibc-20041102T1153-fedora/nptl/sysdeps/unix/sysv/linux/smp.h	2 Nov 2004 17:07:42 -0000	1.1.2.2
+@@ -17,6 +17,7 @@
+    write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+    Boston, MA 02111-1307, USA.  */
+ 
++#include <errno.h>
+ #include <fcntl.h>
+ #include <string.h>
+ #include <sys/sysctl.h>
 --- glibc-20041102T1153/nptl/sysdeps/unix/sysv/linux/bits/local_lim.h	13 Apr 2004 02:00:09 -0000	1.6
 +++ glibc-20041102T1153-fedora/nptl/sysdeps/unix/sysv/linux/bits/local_lim.h	22 Sep 2004 21:21:02 -0000	1.6.2.1
 @@ -3,16 +3,16 @@
