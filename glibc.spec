@@ -269,6 +269,7 @@ esac
 %patch3 -p1
 %endif
 %endif
+rm -f sysdeps/powerpc/powerpc64/dl-lookupcfg.h
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir asm
