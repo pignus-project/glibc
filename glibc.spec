@@ -1,4 +1,4 @@
-%define glibcrelease 45
+%define glibcrelease 46
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200408191746
+%define glibcdate 200408210835
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -1222,6 +1222,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Aug 21 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-46
+- update from CVS
+
 * Thu Aug 19 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-45
 - update from CVS
   - fix nss_compat's initgroups handling (#130363)
