@@ -189,6 +189,29 @@
  #endif
  
  /* These function symbols are provided for the .init/.fini section entry
+--- glibc-20041014T0548/elf/dl-close.c	14 Oct 2004 02:00:27 -0000	1.106
++++ glibc-20041014T0548-fedora/elf/dl-close.c	14 Oct 2004 09:57:38 -0000	1.104.2.2
+@@ -237,7 +237,7 @@ _dl_close (void *_map)
+ 				struct link_map *rl = depmap->l_initfini[k];
+ 
+ 				if (rl->l_idx < nopencount
+-				    & list[rl->l_idx] == rl)
++				    && list[rl->l_idx] == rl)
+ 				  {
+ 				    assert (new_opencount[rl->l_idx] > 0);
+ 				    if (--new_opencount[rl->l_idx] ==  0)
+--- glibc-20041014T0548/elf/dl-load.c	14 Oct 2004 02:03:20 -0000	1.251
++++ glibc-20041014T0548-fedora/elf/dl-load.c	14 Oct 2004 09:57:38 -0000	1.249.2.3
+@@ -909,7 +909,9 @@ _dl_map_object_from_fd (const char *name
+   l = _dl_new_object (realname, name, l_type, loader, mode, nsid);
+   if (__builtin_expect (l == NULL, 0))
+     {
++#ifdef SHARED
+     fail_new:
++#endif
+       errstring = N_("cannot create shared object descriptor");
+       goto call_lose_errno;
+     }
 --- glibc-20041014T0548/elf/dl-support.c	14 Oct 2004 02:06:18 -0000	1.86
 +++ glibc-20041014T0548-fedora/elf/dl-support.c	14 Oct 2004 05:57:53 -0000	1.84.2.3
 @@ -274,6 +274,11 @@ _dl_non_dynamic_init (void)
@@ -287,40 +310,53 @@
  
    search_dirs ();
 --- glibc-20041014T0548/elf/rtld.c	14 Oct 2004 02:07:44 -0000	1.334
-+++ glibc-20041014T0548-fedora/elf/rtld.c	14 Oct 2004 05:57:53 -0000	1.330.2.5
-@@ -1087,6 +1087,49 @@ of this helper program; chances are you 
++++ glibc-20041014T0548-fedora/elf/rtld.c	14 Oct 2004 09:57:38 -0000	1.330.2.6
+@@ -537,7 +537,7 @@ _dl_start (void *arg)
+ # define ELF_MACHINE_START_ADDRESS(map, start) (start)
+ #endif
+ 
+-    return ELF_MACHINE_START_ADDRESS (GL(dl_loaded), entry);
++    return ELF_MACHINE_START_ADDRESS (GL(dl_ns)[LM_ID_BASE]._ns_loaded, entry);
+   }
+ }
+ 
+@@ -1087,6 +1087,53 @@ of this helper program; chances are you 
    ++GL(dl_ns)[LM_ID_BASE]._ns_nloaded;
    ++GL(dl_load_adds);
  
 +#if defined(__i386__)
 +  /* Force non-TLS libraries for glibc 2.0 binaries
 +     or if a buggy binary references non-TLS errno or h_errno.  */
-+  if (__builtin_expect (GL(dl_loaded)->l_info[DT_NUM + DT_THISPROCNUM + DT_VERSIONTAGIDX (DT_VERNEED)] == NULL, 0)
-+      && GL(dl_loaded)->l_info[DT_DEBUG])
++  if (__builtin_expect (main_map->l_info[DT_NUM + DT_THISPROCNUM
++                                         + DT_VERSIONTAGIDX (DT_VERNEED)]
++                        == NULL, 0)
++      && main_map->l_info[DT_DEBUG])
 +    GLRO(dl_osversion) = 0x20205;
 +  else if ((__builtin_expect (mode, normal) != normal
-+	    || GL(dl_loaded)->l_info [ADDRIDX (DT_GNU_LIBLIST)] == NULL)
++	    || main_map->l_info[ADDRIDX (DT_GNU_LIBLIST)] == NULL)
 +	      /* Only binaries have DT_DEBUG dynamic tags...  */
-+	   && GL(dl_loaded)->l_info[DT_DEBUG])
++	   && main_map->l_info[DT_DEBUG])
 +    {
 +      /* Workaround for buggy binaries.  This doesn't handle buggy
 +	 libraries.  */
 +      bool buggy = false;
-+      const ElfW(Sym) *symtab = (const void *) D_PTR (GL(dl_loaded), l_info[DT_SYMTAB]);
-+      const char *strtab = (const void *) D_PTR (GL(dl_loaded), l_info[DT_STRTAB]);
++      const ElfW(Sym) *symtab = (const void *) D_PTR (main_map,
++                                                      l_info[DT_SYMTAB]);
++      const char *strtab = (const void *) D_PTR (main_map,
++                                                 l_info[DT_STRTAB]);
 +      Elf_Symndx symidx;
-+      for (symidx = GL(dl_loaded)->l_buckets[0x6c994f % GL(dl_loaded)->l_nbuckets];
++      for (symidx = main_map->l_buckets[0x6c994f % main_map->l_nbuckets];
 +	   symidx != STN_UNDEF;
-+	   symidx = GL(dl_loaded)->l_chain[symidx])
++	   symidx = main_map->l_chain[symidx])
 +	{
 +	  if (__builtin_expect (strcmp (strtab + symtab[symidx].st_name,
 +					"errno") == 0, 0)
 +	      && ELFW(ST_TYPE) (symtab[symidx].st_info) != STT_TLS)
 +	    buggy = true;
 +	}
-+      for (symidx = GL(dl_loaded)->l_buckets[0xe5c992f % GL(dl_loaded)->l_nbuckets];
++      for (symidx = main_map->l_buckets[0xe5c992f % main_map->l_nbuckets];
 +	   symidx != STN_UNDEF;
-+	   symidx = GL(dl_loaded)->l_chain[symidx])
++	   symidx = main_map->l_chain[symidx])
 +	{
 +	  if (__builtin_expect (strcmp (strtab + symtab[symidx].st_name,
 +					"h_errno") == 0, 0)
@@ -338,7 +374,7 @@
    /* If LD_USE_LOAD_BIAS env variable has not been seen, default
       to not using bias for non-prelinked PIEs and libraries
       and using it for executables or prelinked PIEs or libraries.  */
-@@ -1259,6 +1302,64 @@ ERROR: ld.so: object '%s' from %s cannot
+@@ -1259,6 +1306,67 @@ ERROR: ld.so: object '%s' from %s cannot
  	}
      }
  
@@ -355,8 +391,11 @@
 +   */
 +#define LIB_NOVERSION "/lib/libNoVersion.so.1"
 +
-+  if (__builtin_expect (GL(dl_loaded)->l_info[DT_NUM + DT_THISPROCNUM + DT_VERSIONTAGIDX (DT_VERNEED)] == NULL, 0)
-+      && (GL(dl_loaded)->l_info[DT_DEBUG] || !(GLRO(dl_debug_mask) & DL_DEBUG_PRELINK)))
++  if (__builtin_expect (main_map->l_info[DT_NUM + DT_THISPROCNUM
++                                         + DT_VERSIONTAGIDX (DT_VERNEED)]
++                        == NULL, 0)
++      && (main_map->l_info[DT_DEBUG]
++          || !(GLRO(dl_debug_mask) & DL_DEBUG_PRELINK)))
 +    {
 +      struct stat test_st;
 +      int test_fd;
@@ -383,8 +422,8 @@
 +
 +      if (can_load != 0) {
 +	  struct link_map *new_map;
-+	  new_map = _dl_map_object (GL(dl_loaded), LIB_NOVERSION,
-+				    1, lt_library, 0, 0);
++	  new_map = _dl_map_object (main_map, LIB_NOVERSION,
++				    1, lt_library, 0, 0, LM_ID_BASE);
 +	  if (++new_map->l_opencount == 1) {
 +	      /* It is no duplicate.  */
 +	      ++npreloads;
@@ -494,6 +533,21 @@
    /* Open the output file.  */
    assert (GCONV_MODULES_CACHE[0] == '/');
    strcpy (stpcpy (mempcpy (tmpfname, prefix, prefix_len), GCONV_MODULES_CACHE),
+--- glibc-20041014T0548/include/errno.h	4 Oct 2004 20:59:37 -0000	1.12
++++ glibc-20041014T0548-fedora/include/errno.h	14 Oct 2004 09:57:38 -0000	1.11.2.2
+@@ -36,7 +36,11 @@ extern __thread int errno attribute_tls_
+ # define __set_errno(val) (errno = (val))
+ 
+ # ifndef __ASSEMBLER__
+-extern int *__errno_location (void) __THROW __attribute__ ((__const__));
++extern int *__errno_location (void) __THROW __attribute__ ((__const__))
++#  ifdef RTLD_PRIVATE_ERRNO
++     attribute_hidden
++#  endif
++;
+ libc_hidden_proto (__errno_location)
+ # endif
+ 
 --- glibc-20041014T0548/include/features.h	23 Jul 2004 06:50:54 -0000	1.35
 +++ glibc-20041014T0548-fedora/include/features.h	22 Sep 2004 21:20:53 -0000	1.35.2.1
 @@ -163,8 +163,8 @@
@@ -844,6 +898,25 @@
 +	@echo '#define NPTL_STRUCT_PTHREAD_SIZE 0' > $@
 +endif
 +endif
+--- glibc-20041014T0548/linuxthreads/sysdeps/pthread/errno-loc.c	1 Apr 2003 00:52:40 -0000	1.3
++++ glibc-20041014T0548-fedora/linuxthreads/sysdeps/pthread/errno-loc.c	14 Oct 2004 09:57:39 -0000	1.3.2.1
+@@ -1,6 +1,6 @@
+ /* MT support function to get address of `errno' variable, linuxthreads
+    version.
+-   Copyright (C) 1996, 1998, 2002, 2003 Free Software Foundation, Inc.
++   Copyright (C) 1996, 1998, 2002, 2003, 2004 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+ 
+    The GNU C Library is free software; you can redistribute it and/or
+@@ -23,7 +23,7 @@
+ #include <linuxthreads/internals.h>
+ #include <sysdep-cancel.h>
+ 
+-#if ! USE___THREAD
++#if ! USE___THREAD && !RTLD_PRIVATE_ERRNO
+ #undef errno
+ extern int errno;
+ #endif
 --- glibc-20041014T0548/linuxthreads/sysdeps/pthread/nptl-struct-pthread.sym 1 Jan 1970 00:00:00 -0000
 +++ glibc-20041014T0548-fedora/linuxthreads/sysdeps/pthread/nptl-struct-pthread.sym	22 Sep 2004 21:20:56 -0000	1.1.2.1
 @@ -0,0 +1,13 @@
@@ -1789,6 +1862,25 @@
  #define CACHEMAGIC "ld.so-1.7.0"
  
  /* libc5 and glibc 2.0/2.1 use the same format.  For glibc 2.2 another
+--- glibc-20041014T0548/sysdeps/generic/errno-loc.c	31 Dec 2002 20:39:08 -0000	1.7
++++ glibc-20041014T0548-fedora/sysdeps/generic/errno-loc.c	14 Oct 2004 09:57:41 -0000	1.7.2.1
+@@ -1,6 +1,6 @@
+ /* MT support function to get address of `errno' variable, non-threaded
+    version.
+-   Copyright (C) 1996, 1998, 2002 Free Software Foundation, Inc.
++   Copyright (C) 1996, 1998, 2002, 2004 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+ 
+    The GNU C Library is free software; you can redistribute it and/or
+@@ -21,7 +21,7 @@
+ #include <errno.h>
+ #include <tls.h>
+ 
+-#if ! USE___THREAD
++#if ! USE___THREAD && !RTLD_PRIVATE_ERRNO
+ #undef errno
+ extern int errno;
+ #endif
 --- glibc-20041014T0548/sysdeps/i386/bits/atomic.h 1 Jan 1970 00:00:00 -0000
 +++ glibc-20041014T0548-fedora/sysdeps/i386/bits/atomic.h	5 Oct 2004 12:09:44 -0000	1.1.2.3
 @@ -0,0 +1,410 @@
@@ -2655,6 +2747,99 @@
 +symbol_version (INTUSE (__multi3), __multi3, GLIBC_2.2);
 +
 +#endif
+--- glibc-20041014T0548/sysdeps/sparc/fpu/bits/mathinline.h	30 Sep 2004 06:16:29 -0000	1.15
++++ glibc-20041014T0548-fedora/sysdeps/sparc/fpu/bits/mathinline.h	14 Oct 2004 09:57:42 -0000	1.14.2.2
+@@ -112,7 +112,7 @@
+ 
+ /* Test for negative number.  Used in the signbit() macro.  */
+ __MATH_INLINE int
+-__signbitf (float __x) __THROW
++__NTH (__signbitf (float __x))
+ {
+   __extension__ union { float __f; int __i; } __u = { __f: __x };
+   return __u.__i < 0;
+@@ -121,14 +121,14 @@ __signbitf (float __x) __THROW
+ #   if __WORDSIZE == 32
+ 
+ __MATH_INLINE int
+-__signbit (double __x) __THROW
++__NTH (__signbit (double __x))
+ {
+   __extension__ union { double __d; int __i[2]; } __u = { __d: __x };
+   return __u.__i[0] < 0;
+ }
+ 
+ __MATH_INLINE int
+-__signbitl (long double __x) __THROW
++__NTH (__signbitl (long double __x))
+ {
+   return __signbit ((double)__x);
+ }
+@@ -136,14 +136,14 @@ __signbitl (long double __x) __THROW
+ #   else /* sparc64 */
+ 
+ __MATH_INLINE int
+-__signbit (double __x) __THROW
++__NTH (__signbit (double __x))
+ {
+   __extension__ union { double __d; long int __i; } __u = { __d: __x };
+   return __u.__i < 0;
+ }
+ 
+ __MATH_INLINE int
+-__signbitl (long double __x) __THROW
++__NTH (__signbitl (long double __x))
+ {
+   __extension__ union { long double __l; long int __i[2]; } __u = { __l: __x };
+   return __u.__i[0] < 0;
+@@ -156,7 +156,7 @@ __signbitl (long double __x) __THROW
+ #  if !defined __NO_MATH_INLINES && !__GNUC_PREREQ (3, 2)
+ 
+ __MATH_INLINE double
+-sqrt (double __x) __THROW
++__NTH (sqrt (double __x))
+ {
+   register double __r;
+   __asm ("fsqrtd %1,%0" : "=f" (__r) : "f" (__x));
+@@ -164,7 +164,7 @@ sqrt (double __x) __THROW
+ }
+ 
+ __MATH_INLINE float
+-sqrtf (float __x) __THROW
++__NTH (sqrtf (float __x))
+ {
+   register float __r;
+   __asm ("fsqrts %1,%0" : "=f" (__r) : "f" (__x));
+@@ -173,7 +173,7 @@ sqrtf (float __x) __THROW
+ 
+ #   if __WORDSIZE == 64
+ __MATH_INLINE long double
+-sqrtl (long double __x) __THROW
++__NTH (sqrtl (long double __x))
+ {
+   long double __r;
+   extern void _Qp_sqrt (long double *, __const__ long double *);
+@@ -219,16 +219,16 @@ __ieee754_sqrtl (long double __x)
+ 
+ #  ifndef __NO_MATH_INLINES
+ 
+-__MATH_INLINE double fdim (double __x, double __y) __THROW;
++__MATH_INLINE double __NTH (fdim (double __x, double __y));
+ __MATH_INLINE double
+-fdim (double __x, double __y) __THROW
++__NTH (fdim (double __x, double __y))
+ {
+   return __x <= __y ? 0 : __x - __y;
+ }
+ 
+-__MATH_INLINE float fdimf (float __x, float __y) __THROW;
++__MATH_INLINE float __NTH (fdimf (float __x, float __y));
+ __MATH_INLINE float
+-fdimf (float __x, float __y) __THROW
++__NTH (fdimf (float __x, float __y))
+ {
+   return __x <= __y ? 0 : __x - __y;
+ }
 --- glibc-20041014T0548/sysdeps/unix/nice.c	28 Sep 2002 19:13:13 -0000	1.6
 +++ glibc-20041014T0548-fedora/sysdeps/unix/nice.c	22 Sep 2004 21:21:08 -0000	1.6.2.1
 @@ -41,7 +41,12 @@ nice (int incr)
@@ -2791,6 +2976,46 @@
 +  } while (0)
 +
 +#include_next <dl-cache.h>
+--- glibc-20041014T0548/sysdeps/unix/sysv/linux/i386/setresgid.c	19 Sep 2004 23:44:35 -0000	1.11
++++ glibc-20041014T0548-fedora/sysdeps/unix/sysv/linux/i386/setresgid.c	14 Oct 2004 09:57:42 -0000	1.11.2.1
+@@ -28,7 +28,7 @@
+ #include <pthread-functions.h>
+ 
+ 
+-#ifdef __NR_setresgid
++#if defined __NR_setresgid || defined __NR_setresgid32
+ 
+ # ifdef __NR_setresgid32
+ #  if __ASSUME_32BITUIDS == 0
+@@ -43,7 +43,7 @@ __setresgid (gid_t rgid, gid_t egid, gid
+ {
+   int result;
+ 
+-# if __ASSUME_32BITUIDS > 0
++# if __ASSUME_32BITUIDS > 0 || !defined __NR_setresgid
+   result = INLINE_SYSCALL (setresgid32, 3, rgid, egid, sgid);
+ # else
+ #  ifdef __NR_setresgid32
+--- glibc-20041014T0548/sysdeps/unix/sysv/linux/i386/setresuid.c	19 Sep 2004 23:44:35 -0000	1.12
++++ glibc-20041014T0548-fedora/sysdeps/unix/sysv/linux/i386/setresuid.c	14 Oct 2004 09:57:42 -0000	1.12.2.1
+@@ -28,7 +28,7 @@
+ #include <pthread-functions.h>
+ 
+ 
+-#ifdef __NR_setresuid
++#if defined __NR_setresuid || defined __NR_setresuid32
+ 
+ # ifdef __NR_setresuid32
+ #  if __ASSUME_32BITUIDS == 0
+@@ -43,7 +43,7 @@ __setresuid (uid_t ruid, uid_t euid, uid
+ {
+   int result;
+ 
+-# if __ASSUME_32BITUIDS > 0
++# if __ASSUME_32BITUIDS > 0 || !defined __NR_setresuid
+   result = INLINE_SYSCALL (setresuid32, 3, ruid, euid, suid);
+ # else
+ #  ifdef __NR_setresuid32
 --- glibc-20041014T0548/sysdeps/unix/sysv/linux/ia64/dl-cache.h	6 Jul 2001 04:56:17 -0000	1.2
 +++ glibc-20041014T0548-fedora/sysdeps/unix/sysv/linux/ia64/dl-cache.h	22 Sep 2004 21:21:09 -0000	1.2.4.1
 @@ -22,4 +22,31 @@
