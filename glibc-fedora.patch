@@ -3222,3 +3222,63 @@
 @@ -1 +1 @@
 -s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 \2\3"_
 +s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 /emul/ia32-linux\2\3"_
+--- libc/sysdeps/unix/sysv/linux/i386/setgid.c	12 Nov 2004 16:56:15 -0000	1.7.2.1
++++ libc/sysdeps/unix/sysv/linux/i386/setgid.c	12 Nov 2004 18:41:52 -0000
+@@ -19,6 +19,7 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <setxid.h>
++#include <linux/posix_types.h>
+ #include "kernel-features.h"
+ 
+ 
+--- libc/sysdeps/unix/sysv/linux/i386/setregid.c	12 Nov 2004 16:56:15 -0000	1.11.2.1
++++ libc/sysdeps/unix/sysv/linux/i386/setregid.c	12 Nov 2004 18:41:52 -0000
+@@ -19,6 +19,7 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <setxid.h>
++#include <linux/posix_types.h>
+ #include "kernel-features.h"
+ 
+ 
+--- libc/sysdeps/unix/sysv/linux/i386/setresgid.c	12 Nov 2004 16:56:15 -0000	1.11.2.2
++++ libc/sysdeps/unix/sysv/linux/i386/setresgid.c	12 Nov 2004 18:41:52 -0000
+@@ -19,6 +19,7 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <setxid.h>
++#include <linux/posix_types.h>
+ #include "kernel-features.h"
+ 
+ 
+--- libc/sysdeps/unix/sysv/linux/i386/setresuid.c	12 Nov 2004 16:56:15 -0000	1.12.2.2
++++ libc/sysdeps/unix/sysv/linux/i386/setresuid.c	12 Nov 2004 18:41:52 -0000
+@@ -19,6 +19,7 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <setxid.h>
++#include <linux/posix_types.h>
+ #include "kernel-features.h"
+ 
+ 
+--- libc/sysdeps/unix/sysv/linux/i386/setreuid.c	12 Nov 2004 16:56:15 -0000	1.11.2.1
++++ libc/sysdeps/unix/sysv/linux/i386/setreuid.c	12 Nov 2004 18:41:52 -0000
+@@ -19,6 +19,7 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <setxid.h>
++#include <linux/posix_types.h>
+ #include "kernel-features.h"
+ 
+ 
+--- libc/sysdeps/unix/sysv/linux/i386/setuid.c	12 Nov 2004 16:56:15 -0000	1.7.2.2
++++ libc/sysdeps/unix/sysv/linux/i386/setuid.c	12 Nov 2004 18:41:52 -0000
+@@ -19,6 +19,7 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <setxid.h>
++#include <linux/posix_types.h>
+ #include "kernel-features.h"
+ 
+ 
