@@ -1,4 +1,4 @@
-%define glibcrelease 53
+%define glibcrelease 54
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i386 i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200409140320
+%define glibcdate 200409170216
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -20,7 +20,6 @@ Patch1: %{name}-nptl-check.patch
 Patch2: %{name}-ppc-assume.patch
 Patch3: %{name}-execstack-disable.patch
 Patch4: %{name}-ia64-lib64.patch
-Patch5: nscd-selinux.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -266,7 +265,6 @@ esac
 %patch4 -p1
 %endif
 %endif
-%patch5 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir asm
@@ -1260,6 +1258,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Sep 17 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-54
+- update from CVS
+  - nscd getaddrinfo caching
+
 * Tue Sep 14 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-53
 - restore temporarily old definition of __P()/__PMT()
   for third party apps
