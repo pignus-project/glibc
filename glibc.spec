@@ -1,8 +1,8 @@
 %define linux24 0
-%define glibcrelease 2
+%define glibcrelease 5
 Summary: The GNU libc libraries.
 Name: glibc
-Version: 2.1.95
+Version: 2.2
 %if %{linux24}
 Release: %{glibcrelease}.2.4
 %else
@@ -361,6 +361,37 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Nov 19 2000 Jakub Jelinek <jakub@redhat.com>
+- update to CVS to fix getaddrinfo
+
+* Fri Nov 17 2000 Jakub Jelinek <jakub@redhat.com>
+- update to CVS to fix freopen
+- remove all alpha workarounds, not needed anymore
+
+* Wed Nov 15 2000 Jakub Jelinek <jakub@redhat.com>
+- fix dladdr bug on alpha/sparc32/sparc64
+- fix Makefiles so that they run static tests properly
+
+* Tue Nov 14 2000 Jakub Jelinek <jakub@redhat.com>
+- update to CVS to fix ldconfig
+
+* Thu Nov  9 2000 Jakub Jelinek <jakub@redhat.com>
+- update to glibc 2.2 release
+
+* Mon Nov  6 2000 Jakub Jelinek <jakub@redhat.com>
+- update to CVS to:
+  - export __sysconf@@GLIBC_2.2 (#20417)
+
+* Fri Nov  3 2000 Jakub Jelinek <jakub@redhat.com>
+- merge to 2.1.97
+
+* Mon Oct 30 2000 Jakub Jelinek <jakub@redhat.com>
+- update to CVS, including:
+  - fix WORD_BIT/LONG_BIT definition in limits.h (#19088)
+  - fix hesiod (#19375)
+  - set LC_MESSAGES in zic/zdump for proper error message output (#19495)
+  - fix LFS fcntl when used with non-LFS aware kernels (#19730)
+
 * Thu Oct 19 2000 Jakub Jelinek <jakub@redhat.com>
 - fix alpha semctl (#19199)
 - update to CVS, including:
@@ -368,3 +399,6 @@ rm -f *.filelist*
   - fix locale alias handling code (#18832)
   - fix rexec on little endian machines (#18886)
 - started writing changelog again
+
+* Thu Aug 10 2000 Adrian Havill <havill@redhat.com>
+- added ja ujis alias for backwards compatibility
