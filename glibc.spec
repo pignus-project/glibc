@@ -942,7 +942,7 @@ cp linuxthreads/FAQ.html documentation/FAQ-threads.html
 cp -r linuxthreads/Examples documentation/examples.threads
 cp crypt/README.ufc-crypt documentation/README.ufc-crypt
 cp timezone/README documentation/README.timezone
-cp ChangeLog* documentation
+cp ChangeLog{,.14,.15} documentation
 gzip -9n documentation/ChangeLog*
 
 %ifarch s390x
@@ -1314,6 +1314,8 @@ rm -f *.filelist*
   against LinuxThreads
 - package /usr/lib/debug/%{_lib}/tls/i{5,6}86 symlinks in
   i386 glibc-debuginfo
+- limit number of ChangeLog* files in glibc-common %%doc
+  to last 2.5 years of changes only to save space
 
 * Fri Mar 25 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-18
 - fix build on 64-bit arches with new GCC
