@@ -1,4 +1,4 @@
-%define glibcrelease 101
+%define glibcrelease 101.1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -19,6 +19,16 @@ Patch0: %{name}-redhat.patch
 Patch1: %{name}-nptl-check.patch
 Patch2: %{name}-ppc-assume.patch
 Patch3: %{name}-execstack-disable.patch
+Patch4: glibc-ftw.patch
+Patch5: glibc-ifaddrs.patch
+Patch6: glibc-lt-sigaction.patch
+Patch7: glibc-nptl-cleanups.patch
+Patch8: glibc-nptl-stdio-lock.patch
+Patch9: glibc-stdio-compat.patch
+Patch10: glibc-uselocale.patch
+Patch11: glibc-nptl-static.patch
+Patch12: glibc-regex-icase-mbs.patch
+Patch13: glibc-regex-segfault.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -258,6 +268,16 @@ gcc*\ 3.2.3*)
 %patch3 -p1
   ;; esac ;;
 esac
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
+%patch11 -p1
+%patch12 -p1
+%patch13 -p1
 
 %ifnarch %{ix86} alpha alphaev6 sparc sparcv9
 rm -rf glibc-compat
@@ -1005,6 +1025,20 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Nov 11 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-101.1
+- fix getifaddrs (CAN-2003-0859)
+- fix ftw fd leak
+- fix linuxthreads sigaction (#108634)
+- fix glibc 2.0 stdio compatibility
+- fix uselocale (LC_GLOBAL_LOCALE)
+- speed up stdio locking in non-threaded programs on IA-32
+- try to maintain correct order of cleanups between those
+  registered with __attribute__((cleanup))
+  and with LinuxThreads style pthread_cleanup_push/pop (#108631)
+- fix segfault in regex (#109606)
+- fix RE_ICASE multi-byte handling in regex
+- fix pthread_exit in libpthread.a (#109790)
+
 * Mon Oct 27 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-101
 - update from CVS
   - fix ld.so --verify (and ldd)
