@@ -1,16 +1,18 @@
-%define linux24 0
-%define glibcrelease 9
+%define linux24 1
+%define glibcrelease 3
+%define auxarches i586 i686 athlon sparcv9 alphaev6
+%if %{linux24}
+%define arch24 ia64 sparc64 %{auxarches}
+%else
+%define arch24 ia64 sparc64
+%endif
 Summary: The GNU libc libraries.
 Name: glibc
-Version: 2.2
-%if %{linux24}
-Release: %{glibcrelease}.2.4
-%else
+Version: 2.2.1
 Release: %{glibcrelease}
-%endif
 Copyright: LGPL
 Group: System Environment/Libraries
-Source: %{name}-%{version}.tar.gz
+Source: %{name}-%{version}.tar.bz2
 # In the source tarball the file diff-CYGNUS-to-REDHAT.patch contains all
 # diffs applied by Red Hat to the current CVS version of glibc
 Buildroot: /var/tmp/glibc-%{PACKAGE_VERSION}-root
@@ -18,6 +20,7 @@ Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
 Provides: ldconfig
 Autoreq: false
+Requires: glibc-common = %{version}
 %ifarch alpha
 Provides: ld.so.2
 %else
@@ -28,19 +31,12 @@ Obsoletes: libc
 Prereq: basesystem
 Conflicts: rpm <= 4.0-0.65
 Patch: glibc-kernel-2.4.patch
-%if %{linux24}
-ExcludeArch: ia64
-Conflicts: kernel < 2.4.0
-%define enablekernel 2.4.0
-%else
-%ifarch ia64 sparc64
+%ifarch %{arch24}
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
 %else
 %define enablekernel 2.2.5
 %endif
-%endif
-%define auxarches i586 i686 athlon sparcv9 alphaev6
 
 %description
 The glibc package contains standard libraries which are used by
@@ -49,8 +45,7 @@ memory, as well as to make upgrading easier, common system code is
 kept in one place and shared between programs. This particular package
 contains the most important sets of shared libraries: the standard C
 library and the standard math library. Without these two libraries, a
-Linux system will not function.  The glibc package also contains
-national language (locale) support and timezone databases.
+Linux system will not function.
 
 %package devel
 Summary: Header and object files for development using standard C libraries.
@@ -60,7 +55,7 @@ Prereq: /sbin/install-info
 Obsoletes: libc-debug, libc-headers, libc-devel, linuxthreads-devel
 Obsoletes: glibc-debug
 Prereq: kernel-headers
-Requires: kernel-headers >= 2.2.1
+Requires: kernel-headers >= 2.2.1, %{name} = %{version}
 Autoreq: true
 
 %description devel
@@ -92,6 +87,18 @@ libraries included in the glibc package).
 If you are going to use the gprof program to profile a program, you'll
 need to install the glibc-profile program.
 
+%package common
+Summary: Common binaries and locale data for glibc
+Autoreq: false
+Conflicts: glibc < %{version}-%{release}
+Conflicts: glibc > %{version}-%{release}
+Group: System Environment/Base
+
+%description common
+The glibc-common package includes common binaries for the GNU libc
+libraries, as well as national language (locale) support and timezone
+databases.
+
 %package -n nscd
 Summary: A Name Service Caching Daemon (nscd).
 Group: System Environment/Daemons
@@ -111,7 +118,7 @@ you're not using a version 2.0 kernel.
 
 %prep
 %setup -q
-%if %{linux24}
+%ifarch %{arch24}
 # If we are building enablekernel 2.4.0 glibc on older kernel,
 # we have to make sure no binaries compiled against that glibc
 # are ever run
@@ -121,7 +128,7 @@ case `uname -r` in
 ;; esac
 %endif
  
-%ifarch armv4l sparc64 ia64
+%ifarch armv4l sparc64 ia64 s390
 rm -rf glibc-compat
 %endif
 
@@ -149,17 +156,14 @@ GCC="gcc -m32"
 BuildFlags="-mcpu=ultrasparc -mvis -fcall-used-g7"
 GCC="gcc -m64"
 %endif
-# Temporarily don't do this on ia64
-%ifnarch ia64
-BuildFlags="$BuildFlags -freorder-blocks -DNDEBUG=1"
+# Temporarily don't do this on ia64 and s390
+%ifnarch ia64 s390
+BuildFlags="$BuildFlags -freorder-blocks"
 %endif
+BuildFlags="$BuildFlags -DNDEBUG=1"
 EnableKernel="--enable-kernel=%{enablekernel}"
-%if %{linux24}
+%ifarch %{auxarches}
 EnableKernel="$EnableKernel --disable-profile"
-%else
-%ifarch %{auxarches} ia64
-EnableKernel="$EnableKernel --disable-profile"
-%endif
 %endif
 CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
 	--enable-add-ons=yes --without-cvs $EnableKernel \
@@ -190,7 +194,7 @@ mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/locale/ru_RU/LC_MESSAGES
 
 # Remove the files we don't want to distribute
 rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libNoVersion*
-%ifarch sparc64 ia64
+%ifarch sparc64 ia64 s390
 rm -f $RPM_BUILD_ROOT/%{_lib}/libNoVersion*
 %endif
 
@@ -238,6 +242,24 @@ strip -R .comment $RPM_BUILD_ROOT%{_prefix}/sbin/* || :
 strip -R .comment $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown || :
 strip -R .comment $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/* || :
 
+# Hardlink identical locale files together
+ALL_LC="LC_ADDRESS LC_COLLATE LC_CTYPE LC_IDENTIFICATION LC_MEASUREMENT \
+	LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME \
+	LC_MESSAGES/SYS_LC_MESSAGES"
+for i in $RPM_BUILD_ROOT%{_prefix}/lib/locale/*; do
+  if [ ! -d $i ]; then continue; fi
+  for j in $ALL_LC; do
+    for k in $RPM_BUILD_ROOT%{_prefix}/lib/locale/*; do
+      if [ ! -d $k ]; then continue; fi
+      if [ $i = $k ]; then break; fi
+      if cmp -s $i/$j $k/$j; then ln -f $k/$j $i/$j; break; fi
+    done
+  done
+done
+
+# Temporarily remove ko_KR.utf8 locale
+rm -rf $RPM_BUILD_ROOT%{_prefix}/lib/locale/ko_KR.utf8
+
 # BUILD THE FILE LIST
 find $RPM_BUILD_ROOT -type f -or -type l |
 	sed -e 's|.*/etc|%config &|' -e 's|.*/gconv/gconv-modules|%config &|' > rpm.filelist.in
@@ -248,7 +270,12 @@ for n in %{_prefix}/share %{_prefix}/include %{_prefix}/lib/locale; do
 done
 
 # primary filelist
-sed "s|$RPM_BUILD_ROOT||" < rpm.filelist.in | 
+SHARE_LANG='s|.*/share/locale/\([^/_]\+\).*/LC_MESSAGES/.*\.mo|%lang(\1) &|'
+LIB_LANG='s|.*/lib/locale/\([^/_]\+\)|%lang(\1) &|'
+# rpm does not handle %lang() tagged files hardlinked together accross
+# languages very well, temporarily disable
+LIB_LANG=''
+sed -e "s|$RPM_BUILD_ROOT||" -e "$LIB_LANG" -e "$SHARE_LANG" < rpm.filelist.in |
 	grep -v '/etc/localtime'  | \
 	grep -v '/etc/nsswitch.conf'  | \
 	grep -v '/etc/ld.so.conf'  | \
@@ -273,6 +300,19 @@ grep -v '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist.full |
 	grep -v '%{_prefix}/%{_lib}/lib.*\.so'|
 	grep -v '%{_mandir}' | 
 	grep -v 'nscd' > rpm.filelist
+	
+grep '%{_prefix}/bin' < rpm.filelist >> common.filelist
+grep '%{_prefix}/lib/locale' < rpm.filelist >> common.filelist
+grep '%{_prefix}/libexec' < rpm.filelist >> common.filelist
+grep '%{_prefix}/sbin/[^g]' < rpm.filelist >> common.filelist
+grep '%{_prefix}/share' < rpm.filelist >> common.filelist
+
+mv rpm.filelist rpm.filelist.full
+grep -v '%{_prefix}/bin' < rpm.filelist.full |
+	grep -v '%{_prefix}/lib/locale' |
+	grep -v '%{_prefix}/libexec' | 
+	grep -v '%{_prefix}/sbin/[^g]' |
+	grep -v '%{_prefix}/share' > rpm.filelist
 
 # /etc/localtime - we're proud of our timezone
 rm -f $RPM_BUILD_ROOT/etc/localtime
@@ -341,29 +381,66 @@ rm -f *.filelist*
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/ld.so.conf
 %doc README NEWS INSTALL FAQ BUGS NOTES PROJECTS CONFORMANCE
-%doc COPYING COPYING.LIB
-%doc documentation/* README.template README.libm
+%doc COPYING COPYING.LIB README.template README.libm
 %doc hesiod/README.hesiod
 
-%if !%{linux24}
 %ifnarch %{auxarches}
+%files -f common.filelist common
+%defattr(-,root,root)
+%doc documentation/*
+
 %files -f devel.filelist devel
 %defattr(-,root,root)
 
-%ifnarch ia64
 %files -f profile.filelist profile
 %defattr(-,root,root)
-%endif
 
 %files -n nscd
 %defattr(-,root,root)
-%config /etc/nscd.conf
-/etc/rc.d/init.d/nscd
+%config(noreplace) /etc/nscd.conf
+%config /etc/rc.d/init.d/nscd
 %{_prefix}/sbin/nscd
-%endif
 %endif
 
 %changelog
+* Wed Jan 24 2001 Jakub Jelinek <jakub@redhat.com>
+- build all auxiliary arches with --enablekernel 2.4.0, those wanting
+  to run 2.2 kernels can downgrade to the base architecture glibc.
+
+* Sat Jan 20 2001 Jakub Jelinek <jakub@redhat.com>
+- remove %%lang() flags from %%{_prefix}/lib/locale files temporarily
+
+* Sun Jan 14 2001 Jakub Jelinek <jakub@redhat.com>
+- update to 2.2.1 final
+  - fix a pthread_kill_other_threads_np breakage (#23966)
+  - make static binaries using dlopen work on ia64 again
+- fix a typo in glibc-common group
+
+* Wed Jan 10 2001 Bernhard Rosenkraenzer <bero@redhat.com>
+- devel requires glibc = %%{version}
+- noreplace /etc/nscd.conf
+
+* Wed Jan 10 2001 Jakub Jelinek <jakub@redhat.com>
+- some more security fixes:
+  - don't look up LD_PRELOAD libs in cache for SUID apps
+    (because that bypasses SUID bit checking on the library)
+  - place output files for profiling SUID apps into /var/profile,
+    use O_NOFOLLOW for them
+  - add checks for $MEMUSAGE_OUTPUT and $SEGFAULT_OUTPUT_NAME
+- hardlink identical locale files together
+- add %%lang() tags to locale stuff
+- remove ko_KR.utf8 for now, it is provided by locale-utf8 package
+
+* Mon Jan  8 2001 Jakub Jelinek <jakub@redhat.com>
+- add glibc-common subpackage
+- fix alphaev6 memcpy (#22494)
+- fix sys/cdefs.h (#22908)
+- don't define stdin/stdout/stderr as macros for -traditional (#22913)
+- work around a bug in IBM JDK (#22932, #23012)
+- fix pmap_unset when network is down (#23176)
+- move nscd in rc.d before netfs on shutdown
+- fix $RESOLV_HOST_CONF in SUID apps (#23562)
+
 * Fri Dec 15 2000 Jakub Jelinek <jakub@redhat.com>
 - fix ftw and nftw
 
