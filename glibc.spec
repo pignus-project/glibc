@@ -1,4 +1,4 @@
-%define glibcrelease 30
+%define glibcrelease 32
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 Summary: The GNU libc libraries.
 Name: glibc
@@ -50,6 +50,9 @@ Patch10: glibc-2.2.4-collate.patch
 Patch11: glibc-2.2.4-xdr_array.patch
 Patch12: glibc-2.2.4-calloc.patch
 Patch13: glibc-2.2.4-onexit-process.patch
+Patch14: glibc-2.2.4-maxpacket.patch
+Patch15: glibc-2.2.4-setrlimit.patch
+Patch16: glibc-2.2.4-xdrmem.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
@@ -165,6 +168,9 @@ case `uname -r` in
 %patch11 -p1
 %patch12 -p1
 %patch13 -p1
+%patch14 -p1
+%patch15 -p1
+%patch16 -p1
 
 perl -pi -e 'm/PACKET.*1024/ and s/1024/65536/' \
   `find resolv glibc-compat -name \*.c`
@@ -524,6 +530,14 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Mar  5 2003 Jakub Jelinek <jakub@redhat.com> 2.2.4-32
+- fix overflows in xdrmem (Paul Eggert, Roland McGrath)
+
+* Thu Oct 12 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-31
+- use malloc instead of alloca for get*by* functions, so that
+  they work even with extremely low stack sizes (#75128, #75616)
+- don't muck with RLIMIT_STACK in FLOATING_STACKS linuxthreads
+
 * Mon Sep  9 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-30
 - fix resolver buffer overflows
 - don't call free in pthread_onexit_process
