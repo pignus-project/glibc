@@ -1,4 +1,4 @@
-%define glibcrelease 101.1
+%define glibcrelease 101.2
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -26,9 +26,29 @@ Patch7: glibc-nptl-cleanups.patch
 Patch8: glibc-nptl-stdio-lock.patch
 Patch9: glibc-stdio-compat.patch
 Patch10: glibc-uselocale.patch
-Patch11: glibc-nptl-static.patch
-Patch12: glibc-regex-icase-mbs.patch
-Patch13: glibc-regex-segfault.patch
+Patch12: glibc-regex-update.patch
+Patch13: glibc-regex-empty-group.patch
+Patch14: glibc-atan2.patch
+Patch15: glibc-nextafter.patch
+Patch16: glibc-amd64-syscall.patch
+Patch17: glibc-memalign-trace.patch
+Patch18: glibc-linuxthreads-memleak.patch
+Patch19: glibc-linuxthreads-throw.patch
+Patch20: glibc-nptl-pthread-exit.patch
+Patch21: glibc-nptl-pshared-condvar.patch
+Patch22: glibc-nptl-attr-destroy.patch
+Patch23: glibc-nptl-configure.patch
+Patch24: glibc-nptl-fork-dlopen.patch
+Patch25: glibc-nptl-unregister-atfork.patch
+Patch26: glibc-nptl-ia64-defaultstacksize.patch
+Patch27: glibc-nptl-altstk-unwind.patch
+Patch28: glibc-nptl-cancelstate-disabled.patch
+Patch29: glibc-nptl-odd-stacklimit.patch
+Patch30: glibc-regex-leaks.patch
+Patch31: glibc-amd64-ldouble.patch
+Patch32: glibc-ia64-gas-bug.patch
+Patch33: glibc-ld-use-load-bias.patch
+Patch34: glibc-execstack-fix.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -42,7 +62,7 @@ Obsoletes: libc
 Prereq: basesystem, libgcc
 # This is for building auxiliary programs like memusage
 # For initial glibc bootstraps it can be commented out
-BuildPreReq: gd-devel libpng-devel zlib-devel
+BuildPreReq: gd-devel libpng-devel zlib-devel texinfo
 %ifarch %{prelinkarches}
 BuildPreReq: prelink >= 0.2.0-5
 %endif
@@ -275,9 +295,29 @@ esac
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
-%patch11 -p1
 %patch12 -p1
 %patch13 -p1
+%patch14 -p1
+%patch15 -p1
+%patch16 -p1
+%patch17 -p1
+%patch18 -p1
+%patch19 -p1
+%patch20 -p1
+%patch21 -p1
+%patch22 -p1
+%patch23 -p1
+%patch24 -p1
+%patch25 -p1
+%patch26 -p1
+%patch27 -p1
+%patch28 -p1
+%patch29 -p1
+%patch30 -p1
+%patch31 -p1
+%patch32 -p1
+%patch33 -p1
+%patch34 -p1
 
 %ifnarch %{ix86} alpha alphaev6 sparc sparcv9
 rm -rf glibc-compat
@@ -1025,6 +1065,31 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Dec 30 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-101.2
+- fix to make pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, )
+  really disable cancellation (#112512)
+- lots of regex fixes and speedups (#110401)
+- fix nextafter*/nexttoward*
+- handle 6th syscall(3) argument on AMD64
+- handle memalign/posix_memalign in mtrace
+- fix linuxthreads memory leak (#112208)
+- remove throw () from cancellation points in linuxthreads (#112602)
+- fix NPTL unregister_atfork
+- fix unwinding through alternate signal stacks
+- fix atan2
+- fix pshared condvars in NPTL
+- fix pthread_attr_destroy for attributes created with
+  pthread_attr_init@GLIBC_2.0
+- add BuildPrereq texinfo (#110252)
+- fix ceill/floorl on AMD64
+- work around IA64 gas bug with unwind info and .align
+- fix NPTL configure
+- allow dlopen after fork () in threaded programs
+- compute IA-64 default thread stack size correctly
+- fix thread stacks with ulimit -s not a multiple of a page size
+- randomize PIE shared libraries, honor LD_USE_LOAD_BIAS env variable
+- fix execstack handling on kernels without exec-shield
+
 * Tue Nov 11 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-101.1
 - fix getifaddrs (CAN-2003-0859)
 - fix ftw fd leak
