@@ -3383,8 +3383,16 @@
  #ifdef SHARED
  	b	JUMPTARGET(__GI__exit)
 --- glibc-20041215T0847/sysdeps/unix/sysv/linux/s390/s390-32/clone.S	1 Jul 2004 17:34:29 -0000	1.8
-+++ glibc-20041215T0847-fedora/sysdeps/unix/sysv/linux/s390/s390-32/clone.S	15 Dec 2004 09:53:45 -0000	1.8.2.1
-@@ -54,6 +54,18 @@ error:
++++ glibc-20041215T0847-fedora/sysdeps/unix/sysv/linux/s390/s390-32/clone.S	15 Dec 2004 12:20:45 -0000	1.8.2.2
+@@ -21,6 +21,7 @@
+    and invokes a function in the right context after its all over.  */
+ 
+ #include <sysdep.h>
++#include <tls.h>
+ #define _ERRNO_H	1
+ #include <bits/errno.h>
+ 
+@@ -54,6 +55,18 @@ error:
  PSEUDO_END (__clone)
  	
  thread_start:
@@ -3404,8 +3412,16 @@
  	lr      %r2,%r0         /* set first parameter to void *arg */
  	ahi     %r15,-96        /* make room on the stack for the save area */
 --- glibc-20041215T0847/sysdeps/unix/sysv/linux/s390/s390-64/clone.S	1 Jul 2004 17:34:30 -0000	1.10
-+++ glibc-20041215T0847-fedora/sysdeps/unix/sysv/linux/s390/s390-64/clone.S	15 Dec 2004 09:53:46 -0000	1.10.2.1
-@@ -55,6 +55,20 @@ error:
++++ glibc-20041215T0847-fedora/sysdeps/unix/sysv/linux/s390/s390-64/clone.S	15 Dec 2004 12:20:47 -0000	1.10.2.2
+@@ -22,6 +22,7 @@
+    and invokes a function in the right context after its all over.  */
+ 
+ #include <sysdep.h>
++#include <tls.h>
+ #define _ERRNO_H	1
+ #include <bits/errno.h>
+ 
+@@ -55,6 +56,20 @@ error:
  PSEUDO_END (__clone)
  
  thread_start:
