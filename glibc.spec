@@ -1,4 +1,6 @@
-%define glibcrelease 55
+%define glibcdate 20040925T0738
+%define glibcversion 2.3.3
+%define glibcrelease 57
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,20 +8,19 @@
 %define withtlsarches i386 i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200409220152
 Summary: The GNU libc libraries.
 Name: glibc
-Version: 2.3.3
+Version: %{glibcversion}
 Release: %{glibcrelease}
 Copyright: LGPL
 Group: System Environment/Libraries
-Source0: %{name}-%{version}-%{glibcdate}.tar.bz2
-Source1: %{name}-redhat-%{glibcdate}.tar.bz2
-Patch0: %{name}-redhat.patch
+%define glibcsrcdir %{name}-%{glibcdate}
+Source0: %{glibcsrcdir}.tar.bz2
+Source1: %{name}-fedora-%{glibcdate}.tar.bz2
+Patch0: %{name}-fedora.patch
 Patch1: %{name}-nptl-check.patch
 Patch2: %{name}-ppc-assume.patch
-Patch3: %{name}-execstack-disable.patch
-Patch4: %{name}-ia64-lib64.patch
+Patch3: %{name}-ia64-lib64.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -76,7 +77,7 @@ BuildRequires: gcc >= 3.2.1-5
 BuildPreReq: elfutils >= 0.72
 BuildPreReq: rpm >= 4.2-0.56
 %endif
-%define __find_provides %{_builddir}/%{name}-%{version}-%{glibcdate}/find_provides.sh
+%define __find_provides %{_builddir}/%{glibcsrcdir}/find_provides.sh
 %define _filter_GLIBC_PRIVATE 1
 
 %description
@@ -173,7 +174,7 @@ need to install the glibc-profile package.
 %package common
 Summary: Common binaries and locale data for glibc
 Conflicts: %{name} < %{version}
-Conflicts: %{name} > %{version} 
+Conflicts: %{name} > %{version}
 Autoreq: false
 Requires: tzdata >= 2003a
 Group: System Environment/Base
@@ -187,6 +188,7 @@ Summary: A Name Service Caching Daemon (nscd).
 Group: System Environment/Daemons
 Conflicts: kernel < 2.2.0
 Requires: libselinux >= 1.17.10-1
+Conflicts: selinux-policy-targeted < 1.17.20
 Prereq: /sbin/chkconfig, /usr/sbin/useradd, /usr/sbin/userdel, sh-utils
 Autoreq: true
 
@@ -246,10 +248,10 @@ package or when debugging this package.
 %endif
 
 %prep
-%setup -q -n %{name}-%{version}-%{glibcdate} -a1
+%setup -q -n %{glibcsrcdir} -a1
 %patch0 -p1
 case "`gcc --version | head -1`" in
-gcc*\ 3.3*)
+gcc*\ 3.[34]*)
 %ifarch %{nptlarches}
 %patch1 -p1
 %endif
@@ -257,12 +259,11 @@ gcc*\ 3.3*)
 gcc*\ 3.2.3*)
   case "`uname -r`" in *.ent*|*.EL*)
 %patch2 -p1
-%patch3 -p1
   ;; esac ;;
 esac
 %ifarch ia64
 %if "%{_lib}" == "lib64"
-%patch4 -p1
+%patch3 -p1
 %endif
 %endif
 
@@ -510,7 +511,7 @@ else
   numprocs=1
 fi
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
-$GCC -static -L. -Os ../redhat/glibc_post_upgrade.c -o glibc_post_upgrade \
+$GCC -static -L. -Os ../fedora/glibc_post_upgrade.c -o glibc_post_upgrade \
 %ifarch i386
     -DARCH_386 \
 %endif
@@ -519,11 +520,6 @@ $GCC -static -L. -Os ../redhat/glibc_post_upgrade.c -o glibc_post_upgrade \
 %endif
     '-DGCONV_MODULES_CACHE="%{_prefix}/%{_lib}/gconv/gconv-modules.cache"' \
     '-DLD_SO_CONF="/etc/ld.so.conf"'
-mkdir sed
-cd sed
-CC="$GCC" CFLAGS="$BuildFlags -g -O2" ../../redhat/sed-3.02/configure
-make -j$numprocs
-cd ..
 cd ..
 
 # hack
@@ -549,11 +545,6 @@ CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
 	$WithTls --build %{_target_cpu}-redhat-linux --host %{_target_cpu}-redhat-linux
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
 
-mkdir sed
-cd sed
-CFLAGS="$BuildFlags -g -O2" ../../redhat/sed-3.02/configure
-make -j$numprocs
-cd ..
 cd ..
 %endif
 
@@ -569,11 +560,6 @@ CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
 	$WithTls --build %{nptl_target_cpu}-redhat-linux --host %{nptl_target_cpu}-redhat-linux
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
 
-mkdir sed
-cd sed
-CFLAGS="$BuildFlags -g -O2" ../../redhat/sed-3.02/configure
-make -j$numprocs
-cd ..
 cd ..
 %endif
 
@@ -724,7 +710,7 @@ gzip -9nvf $RPM_BUILD_ROOT%{_infodir}/libc*
 
 ln -sf libbsd-compat.a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libbsd.a
 
-install -m 644 redhat/nsswitch.conf $RPM_BUILD_ROOT/etc/nsswitch.conf
+install -m 644 fedora/nsswitch.conf $RPM_BUILD_ROOT/etc/nsswitch.conf
 
 mkdir -p $RPM_BUILD_ROOT/etc/default
 install -m 644 nis/nss $RPM_BUILD_ROOT/etc/default/nss
@@ -798,7 +784,7 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/include/rpcsvc/rquota.[hx]
 
 # Hardlink identical locale files together
 %ifnarch %{auxarches}
-gcc -O2 -o build-%{_target_cpu}-linux/hardlink redhat/hardlink.c
+gcc -O2 -o build-%{_target_cpu}-linux/hardlink fedora/hardlink.c
 build-%{_target_cpu}-linux/hardlink -vc $RPM_BUILD_ROOT%{_prefix}/lib/locale
 %endif
 
@@ -813,7 +799,7 @@ find $RPM_BUILD_ROOT -type f -or -type l |
 	    -e 's|.*/gconv/gconv-modules$|%verify(not md5 size mtime) %config(noreplace) &|' \
 	    -e 's|.*/gconv/gconv-modules.cache|%verify(not md5 size mtime) &|' \
 	    -e '/lib\/debug/d' > rpm.filelist.in
-for n in %{_prefix}/share %{_prefix}/include %{_prefix}/lib/locale; do 
+for n in %{_prefix}/share %{_prefix}/include %{_prefix}/lib/locale; do
     find ${RPM_BUILD_ROOT}${n} -type d | \
 	grep -v '%{_prefix}/share$' | \
 	grep -v '\(%{_mandir}\|%{_infodir}\)' | \
@@ -843,12 +829,12 @@ for i in $RPM_BUILD_ROOT%{_prefix}/bin/{xtrace,memusage}; do
 done
 
 grep '%{_prefix}/%{_lib}/lib.*_p\.a' < rpm.filelist > profile.filelist || :
-egrep "(%{_prefix}/include)|(%{_infodir})" < rpm.filelist | 
+egrep "(%{_prefix}/include)|(%{_infodir})" < rpm.filelist |
 	grep -v %{_prefix}/include/nptl |
 	grep -v %{_infodir}/dir > devel.filelist
 
 mv rpm.filelist rpm.filelist.full
-grep -v '%{_prefix}/%{_lib}/lib.*_p.a' rpm.filelist.full | 
+grep -v '%{_prefix}/%{_lib}/lib.*_p.a' rpm.filelist.full |
 	egrep -v "(%{_prefix}/include)|(%{_infodir})" > rpm.filelist
 
 grep '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist >> devel.filelist
@@ -865,7 +851,7 @@ grep -v '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist.full |
 	grep -v '%{_prefix}/%{_lib}/.*\.o' |
 	grep -v '%{_prefix}/%{_lib}/lib.*\.so'|
 	grep -v '%{_prefix}/%{_lib}/nptl' |
-	grep -v '%{_mandir}' | 
+	grep -v '%{_mandir}' |
 	grep -v 'nscd' > rpm.filelist
 
 grep '%{_prefix}/bin' < rpm.filelist >> common.filelist
@@ -878,7 +864,7 @@ grep '%{_prefix}/share' < rpm.filelist \
 mv rpm.filelist rpm.filelist.full
 grep -v '%{_prefix}/bin' < rpm.filelist.full |
 	grep -v '%{_prefix}/lib/locale' |
-	grep -v '%{_prefix}/libexec' | 
+	grep -v '%{_prefix}/libexec' |
 	grep -v '%{_prefix}/sbin/[^gi]' |
 	grep -v '%{_prefix}/share' > rpm.filelist
 
@@ -902,7 +888,7 @@ cp -f $RPM_BUILD_ROOT%{_prefix}/share/zoneinfo/US/Eastern $RPM_BUILD_ROOT/etc/lo
 
 rm -rf $RPM_BUILD_ROOT%{_prefix}/share/zoneinfo
 
-cd redhat
+cd fedora
 $GCC -Os -static -o build-locale-archive build-locale-archive.c \
   ../build-%{_target_cpu}-linux/locale/locarchive.o \
   ../build-%{_target_cpu}-linux/locale/md5.o \
@@ -943,20 +929,17 @@ perl -pi -e 's/alarm \(TIMEOUT\)/alarm (TIMEOUT * 15 * '$numprocs' < 600 ? TIMEO
 echo ====================TESTING=========================
 cd build-%{_target_cpu}-linux
 make -j$numprocs -k check PARALLELMFLAGS=-s 2>&1 | tee check.log || :
-make -j$numprocs -C sed check || :
 cd ..
 %ifarch i686 athlon
 echo ====================TESTING LINUXTHREADS FS=========
 cd build-%{_target_cpu}-linuxltfs
 make -j$numprocs -k check PARALLELMFLAGS=-s 2>&1 | tee check.log || :
-make -j$numprocs -C sed check || :
 cd ..
 %endif
 %ifarch %{nptlarches}
 echo ====================TESTING NPTL====================
 cd build-%{nptl_target_cpu}-linuxnptl
 make -j$numprocs -k check PARALLELMFLAGS=-s 2>&1 | tee check.log || :
-make -j$numprocs -C sed check || :
 cd ..
 %endif
 echo ====================TESTING DETAILS=================
@@ -1084,18 +1067,18 @@ find $RPM_BUILD_ROOT/usr/src/debug -type d -print | xargs chmod a+rx
 %define basearch sparc
 %endif
 cat $blf > debuginfo.filelist
-find $RPM_BUILD_ROOT/usr/src/debug/%{name}-%{version}-%{glibcdate} -type d \
+find $RPM_BUILD_ROOT/usr/src/debug/%{glibcsrcdir} -type d \
   | sed "s#^$RPM_BUILD_ROOT#%%dir #" >> debuginfo.filelist
-grep '/generic/\|/linux/\|/%{basearch}/\|/nptl\(_db\)\?/\|^%{name}-%{version}-%{glibcdate}/build' \
+grep '/generic/\|/linux/\|/%{basearch}/\|/nptl\(_db\)\?/\|^%{glibcsrcdir}/build' \
   $sf.sorted | sed 's|^|/usr/src/debug/|' >> debuginfo.filelist
 touch debuginfocommon.filelist
 %else
-( grep '^%{name}-%{version}-%{glibcdate}/build-\|dl-osinfo\.h' $csf.sorted || : ) > $csf.sorted.build
+( grep '^%{glibcsrcdir}/build-\|dl-osinfo\.h' $csf.sorted || : ) > $csf.sorted.build
 cat $blf > debuginfo.filelist
 cat $cblf > debuginfocommon.filelist
-grep '^%{name}-%{version}-%{glibcdate}/build-\|dl-osinfo\.h' $sf.sorted \
+grep '^%{glibcsrcdir}/build-\|dl-osinfo\.h' $sf.sorted \
   | sed 's|^|/usr/src/debug/|' >> debuginfo.filelist
-find $RPM_BUILD_ROOT/usr/src/debug/%{name}-%{version}-%{glibcdate} -type d \
+find $RPM_BUILD_ROOT/usr/src/debug/%{glibcsrcdir} -type d \
   | sed "s#^$RPM_BUILD_ROOT#%%dir #" >> debuginfocommon.filelist
 ( cat $csf.sorted; grep -v -f $csf.sorted.build $sf.sorted ) \
   | grep -v 'dl-osinfo\.h' | LC_ALL=C sort -u \
@@ -1103,7 +1086,7 @@ find $RPM_BUILD_ROOT/usr/src/debug/%{name}-%{version}-%{glibcdate} -type d \
 %endif
 %else
 cat $blf $cblf | LC_ALL=C sort -u > debuginfo.filelist
-echo '/usr/src/debug/%{name}-%{version}-%{glibcdate}' >> debuginfo.filelist
+echo '/usr/src/debug/%{glibcsrcdir}' >> debuginfo.filelist
 %endif
 
 [ "x$save_trace" = xyes ] && set -x
@@ -1258,6 +1241,20 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Sep 25 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-57
+- update from CVS
+  - fix setuid in LD_ASSUME_KERNEL=2.2.5 libc (#133558)
+  - fix nis locking (#132204)
+  - RTLD_DEEPBIND support
+  - fix pthread_create bugs (BZ #401, #405)
+
+* Wed Sep 22 2004 Roland McGrath <roland@redhat.com> 2.3.3-56
+- migrated CVS to fedora-branch in sources.redhat.com glibc repository
+  - source tarballs renamed
+  - redhat/ moved to fedora/, some old cruft removed
+- update from trunk
+  - some __nonnull annotations
+
 * Wed Sep 22 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-55
 - update from CVS
   - set{re,e,res}[ug]id now affect the whole process in NPTL
