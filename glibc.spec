@@ -1,4 +1,4 @@
-%define glibcrelease 2
+%define glibcrelease 3
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200312290658
+%define glibcdate 200312301455
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -1007,6 +1007,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Dec 30 2003 Jakub Jelinek <jakub@redhat.com> 2.3.3-3
+- update from CVS
+  - fix pmap_set fd and memory leak (#112726)
+- fix backreference handling in regex
+- rebuilt under glibc without the above bug to fix
+  libc.so linker script (#112738)
+
 * Mon Dec 29 2003 Jakub Jelinek <jakub@redhat.com> 2.3.3-2
 - update from CVS
   - faster getpid () in NPTL builds
