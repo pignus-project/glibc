@@ -1,4 +1,4 @@
-%define glibcrelease 42
+%define glibcrelease 43
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200408110537
+%define glibcdate 200408121345
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -1221,6 +1221,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Aug 12 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-43
+- update from CVS
+  - remove debugging printout (#129747)
+  - make <sys/shm.h> usable in C++ (IT#45148)
+- update RLIMIT_* constants in <bits/resource.h>, make
+  <sys/resource.h> POSIX compliant (#129740)
+
 * Wed Aug 11 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-42
 - fix last tzset () fixes, disable rereading of /etc/localtime
   every time for now
