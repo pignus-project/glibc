@@ -1,6 +1,6 @@
-%define glibcdate 20041210T0634
+%define glibcdate 20041213T2323
 %define glibcversion 2.3.3
-%define glibcrelease 90.EL4
+%define glibcrelease 91
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -1267,7 +1267,17 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri Dec 10 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-90.EL4
+* Tue Dec 14 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-91
+- update from CVS
+  - double buffer size in getXXbyYY or getXXent on ERANGE
+    instead of adding BUFLEN (#142617)
+  - avoid busy loop in malloc if another thread is doing fork
+    (#142214)
+  - some more realloc corruption checks
+  - fix getconf _POSIX_V6_WIDTH_RESTRICTED_ENVS output,
+    tweak %{_prefix}/libexec/getconf/ filenames
+
+* Fri Dec 10 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-90
 - update from CVS
   - regex speedups
   - use | cat in ldd if running under bash3+ to allow running
