@@ -1,6 +1,7 @@
-%define glibcdate 20041218T2312
-%define glibcversion 2.3.3
-%define glibcrelease 99
+%define glibcdate 20041219T2331
+%define glibcname glibc
+%define glibcversion 2.3.4
+%define glibcrelease 3
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -526,8 +527,9 @@ $GCC -static -L. -Os ../fedora/glibc_post_upgrade.c -o glibc_post_upgrade.%{_tar
 %ifarch %{nptlarches}
     '-DLIBTLS="/%{_lib}/tls/"' \
 %endif
-    '-DGCONV_MODULES_CACHE="%{_prefix}/%{_lib}/gconv/gconv-modules.cache"' \
-    '-DLD_SO_CONF="/etc/ld.so.conf"'
+    '-DGCONV_MODULES_DIR="%{_prefix}/%{_lib}/gconv"' \
+    '-DLD_SO_CONF="/etc/ld.so.conf"' \
+    '-DICONVCONFIG="%{_sbindir}/iconvconfig.%{_target_cpu}"'
 cd ..
 
 # hack
@@ -801,6 +803,9 @@ build-%{_target_cpu}-linux/hardlink -vc $RPM_BUILD_ROOT%{_prefix}/lib/locale
 rm -f ${RPM_BUILD_ROOT}/%{_lib}/libnss1-*
 rm -f ${RPM_BUILD_ROOT}/%{_lib}/libnss-*.so.1
 %endif
+
+# Ugly hack for buggy rpm
+ln -f ${RPM_BUILD_ROOT}%{_sbindir}/iconvconfig{,.%{_target_cpu}}
 
 # BUILD THE FILE LIST
 find $RPM_BUILD_ROOT -type f -or -type l |
@@ -1268,6 +1273,24 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Dec 21 2004 Jakub Jelinek <jakub@redhat.com> 2.3.4-3
+- rebuilt
+
+* Mon Dec 20 2004 Jakub Jelinek <jakub@redhat.com> 2.3.4-2
+- work around rpm bug some more, this time by copying
+  iconvconfig to iconvconfig.%%{_target_cpu}.
+
+* Mon Dec 20 2004 Jakub Jelinek <jakub@redhat.com> 2.3.4-1
+- update from CVS
+  - glibc 2.3.4 release
+  - add -o and --nostdlib options to iconvconfig
+- if /sbin/ldconfig doesn't exist when running
+  glibc_post_upgrade.%%{_target_cpu}, just don't attempt to run it.
+  This can happen during first install of bi-arch glibc and the
+  other arch glibc's %post wil run /sbin/ldconfig (#143326)
+- use -o and --nostdlib options to create all needed
+  gconv-modules.cache files on bi-arch setups
+
 * Sun Dec 19 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-99
 - rebuilt
 
