@@ -508,7 +508,7 @@
                  break;
                }
 --- glibc-20041005T0745/grp/initgroups.c	30 Sep 2004 02:14:32 -0000	1.32
-+++ glibc-20041005T0745-fedora/grp/initgroups.c	5 Oct 2004 11:23:17 -0000	1.31.2.2
++++ glibc-20041005T0745-fedora/grp/initgroups.c	5 Oct 2004 12:09:42 -0000	1.31.2.3
 @@ -73,7 +73,7 @@ internal_getgrouplist (const char *user,
    /* Start is one, because we have the first group as parameter.  */
    long int start = 1;
@@ -537,7 +537,7 @@
 +	{
 +	  long int inner;
 +	  for (inner = 0; inner < prev_start; ++inner)
-+	    if ((*groupsp)[inner] == (*groups)[cnt])
++	    if ((*groupsp)[inner] == (*groupsp)[cnt])
 +	      break;
 +
 +	  if (inner < prev_start)
@@ -1911,7 +1911,7 @@
 +}
 +
 --- glibc-20041005T0745/nscd/initgrcache.c	30 Sep 2004 02:18:04 -0000	1.1
-+++ glibc-20041005T0745-fedora/nscd/initgrcache.c	5 Oct 2004 11:23:18 -0000	1.1.2.2
++++ glibc-20041005T0745-fedora/nscd/initgrcache.c	5 Oct 2004 12:09:43 -0000	1.1.2.3
 @@ -117,6 +117,7 @@ addinitgroupsX (struct database_dyn *db,
    /* Nothing added yet.  */
    while (! no_more)
@@ -1930,13 +1930,13 @@
 +	{
 +	  long int inner;
 +	  for (inner = 0; inner < prev_start; ++inner)
-+	    if ((*groupsp)[inner] == (*groups)[cnt])
++	    if (groups[inner] == groups[cnt])
 +	      break;
 +
 +	  if (inner < prev_start)
 +	    ++cnt;
 +	  else
-+	    (*groupsp)[cnt] = (*groupsp)[--start];
++	    groups[cnt] = groups[--start];
 +	}
 +
        if (status != NSS_STATUS_TRYAGAIN)
@@ -2025,8 +2025,8 @@
  
  /* libc5 and glibc 2.0/2.1 use the same format.  For glibc 2.2 another
 --- glibc-20041005T0745/sysdeps/i386/bits/atomic.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20041005T0745-fedora/sysdeps/i386/bits/atomic.h	5 Oct 2004 08:25:26 -0000	1.1.2.2
-@@ -0,0 +1,405 @@
++++ glibc-20041005T0745-fedora/sysdeps/i386/bits/atomic.h	5 Oct 2004 12:09:44 -0000	1.1.2.3
+@@ -0,0 +1,410 @@
 +/* Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
 +   This file is part of the GNU C Library.
 +   Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
@@ -2209,6 +2209,11 @@
 +     __typeof (*mem) __gnewval = (newval);				      \
 +									      \
 +     *__gmemp == (oldval) ? (*__gmemp = __gnewval, 0) : 1; })
++
++/* XXX We do not really need 64-bit compare-and-exchange.  At least
++   not in the moment.  */
++# define __arch_compare_and_exchange_val_64_acq(mem, newval, oldval) \
++  ({ __typeof (*mem) ret = *(mem); abort (); ret = (newval); ret = (oldval); })
 +
 +#endif
 +
