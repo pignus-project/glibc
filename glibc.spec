@@ -1,7 +1,7 @@
-%define glibcdate 20050211T0853
+%define glibcdate 20050211T1037
 %define glibcname glibc
 %define glibcversion 2.3.4
-%define glibcrelease 8
+%define glibcrelease 9
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -843,9 +843,12 @@ for i in $RPM_BUILD_ROOT%{_prefix}/bin/{xtrace,memusage}; do
 done
 
 grep '%{_prefix}/%{_lib}/lib.*_p\.a' < rpm.filelist > profile.filelist || :
-egrep "(%{_prefix}/include)|(%{_infodir})" < rpm.filelist |
-	grep -v %{_prefix}/include/nptl |
-	grep -v %{_infodir}/dir > devel.filelist
+grep '%{_infodir}' < rpm.filelist | grep -v '%{_infodir}/dir' > devel.filelist
+grep '%{_prefix}/include/gnu/stubs-[32164]\+\.h' < rpm.filelist >> devel.filelist
+
+grep '%{_prefix}/include' < rpm.filelist |
+	egrep -v '%{_prefix}/include/(nptl|gnu/stubs-[32164]+\.h)' \
+		> headers.filelist
 
 mv rpm.filelist rpm.filelist.full
 grep -v '%{_prefix}/%{_lib}/lib.*_p.a' rpm.filelist.full |
@@ -855,10 +858,6 @@ grep '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist >> devel.filelist
 grep '%{_prefix}/%{_lib}/.*\.o' < rpm.filelist >> devel.filelist
 grep '%{_prefix}/%{_lib}/lib.*\.so' < rpm.filelist >> devel.filelist
 grep '%{_mandir}' < rpm.filelist >> devel.filelist
-
-grep '%{_prefix}/include' < devel.filelist > headers.filelist
-grep -v '%{_prefix}/include' < devel.filelist > devel.filelist.tmp
-mv -f devel.filelist.tmp devel.filelist
 
 mv rpm.filelist rpm.filelist.full
 grep -v '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist.full |
@@ -1273,6 +1272,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb 11 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-9
+- update from CVS
+  - bi-arch <gnu/stubs.h> (BZ#715)
+
 * Fri Feb 11 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-8
 - update from CVS
   - bi-arch <gnu/lib-names.h> (BZ#632)
@@ -1640,7 +1643,7 @@ rm -f *.filelist*
 - update from CVS
   - fix BZ #151, #362, #381, #407
   - fdim fix for +inf/+inf (BZ #376)
- 
+
 * Sun Sep 26 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-58
 - update from CVS
   - vasprintf fix (BZ #346)
