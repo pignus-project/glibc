@@ -1,7 +1,10 @@
 --- glibc-20040929T0821/ChangeLog	29 Sep 2004 05:59:26 -0000	1.8825
-+++ glibc-20040929T0821-fedora/ChangeLog	29 Sep 2004 09:00:58 -0000	1.8782.2.8
-@@ -1,3 +1,9 @@
++++ glibc-20040929T0821-fedora/ChangeLog	29 Sep 2004 10:00:28 -0000	1.8782.2.9
+@@ -1,3 +1,12 @@
 +2004-09-29  Jakub Jelinek  <jakub@redhat.com>
++
++	* time/tzfile.c (tzfile_mtime): New variable.
++	(__tzfile_read): Reread the file if mtime is different.
 +
 +	* sysdeps/i386/fpu/s_fdim.S (__fdim): Handle +inf/+inf.
 +	* sysdeps/i386/fpu/s_fdimf.S (__fdimf): Likewise.
@@ -10,7 +13,7 @@
  2004-09-28  Ulrich Drepper  <drepper@redhat.com>
  
  	* nscd/nscd_getai.c: Use NO_MAPPING instead of MAP_FAILED for test
-@@ -236,6 +242,22 @@
+@@ -236,6 +245,22 @@
  	* string/string.h: Add __nonnull annotations.
  	* stdlib/stdlib.h: Likewise.
  
@@ -33,7 +36,7 @@
  2004-09-20  H.J. Lu  <hongjiu.lu@intel.com>
  
  	* sysdeps/unix/sysv/linux/ia64/sysdep.h (DO_INLINE_SYSCALL):
-@@ -965,6 +987,23 @@
+@@ -965,6 +990,23 @@
  	before return type.
  	* locale/localename.c (__current_locale_name): Likewise.
  
@@ -57,7 +60,7 @@
  2004-08-30  Roland McGrath  <roland@frob.com>
  
  	* scripts/extract-abilist.awk: If `lastversion' variable defined, omit
-@@ -1121,6 +1160,22 @@
+@@ -1121,6 +1163,22 @@
  	* resolv/nss_dns/dns-canon.c (_nss_dns_getcanonname_r): Initialize
  	status to NSS_STATUS_UNAVAIL.
  
@@ -80,7 +83,7 @@
  2004-08-19  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/posix/getaddrinfo.c (gaih_inet): Use h->h_name in the
-@@ -1425,6 +1480,12 @@
+@@ -1425,6 +1483,12 @@
  
  	* iconvdata/testdata/ISO-2022-JP-3: Regenerated.
  
@@ -2962,3 +2965,35 @@
 +++ glibc-20040929T0821-fedora/sysdeps/unix/sysv/linux/sparc/sparc32/setresuid.c 1 Jan 1970 00:00:00 -0000
 @@ -1 +0,0 @@
 -#include <sysdeps/unix/sysv/linux/i386/setresuid.c>
+--- glibc-20040929T0821/time/tzfile.c	11 Aug 2004 19:25:51 -0000	1.58
++++ glibc-20040929T0821-fedora/time/tzfile.c	29 Sep 2004 10:00:27 -0000	1.58.2.1
+@@ -32,6 +32,7 @@
+ int __use_tzfile;
+ static dev_t tzfile_dev;
+ static ino64_t tzfile_ino;
++static time_t tzfile_mtime;
+ 
+ struct ttinfo
+   {
+@@ -161,7 +162,8 @@ __tzfile_read (const char *file, size_t 
+       fclose (f);
+       goto ret_free_transitions;
+     }
+-  if (was_using_tzfile && tzfile_ino == st.st_ino && tzfile_dev == st.st_dev)
++  if (was_using_tzfile && tzfile_ino == st.st_ino && tzfile_dev == st.st_dev
++      && tzfile_mtime == st.st_mtime)
+     {
+       /* It's the same file.  No further work needed.  */
+       fclose (f);
+@@ -172,9 +174,10 @@ __tzfile_read (const char *file, size_t 
+   free ((void *) transitions);
+   transitions = NULL;
+ 
+-  /* Remember the inode and device number.  */
++  /* Remember the inode and device number and modification time.  */
+   tzfile_dev = st.st_dev;
+   tzfile_ino = st.st_ino;
++  tzfile_mtime = st.st_mtime;
+ 
+   /* No threads reading this stream.  */
+   __fsetlocking (f, FSETLOCKING_BYCALLER);
