@@ -158,7 +158,7 @@ for developing programs which can use the LinuxThreads library (normally
 newly linked programs will work only with NPTL).  To compile and link
 a program against LinuxThreads libraries, use
 -I/usr/include/linuxthreads -L/usr/%{_lib}/linuxthreads \\
--Wl,-rpath-link,/usr/%{_lib}/linuxthreads
+-Wl,-rpath-link,/%{_lib}/obsolete/linuxthreads
 %endif
 
 %package profile
@@ -675,6 +675,13 @@ sed "s| /%{_lib}/| /%{_lib}/$ObsDir/|" $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libc.so
   > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/linuxthreads/libc.so
 sed "s| /%{_lib}/| /%{_lib}/$ObsDir/|;s|/libpthread_nonshared|/linuxthreads&|" $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libpthread.so \
   > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/linuxthreads/libpthread.so
+%ifarch %{rtkaioarches}
+ln -sf /%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed 's/librt-/librtkaio-/'` \
+  $RPM_BUILD_ROOT%{_prefix}/%{_lib}/linuxthreads/librt.so
+%else
+ln -sf /%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so` \
+  $RPM_BUILD_ROOT%{_prefix}/%{_lib}/linuxthreads/librt.so
+%endif
 strip -g $RPM_BUILD_ROOT%{_prefix}/%{_lib}/linuxthreads/*.a
 mkdir -p $RPM_BUILD_ROOT/nptl $RPM_BUILD_ROOT%{_prefix}/include/linuxthreads
 make -j1 install_root=$RPM_BUILD_ROOT/nptl install-headers PARALLELMFLAGS=-s
