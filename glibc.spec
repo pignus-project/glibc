@@ -1,4 +1,4 @@
-%define glibcrelease 39
+%define glibcrelease 42
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200407231111
+%define glibcdate 200408110537
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -20,6 +20,7 @@ Patch1: %{name}-nptl-check.patch
 Patch2: %{name}-ppc-assume.patch
 Patch3: %{name}-execstack-disable.patch
 Patch4: %{name}-ia64-lib64.patch
+Patch5: nscd-selinux.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -256,6 +257,7 @@ esac
 %patch4 -p1
 %endif
 %endif
+%patch5 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir asm
@@ -1219,6 +1221,33 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Aug 11 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-42
+- fix last tzset () fixes, disable rereading of /etc/localtime
+  every time for now
+- really enable SELinux support for NSCD
+
+* Wed Aug 11 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-41
+- update from CVS
+  - fread_unlocked/fwrite_unlocked macro fixes (BZ #309, #316)
+  - tzset () fixes (BZ #154)
+- speed up pthread_rwlock_unlock on arches other than i386 and
+  x86_64 (#129455)
+- fix compilation with -ansi (resp. -std=c89 or -std=c99) and
+  -D_XOPEN_SOURCE=[56]00 but no -D_POSIX_SOURCE* or -D_POSIX_C_SOURCE*
+  (BZ #284)
+- add SELinux support for NSCD
+
+* Fri Aug  6 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-40
+- update from CVS
+  - change res_init to force all threads to re-initialize
+    resolver before they use it next time (#125712)
+  - various getaddrinfo and related fixes (BZ #295, #296)
+  - fix IBM{932,943} iconv modules (#128674)
+  - some nscd fixes (e.g. BZ #292)
+  - RFC 3678 support (Multicast Source Filters)
+- handle /lib/i686/librtkaio-* in i386 glibc_post_upgrade
+  the same as /lib/i686/librt-*
+
 * Fri Jul 23 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-39
 - update from CVS
   - conformance related changes in headers
