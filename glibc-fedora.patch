@@ -1,6 +1,22 @@
 --- glibc-20050303T1335/ChangeLog	3 Mar 2005 08:28:23 -0000	1.9240
-+++ glibc-20050303T1335-fedora/ChangeLog	3 Mar 2005 17:29:55 -0000	1.8782.2.82
-@@ -10,6 +10,7 @@
++++ glibc-20050303T1335-fedora/ChangeLog	5 Mar 2005 13:13:04 -0000	1.8782.2.85
+@@ -1,3 +1,15 @@
++2005-03-05  Jakub Jelinek  <jakub@redhat.com>
++
++	* Makerules ($(inst_libdir)/libc.so): Use $(slibdir) instead of
++	$(inst_slibdir) in AS_NEEDED directive.
++
++	* include/bits/unistd.h: New file.
++	* include/bits/socket2.h: New file.
++
++	* sysdeps/i386/dl-machine.h (ELF_MACHINE_NO_RELA): Define
++	unconditionally to (defined RTLD_BOOTSTRAP).
++	* sysdeps/arm/dl-machine.h (ELF_MACHINE_NO_RELA): Likewise.
++
+ 2005-03-01  H.J. Lu  <hongjiu.lu@intel.com>
+ 
+ 	[BZ #776]
+@@ -10,6 +22,7 @@
  	loader is closed.  Fixes unload3.
  	* elf/tst-global1.c: New file.
  	* elf/Makefile (tests): Add tst-global1.
@@ -8,7 +24,7 @@
  
  2005-03-03  Jakub Jelinek  <jakub@redhat.com>
  
-@@ -529,6 +530,18 @@
+@@ -529,6 +542,18 @@
  
  	* scripts/soversions.awk: Fix default version set handling.
  
@@ -188,6 +204,17 @@
  2004-08-30  Roland McGrath  <roland@frob.com>
  
  	* scripts/extract-abilist.awk: If `lastversion' variable defined, omit
+--- glibc-20050303T1335/Makerules	24 Feb 2005 02:10:30 -0000	1.429
++++ glibc-20050303T1335-fedora/Makerules	5 Mar 2005 13:13:06 -0000	1.423.2.5
+@@ -972,7 +972,7 @@ $(inst_libdir)/libc.so: $(common-objpfx)
+ 	 cat $<; \
+ 	 echo 'GROUP ( $(slibdir)/libc.so$(libc.so-version)' \
+ 	      '$(libdir)/$(patsubst %,$(libtype.oS),$(libprefix)$(libc-name))'\
+-	      ' AS_NEEDED (' $(inst_slibdir)/$(rtld-installed-name) ') )' \
++	      ' AS_NEEDED (' $(slibdir)/$(rtld-installed-name) ') )' \
+ 	) > $@.new
+ 	mv -f $@.new $@
+ 
 --- glibc-20050303T1335/Versions.def	21 Feb 2005 23:06:21 -0000	1.59
 +++ glibc-20050303T1335-fedora/Versions.def	3 Mar 2005 16:52:24 -0000	1.58.2.2
 @@ -20,7 +20,6 @@ libc {
@@ -774,6 +801,14 @@
  
  #define __GLIBC_PREREQ(maj, min) \
  	((__GLIBC__ << 16) + __GLIBC_MINOR__ >= ((maj) << 16) + (min))
+--- glibc-20050303T1335/include/bits/socket2.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20050303T1335-fedora/include/bits/socket2.h	5 Mar 2005 13:04:47 -0000	1.1.2.1
+@@ -0,0 +1 @@
++#include <socket/bits/socket2.h>
+--- glibc-20050303T1335/include/bits/unistd.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20050303T1335-fedora/include/bits/unistd.h	5 Mar 2005 13:04:47 -0000	1.1.2.1
+@@ -0,0 +1 @@
++#include <posix/bits/unistd.h>
 --- glibc-20050303T1335/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
 +++ glibc-20050303T1335-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
 @@ -58,8 +58,6 @@ korean		ko_KR.eucKR
@@ -858,8 +893,16 @@
 +         __chk_fail ();							      \
 +       fgets_unlocked (__str, __n_val, __fp); }))
 --- glibc-20050303T1335/linuxthreads/ChangeLog	10 Feb 2005 07:16:22 -0000	1.837
-+++ glibc-20050303T1335-fedora/linuxthreads/ChangeLog	11 Feb 2005 09:01:50 -0000	1.817.2.17
-@@ -766,6 +766,12 @@
++++ glibc-20050303T1335-fedora/linuxthreads/ChangeLog	5 Mar 2005 13:03:34 -0000	1.817.2.18
+@@ -1,3 +1,7 @@
++2005-03-05  Jakub Jelinek  <jakub@redhat.com>
++
++	* sysdeps/powerpc/tcb-offsets.sym (thread_offsetof): Rework for GCC 4.
++
+ 2005-02-09  Daniel Jacobowitz  <dan@codesourcery.com>
+ 
+ 	* descr.h (__pthread_find_self, thread_self): Mark as pure
+@@ -766,6 +770,12 @@
  	(pthread_barrierattr_setpshared): Return EINVAL if pshared
  	is neither PTHREAD_PROCESS_PRIVATE nor PTHREAD_PROCESS_SHARED.
  
@@ -872,7 +915,7 @@
  2003-09-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/unix/sysv/linux/i386/dl-sysdep.h
-@@ -898,6 +904,34 @@
+@@ -898,6 +908,34 @@
  
  2003-07-22  Jakub Jelinek  <jakub@redhat.com>
  
@@ -1102,6 +1145,17 @@
  
  /* Alignment requirements for the TCB.  */
  #  define TLS_TCB_ALIGN __alignof__ (struct _pthread_descr_struct)
+--- glibc-20050303T1335/linuxthreads/sysdeps/powerpc/tcb-offsets.sym	13 Jan 2004 21:30:17 -0000	1.7
++++ glibc-20050303T1335-fedora/linuxthreads/sysdeps/powerpc/tcb-offsets.sym	5 Mar 2005 13:03:35 -0000	1.7.2.1
+@@ -8,7 +8,7 @@
+ -- Abuse tls.h macros to derive offsets relative to the thread register.
+ #  undef __thread_register
+ #  define __thread_register	((void *) 0)
+-#  define thread_offsetof(mem)	((void *) &THREAD_SELF->p_##mem - (void *) 0)
++#  define thread_offsetof(mem)	((ptrdiff_t) THREAD_SELF + offsetof (struct _pthread_descr_struct, p_##mem))
+ 
+ # else
+ 
 --- glibc-20050303T1335/linuxthreads/sysdeps/powerpc/tls.h	9 Jan 2005 20:01:14 -0000	1.9
 +++ glibc-20050303T1335-fedora/linuxthreads/sysdeps/powerpc/tls.h	8 Feb 2005 10:04:14 -0000	1.8.2.2
 @@ -69,11 +69,19 @@ typedef struct
@@ -2006,6 +2060,19 @@
 +       if (__bos0 (buf) != (size_t) -1 && __bos0 (buf) < __n_val)	      \
 +         __chk_fail ();							      \
 +       recvfrom (fd, buf, __n_val, flags, addr, addr_len); }))
+--- glibc-20050303T1335/sysdeps/arm/dl-machine.h	1 Mar 2005 20:34:40 -0000	1.50
++++ glibc-20050303T1335-fedora/sysdeps/arm/dl-machine.h	5 Mar 2005 13:03:35 -0000	1.48.2.3
+@@ -353,9 +353,7 @@ elf_machine_plt_value (struct link_map *
+ 
+ /* ARM never uses Elf32_Rela relocations for the dynamic linker.
+    Prelinked libraries may use Elf32_Rela though.  */
+-#ifdef RTLD_BOOTSTRAP
+-# define ELF_MACHINE_NO_RELA 1
+-#endif
++#define ELF_MACHINE_NO_RELA (defined RTLD_BOOTSTRAP)
+ 
+ #ifdef RESOLVE
+ 
 --- glibc-20050303T1335/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
 +++ glibc-20050303T1335-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
 @@ -36,6 +36,14 @@
@@ -2023,6 +2090,19 @@
  #define CACHEMAGIC "ld.so-1.7.0"
  
  /* libc5 and glibc 2.0/2.1 use the same format.  For glibc 2.2 another
+--- glibc-20050303T1335/sysdeps/i386/dl-machine.h	17 Feb 2005 01:16:33 -0000	1.133
++++ glibc-20050303T1335-fedora/sysdeps/i386/dl-machine.h	5 Mar 2005 13:03:35 -0000	1.127.2.4
+@@ -301,9 +301,7 @@ elf_machine_plt_value (struct link_map *
+ 
+ /* The i386 never uses Elf32_Rela relocations for the dynamic linker.
+    Prelinked libraries may use Elf32_Rela though.  */
+-#ifdef RTLD_BOOTSTRAP
+-# define ELF_MACHINE_NO_RELA 1
+-#endif
++#define ELF_MACHINE_NO_RELA (defined RTLD_BOOTSTRAP)
+ 
+ #ifdef RESOLVE_MAP
+ 
 --- glibc-20050303T1335/sysdeps/i386/bits/atomic.h 1 Jan 1970 00:00:00 -0000
 +++ glibc-20050303T1335-fedora/sysdeps/i386/bits/atomic.h	5 Oct 2004 12:09:44 -0000	1.1.2.3
 @@ -0,0 +1,410 @@
@@ -2436,6 +2516,13 @@
 +
 +
 +#define atomic_delay() asm ("rep; nop")
+--- glibc-20050303T1335/sysdeps/i386/i486/Makefile 1 Jan 1970 00:00:00 -0000
++++ glibc-20050303T1335-fedora/sysdeps/i386/i486/Makefile	5 Mar 2005 13:03:35 -0000	1.1.2.1
+@@ -0,0 +1,4 @@
++# Temporary workaround for GCC4 PR debug/19345
++ifeq ($(subdir),string)
++CFLAGS-string-inlines.c += -g0
++endif
 --- glibc-20050303T1335/sysdeps/ia64/Makefile	16 Aug 2004 06:46:14 -0000	1.10
 +++ glibc-20050303T1335-fedora/sysdeps/ia64/Makefile	22 Sep 2004 21:21:07 -0000	1.10.2.1
 @@ -12,8 +12,8 @@ elide-routines.os += hp-timing
@@ -3505,47 +3592,3 @@
  #define IEXTEN	0x00008000
  
  /* modem lines */
---- libc/linuxthreads/sysdeps/powerpc/tcb-offsets.sym.jj	2005-03-04 14:21:29.000000000 -0500
-+++ libc/linuxthreads/sysdeps/powerpc/tcb-offsets.sym	2005-03-04 14:26:29.000000000 -0500
-@@ -8,7 +8,7 @@
- -- Abuse tls.h macros to derive offsets relative to the thread register.
- #  undef __thread_register
- #  define __thread_register	((void *) 0)
--#  define thread_offsetof(mem)	((void *) &THREAD_SELF->p_##mem - (void *) 0)
-+#  define thread_offsetof(mem)	((ptrdiff_t) THREAD_SELF + offsetof (struct _pthread_descr_struct, p_##mem))
- 
- # else
- 
---- libc/sysdeps/i386/dl-machine.h.jj	2005-02-16 20:16:33.000000000 -0500
-+++ libc/sysdeps/i386/dl-machine.h	2005-03-04 16:50:32.313591897 -0500
-@@ -301,9 +301,7 @@ elf_machine_plt_value (struct link_map *
- 
- /* The i386 never uses Elf32_Rela relocations for the dynamic linker.
-    Prelinked libraries may use Elf32_Rela though.  */
--#ifdef RTLD_BOOTSTRAP
--# define ELF_MACHINE_NO_RELA 1
--#endif
-+#define ELF_MACHINE_NO_RELA (defined RTLD_BOOTSTRAP)
- 
- #ifdef RESOLVE_MAP
- 
---- libc/sysdeps/arm/dl-machine.h.jj	2005-03-01 15:34:40.000000000 -0500
-+++ libc/sysdeps/arm/dl-machine.h	2005-03-04 16:50:43.913473979 -0500
-@@ -353,9 +353,7 @@ elf_machine_plt_value (struct link_map *
- 
- /* ARM never uses Elf32_Rela relocations for the dynamic linker.
-    Prelinked libraries may use Elf32_Rela though.  */
--#ifdef RTLD_BOOTSTRAP
--# define ELF_MACHINE_NO_RELA 1
--#endif
-+#define ELF_MACHINE_NO_RELA (defined RTLD_BOOTSTRAP)
- 
- #ifdef RESOLVE
- 
---- libc/sysdeps/i386/i486/Makefile.jj	2005-01-27 14:27:08.338732320 +0100
-+++ libc/sysdeps/i386/i486/Makefile	2005-03-05 01:17:12.459113304 +0100
-@@ -0,0 +1,4 @@
-+# Temporary workaround for GCC4 PR debug/19345
-+ifeq ($(subdir),string)
-+CFLAGS-string-inlines.c += -g0
-+endif
