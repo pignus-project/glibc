@@ -1,15 +1,13 @@
-%define glibcrelease 44
+%define glibcrelease 5
 %define auxarches i586 i686 athlon sparcv9 alphaev6
-%define prelinkarches i686 athlon alpha alphaev6
-%define prelinkdate 20020617
+%define prelinkarches i686 athlon alpha alphaev6 sparc sparcv9
 Summary: The GNU libc libraries.
 Name: glibc
-Version: 2.2.5
+Version: 2.2.93
 Release: %{glibcrelease}
 Copyright: LGPL
 Group: System Environment/Libraries
 Source: %{name}-%{version}.tar.bz2
-Source2: ftp://people.redhat.com/jakub/prelink/prelink-%{prelinkdate}.tar.bz2
 # In the source tarball the file diff-CYGNUS-to-REDHAT.patch contains all
 # diffs applied by Red Hat to the current CVS version of glibc
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
@@ -25,24 +23,15 @@ Prereq: basesystem
 # This is for building auxiliary programs like memusage
 # For initial glibc bootstraps it can be commented out
 BuildPreReq: gd-devel libpng-devel zlib-devel
-BuildPreReq: libelf >= 0.7.0-2
+%ifarch %{prelinkarches}
+BuildPreReq: prelink >= 0.2.0-5
+%endif
 # This is to ensure that __frame_state_for exported by glibc
 # will be compatible with egcs 1.x.y
 BuildPreReq: gcc >= 2.96-84
 Conflicts: rpm <= 4.0-0.65
 Conflicts: glibc-devel < 2.2.3
 Patch: glibc-kernel-2.4.patch
-Patch2: glibc-2.2.5.patch
-Patch3: glibc-2.2.5-security.patch
-Patch4: glibc-2.2.5-getdents.patch
-Patch5: glibc-2.2.5-xdr_array.patch
-Patch6: glibc-2.2.5-calloc.patch
-Patch7: glibc-2.2.5-dl-environ.patch
-Patch8: glibc-2.2.5-wprintf.patch
-Patch9: glibc-2.2.5-maxpacket.patch
-Patch10: glibc-2.2.5-setrlimit.patch
-Patch11: glibc-2.2.5-xdrmem.patch
-Patch12: glibc-2.2.5-getgrouplist.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
@@ -75,7 +64,7 @@ Prereq: /sbin/install-info
 Obsoletes: libc-debug, libc-headers, libc-devel, linuxthreads-devel
 Prereq: kernel-headers
 Requires: kernel-headers >= 2.2.1, %{name} = %{version}
-%ifarch x86
+%ifarch %{ix86}
 # Earlier gcc's had atexit reference in crtendS.o, which does not
 # work with this glibc where atexit is in libc_nonshared.a
 Conflicts: gcc < 2.96-79
@@ -195,25 +184,6 @@ case `uname -r` in
 %enablemask)
 %patch -p1
 ;; esac
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-
-perl -pi -e 'm/PACKET.*1024/ and s/1024/65536/' \
-  `find resolv glibc-compat -name \*.c`
-
-%ifarch %{prelinkarches}
-mkdir prelink
-tar x --bzip2 -C prelink -f %{SOURCE2}
-%endif
 
 %ifarch armv4l sparc64 ia64 s390 s390x
 rm -rf glibc-compat
@@ -229,6 +199,7 @@ cat > find_provides.sh <<EOF
 exit 0
 EOF
 chmod +x find_provides.sh
+touch sysdeps/*/elf/configure configure
 
 %build
 rm -rf build-%{_target_cpu}-linux
@@ -260,13 +231,13 @@ if gcc -v | grep -q 'gcc version 3'; then
   BuildFlags="$BuildFlags -finline-limit=2000"
 fi
 EnableKernel="--enable-kernel=%{enablekernel}"
-%ifarch %{auxarches}
+%ifarch %{auxarches} x86_64
 EnableKernel="$EnableKernel --disable-profile"
 %endif
 echo "$BuildFlags" > ../BuildFlags
 CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
 	--enable-add-ons=yes --without-cvs $EnableKernel \
-	%{_target_cpu}-redhat-linux
+	--without-tls %{_target_cpu}-redhat-linux
 if [ -x /usr/bin/getconf ] ; then
   numprocs=$(/usr/bin/getconf _NPROCESSORS_ONLN)
   if [ $numprocs -eq 0 ]; then
@@ -308,7 +279,7 @@ BuildFlags=`cat ../BuildFlags`
 EnableKernel="--enable-kernel=%{enablekernel2} --disable-profile"
 CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
 	--enable-add-ons=yes --without-cvs $EnableKernel \
-	%{_target_cpu}-redhat-linux
+	--without-tls %{_target_cpu}-redhat-linux
 if [ -x /usr/bin/getconf ] ; then
   numprocs=$(/usr/bin/getconf _NPROCESSORS_ONLN)
   if [ $numprocs -eq 0 ]; then
@@ -327,14 +298,6 @@ cp -a linuxthreads/libpthread.so $RPM_BUILD_ROOT/lib/i686/`basename $RPM_BUILD_R
 ln -sf `basename $RPM_BUILD_ROOT/lib/libpthread-*.so` $RPM_BUILD_ROOT/lib/i686/`basename $RPM_BUILD_ROOT/lib/libpthread.so.*`
 strip -R .comment $RPM_BUILD_ROOT/lib/{libc,libm,libpthread}-*.so
 cd ..
-%endif
-
-%ifarch %{prelinkarches}
-# Build prelink
-cd prelink/prelink
-%configure
-make
-cd ../..
 %endif
 
 # compatibility hack: this locale has vanished from glibc, but some other
@@ -447,27 +410,26 @@ popd
 
 %ifarch i686 athlon
 # Prelink ld.so and libc.so
-cd prelink
 > prelink.conf
 # For now disable prelinking of ld.so, as it breaks statically linked
 # binaries built against non-NDEBUG old glibcs (assert unknown dynamic tag)
-# prelink/src/prelink -c ./prelink.conf -C ./prelink.cache \
+# /usr/sbin/prelink -c ./prelink.conf -C ./prelink.cache \
 #  --mmap-region-start=0x40000000 $RPM_BUILD_ROOT/%{_lib}/ld-*.so
-prelink/src/prelink --reloc-only=0x42000000 \
-  $RPM_BUILD_ROOT/%{_lib}/i686/libc-*.so
-cd ..
+/usr/sbin/prelink --reloc-only=0x42000000 $RPM_BUILD_ROOT/%{_lib}/i686/libc-*.so
 %endif
 %ifarch alpha alphaev6
 # Prelink ld.so and libc.so
-cd prelink
 > prelink.conf
 # For now disable prelinking of ld.so, as it breaks statically linked
 # binaries built against non-NDEBUG old glibcs (assert unknown dynamic tag)
-# prelink/src/prelink -c ./prelink.conf -C ./prelink.cache \
+# /usr/sbin/prelink -c ./prelink.conf -C ./prelink.cache \
 #  --mmap-region-start=0x0000020000000000 $RPM_BUILD_ROOT/%{_lib}/ld-*.so
-prelink/src/prelink --reloc-only=0x0000020010000000 \
-  $RPM_BUILD_ROOT/%{_lib}/libc-*.so
-cd ..
+/usr/sbin/prelink --reloc-only=0x0000020010000000 $RPM_BUILD_ROOT/%{_lib}/libc-*.so
+%endif
+%ifarch sparc sparcv9
+# Prelink libc.so
+> prelink.conf
+/usr/sbin/prelink --reloc-only=0x72000000 $RPM_BUILD_ROOT/%{_lib}/libc-*.so
 %endif
 
 # rquota.x and rquota.h are now provided by quota
@@ -484,7 +446,7 @@ find $RPM_BUILD_ROOT -type f -or -type l |
 	sed -e 's|.*/etc|%config &|' \
 	    -e 's|.*/gconv/gconv-modules$|%verify(not md5 size mtime) %config(noreplace) &|' \
 	    -e 's|.*/gconv/gconv-modules.cache|%verify(not md5 size mtime) &|' \
-	    -e '/debug/d' > rpm.filelist.in
+	    -e '/%{_lib}\/debug/d' > rpm.filelist.in
 for n in %{_prefix}/share %{_prefix}/include %{_prefix}/lib/locale; do 
     find ${RPM_BUILD_ROOT}${n} -type d | \
 	grep -v '%{_prefix}/share$' | \
@@ -554,6 +516,16 @@ rm -f $RPM_BUILD_ROOT/etc/localtime
 cp -f $RPM_BUILD_ROOT%{_prefix}/share/zoneinfo/US/Eastern $RPM_BUILD_ROOT/etc/localtime
 #ln -sf ..%{_prefix}/share/zoneinfo/US/Eastern $RPM_BUILD_ROOT/etc/localtime
 
+cd redhat
+gcc -Os -static -o build-locale-archive build-locale-archive.c \
+  ../build-%{_target_cpu}-linux/locale/locarchive.o \
+  ../build-%{_target_cpu}-linux/locale/md5.o \
+  -DDATADIR=\"%{_datadir}\" -DPREFIX=\"%{_prefix}\" \
+  -L../build-%{_target_cpu}-linux
+strip build-locale-archive
+install -m 700 build-locale-archive $RPM_BUILD_ROOT/usr/sbin/build-locale-archive
+cd ..
+
 # the last bit: more documentation
 rm -rf documentation
 mkdir documentation
@@ -583,6 +555,8 @@ echo ====================TESTING END=====================
 
 %postun -p /sbin/ldconfig
 
+%post common -p /usr/sbin/build-locale-archive
+
 %post devel
 /sbin/install-info %{_infodir}/libc.info.gz %{_infodir}/dir
 
@@ -602,7 +576,7 @@ fi
 %postun utils -p /sbin/ldconfig
 
 %pre -n nscd
-/usr/sbin/useradd -M -o -r -d / -s /bin/false \
+/usr/sbin/useradd -M -o -r -d / -s /sbin/nologin \
 	-c "NSCD Daemon" -u 28 nscd > /dev/null 2>&1 || :
 
 %post -n nscd
@@ -635,7 +609,7 @@ rm -f *.filelist*
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/ld.so.conf
 %doc README NEWS INSTALL FAQ BUGS NOTES PROJECTS CONFORMANCE
-%doc COPYING COPYING.LIB README.libm
+%doc COPYING COPYING.LIB README.libm LICENSES
 %doc hesiod/README.hesiod
 
 %files debug
@@ -646,13 +620,16 @@ rm -f *.filelist*
 %ifnarch %{auxarches}
 %files -f common.filelist common
 %defattr(-,root,root)
+%{_prefix}/sbin/build-locale-archive
 %doc documentation/*
 
 %files -f devel.filelist devel
 %defattr(-,root,root)
 
+%ifnarch x86_64
 %files -f profile.filelist profile
 %defattr(-,root,root)
+%endif
 
 %files utils
 %defattr(-,root,root)
@@ -677,44 +654,157 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Wed Nov  5 2003 Jakub Jelinek <jakub@redhat.com> 2.2.4-44
-- fix getgrouplist (#101691)
+* Fri Sep  6 2002 Jakub Jelinek <jakub@redhat.com> 2.2.93-5
+- fix wcsmbs functions with invalid character sets (or malloc
+  failures)
+- make sure __ctype_b etc. compat vars are updated even if
+  they are copy relocs in the main program
 
-* Wed Mar  5 2003 Jakub Jelinek <jakub@redhat.com> 2.2.5-43
-- fix overflows in xdrmem (Paul Eggert, Roland McGrath)
+* Thu Sep  5 2002 Jakub Jelinek <jakub@redhat.com> 2.2.93-4
+- fix /lib/libnss1_dns.so.1 (missing __set_h_errno definition
+  leading to unresolved __set_h_errno symbol)
 
-* Thu Oct 12 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-42
-- use malloc instead of alloca for get*by* functions, so that
-  they work even with extremely low stack sizes (#75128, #75616)
-- fix *wprintf
-- don't muck with RLIMIT_STACK in FLOATING_STACKS linuxthreads
+* Wed Sep  4 2002 Jakub Jelinek <jakub@redhat.com> 2.2.93-3
+- security fix - increase dns-network.c MAXPACKET to at least
+  65536 to avoid buffer overrun. Likewise glibc-compat
+  dns-{host,network}.c.
 
-* Thu Sep 12 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-41
-- only remove required dangerous env variables from environment
-  for suid/sgid apps, not also any variables matching their prefixes
+* Tue Sep  3 2002 Jakub Jelinek <jakub@redhat.com> 2.2.93-2
+- temporarily add back __ctype_b, __ctype_tolower and __ctype_toupper to
+  libc.a and export them as @@GLIBC_2.0 symbols, not @GLIBC_2.0
+  from libc.so - we have still lots of .a libraries referencing
+  __ctype_{b,tolower,toupper} out there...
 
-* Mon Sep  9 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-40
-- fix resolver buffer overflows
+* Tue Sep  3 2002 Jakub Jelinek <jakub@redhat.com> 2.2.93-1
+- update from CVS
+  - 2.2.93 release
+  - use double instead of single indirection in isXXX macros
+  - per-locale wcsmbs conversion state
 
-* Wed Aug  7 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-39
-- fix the calloc patch so that calloc (131072, 0) doesn't
-  crash
+* Sat Aug 31 2002 Jakub Jelinek <jakub@redhat.com> 2.2.92-2
+- update from CVS
+  - fix newlocale/duplocale/uselocale
+- disable profile on x86_64 for now
 
-* Thu Aug  1 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-38
-- fix xdr_array buffer overflow
-- fix calloc overflow (both patches by Solar Designer)
-- getdents fix for LSB conformance
+* Sat Aug 31 2002 Jakub Jelinek <jakub@redhat.com> 2.2.92-1
+- update from CVS
+  - 2.2.92 release
+  - fix gettext after uselocale
+  - fix locales in statically linked threaded programs
+  - fix NSS
 
-* Tue Jul  9 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-37
-- fix buffer overflows in getnetby* (if nsswitch.conf
-  network: line includes dns) and gethostby* for apps compiled
-  against glibc 2.0.
+* Thu Aug 29 2002 Jakub Jelinek <jakub@redhat.com> 2.2.91-1
+- update from CVS
+  - 2.2.91 release
+  - fix fd leaks in locale-archive reader (#72043)
+- handle EROFS in build-locale-archive gracefully (#71665)
 
-* Tue Jun 18 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-36
-- fix nice return value
-- fix __moddi3 (#65612, #65695)
-- export get*ent_r@@GLIBC_2.1.2 symbols (#66278)
-- update prelink to fix prelink -r on alpha
+* Wed Aug 28 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-27
+- update from CVS
+  - fix re_match (#72312)
+- support more than 1024 threads
+
+* Fri Aug 23 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-26
+- update from CVS
+  - fix i386 build
+
+* Thu Aug 22 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-25
+- update from CVS
+  - fix locale-archive loading hang on some (non-primary) locales
+    (#72122, #71878)
+  - fix umount problems with locale-archives when /usr is a separate
+    partition (#72043)
+- add LICENSES file
+
+* Fri Aug 16 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-24
+- update from CVS
+  - only mmap up to 2MB of locale-archive on 32-bit machines
+    initially
+  - fix fseek past end + fread segfault with mmaped stdio
+- include <sys/debugreg.h> which is mistakenly not included
+  in glibc-devel on IA-32
+
+* Fri Aug 16 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-23
+- don't return normalized locale name in setlocale when using
+  locale-archive
+
+* Thu Aug 15 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-22
+- update from CVS
+  - optimize for primary system locale
+- localedef fixes (#71552, #67705)
+
+* Wed Aug 14 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-21
+- fix path to locale-archive in libc reader
+- build locale archive at glibc-common %post time
+- export __strtold_internal and __wcstold_internal on Alpha again
+- workaround some localedata problems
+
+* Tue Aug 13 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-20
+- update from CVS
+- patch out set_thread_area for now
+
+* Fri Aug  9 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-19
+- update from CVS
+- GB18030 patch from Yu Shao
+- applied Debian patch for getaddrinfo IPv4 vs. IPv6
+- fix regcomp (#71039)
+
+* Sun Aug  4 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-18
+- update from CVS
+- use /usr/sbin/prelink, not prelink (#70376)
+
+* Thu Jul 25 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-17
+- update from CVS
+
+* Thu Jul 25 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-16
+- update from CVS
+  - ungetc fix (#69586)
+  - fseek errno fix (#69589)
+  - change *etrlimit prototypes for C++ (#68588)
+- use --without-tls instead of --disable-tls
+
+* Thu Jul 11 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-15
+- set nscd user's shell to /sbin/nologin (#68369)
+- fix glibc-compat buffer overflows (security)
+- buildrequire prelink, don't build glibc's own copy of it (#67567)
+- update from CVS
+  - regex fix (#67734)
+  - fix unused warnings (#67706)
+  - fix freopen with mmap stdio (#67552)
+  - fix realloc (#68499)
+
+* Tue Jun 25 2002 Bill Nottingham <notting@redhat.com> 2.2.90-14
+- update from CVS
+  - fix argp on long words
+  - update atime in libio
+
+* Sat Jun 22 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-13
+- update from CVS
+  - a thread race fix
+  - fix readdir on invalid dirp
+
+* Wed Jun 19 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-12
+- update from CVS
+  - don't use __thread in headers
+- fix system(3) in threaded apps
+- update prelink, so that it is possible to prelink -u libc.so.6.1
+  on Alpha
+
+* Fri Jun  7 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-11
+- update from CVS
+  - fix __moddi3 (#65612, #65695)
+  - fix ether_line (#64427)
+- fix setvbuf with mmap stdio (#65864)
+- --disable-tls for now, waiting for kernel
+- avoid duplication of __divtf3 etc. on IA-64
+- make sure get*ent_r and _IO_wfile_jumps are exported (#62278)
+
+* Tue May 21 2002 Jakub Jelinek <jakub@redhat.com> 2.2.90-10
+- update from CVS
+  - fix Alpha pthread bug with gcc 3.1
+
+* Fri Apr 19 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-35
+- fix nice
 
 * Mon Apr 15 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-34
 - add relocation dependencies even for weak symbols (#63422)
