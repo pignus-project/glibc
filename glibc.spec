@@ -1,4 +1,4 @@
-%define glibcrelease 39
+%define glibcrelease 40
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches i686 athlon alpha alphaev6
 %define prelinkdate 20020617
@@ -194,6 +194,9 @@ case `uname -r` in
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+
+perl -pi -e 'm/PACKET.*1024/ and s/1024/65536/' \
+  `find resolv glibc-compat -name \*.c`
 
 %ifarch %{prelinkarches}
 mkdir prelink
@@ -662,6 +665,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Sep  9 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-40
+- fix resolver buffer overflows
+
 * Wed Aug  7 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-39
 - fix the calloc patch so that calloc (131072, 0) doesn't
   crash
