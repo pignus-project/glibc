@@ -1,4 +1,4 @@
-%define glibcrelease 38
+%define glibcrelease 39
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200407221119
+%define glibcdate 200407231111
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -465,7 +465,7 @@ if echo '__thread int a;' | $GCC -xc - -S -o /dev/null 2>/dev/null; then
 fi
 
 BuildFlags="$BuildFlags -DNDEBUG=1"
-if gcc -v 2>&1 | grep -q 'gcc version 3'; then
+if gcc -v 2>&1 | grep -q 'gcc version 3.[0123]'; then
   BuildFlags="$BuildFlags -finline-limit=2000"
 fi
 EnableKernel="--enable-kernel=%{enablekernel}"
@@ -1219,6 +1219,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jul 23 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-39
+- update from CVS
+  - conformance related changes in headers
+- remove -finline-limit=2000 for GCC 3.4.x+
+
 * Thu Jul 22 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-38
 - update from CVS
   - fix res_init leaks
