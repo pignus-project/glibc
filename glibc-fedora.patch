@@ -1,6 +1,23 @@
 --- glibc-20040925T0738/ChangeLog	25 Sep 2004 06:49:33 -0000	1.8793
-+++ glibc-20040925T0738-fedora/ChangeLog	25 Sep 2004 07:55:33 -0000	1.8782.2.3
-@@ -1,3 +1,12 @@
++++ glibc-20040925T0738-fedora/ChangeLog	26 Sep 2004 04:48:47 -0000	1.8782.2.4
+@@ -1,3 +1,29 @@
++2004-09-25  Ulrich Drepper  <drepper@redhat.com>
++
++	* intl/dcigettext.c (DCIGETTEXT): Protect tfind/tsearch calls.
++	* intl/dcigettext.c (_nl_find_msg): Call _nl_load_domain also if
++	decided < 0.
++	* intl/finddomain.c (_nl_find_domain): Likewise.
++	* intl/l10nflist.c (_nl_make_l10nflist): Initialize lock.
++	* intl/loadinfo.h (struct loaded_l10nfile): Add lock element.
++	* intl/loadmsgcat.c (_nl_load_domain): Set decided to 1 only once we
++	are done.  First set to -1 to signal initialization is ongoing.
++	Protect against concurrent callers with recursive lock.
++	* intl/finddomain.c (_nl_find_domain): Protect calls to
++	_nl_make_l10nflist.
++	* sysdeps/posix/getaddrinfo.c (getaddrinfo): If determinination of
++	source address fails, initialized source_addr_len field so that
++	duplicate address recognition does not copy junk.  [BZ #322]
++
 +2004-09-25  Jakub Jelinek  <jakub@redhat.com>
 +
 +	* sysdeps/unix/sysv/linux/i386/setuid.c (__setuid): Remove second
@@ -13,7 +30,7 @@
  2004-09-24  Ulrich Drepper  <drepper@redhat.com>
  
  	* misc/daemon.c (daemon): Don't succeed if /dev/null cannot be
-@@ -83,6 +92,22 @@
+@@ -83,6 +109,22 @@
  	* string/string.h: Add __nonnull annotations.
  	* stdlib/stdlib.h: Likewise.
  
@@ -36,7 +53,7 @@
  2004-09-20  H.J. Lu  <hongjiu.lu@intel.com>
  
  	* sysdeps/unix/sysv/linux/ia64/sysdep.h (DO_INLINE_SYSCALL):
-@@ -812,6 +837,23 @@
+@@ -812,6 +854,23 @@
  	before return type.
  	* locale/localename.c (__current_locale_name): Likewise.
  
@@ -60,7 +77,7 @@
  2004-08-30  Roland McGrath  <roland@frob.com>
  
  	* scripts/extract-abilist.awk: If `lastversion' variable defined, omit
-@@ -968,6 +1010,22 @@
+@@ -968,6 +1027,22 @@
  	* resolv/nss_dns/dns-canon.c (_nss_dns_getcanonname_r): Initialize
  	status to NSS_STATUS_UNAVAIL.
  
@@ -83,7 +100,7 @@
  2004-08-19  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/posix/getaddrinfo.c (gaih_inet): Use h->h_name in the
-@@ -1272,6 +1330,12 @@
+@@ -1272,6 +1347,12 @@
  
  	* iconvdata/testdata/ISO-2022-JP-3: Regenerated.
  
@@ -520,6 +537,345 @@
  # define _POSIX_SOURCE	1
  # if defined _XOPEN_SOURCE && (_XOPEN_SOURCE - 0) < 500
  #  define _POSIX_C_SOURCE	2
+--- glibc-20040925T0738/intl/dcigettext.c	11 Jun 2003 21:45:34 -0000	1.45
++++ glibc-20040925T0738-fedora/intl/dcigettext.c	26 Sep 2004 04:48:47 -0000	1.45.2.1
+@@ -1,5 +1,5 @@
+ /* Implementation of the internal dcigettext function.
+-   Copyright (C) 1995-2002, 2003 Free Software Foundation, Inc.
++   Copyright (C) 1995-2002, 2003, 2004 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+ 
+    The GNU C Library is free software; you can redistribute it and/or
+@@ -439,7 +439,15 @@ DCIGETTEXT (domainname, msgid1, msgid2, 
+   search->domainname = (char *) domainname;
+   search->category = category;
+ 
++  /* Since tfind/tsearch manage a balanced tree, concurrent tfind and
++     tsearch calls can be fatal.  */
++  __libc_rwlock_define_initialized (static, tree_lock);
++  __libc_rwlock_rdlock (tree_lock);
++
+   foundp = (struct known_translation_t **) tfind (search, &root, transcmp);
++
++  __libc_rwlock_unlock (tree_lock);
++
+   freea (search);
+   if (foundp != NULL && (*foundp)->counter == _nl_msg_cat_cntr)
+     {
+@@ -633,9 +641,14 @@ DCIGETTEXT (domainname, msgid1, msgid2, 
+ 		      newp->translation = retval;
+ 		      newp->translation_length = retlen;
+ 
++		      __libc_rwlock_wrlock (tree_lock);
++
+ 		      /* Insert the entry in the search tree.  */
+ 		      foundp = (struct known_translation_t **)
+ 			tsearch (newp, &root, transcmp);
++
++		      __libc_rwlock_unlock (tree_lock);
++
+ 		      if (foundp == NULL
+ 			  || __builtin_expect (*foundp != newp, 0))
+ 			/* The insert failed.  */
+@@ -680,7 +693,7 @@ _nl_find_msg (domain_file, domainbinding
+   char *result;
+   size_t resultlen;
+ 
+-  if (domain_file->decided == 0)
++  if (domain_file->decided <= 0)
+     _nl_load_domain (domain_file, domainbinding);
+ 
+   if (domain_file->data == NULL)
+--- glibc-20040925T0738/intl/finddomain.c	6 Aug 2004 17:48:47 -0000	1.30
++++ glibc-20040925T0738-fedora/intl/finddomain.c	26 Sep 2004 04:48:47 -0000	1.30.2.1
+@@ -35,6 +35,7 @@
+ #include "gettextP.h"
+ #ifdef _LIBC
+ # include <libintl.h>
++# include <bits/libc-lock.h>
+ #else
+ # include "libgnuintl.h"
+ #endif
+@@ -78,17 +79,23 @@ _nl_find_domain (dirname, locale, domain
+ 		(4) modifier
+    */
+ 
++  /* We need to protect modifying the _NL_LOADED_DOMAINS data.  */
++  __libc_rwlock_define_initialized (static, lock);
++  __libc_rwlock_rdlock (lock);
++
+   /* If we have already tested for this locale entry there has to
+      be one data set in the list of loaded domains.  */
+   retval = _nl_make_l10nflist (&_nl_loaded_domains, dirname,
+ 			       strlen (dirname) + 1, 0, locale, NULL, NULL,
+ 			       NULL, NULL, domainname, 0);
++  __libc_rwlock_unlock (lock);
++
+   if (retval != NULL)
+     {
+       /* We know something about this locale.  */
+       int cnt;
+ 
+-      if (retval->decided == 0)
++      if (retval->decided <= 0)
+ 	_nl_load_domain (retval, domainbinding);
+ 
+       if (retval->data != NULL)
+@@ -96,12 +103,13 @@ _nl_find_domain (dirname, locale, domain
+ 
+       for (cnt = 0; retval->successor[cnt] != NULL; ++cnt)
+ 	{
+-	  if (retval->successor[cnt]->decided == 0)
++	  if (retval->successor[cnt]->decided <= 0)
+ 	    _nl_load_domain (retval->successor[cnt], domainbinding);
+ 
+ 	  if (retval->successor[cnt]->data != NULL)
+ 	    break;
+ 	}
++
+       return cnt >= 0 ? retval : NULL;
+       /* NOTREACHED */
+     }
+@@ -132,24 +140,29 @@ _nl_find_domain (dirname, locale, domain
+   mask = _nl_explode_name (locale, &language, &modifier, &territory,
+ 			   &codeset, &normalized_codeset);
+ 
++  /* We need to protect modifying the _NL_LOADED_DOMAINS data.  */
++  __libc_rwlock_wrlock (lock);
++
+   /* Create all possible locale entries which might be interested in
+      generalization.  */
+   retval = _nl_make_l10nflist (&_nl_loaded_domains, dirname,
+ 			       strlen (dirname) + 1, mask, language, territory,
+ 			       codeset, normalized_codeset, modifier,
+ 			       domainname, 1);
++  __libc_rwlock_unlock (lock);
++
+   if (retval == NULL)
+     /* This means we are out of core.  */
+     return NULL;
+ 
+-  if (retval->decided == 0)
++  if (retval->decided <= 0)
+     _nl_load_domain (retval, domainbinding);
+   if (retval->data == NULL)
+     {
+       int cnt;
+       for (cnt = 0; retval->successor[cnt] != NULL; ++cnt)
+ 	{
+-	  if (retval->successor[cnt]->decided == 0)
++	  if (retval->successor[cnt]->decided <= 0)
+ 	    _nl_load_domain (retval->successor[cnt], domainbinding);
+ 	  if (retval->successor[cnt]->data != NULL)
+ 	    break;
+--- glibc-20040925T0738/intl/l10nflist.c	24 Jul 2002 10:07:07 -0000	1.30
++++ glibc-20040925T0738-fedora/intl/l10nflist.c	26 Sep 2004 04:48:47 -0000	1.30.2.1
+@@ -1,4 +1,4 @@
+-/* Copyright (C) 1995-1999, 2000, 2001, 2002 Free Software Foundation, Inc.
++/* Copyright (C) 1995-2002, 2004 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+    Contributed by Ulrich Drepper <drepper@gnu.ai.mit.edu>, 1995.
+ 
+@@ -273,10 +273,14 @@ _nl_make_l10nflist (l10nfile_list, dirli
+     return NULL;
+ 
+   retval->filename = abs_filename;
++  /* If more than one directory is in the list this is a pseudo-entry
++     which just references others.  We do not try to load data for it,
++     ever.  */
+   retval->decided = (__argz_count (dirlist, dirlist_len) != 1
+ 		     || ((mask & XPG_CODESET) != 0
+ 			 && (mask & XPG_NORM_CODESET) != 0));
+   retval->data = NULL;
++  __libc_lock_init_recursive (retval->lock);
+ 
+   if (last == NULL)
+     {
+--- glibc-20040925T0738/intl/loadinfo.h	8 Jan 2003 06:35:09 -0000	1.18
++++ glibc-20040925T0738-fedora/intl/loadinfo.h	26 Sep 2004 04:48:47 -0000	1.18.2.1
+@@ -1,4 +1,4 @@
+-/* Copyright (C) 1996-2000, 2002, 2003 Free Software Foundation, Inc.
++/* Copyright (C) 1996-2000, 2002, 2003, 2004 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1996.
+ 
+@@ -20,6 +20,8 @@
+ #ifndef _LOADINFO_H
+ #define _LOADINFO_H	1
+ 
++#include <bits/libc-lock.h>
++
+ /* Declarations of locale dependent catalog lookup functions.
+    Implemented in
+ 
+@@ -61,6 +63,7 @@ struct loaded_l10nfile
+ {
+   const char *filename;
+   int decided;
++  __libc_lock_define_recursive (, lock);
+ 
+   const void *data;
+ 
+--- glibc-20040925T0738/intl/loadmsgcat.c	6 Aug 2004 17:49:24 -0000	1.53
++++ glibc-20040925T0738-fedora/intl/loadmsgcat.c	26 Sep 2004 04:48:47 -0000	1.53.2.1
+@@ -899,7 +899,7 @@ _nl_load_domain (domain_file, domainbind
+      struct loaded_l10nfile *domain_file;
+      struct binding *domainbinding;
+ {
+-  int fd;
++  int fd = -1;
+   size_t size;
+ #ifdef _LIBC
+   struct stat64 st;
+@@ -912,7 +912,24 @@ _nl_load_domain (domain_file, domainbind
+   int revision;
+   const char *nullentry;
+ 
+-  domain_file->decided = 1;
++  __libc_lock_lock_recursive (domain_file->lock);
++  if (domain_file->decided != 0)
++    {
++      /* There are two possibilities:
++
++         + is is the same thread calling again during this
++	   initialization via _nl_init_domain_conv and _nl_find_msg.  We
++	   have initialized everything this call needs.
++
++	 + this is another thread which tried to initialize this object.
++           Not necessary anymore since if the lock is available this
++	   is finished.
++      */
++      __libc_lock_unlock_recursive (domain_file->lock);
++      return;
++    }
++
++  domain_file->decided = -1;
+   domain_file->data = NULL;
+ 
+   /* Note that it would be useless to store domainbinding in domain_file
+@@ -924,12 +941,12 @@ _nl_load_domain (domain_file, domainbind
+      specification the locale file name is different for XPG and CEN
+      syntax.  */
+   if (domain_file->filename == NULL)
+-    return;
++    goto out;
+ 
+   /* Try to open the addressed file.  */
+   fd = open (domain_file->filename, O_RDONLY);
+   if (fd == -1)
+-    return;
++    goto out;
+ 
+   /* We must know about the size of the file.  */
+   if (
+@@ -940,11 +957,8 @@ _nl_load_domain (domain_file, domainbind
+ #endif
+       || __builtin_expect ((size = (size_t) st.st_size) != st.st_size, 0)
+       || __builtin_expect (size < sizeof (struct mo_file_header), 0))
+-    {
+-      /* Something went wrong.  */
+-      close (fd);
+-      return;
+-    }
++    /* Something went wrong.  */
++    goto out;;
+ 
+ #ifdef HAVE_MMAP
+   /* Now we are ready to load the file.  If mmap() is available we try
+@@ -952,45 +966,42 @@ _nl_load_domain (domain_file, domainbind
+   data = (struct mo_file_header *) mmap (NULL, size, PROT_READ,
+ 					 MAP_PRIVATE, fd, 0);
+ 
+-  if (__builtin_expect (data != (struct mo_file_header *) -1, 1))
++  if (__builtin_expect (data != MAP_FAILED, 1))
+     {
+       /* mmap() call was successful.  */
+       close (fd);
++      fd = -1;
+       use_mmap = 1;
+     }
+ #endif
+ 
+   /* If the data is not yet available (i.e. mmap'ed) we try to load
+      it manually.  */
+-  if (data == (struct mo_file_header *) -1)
++  if (data == MAP_FAILED)
+     {
+       size_t to_read;
+       char *read_ptr;
+ 
+       data = (struct mo_file_header *) malloc (size);
+       if (data == NULL)
+-	return;
++	goto out;
+ 
+       to_read = size;
+       read_ptr = (char *) data;
+       do
+ 	{
+-	  long int nb = (long int) read (fd, read_ptr, to_read);
++	  long int nb = (long int) TEMP_FAILURE_RETRY (read (fd, read_ptr,
++							     to_read));
+ 	  if (nb <= 0)
+-	    {
+-#ifdef EINTR
+-	      if (nb == -1 && errno == EINTR)
+-		continue;
+-#endif
+-	      close (fd);
+-	      return;
+-	    }
++	    goto out;
++
+ 	  read_ptr += nb;
+ 	  to_read -= nb;
+ 	}
+       while (to_read > 0);
+ 
+       close (fd);
++      fd = -1;
+     }
+ 
+   /* Using the magic number we can test whether it really is a message
+@@ -1005,12 +1016,12 @@ _nl_load_domain (domain_file, domainbind
+       else
+ #endif
+ 	free (data);
+-      return;
++      goto out;
+     }
+ 
+   domain = (struct loaded_domain *) malloc (sizeof (struct loaded_domain));
+   if (domain == NULL)
+-    return;
++    goto out;
+   domain_file->data = domain;
+ 
+   domain->data = (char *) data;
+@@ -1372,7 +1383,7 @@ _nl_load_domain (domain_file, domainbind
+ 	free (data);
+       free (domain);
+       domain_file->data = NULL;
+-      return;
++      goto out;
+     }
+ 
+   /* Now initialize the character set converter from the character set
+@@ -1382,6 +1393,14 @@ _nl_load_domain (domain_file, domainbind
+ 
+   /* Also look for a plural specification.  */
+   EXTRACT_PLURAL_EXPRESSION (nullentry, &domain->plural, &domain->nplurals);
++
++ out:
++  if (fd != -1)
++    close (fd);
++
++  domain_file->decided = 1;
++
++  __libc_lock_unlock_recursive (domain_file->lock);
+ }
+ 
+ 
 --- glibc-20040925T0738/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
 +++ glibc-20040925T0738-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
 @@ -58,8 +58,6 @@ korean		ko_KR.eucKR
@@ -2695,6 +3051,61 @@
 +symbol_version (INTUSE (__multi3), __multi3, GLIBC_2.2);
 +
 +#endif
+--- glibc-20040925T0738/sysdeps/posix/getaddrinfo.c	18 Sep 2004 23:57:15 -0000	1.81
++++ glibc-20040925T0738-fedora/sysdeps/posix/getaddrinfo.c	26 Sep 2004 04:48:48 -0000	1.81.2.1
+@@ -1561,10 +1561,7 @@ getaddrinfo (const char *name, const cha
+ 	  results[i].dest_addr = q;
+ 	  results[i].got_source_addr = false;
+ 
+-	  /* We overwrite the type with SOCK_DGRAM since we do not
+-	     want connect() to connect to the other side.  If we
+-	     cannot determine the source address remember this
+-	     fact.  If we just looked up the address for a different
++	  /* If we just looked up the address for a different
+ 	     protocol, reuse the result.  */
+ 	  if (last != NULL && last->ai_addrlen == q->ai_addrlen
+ 	      && memcmp (last->ai_addr, q->ai_addr, q->ai_addrlen) == 0)
+@@ -1576,21 +1573,28 @@ getaddrinfo (const char *name, const cha
+ 	    }
+ 	  else
+ 	    {
++	      /* We overwrite the type with SOCK_DGRAM since we do not
++		 want connect() to connect to the other side.  If we
++		 cannot determine the source address remember this
++		 fact.  */
+ 	      int fd = __socket (q->ai_family, SOCK_DGRAM, IPPROTO_IP);
+-	      if (fd != -1)
++	      socklen_t sl = sizeof (results[i].source_addr);
++	      if (fd != -1
++		  && __connect (fd, q->ai_addr, q->ai_addrlen) == 0
++		  && __getsockname (fd,
++				    (struct sockaddr *) &results[i].source_addr,
++				    &sl) == 0)
+ 		{
+-		  socklen_t sl = sizeof (results[i].source_addr);
+-		  if (__connect (fd, q->ai_addr, q->ai_addrlen) == 0
+-		      && __getsockname (fd,
+-					(struct sockaddr *) &results[i].source_addr,
+-					&sl) == 0)
+-		    {
+-		      results[i].source_addr_len = sl;
+-		      results[i].got_source_addr = true;
+-		    }
+-
+-		  close_not_cancel_no_status (fd);
++		  results[i].source_addr_len = sl;
++		  results[i].got_source_addr = true;
+ 		}
++	      else
++		/* Just make sure that if we have to process the same
++		   address again we do not copy any memory.  */
++		results[i].source_addr_len = 0;
++
++	      if (fd != -1)
++		close_not_cancel_no_status (fd);
+ 	    }
+ 
+ 	  /* Remember the canonical name.  */
 --- glibc-20040925T0738/sysdeps/unix/nice.c	28 Sep 2002 19:13:13 -0000	1.6
 +++ glibc-20040925T0738-fedora/sysdeps/unix/nice.c	22 Sep 2004 21:21:08 -0000	1.6.2.1
 @@ -41,7 +41,12 @@ nice (int incr)
