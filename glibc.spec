@@ -1,4 +1,4 @@
-%define glibcrelease 101.4
+%define glibcrelease 101.5
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -52,6 +52,30 @@ Patch34: glibc-execstack-fix.patch
 Patch35: glibc-regex-bkref.patch
 Patch36: glibc-pmap-set.patch
 Patch37: glibc-regex-update2.patch
+Patch38: glibc-amd64-backtrace.patch
+Patch39: glibc-amd64-bugfixes.patch
+Patch40: glibc-intl-fixes.patch
+Patch41: glibc-ipv6-nibble.patch
+Patch42: glibc-iso6937.patch
+Patch43: glibc-inttypes.patch
+Patch44: glibc-readahead.patch
+Patch45: glibc-catgets.patch
+Patch46: glibc-obstack.patch
+Patch47: glibc-ia64-siginfo.patch
+Patch48: glibc-translation-update.patch
+Patch49: glibc-lround1.patch
+Patch50: glibc-ppc32-cacheflush.patch
+Patch51: glibc-xent-locking.patch
+Patch52: glibc-printf-size.patch
+Patch53: glibc-fclrexcpt.patch
+Patch54: glibc-exit-flush.patch
+Patch55: glibc-tzset-cap.patch
+Patch56: glibc-setenv-alloca.patch
+Patch57: glibc-regex-update3.patch
+Patch58: glibc-lround2.patch
+Patch59: glibc-lround3.patch
+Patch60: glibc-execstack-fix2.patch
+Patch61: glibc-nptl-condtimedwait.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -324,6 +348,30 @@ esac
 %patch35 -p1
 %patch36 -p1
 %patch37 -p1
+%patch38 -p1
+%patch39 -p1
+%patch40 -p1
+%patch41 -p1
+%patch42 -p1
+%patch43 -p1
+%patch44 -p1
+%patch45 -p1
+%patch46 -p1
+%patch47 -p1
+%patch48 -p1
+%patch49 -p1
+%patch50 -p1
+%patch51 -p1
+%patch52 -p1
+%patch53 -p1
+%patch54 -p1
+%patch55 -p1
+%patch56 -p1
+%patch57 -p1
+%patch58 -p1
+%patch59 -p1
+%patch60 -p1
+%patch61 -p1
 
 %ifnarch %{ix86} alpha alphaev6 sparc sparcv9
 rm -rf glibc-compat
@@ -1071,6 +1119,25 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb 13 2004 Jakub Jelinek <jakub@redhat.com> 2.3.2-101.5
+- assorted AMD64 bugfixes
+- %I format directive fixes
+- IPv6 resolver now uses two-nibble format by default again
+- ISO_6937-2 conversion fixes
+- PRI*FAST* macro fix in <inttypes.h>
+- readahead prototypes in <fcntl.h>
+- IA-64 <bits/siginfo.h> fixes
+- updated be, nl, ja and pl translations
+- {,l}lr{ound,int}* fixes
+- *ent{,_r} locking fixes
+- don't acquire stdio lock on exit
+- cap TZ env var hours to 24, not 23
+- avoid using too much stack in setenv
+- another round of regex updates
+- fix backtrace in threads on AMD64
+- pthread_cond_timedwait bugfix
+- protect _dl_make_stack_executable with a special challenge
+
 * Tue Jan  6 2004 Jakub Jelinek <jakub@redhat.com> 2.3.2-101.4
 - some further regex speedups
 - fix re.translate handling in regex (#112869)
