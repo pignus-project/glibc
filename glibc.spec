@@ -1,6 +1,6 @@
-%define glibcdate 20041021T0701
+%define glibcdate 20041102T1153
 %define glibcversion 2.3.3
-%define glibcrelease 73
+%define glibcrelease 75
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -1258,6 +1258,21 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Nov  2 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-75
+- update from CVS
+  - mktime cleanups (BZ #487, #473, 
+  - unique comments in free(3) check error messages
+- adjust some x86_64 headers for -m32 (#129712)
+- object size checking support even with GCC-3.4.2-RH >= 3.4.2-8
+
+* Wed Oct 27 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-74
+- fix <netinet/udp.h> header
+- fix globfree (#137176)
+- fix exiting if there are dlmopened libraries in namespaces
+  other than main one not closed yet
+- export again _res_opcodes and __p_{class,type}_syms from
+  libresolv.so that were lost in -69
+
 * Thu Oct 21 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-73
 - remove setaltroot and key{_add,_request,ctl} also from Versions
 - back out _sys_errlist changes
