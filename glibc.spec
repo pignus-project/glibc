@@ -1,4 +1,4 @@
-%define glibcrelease 13
+%define glibcrelease 15c
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 Summary: The GNU libc libraries.
 Name: glibc
@@ -37,7 +37,9 @@ BuildPreReq: gcc >= 2.96-82
 %endif
 Conflicts: rpm <= 4.0-0.65
 Conflicts: glibc-devel < 2.2.3
-Patch: glibc-kernel-2.4.patch
+Patch0: glibc-kernel-2.4.patch
+Patch1: glibc-2.2.4-gb18030.patch
+Patch2: glibc-2.2.4-sc.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
@@ -132,12 +134,14 @@ performance with NIS+ and may help with DNS as well.
 
 %prep
 %setup -q
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
 # If we are building enablekernel 2.x.y glibc on older kernel,
 # we have to make sure no binaries compiled against that glibc
 # are ever run
 case `uname -r` in
 %enablemask)
-%patch -p1
 ;; esac
 
 %ifarch armv4l sparc64 ia64 s390 s390x
@@ -463,6 +467,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Nov 10 2001 Yu Shao <yshao@redhat.com> 2.2.4-15c
+- add llch@redhat.com's glibc-2.2.4-sc.patch
+
+* Sat Nov 10 2001 Yu Shao <yshao@redhat.com> 2.2.4-14c
+- gb18030 fix
+
 * Mon Sep  3 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-13
 - fix iconvconfig
 
