@@ -1,26 +1,20 @@
-%define linux24 1
-%define glibcrelease 3
+%define glibcrelease 10
 %define auxarches i586 i686 athlon sparcv9 alphaev6
-%if %{linux24}
-%define arch24 ia64 sparc64 %{auxarches}
-%else
-%define arch24 ia64 sparc64
-%endif
 Summary: The GNU libc libraries.
 Name: glibc
-Version: 2.2.1
+Version: 2.2.2
 Release: %{glibcrelease}
 Copyright: LGPL
 Group: System Environment/Libraries
 Source: %{name}-%{version}.tar.bz2
 # In the source tarball the file diff-CYGNUS-to-REDHAT.patch contains all
 # diffs applied by Red Hat to the current CVS version of glibc
-Buildroot: /var/tmp/glibc-%{PACKAGE_VERSION}-root
+Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
 Provides: ldconfig
 Autoreq: false
-Requires: glibc-common = %{version}
+Requires: glibc-common = %{version}-%{release}
 %ifarch alpha
 Provides: ld.so.2
 %else
@@ -31,12 +25,14 @@ Obsoletes: libc
 Prereq: basesystem
 Conflicts: rpm <= 4.0-0.65
 Patch: glibc-kernel-2.4.patch
-%ifarch %{arch24}
+%ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
 %else
 %define enablekernel 2.2.5
 %endif
+%define enablekernel2 2.4.1
+%define __find_provides %{_builddir}/%{name}-%{version}/find_provides.sh
 
 %description
 The glibc package contains standard libraries which are used by
@@ -89,9 +85,9 @@ need to install the glibc-profile program.
 
 %package common
 Summary: Common binaries and locale data for glibc
+Conflicts: %{name} < %{version}
+Conflicts: %{name} > %{version} 
 Autoreq: false
-Conflicts: glibc < %{version}-%{release}
-Conflicts: glibc > %{version}-%{release}
 Group: System Environment/Base
 
 %description common
@@ -118,21 +114,27 @@ you're not using a version 2.0 kernel.
 
 %prep
 %setup -q
-%ifarch %{arch24}
-# If we are building enablekernel 2.4.0 glibc on older kernel,
+%ifarch ia64 sparc64 s390x %{auxarches}
+# If we are building enablekernel 2.4.1 glibc on older kernel,
 # we have to make sure no binaries compiled against that glibc
 # are ever run
 case `uname -r` in
-[01].*|2.[0-3]*)
+[01].*|2.[0-3]*|2.4.0*)
 %patch -p1
 ;; esac
 %endif
- 
-%ifarch armv4l sparc64 ia64 s390
+
+%ifarch armv4l sparc64 ia64 s390 s390x
 rm -rf glibc-compat
 %endif
 
 find . -type f -size 0 -o -name "*.orig" -exec rm -f {} \;
+
+cat > find_provides.sh <<EOF
+#!/bin/sh
+/usr/lib/rpm/find-provides | grep -v GLIBC_2.2.3
+EOF
+chmod +x find_provides.sh
 
 %build
 rm -rf build-%{_target_cpu}-linux
@@ -157,7 +159,7 @@ BuildFlags="-mcpu=ultrasparc -mvis -fcall-used-g7"
 GCC="gcc -m64"
 %endif
 # Temporarily don't do this on ia64 and s390
-%ifnarch ia64 s390
+%ifnarch ia64 s390 s390x
 BuildFlags="$BuildFlags -freorder-blocks"
 %endif
 BuildFlags="$BuildFlags -DNDEBUG=1"
@@ -165,6 +167,7 @@ EnableKernel="--enable-kernel=%{enablekernel}"
 %ifarch %{auxarches}
 EnableKernel="$EnableKernel --disable-profile"
 %endif
+echo "$BuildFlags" > ../BuildFlags
 CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
 	--enable-add-ons=yes --without-cvs $EnableKernel \
 	%{_target_cpu}-redhat-linux
@@ -187,6 +190,35 @@ cd build-%{_target_cpu}-linux && \
     make install_root=$RPM_BUILD_ROOT install-locales -C ../localedata objdir=`pwd` && \
     cd ..
 
+%ifarch i686
+rm -rf build-%{_target_cpu}-linux2.4
+mkdir build-%{_target_cpu}-linux2.4 ; cd build-%{_target_cpu}-linux2.4
+GCC=gcc
+BuildFlags=`cat ../BuildFlags`
+EnableKernel="--enable-kernel=%{enablekernel2} --disable-profile"
+CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
+	--enable-add-ons=yes --without-cvs $EnableKernel \
+	%{_target_cpu}-redhat-linux
+if [ -x /usr/bin/getconf ] ; then
+  numprocs=$(/usr/bin/getconf _NPROCESSORS_ONLN)
+  if [ $numprocs -eq 0 ]; then
+    numprocs=1
+  fi
+else
+  numprocs=1
+fi
+make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
+mkdir -p $RPM_BUILD_ROOT/lib/%{_target_cpu}/
+cp -a libc.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libc-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/lib/libc-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libc.so.*`
+cp -a math/libm.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libm-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/lib/libm-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libm.so.*`
+cp -a linuxthreads/libpthread.so $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libpthread-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/lib/libpthread-*.so` $RPM_BUILD_ROOT/lib/%{_target_cpu}/`basename $RPM_BUILD_ROOT/lib/libpthread.so.*`
+strip -R .comment $RPM_BUILD_ROOT/lib/{libc,libm,libpthread}-*.so
+cd ..
+%endif
+
 # compatibility hack: this locale has vanished from glibc, but some other
 # programs are still using it. Normally we would handle it in the %pre
 # section but with glibc that is simply not an option
@@ -194,7 +226,7 @@ mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/locale/ru_RU/LC_MESSAGES
 
 # Remove the files we don't want to distribute
 rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libNoVersion*
-%ifarch sparc64 ia64 s390
+%ifarch sparc64 ia64 s390 s390x
 rm -f $RPM_BUILD_ROOT/%{_lib}/libNoVersion*
 %endif
 
@@ -257,12 +289,10 @@ for i in $RPM_BUILD_ROOT%{_prefix}/lib/locale/*; do
   done
 done
 
-# Temporarily remove ko_KR.utf8 locale
-rm -rf $RPM_BUILD_ROOT%{_prefix}/lib/locale/ko_KR.utf8
-
 # BUILD THE FILE LIST
 find $RPM_BUILD_ROOT -type f -or -type l |
-	sed -e 's|.*/etc|%config &|' -e 's|.*/gconv/gconv-modules|%config &|' > rpm.filelist.in
+	sed -e 's|.*/etc|%config &|' \
+	    -e 's|.*/gconv/gconv-modules|%verify(not md5 size mtime) %config(noreplace) &|' > rpm.filelist.in
 for n in %{_prefix}/share %{_prefix}/include %{_prefix}/lib/locale; do 
     find ${RPM_BUILD_ROOT}${n} -type d | \
 	grep -v '%{_prefix}/share$' | \
@@ -403,6 +433,74 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Apr  6 2001 Jakub Jelinek <jakub@redhat.com>
+- support even 2.4.0 kernels on ia64, sparc64 and s390x
+- include UTF-8 locales
+- make gconv-modules %%config(noreplace)
+
+* Fri Mar 23 2001 Jakub Jelinek <jakub@redhat.com>
+- back out sunrpc changes
+
+* Wed Mar 21 2001 Jakub Jelinek <jakub@redhat.com>
+- update from CVS
+  - fix ia64 build
+  - fix pthread_getattr_np
+
+* Fri Mar 16 2001 Jakub Jelinek <jakub@redhat.com>
+- update from CVS
+  - run atexit() registered functions at dlclose time if they are in shared
+    libraries (#28625)
+  - add pthread_getattr_np API to make JVM folks happy
+
+* Wed Mar 14 2001 Jakub Jelinek <jakub@redhat.com>
+- require 2.4.1 instead of 2.4.0 on platforms where it required 2.4 kernel
+- fix ldd behaviour on unresolved symbols
+- remove nonsensical ldconfig warning, update osversion for the most
+  recent library with the same soname in the same directory instead (#31703)
+- apply selected patches from CVS
+- s390x spec file changes from Florian La Roche
+
+* Wed Mar  7 2001 Jakub Jelinek <jakub@redhat.com>
+- fix gencat (#30894)
+- fix ldconfig changes from yesterday, fix LD_ASSUME_KERNEL handling
+
+* Tue Mar  6 2001 Jakub Jelinek <jakub@redhat.com>
+- update from CVS
+- make pthread_attr_setstacksize consistent before and after pthread manager
+  is started (#28194)
+- pass back struct sigcontext from pthread signal wrapper (on ia32 only so
+  far, #28493)
+- on i686 ship both --enable-kernel 2.2.5 and 2.4.0 libc/libm/libpthread,
+  make ld.so pick the right one
+
+* Sat Feb 17 2001 Preston Brown <pbrown@redhat.com>
+- glib-common doesn't require glibc, until we can figure out how to get out of dependency hell.
+
+* Sat Feb 17 2001 Jakub Jelinek <jakub@redhat.com>
+- make glibc require particular version of glibc-common
+  and glibc-common prerequire glibc.
+
+* Fri Feb 16 2001 Jakub Jelinek <jakub@redhat.com>
+- glibc 2.2.2 release
+  - fix regex REG_ICASE bug seen in ksymoops
+
+* Sat Feb 10 2001 Jakub Jelinek <jakub@redhat.com>
+- fix regexec leaking memory (#26864)
+
+* Fri Feb  9 2001 Jakub Jelinek <jakub@redhat.com>
+- update from CVS
+  - fix ia64 build with gnupro
+  - make regex 64bit clean
+  - fix tgmath make check failures on alpha
+
+* Tue Feb  6 2001 Jakub Jelinek <jakub@redhat.com>
+- update again for ia64 DF_1_INITFIRST
+
+* Fri Feb  2 2001 Jakub Jelinek <jakub@redhat.com>
+- update from CVS
+  - fix getaddrinfo (#25437)
+  - support DF_1_INITFIRST (#25029)
+
 * Wed Jan 24 2001 Jakub Jelinek <jakub@redhat.com>
 - build all auxiliary arches with --enablekernel 2.4.0, those wanting
   to run 2.2 kernels can downgrade to the base architecture glibc.
