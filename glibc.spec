@@ -1,4 +1,4 @@
-%define glibcrelease 32
+%define glibcrelease 33
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200406140419
+%define glibcdate 200406281007
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -1219,6 +1219,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jun 28 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-33
+- update from CVS
+  - reread resolv.conf for nscd --invalidate=hosts
+  - fix F_GETLK/F_SETLK/F_SETLKW constants on x86_64 for
+    -m32 -D_FILE_OFFSET_BITS=64 compilations
+  - avoid calling non-existing fcntl64 syscall on ppc64
+
 * Mon Jun 14 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-32
 - update from CVS
   - FUTEX_CMP_REQUEUE support (fix pthread_cond_* deadlocks)
