@@ -1,7 +1,7 @@
-%define glibcdate 20050211T1037
+%define glibcdate 20050303T1335
 %define glibcname glibc
 %define glibcversion 2.3.4
-%define glibcrelease 10
+%define glibcrelease 11
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -465,6 +465,9 @@ mkdir build-%{_target_cpu}-linux ; cd build-%{_target_cpu}-linux
 GCC=gcc
 %ifarch %{ix86}
 BuildFlags="-march=%{_target_cpu}"
+%endif
+%ifarch i686
+BuildFlags="-march=i686 -mtune=pentium4"
 %endif
 %ifarch alphaev6
 BuildFlags="-mcpu=ev6"
@@ -1272,6 +1275,16 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Mar  3 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-11
+- update from CVS
+  - fix execvp (#149290)
+  - fix dlclose (#145810)
+  - clear padding in gconv-modules.cache (#146614, BZ#776)
+- rebuilt with GCC4
+- changed __GLIBC_MINOR__ for now back to 3
+- back out the newly added GLIBC_2.4 *_chk routines, instead
+  do the checking in macros
+
 * Sat Feb 12 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-10
 - hopefully fix interaction with prelink (#147655)
 
