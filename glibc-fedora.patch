@@ -1,21 +1,68 @@
 --- glibc-20041018T0940/ChangeLog	18 Oct 2004 05:17:42 -0000	1.8895
-+++ glibc-20041018T0940-fedora/ChangeLog	18 Oct 2004 11:55:59 -0000	1.8782.2.22
-@@ -1,3 +1,14 @@
++++ glibc-20041018T0940-fedora/ChangeLog	18 Oct 2004 23:30:18 -0000	1.8782.2.24
+@@ -1,3 +1,61 @@
++2004-10-19  Jakub Jelinek  <jakub@redhat.com>
++
++	* include/features.h (__USE_FORTIFY_LEVEL): Enable even with
++	Red Hat gcc4 4.0.0 and above.
++
 +2004-10-18  Jakub Jelinek  <jakub@redhat.com>
 +
-+	* malloc/arena.c (ptmalloc_init): Don't use brk if dlopened
-+	from statically linked program and avoid calling _dl_addr in that
-+	case.
++	* elf/dl-libc.c (__libc_dlsym_private, __libc_register_dl_open_hook):
++	New functions.
++	(__libc_dlopen_mode): Call __libc_register_dl_open_hook and
++	__libc_register_dlfcn_hook.
++	* dlfcn/Makefile (routines, elide-routines.os): Set.
++	Add rules to build and test tststatic2.
++	* dlfcn/tststatic2.c: New test.
++	* dlfcn/modstatic2.c: New test module.
++	* dlfcn/dladdr.c: Call _dlfcn_hook from libdl.so if not NULL.
++	Define __ prefixed routine in libc.a and in libdl.a just call it.
++	* dlfcn/dladdr1.c: Likewise.
++	* dlfcn/dlclose.c: Likewise.
++	* dlfcn/dlerror.c: Likewise.
++	* dlfcn/dlinfo.c: Likewise.
++	* dlfcn/dlmopen.c: Likewise.
++	* dlfcn/dlopen.c: Likewise.
++	* dlfcn/dlopenold.c: Likewise.
++	* dlfcn/dlsym.c: Likewise.
++	* dlfcn/dlvsym.c: Likewise.
++	* dlfcn/sdladdr.c: New file.
++	* dlfcn/sdladdr1.c: New file.
++	* dlfcn/sdlclose.c: New file.
++	* dlfcn/sdlerror.c: New file.
++	* dlfcn/sdlinfo.c: New file.
++	* dlfcn/sdlopen.c: New file.
++	* dlfcn/sdlsym.c: New file.
++	* dlfcn/sdlvsym.c: New file.
++	* dlfcn/Versions (libdl): Export _dlfcn_hook@GLIBC_PRIVATE.
++	* include/dlfcn.h (DL_CALLER_DECL, DL_CALLER RETURN_ADDRESS): Define.
++	(struct dlfcn_hook): New type.
++	(_dlfcn_hook): New extern decl.
++	(__dlopen, __dlclose, __dlsym, __dlerror, __dladdr, __dladdr1,
++	__dlinfo, __dlmopen, __libc_dlsym_private,
++	__libc_register_dl_open_hook, __libc_register_dlfcn_hook): New
++	prototypes.
++	(__dlvsym): Use DL_CALLER_DECL.
++	* include/libc-symbols.h: Define libdl_hidden_proto and friends.
 +
-+2004-10-18  Jakub Jelinek  <jakub@redhat.com>
++	* malloc/arena.c (_dl_open_hook): Extern decl.
++	(ptmalloc_init): Don't call _dl_addr when dlopened from statically
++	linked programs but don't use brk for them either.
 +
-+	* sysdeps/generic/strcpy_chk.c (__strcpy_chk): Speed up by checking
-+	destlen only every 4 bytes.
++2004-10-18  Roland McGrath  <roland@redhat.com>
++
++	* dlfcn/bug-dlsym1.c (main): Remove bogus setenv call.
++
++2004-10-18  Ulrich Drepper  <drepper@redhat.com>
++
++	* elf/dl-open.c (dl_open_worker): Avoid dereferencing map in
++	statically linked code if there might none be found.
 +
  2004-10-06  Maciej W. Rozycki  <macro@mips.com>
  
  	* sysdeps/unix/sysv/linux/mips/mips32/sysdep.h
-@@ -928,6 +939,22 @@
+@@ -928,6 +986,22 @@
  	* string/string.h: Add __nonnull annotations.
  	* stdlib/stdlib.h: Likewise.
  
@@ -38,7 +85,7 @@
  2004-09-20  H.J. Lu  <hongjiu.lu@intel.com>
  
  	* sysdeps/unix/sysv/linux/ia64/sysdep.h (DO_INLINE_SYSCALL):
-@@ -1657,6 +1684,23 @@
+@@ -1657,6 +1731,23 @@
  	before return type.
  	* locale/localename.c (__current_locale_name): Likewise.
  
@@ -62,7 +109,7 @@
  2004-08-30  Roland McGrath  <roland@frob.com>
  
  	* scripts/extract-abilist.awk: If `lastversion' variable defined, omit
-@@ -1813,6 +1857,22 @@
+@@ -1813,6 +1904,22 @@
  	* resolv/nss_dns/dns-canon.c (_nss_dns_getcanonname_r): Initialize
  	status to NSS_STATUS_UNAVAIL.
  
@@ -85,7 +132,7 @@
  2004-08-19  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/posix/getaddrinfo.c (gaih_inet): Use h->h_name in the
-@@ -2117,6 +2177,12 @@
+@@ -2117,6 +2224,12 @@
  
  	* iconvdata/testdata/ISO-2022-JP-3: Regenerated.
  
@@ -204,6 +251,1105 @@
  #endif
  
  /* These function symbols are provided for the .init/.fini section entry
+--- glibc-20041018T0940/dlfcn/Makefile	14 Oct 2004 01:46:57 -0000	1.33
++++ glibc-20041018T0940-fedora/dlfcn/Makefile	18 Oct 2004 23:30:21 -0000	1.32.2.2
+@@ -21,9 +21,11 @@ headers		:= bits/dlfcn.h dlfcn.h
+ extra-libs	:= libdl
+ libdl-routines	:= dlopen dlclose dlsym dlvsym dlerror dladdr dladdr1 dlinfo \
+ 		   dlmopen
++routines	:= $(patsubst %,s%,$(libdl-routines))
++elide-routines.os := $(routines)
+ distribute	:= dlopenold.c glreflib1.c glreflib2.c failtestmod.c \
+ 		   defaultmod1.c defaultmod2.c errmsg1mod.c modatexit.c \
+-		   modcxaatexit.c modstatic.c \
++		   modcxaatexit.c modstatic.c modstatic2.c \
+ 		   bug-dlsym1-lib1.c bug-dlsym1-lib2.c
+ 
+ extra-libs-others := libdl
+@@ -51,10 +53,11 @@ glreflib2.so-no-z-defs = yes
+ errmsg1mod.so-no-z-defs = yes
+ 
+ ifeq (yesyesyes,$(build-static)$(build-shared)$(elf))
+-tests += tststatic
+-tests-static += tststatic
+-modules-names += modstatic
++tests += tststatic tststatic2
++tests-static += tststatic tststatic2
++modules-names += modstatic modstatic2
+ tststatic-ENV = LD_LIBRARY_PATH=$(objpfx):$(common-objpfx):$(common-objpfx)elf
++tststatic2-ENV = LD_LIBRARY_PATH=$(objpfx):$(common-objpfx):$(common-objpfx)elf
+ endif
+ 
+ extra-objs += $(modules-names:=.os)
+@@ -106,7 +109,12 @@ $(objpfx)modatexit.so: $(common-objpfx)l
+ $(objpfx)tststatic: $(objpfx)libdl.a
+ $(objpfx)tststatic.out: $(objpfx)tststatic $(objpfx)modstatic.so
+ 
+-$(objpfx)modstatic.so: $(common-objpfx)libc.so $(common-objpfx)libc_nonshared.a
++$(objpfx)tststatic2: $(objpfx)libdl.a
++$(objpfx)tststatic2.out: $(objpfx)tststatic2 $(objpfx)modstatic.so \
++			 $(objpfx)modstatic2.so
++
++$(objpfx)modstatic2.so: $(libdl) $(common-objpfx)libc.so \
++			$(common-objpfx)libc_nonshared.a
+ 
+ $(objpfx)bug-dlopen1: $(libdl)
+ 
+--- glibc-20041018T0940/dlfcn/Versions	14 Oct 2004 01:47:20 -0000	1.4
++++ glibc-20041018T0940-fedora/dlfcn/Versions	18 Oct 2004 23:30:21 -0000	1.3.2.2
+@@ -11,4 +11,7 @@ libdl {
+   GLIBC_2.3.4 {
+     dlmopen;
+   }
++  GLIBC_PRIVATE {
++    _dlfcn_hook;
++  }
+ }
+--- glibc-20041018T0940/dlfcn/bug-dlsym1.c	21 Aug 2002 23:03:46 -0000	1.1
++++ glibc-20041018T0940-fedora/dlfcn/bug-dlsym1.c	18 Oct 2004 23:30:21 -0000	1.1.2.1
+@@ -10,8 +10,6 @@ int main(void)
+     void *handle;
+     char *c;
+ 
+-    setenv ("LD_LIBRARY_PATH", "/home/roland/build/tls-libc/dlfcn", 1);
+-
+     /* open lib1.so, which has the unresolved test symbol and a DT_NEEDED
+        on lib2.so, which provides the symbol */
+     if ((handle = dlopen("bug-dlsym1-lib1.so", RTLD_NOW)) == NULL) {
+--- glibc-20041018T0940/dlfcn/dladdr.c	10 Mar 2003 09:12:11 -0000	1.3
++++ glibc-20041018T0940-fedora/dlfcn/dladdr.c	18 Oct 2004 23:30:21 -0000	1.3.2.1
+@@ -1,5 +1,6 @@
+ /* Locate the shared object symbol nearest a given address.
+-   Copyright (C) 1996, 1997, 1998, 1999, 2003 Free Software Foundation, Inc.
++   Copyright (C) 1996, 1997, 1998, 1999, 2003, 2004
++   Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+ 
+    The GNU C Library is free software; you can redistribute it and/or
+@@ -19,8 +20,26 @@
+ 
+ #include <dlfcn.h>
+ 
++#if !defined SHARED && defined IS_IN_libdl
++
+ int
+ dladdr (const void *address, Dl_info *info)
+ {
++  return __dladdr (address, info);
++}
++
++#else
++
++int
++__dladdr (const void *address, Dl_info *info)
++{
++# ifdef SHARED
++  if (__builtin_expect (_dlfcn_hook != NULL, 0))
++    return _dlfcn_hook->dladdr (address, info);
++# endif
+   return _dl_addr (address, info, NULL, NULL);
+ }
++# ifdef SHARED
++strong_alias (__dladdr, dladdr)
++# endif
++#endif
+--- glibc-20041018T0940/dlfcn/dladdr1.c	10 Mar 2003 09:12:11 -0000	1.1
++++ glibc-20041018T0940-fedora/dlfcn/dladdr1.c	18 Oct 2004 23:30:21 -0000	1.1.2.1
+@@ -1,5 +1,5 @@
+ /* Locate the shared object symbol nearest a given address.
+-   Copyright (C) 2003 Free Software Foundation, Inc.
++   Copyright (C) 2003, 2004 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+ 
+    The GNU C Library is free software; you can redistribute it and/or
+@@ -19,9 +19,24 @@
+ 
+ #include <dlfcn.h>
+ 
++#if !defined SHARED && defined IS_IN_libdl
++
+ int
+ dladdr1 (const void *address, Dl_info *info, void **extra, int flags)
+ {
++  return __dladdr1 (address, info, extra, flags);
++}
++
++#else
++
++int
++__dladdr1 (const void *address, Dl_info *info, void **extra, int flags)
++{
++# ifdef SHARED
++  if (__builtin_expect (_dlfcn_hook != NULL, 0))
++    return _dlfcn_hook->dladdr1 (address, info, extra, flags);
++# endif
++
+   switch (flags)
+     {
+     default:			/* Make this an error?  */
+@@ -33,3 +48,7 @@ dladdr1 (const void *address, Dl_info *i
+       return _dl_addr (address, info, (struct link_map **) extra, NULL);
+     }
+ }
++# ifdef SHARED
++strong_alias (__dladdr1, dladdr1)
++# endif
++#endif
+--- glibc-20041018T0940/dlfcn/dlclose.c	6 Jul 2001 04:54:45 -0000	1.2
++++ glibc-20041018T0940-fedora/dlfcn/dlclose.c	18 Oct 2004 23:30:21 -0000	1.2.4.1
+@@ -1,5 +1,6 @@
+ /* Close a handle opened by `dlopen'.
+-   Copyright (C) 1995, 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
++   Copyright (C) 1995, 1996, 1997, 1998, 1999, 2004
++   Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+ 
+    The GNU C Library is free software; you can redistribute it and/or
+@@ -19,6 +20,16 @@
+ 
+ #include <dlfcn.h>
+ 
++#if !defined SHARED && defined IS_IN_libdl
++
++int
++dlclose (void *handle)
++{
++  return __dlclose (handle);
++}
++
++#else
++
+ static void
+ dlclose_doit (void *handle)
+ {
+@@ -26,7 +37,16 @@ dlclose_doit (void *handle)
+ }
+ 
+ int
+-dlclose (void *handle)
++__dlclose (void *handle)
+ {
++# ifdef SHARED
++  if (__builtin_expect (_dlfcn_hook != NULL, 0))
++    return _dlfcn_hook->dlclose (handle);
++# endif
++
+   return _dlerror_run (dlclose_doit, handle) ? -1 : 0;
+ }
++# ifdef SHARED
++strong_alias (__dlclose, dlclose)
++# endif
++#endif
+--- glibc-20041018T0940/dlfcn/dlerror.c	6 Mar 2004 08:09:14 -0000	1.13
++++ glibc-20041018T0940-fedora/dlfcn/dlerror.c	18 Oct 2004 23:30:21 -0000	1.13.2.1
+@@ -25,6 +25,16 @@
+ #include <bits/libc-lock.h>
+ #include <ldsodefs.h>
+ 
++#if !defined SHARED && defined IS_IN_libdl
++
++char *
++dlerror (void)
++{
++  return __dlerror ();
++}
++
++#else
++
+ /* Type for storing results of dynamic loading actions.  */
+ struct dl_action_result
+   {
+@@ -46,11 +56,16 @@ static void free_key_mem (void *mem);
+ 
+ 
+ char *
+-dlerror (void)
++__dlerror (void)
+ {
+   char *buf = NULL;
+   struct dl_action_result *result;
+ 
++# ifdef SHARED
++  if (__builtin_expect (_dlfcn_hook != NULL, 0))
++    return _dlfcn_hook->dlerror ();
++# endif
++
+   /* If we have not yet initialized the buffer do it now.  */
+   __libc_once (once, init);
+ 
+@@ -99,6 +114,9 @@ dlerror (void)
+ 
+   return buf;
+ }
++# ifdef SHARED
++strong_alias (__dlerror, dlerror)
++# endif
+ 
+ int
+ internal_function
+@@ -185,3 +203,35 @@ free_key_mem (void *mem)
+   free (mem);
+   __libc_setspecific (key, NULL);
+ }
++
++# ifdef SHARED
++
++struct dlfcn_hook *_dlfcn_hook __attribute__((nocommon));
++libdl_hidden_data_def (_dlfcn_hook)
++
++# else
++
++static struct dlfcn_hook _dlfcn_hooks =
++  {
++    .dlopen = __dlopen,
++    .dlclose = __dlclose,
++    .dlsym = __dlsym,
++    .dlvsym = __dlvsym,
++    .dlerror = __dlerror,
++    .dladdr = __dladdr,
++    .dladdr1 = __dladdr1,
++    .dlinfo = __dlinfo,
++    .dlmopen = __dlmopen
++  };
++
++void
++__libc_register_dlfcn_hook (struct link_map *map)
++{
++  struct dlfcn_hook **hook;
++
++  hook = (struct dlfcn_hook **) __libc_dlsym_private (map, "_dlfcn_hook");
++  if (hook != NULL)
++    *hook = &_dlfcn_hooks;
++}
++# endif
++#endif
+--- glibc-20041018T0940/dlfcn/dlinfo.c	14 Oct 2004 16:07:37 -0000	1.4
++++ glibc-20041018T0940-fedora/dlfcn/dlinfo.c	18 Oct 2004 23:30:21 -0000	1.2.2.3
+@@ -22,6 +22,16 @@
+ #include <ldsodefs.h>
+ #include <libintl.h>
+ 
++#if !defined SHARED && defined IS_IN_libdl
++
++int
++dlinfo (void *handle, int request, void *arg)
++{
++  return __dlinfo (handle, request, arg, RETURN_ADDRESS (0));
++}
++
++#else
++
+ struct dlinfo_args
+ {
+   ElfW(Addr) caller;
+@@ -36,7 +46,7 @@ dlinfo_doit (void *argsblock)
+   struct dlinfo_args *const args = argsblock;
+   struct link_map *l = args->handle;
+ 
+-#if 0
++# if 0
+   if (args->handle == RTLD_SELF)
+     {
+       Lmid_t nsid;
+@@ -53,7 +63,7 @@ dlinfo_doit (void *argsblock)
+ 	GLRO(dl_signal_error) (0, NULL, NULL, N_("\
+ RTLD_SELF used in code not dynamically loaded"));
+     }
+-#endif
++# endif
+ 
+   switch (args->request)
+     {
+@@ -84,9 +94,19 @@ RTLD_SELF used in code not dynamically l
+ }
+ 
+ int
+-dlinfo (void *handle, int request, void *arg)
++__dlinfo (void *handle, int request, void *arg DL_CALLER_DECL)
+ {
+-  struct dlinfo_args args = { (ElfW(Addr)) RETURN_ADDRESS (0),
++# ifdef SHARED
++  if (__builtin_expect (_dlfcn_hook != NULL, 0))
++    return _dlfcn_hook->dlinfo (handle, request, arg,
++				DL_CALLER);
++# endif
++
++  struct dlinfo_args args = { (ElfW(Addr)) DL_CALLER,
+ 			      handle, request, arg };
+   return _dlerror_run (&dlinfo_doit, &args) ? -1 : 0;
+ }
++# ifdef SHARED
++strong_alias (__dlinfo, dlinfo)
++# endif
++#endif
+--- glibc-20041018T0940/dlfcn/dlmopen.c	14 Oct 2004 01:46:27 -0000	1.1
++++ glibc-20041018T0940-fedora/dlfcn/dlmopen.c	18 Oct 2004 23:30:21 -0000	1.1.2.2
+@@ -23,6 +23,17 @@
+ #include <stddef.h>
+ #include <ldsodefs.h>
+ 
++#if !defined SHARED && defined IS_IN_libdl
++
++void *
++dlmopen (Lmid_t nsid, const char *file, int mode)
++{
++  return __dlmopen (nsid, file, mode, RETURN_ADDRESS (0));
++}
++static_link_warning (dlmopen)
++
++#else
++
+ struct dlmopen_args
+ {
+   /* Namespace ID.  */
+@@ -43,11 +54,11 @@ dlmopen_doit (void *a)
+ 
+   /* Non-shared code has no support for multiple namespaces.  */
+   if (args->nsid != LM_ID_BASE)
+-#ifdef SHARED
++# ifdef SHARED
+     /* If trying to open the link map for the main executable the namespace
+        must be the main one.  */
+     if (args->file == NULL)
+-#endif
++# endif
+       GLRO(dl_signal_error) (EINVAL, NULL, NULL, N_("invalid namespace"));
+ 
+   args->new = _dl_open (args->file ?: "", args->mode | __RTLD_DLOPEN,
+@@ -56,14 +67,32 @@ dlmopen_doit (void *a)
+ 
+ 
+ void *
+-dlmopen (Lmid_t nsid, const char *file, int mode)
++__dlmopen (Lmid_t nsid, const char *file, int mode DL_CALLER_DECL)
+ {
++# ifdef SHARED
++  if (__builtin_expect (_dlfcn_hook != NULL, 0))
++    return _dlfcn_hook->dlmopen (nsid, file, mode, RETURN_ADDRESS (0));
++# endif
++
+   struct dlmopen_args args;
+   args.nsid = nsid;
+   args.file = file;
+   args.mode = mode;
+-  args.caller = RETURN_ADDRESS (0);
++  args.caller = DL_CALLER;
+ 
++# ifdef SHARED
+   return _dlerror_run (dlmopen_doit, &args) ? NULL : args.new;
++# else
++  if (_dlerror_run (dlmopen_doit, &args))
++    return NULL;
++
++  __libc_register_dl_open_hook ((struct link_map *) args.new);
++  __libc_register_dlfcn_hook ((struct link_map *) args.new);
++
++  return args.new;
++# endif
+ }
+-static_link_warning (dlmopen)
++# ifdef SHARED
++strong_alias (__dlmopen, dlmopen)
++# endif
++#endif
+--- glibc-20041018T0940/dlfcn/dlopen.c	14 Oct 2004 01:48:54 -0000	1.9
++++ glibc-20041018T0940-fedora/dlfcn/dlopen.c	18 Oct 2004 23:30:21 -0000	1.8.2.2
+@@ -20,6 +20,17 @@
+ #include <dlfcn.h>
+ #include <stddef.h>
+ 
++#if !defined SHARED && defined IS_IN_libdl
++
++void *
++dlopen (const char *file, int mode)
++{
++  return __dlopen (file, mode, RETURN_ADDRESS (0));
++}
++static_link_warning (dlopen)
++
++#else
++
+ struct dlopen_args
+ {
+   /* The arguments for dlopen_doit.  */
+@@ -33,11 +44,11 @@ struct dlopen_args
+ 
+ 
+ /* Non-shared code has no support for multiple namespaces.  */
+-#ifdef SHARED
+-# define NS __LM_ID_CALLER
+-#else
+-# define NS LM_ID_BASE
+-#endif
++# ifdef SHARED
++#  define NS __LM_ID_CALLER
++# else
++#  define NS LM_ID_BASE
++# endif
+ 
+ 
+ static void
+@@ -50,17 +61,34 @@ dlopen_doit (void *a)
+ }
+ 
+ 
+-extern void *__dlopen_check (const char *file, int mode);
+ void *
+-__dlopen_check (const char *file, int mode)
++__dlopen (const char *file, int mode DL_CALLER_DECL)
+ {
++# ifdef SHARED
++  if (__builtin_expect (_dlfcn_hook != NULL, 0))
++    return _dlfcn_hook->dlopen (file, mode, DL_CALLER);
++# endif
++
+   struct dlopen_args args;
+   args.file = file;
+   args.mode = mode;
+-  args.caller = RETURN_ADDRESS (0);
++  args.caller = DL_CALLER;
+ 
++# ifdef SHARED
+   return _dlerror_run (dlopen_doit, &args) ? NULL : args.new;
++# else
++  if (_dlerror_run (dlopen_doit, &args))
++    return NULL;
++
++  __libc_register_dl_open_hook ((struct link_map *) args.new);
++  __libc_register_dlfcn_hook ((struct link_map *) args.new);
++
++  return args.new;
++# endif
+ }
+-#include <shlib-compat.h>
++# ifdef SHARED
++#  include <shlib-compat.h>
++strong_alias (__dlopen, __dlopen_check)
+ versioned_symbol (libdl, __dlopen_check, dlopen, GLIBC_2_1);
+-static_link_warning (dlopen)
++# endif
++#endif
+--- glibc-20041018T0940/dlfcn/dlopenold.c	14 Oct 2004 01:48:54 -0000	1.8
++++ glibc-20041018T0940-fedora/dlfcn/dlopenold.c	18 Oct 2004 23:30:21 -0000	1.7.4.2
+@@ -67,6 +67,9 @@ __dlopen_nocheck (const char *file, int 
+     mode |= RTLD_LAZY;
+   args.mode = mode;
+ 
++  if (__builtin_expect (_dlfcn_hook != NULL, 0))
++    return _dlfcn_hook->dlopen (file, mode, RETURN_ADDRESS (0));
++
+   return _dlerror_run (dlopen_doit, &args) ? NULL : args.new;
+ }
+ compat_symbol (libdl, __dlopen_nocheck, dlopen, GLIBC_2_0);
+--- glibc-20041018T0940/dlfcn/dlsym.c	21 Feb 2004 01:03:02 -0000	1.5
++++ glibc-20041018T0940-fedora/dlfcn/dlsym.c	18 Oct 2004 23:30:21 -0000	1.5.2.1
+@@ -22,6 +22,16 @@
+ 
+ #include <ldsodefs.h>
+ 
++#if !defined SHARED && defined IS_IN_libdl
++
++void *
++dlsym (void *handle, const char *name)
++{
++  return __dlsym (handle, name, RETURN_ADDRESS (0));
++}
++
++#else
++
+ struct dlsym_args
+ {
+   /* The arguments to dlsym_doit.  */
+@@ -43,10 +53,15 @@ dlsym_doit (void *a)
+ 
+ 
+ void *
+-dlsym (void *handle, const char *name)
++__dlsym (void *handle, const char *name DL_CALLER_DECL)
+ {
++# ifdef SHARED
++  if (__builtin_expect (_dlfcn_hook != NULL, 0))
++    return _dlfcn_hook->dlsym (handle, name, DL_CALLER);
++# endif
++
+   struct dlsym_args args;
+-  args.who = RETURN_ADDRESS (0);
++  args.who = DL_CALLER;
+   args.handle = handle;
+   args.name = name;
+ 
+@@ -59,3 +74,7 @@ dlsym (void *handle, const char *name)
+ 
+   return result;
+ }
++# ifdef SHARED
++strong_alias (__dlsym, dlsym)
++# endif
++#endif
+--- glibc-20041018T0940/dlfcn/dlvsym.c	21 Feb 2004 01:03:02 -0000	1.5
++++ glibc-20041018T0940-fedora/dlfcn/dlvsym.c	18 Oct 2004 23:30:21 -0000	1.5.2.1
+@@ -22,6 +22,17 @@
+ 
+ #include <ldsodefs.h>
+ 
++#if !defined SHARED && defined IS_IN_libdl
++
++void *
++weak_function
++dlvsym (void *handle, const char *name, const char *version_str)
++{
++  return __dlvsym (handle, name, version_str, RETURN_ADDRESS (0));
++}
++
++#else
++
+ struct dlvsym_args
+ {
+   /* The arguments to dlvsym_doit.  */
+@@ -44,13 +55,18 @@ dlvsym_doit (void *a)
+ }
+ 
+ void *
+-__dlvsym (void *handle, const char *name, const char *version_str)
++__dlvsym (void *handle, const char *name, const char *version_str
++	  DL_CALLER_DECL)
+ {
+-  struct dlvsym_args args;
++# ifdef SHARED
++  if (__builtin_expect (_dlfcn_hook != NULL, 0))
++    return _dlfcn_hook->dlvsym (handle, name, version_str, DL_CALLER);
++# endif
+ 
++  struct dlvsym_args args;
+   args.handle = handle;
+   args.name = name;
+-  args.who = RETURN_ADDRESS (0);
++  args.who = DL_CALLER;
+   args.version = version_str;
+ 
+   /* Protect against concurrent loads and unloads.  */
+@@ -62,4 +78,7 @@ __dlvsym (void *handle, const char *name
+ 
+   return result;
+ }
++# ifdef SHARED
+ weak_alias (__dlvsym, dlvsym)
++# endif
++#endif
+--- glibc-20041018T0940/dlfcn/modstatic2.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20041018T0940-fedora/dlfcn/modstatic2.c	18 Oct 2004 23:30:21 -0000	1.1.2.1
+@@ -0,0 +1,228 @@
++#include <dlfcn.h>
++#include <link.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <gnu/lib-names.h>
++
++int test (FILE *out, int a);
++
++int
++test (FILE *out, int a)
++{
++  fputs ("in modstatic2.c (test)\n", out);
++
++  void *handle = dlopen ("modstatic2-nonexistent.so", RTLD_LAZY);
++  if (handle == NULL)
++    fprintf (out, "nonexistent: %s\n", dlerror ());
++  else
++    exit (1);
++
++  handle = dlopen ("modstatic2.so", RTLD_LAZY);
++  if (handle == NULL)
++    {
++      fprintf (out, "%s\n", dlerror ());
++      exit (1);
++    }
++
++  int (*test2) (FILE *, int);
++  test2 = dlsym (handle, "test");
++  if (test2 == NULL)
++    {
++      fprintf (out, "%s\n", dlerror ());
++      exit (1);
++    }
++  if (test2 != test)
++    {
++      fprintf (out, "test %p != test2 %p\n", test, test2);
++      exit (1);
++    }
++
++  Dl_info info;
++  int res = dladdr (test2, &info);
++  if (res == 0)
++    {
++      fputs ("dladdr returned 0\n", out);
++      exit (1);
++    }
++  else
++    {
++      if (strstr (info.dli_fname, "modstatic2.so") == NULL
++	  || strcmp (info.dli_sname, "test") != 0)
++	{
++	  fprintf (out, "fname %s sname %s\n", info.dli_fname, info.dli_sname);
++	  exit (1);
++	}
++      if (info.dli_saddr != (void *) test2)
++	{
++	  fprintf (out, "saddr %p != test %p\n", info.dli_saddr, test2);
++	  exit (1);
++	}
++    }
++
++  ElfW(Sym) *sym;
++  void *symp;
++  res = dladdr1 (test2, &info, &symp, RTLD_DL_SYMENT);
++  if (res == 0)
++    {
++      fputs ("dladdr1 returned 0\n", out);
++      exit (1);
++    }
++  else
++    {
++      if (strstr (info.dli_fname, "modstatic2.so") == NULL
++	  || strcmp (info.dli_sname, "test") != 0)
++	{
++	  fprintf (out, "fname %s sname %s\n", info.dli_fname, info.dli_sname);
++	  exit (1);
++	}
++      if (info.dli_saddr != (void *) test2)
++	{
++	  fprintf (out, "saddr %p != test %p\n", info.dli_saddr, test2);
++	  exit (1);
++	}
++      sym = symp;
++      if (sym == NULL)
++	{
++	  fputs ("sym == NULL\n", out);
++	  exit (1);
++	}
++      if (ELF32_ST_BIND (sym->st_info) != STB_GLOBAL
++	  || ELF32_ST_VISIBILITY (sym->st_other) != STV_DEFAULT)
++	{
++	  fprintf (out, "bind %d visibility %d\n",
++		   (int) ELF32_ST_BIND (sym->st_info),
++		   (int) ELF32_ST_VISIBILITY (sym->st_other));
++	  exit (1);
++	}
++    }
++
++  Lmid_t lmid;
++  res = dlinfo (handle, RTLD_DI_LMID, &lmid);
++  if (res != 0)
++    {
++      fprintf (out, "dlinfo returned %d %s\n", res, dlerror ());
++      exit (1);
++    }
++  else if (lmid != LM_ID_BASE)
++    {
++      fprintf (out, "lmid %d != %d\n", (int) lmid, (int) LM_ID_BASE);
++      exit (1);
++    }
++
++  void *handle2 = dlopen (LIBDL_SO, RTLD_LAZY);
++  if (handle2 == NULL)
++    {
++      fprintf (out, "libdl.so: %s\n", dlerror ());
++      exit (1);
++    }
++
++#ifdef DO_VERSIONING
++  if (dlvsym (handle2, "_dlfcn_hook", "GLIBC_PRIVATE") == NULL)
++    {
++      fprintf (out, "dlvsym: %s\n", dlerror ());
++      exit (1);
++    }
++#endif
++
++  void *(*dlsymfn) (void *, const char *);
++  dlsymfn = dlsym (handle2, "dlsym");
++  if (dlsymfn == NULL)
++    {
++      fprintf (out, "dlsym \"dlsym\": %s\n", dlerror ());
++      exit (1);
++    }
++  void *test3 = dlsymfn (handle, "test");
++  if (test3 == NULL)
++    {
++      fprintf (out, "%s\n", dlerror ());
++      exit (1);
++    }
++  else if (test3 != (void *) test2)
++    {
++      fprintf (out, "test2 %p != test3 %p\n", test2, test3);
++      exit (1);
++    }
++
++  dlclose (handle2);
++  dlclose (handle);
++
++  handle = dlmopen (LM_ID_BASE, "modstatic2.so", RTLD_LAZY);
++  if (handle == NULL)
++    {
++      fprintf (out, "%s\n", dlerror ());
++      exit (1);
++    }
++  dlclose (handle);
++
++  handle = dlmopen (LM_ID_NEWLM, "modstatic2.so", RTLD_LAZY);
++  if (handle == NULL)
++    fprintf (out, "LM_ID_NEWLM: %s\n", dlerror ());
++  else
++    {
++      fputs ("LM_ID_NEWLM unexpectedly succeeded\n", out);
++      exit (1);
++    }
++
++  handle = dlopen ("modstatic.so", RTLD_LAZY);
++  if (handle == NULL)
++    {
++      fprintf (out, "%s\n", dlerror ());
++      exit (1);
++    }
++
++  int (*test4) (int);
++  test4 = dlsym (handle, "test");
++  if (test4 == NULL)
++    {
++      fprintf (out, "%s\n", dlerror ());
++      exit (1);
++    }
++
++  res = test4 (16);
++  if (res != 16 + 16)
++    {
++      fprintf (out, "modstatic.so (test) returned %d\n", res);
++      exit (1);
++    }
++
++  res = dladdr1 (test4, &info, &symp, RTLD_DL_SYMENT);
++  if (res == 0)
++    {
++      fputs ("dladdr1 returned 0\n", out);
++      exit (1);
++    }
++  else
++    {
++      if (strstr (info.dli_fname, "modstatic.so") == NULL
++	  || strcmp (info.dli_sname, "test") != 0)
++	{
++	  fprintf (out, "fname %s sname %s\n", info.dli_fname, info.dli_sname);
++	  exit (1);
++	}
++      if (info.dli_saddr != (void *) test4)
++	{
++	  fprintf (out, "saddr %p != test %p\n", info.dli_saddr, test4);
++	  exit (1);
++	}
++      sym = symp;
++      if (sym == NULL)
++	{
++	  fputs ("sym == NULL\n", out);
++	  exit (1);
++	}
++      if (ELF32_ST_BIND (sym->st_info) != STB_GLOBAL
++	  || ELF32_ST_VISIBILITY (sym->st_other) != STV_DEFAULT)
++	{
++	  fprintf (out, "bind %d visibility %d\n",
++		   (int) ELF32_ST_BIND (sym->st_info),
++		   (int) ELF32_ST_VISIBILITY (sym->st_other));
++	  exit (1);
++	}
++    }
++
++  dlclose (handle);
++
++  fputs ("leaving modstatic2.c (test)\n", out);
++  return a + a;
++}
+--- glibc-20041018T0940/dlfcn/sdladdr.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20041018T0940-fedora/dlfcn/sdladdr.c	18 Oct 2004 23:30:21 -0000	1.1.2.1
+@@ -0,0 +1 @@
++#include "dladdr.c"
+--- glibc-20041018T0940/dlfcn/sdladdr1.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20041018T0940-fedora/dlfcn/sdladdr1.c	18 Oct 2004 23:30:21 -0000	1.1.2.1
+@@ -0,0 +1 @@
++#include "dladdr1.c"
+--- glibc-20041018T0940/dlfcn/sdlclose.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20041018T0940-fedora/dlfcn/sdlclose.c	18 Oct 2004 23:30:22 -0000	1.1.2.1
+@@ -0,0 +1 @@
++#include "dlclose.c"
+--- glibc-20041018T0940/dlfcn/sdlerror.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20041018T0940-fedora/dlfcn/sdlerror.c	18 Oct 2004 23:30:22 -0000	1.1.2.1
+@@ -0,0 +1 @@
++#include "dlerror.c"
+--- glibc-20041018T0940/dlfcn/sdlinfo.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20041018T0940-fedora/dlfcn/sdlinfo.c	18 Oct 2004 23:30:22 -0000	1.1.2.1
+@@ -0,0 +1 @@
++#include "dlinfo.c"
+--- glibc-20041018T0940/dlfcn/sdlmopen.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20041018T0940-fedora/dlfcn/sdlmopen.c	18 Oct 2004 23:30:22 -0000	1.1.2.1
+@@ -0,0 +1 @@
++#include "dlmopen.c"
+--- glibc-20041018T0940/dlfcn/sdlopen.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20041018T0940-fedora/dlfcn/sdlopen.c	18 Oct 2004 23:30:22 -0000	1.1.2.1
+@@ -0,0 +1 @@
++#include "dlopen.c"
+--- glibc-20041018T0940/dlfcn/sdlsym.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20041018T0940-fedora/dlfcn/sdlsym.c	18 Oct 2004 23:30:22 -0000	1.1.2.1
+@@ -0,0 +1 @@
++#include "dlsym.c"
+--- glibc-20041018T0940/dlfcn/sdlvsym.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20041018T0940-fedora/dlfcn/sdlvsym.c	18 Oct 2004 23:30:22 -0000	1.1.2.1
+@@ -0,0 +1 @@
++#include "dlvsym.c"
+--- glibc-20041018T0940/dlfcn/tststatic2.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20041018T0940-fedora/dlfcn/tststatic2.c	18 Oct 2004 23:30:22 -0000	1.1.2.1
+@@ -0,0 +1,166 @@
++#include <dlfcn.h>
++#include <link.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <gnu/lib-names.h>
++
++int
++main (void)
++{
++  void *handle = dlopen ("modstatic2-nonexistent.so", RTLD_LAZY);
++  if (handle == NULL)
++    printf ("nonexistent: %s\n", dlerror ());
++  else
++    exit (1);
++
++  handle = dlopen ("modstatic2.so", RTLD_LAZY);
++  if (handle == NULL)
++    {
++      printf ("%s\n", dlerror ());
++      exit (1);
++    }
++
++  int (*test) (FILE *, int);
++  test = dlsym (handle, "test");
++  if (test == NULL)
++    {
++      printf ("%s\n", dlerror ());
++      exit (1);
++    }
++
++  Dl_info info;
++  int res = dladdr (test, &info);
++  if (res == 0)
++    {
++      puts ("dladdr returned 0");
++      exit (1);
++    }
++  else
++    {
++      if (strstr (info.dli_fname, "modstatic2.so") == NULL
++	  || strcmp (info.dli_sname, "test") != 0)
++	{
++	  printf ("fname %s sname %s\n", info.dli_fname, info.dli_sname);
++	  exit (1);
++	}
++      if (info.dli_saddr != (void *) test)
++	{
++	  printf ("saddr %p != test %p\n", info.dli_saddr, test);
++	  exit (1);
++	}
++    }
++
++  ElfW(Sym) *sym;
++  void *symp;
++  res = dladdr1 (test, &info, &symp, RTLD_DL_SYMENT);
++  if (res == 0)
++    {
++      puts ("dladdr1 returned 0");
++      exit (1);
++    }
++  else
++    {
++      if (strstr (info.dli_fname, "modstatic2.so") == NULL
++	  || strcmp (info.dli_sname, "test") != 0)
++	{
++	  printf ("fname %s sname %s\n", info.dli_fname, info.dli_sname);
++	  exit (1);
++	}
++      if (info.dli_saddr != (void *) test)
++	{
++	  printf ("saddr %p != test %p\n", info.dli_saddr, test);
++	  exit (1);
++	}
++      sym = symp;
++      if (sym == NULL)
++	{
++	  puts ("sym == NULL\n");
++	  exit (1);
++	}
++      if (ELF32_ST_BIND (sym->st_info) != STB_GLOBAL
++	  || ELF32_ST_VISIBILITY (sym->st_other) != STV_DEFAULT)
++	{
++	  printf ("bind %d visibility %d\n",
++		  (int) ELF32_ST_BIND (sym->st_info),
++		  (int) ELF32_ST_VISIBILITY (sym->st_other));
++	  exit (1);
++	}
++    }
++
++  Lmid_t lmid;
++  res = dlinfo (handle, RTLD_DI_LMID, &lmid);
++  if (res != 0)
++    {
++      printf ("dlinfo returned %d %s\n", res, dlerror ());
++      exit (1);
++    }
++  else if (lmid != LM_ID_BASE)
++    {
++      printf ("lmid %d != %d\n", (int) lmid, (int) LM_ID_BASE);
++      exit (1);
++    }
++
++  res = test (stdout, 2);
++  if (res != 4)
++    {
++      printf ("Got %i, expected 4\n", res);
++      exit (1);
++    }
++
++  void *handle2 = dlopen (LIBDL_SO, RTLD_LAZY);
++  if (handle2 == NULL)
++    {
++      printf ("libdl.so: %s\n", dlerror ());
++      exit (1);
++    }
++
++#ifdef DO_VERSIONING
++  if (dlvsym (handle2, "_dlfcn_hook", "GLIBC_PRIVATE") == NULL)
++    {
++      printf ("dlvsym: %s\n", dlerror ());
++      exit (1);
++    }
++#endif
++
++  void *(*dlsymfn) (void *, const char *);
++  dlsymfn = dlsym (handle2, "dlsym");
++  if (dlsymfn == NULL)
++    {
++      printf ("dlsym \"dlsym\": %s\n", dlerror ());
++      exit (1);
++    }
++  void *test2 = dlsymfn (handle, "test");
++  if (test2 == NULL)
++    {
++      printf ("%s\n", dlerror ());
++      exit (1);
++    }
++  else if (test2 != (void *) test)
++    {
++      printf ("test %p != test2 %p\n", test, test2);
++      exit (1);
++    }
++
++  dlclose (handle2);
++  dlclose (handle);
++
++  handle = dlmopen (LM_ID_BASE, "modstatic2.so", RTLD_LAZY);
++  if (handle == NULL)
++    {
++      printf ("%s\n", dlerror ());
++      exit (1);
++    }
++  dlclose (handle);
++
++  handle = dlmopen (LM_ID_NEWLM, "modstatic2.so", RTLD_LAZY);
++  if (handle == NULL)
++    printf ("LM_ID_NEWLM: %s\n", dlerror ());
++  else
++    {
++      puts ("LM_ID_NEWLM unexpectedly succeeded");
++      exit (1);
++    }
++
++  return 0;
++}
+--- glibc-20041018T0940/elf/dl-libc.c	14 Oct 2004 02:02:33 -0000	1.23
++++ glibc-20041018T0940-fedora/elf/dl-libc.c	18 Oct 2004 23:30:22 -0000	1.22.2.2
+@@ -121,7 +121,6 @@ do_dlsym_private (void *ptr)
+   vers.hidden = 1;
+   /* vers.hash = _dl_elf_hash (version);  */
+   vers.hash = 0x0963cf85;
+-  /* FIXME: Shouldn't we use libc.so.6* here?  */
+   vers.filename = NULL;
+ 
+   struct do_dlsym_args *args = (struct do_dlsym_args *) ptr;
+@@ -156,23 +155,36 @@ __libc_dlopen_mode (const char *name, in
+   if (dlerror_run (do_dlopen, &args))
+     return NULL;
+ 
++  __libc_register_dl_open_hook (args.map);
++  __libc_register_dlfcn_hook (args.map);
++  return (void *) args.map;
++#endif
++}
++libc_hidden_def (__libc_dlopen_mode)
++
++#ifndef SHARED
++void *
++__libc_dlsym_private (struct link_map *map, const char *name)
++{
+   struct do_dlsym_args sargs;
+-  sargs.map = args.map;
+-  sargs.name = "_dl_open_hook";
++  sargs.map = map;
++  sargs.name = name;
+ 
+   if (! dlerror_run (do_dlsym_private, &sargs))
+-    {
+-      struct dl_open_hook **hook
+-	= (struct dl_open_hook **)
+-	  (DL_SYMBOL_ADDRESS (sargs.loadbase, sargs.ref));
+-      if (hook != NULL)
+-	*hook = &_dl_open_hook;
+-    }
++    return DL_SYMBOL_ADDRESS (sargs.loadbase, sargs.ref);
++  return NULL;
++}
+ 
+-  return (void *) args.map;
+-#endif
++void
++__libc_register_dl_open_hook (struct link_map *map)
++{
++  struct dl_open_hook **hook;
++
++  hook = (struct dl_open_hook **) __libc_dlsym_private (map, "_dl_open_hook");
++  if (hook != NULL)
++    *hook = &_dl_open_hook;
+ }
+-libc_hidden_def (__libc_dlopen_mode)
++#endif
+ 
+ void *
+ __libc_dlsym (void *map, const char *name)
+--- glibc-20041018T0940/elf/dl-open.c	14 Oct 2004 02:05:42 -0000	1.113
++++ glibc-20041018T0940-fedora/elf/dl-open.c	18 Oct 2004 23:30:22 -0000	1.111.2.3
+@@ -207,7 +207,15 @@ dl_open_worker (void *a)
+ 
+     found_caller:
+       if (args->nsid == __LM_ID_CALLER)
+-	args->nsid = call_map->l_ns;
++	{
++#ifndef SHARED
++	  /* In statically linked apps there might be no loaded object.  */
++	  if (call_map == NULL)
++	    args->nsid = LM_ID_BASE;
++	  else
++#endif
++	    args->nsid = call_map->l_ns;
++	}
+     }
+ 
+   /* Maybe we have to expand a DST.  */
 --- glibc-20041018T0940/elf/dl-support.c	14 Oct 2004 02:06:18 -0000	1.86
 +++ glibc-20041018T0940-fedora/elf/dl-support.c	14 Oct 2004 05:57:53 -0000	1.84.2.3
 @@ -274,6 +274,11 @@ _dl_non_dynamic_init (void)
@@ -516,8 +1662,82 @@
    /* Open the output file.  */
    assert (GCONV_MODULES_CACHE[0] == '/');
    strcpy (stpcpy (mempcpy (tmpfname, prefix, prefix_len), GCONV_MODULES_CACHE),
+--- glibc-20041018T0940/include/dlfcn.h	14 Oct 2004 01:57:25 -0000	1.18
++++ glibc-20041018T0940-fedora/include/dlfcn.h	18 Oct 2004 23:30:22 -0000	1.17.2.2
+@@ -11,8 +11,6 @@
+ #define __LM_ID_CALLER	-2
+ 
+ /* Now define the internal interfaces.  */
+-extern void *__dlvsym (void *__handle, __const char *__name,
+-		       __const char *__version);
+ 
+ #define __libc_dlopen(name) __libc_dlopen_mode (name, RTLD_LAZY)
+ extern void *__libc_dlopen_mode  (__const char *__name, int __mode);
+@@ -76,4 +74,62 @@ extern int _dl_catch_error (const char *
+ extern int _dlerror_run (void (*operate) (void *), void *args)
+      internal_function;
+ 
++#ifdef SHARED
++# define DL_CALLER_DECL /* Nothing */
++# define DL_CALLER RETURN_ADDRESS (0)
++#else
++# define DL_CALLER_DECL , void *dl_caller
++# define DL_CALLER dl_caller
++#endif
++
++struct dlfcn_hook
++{
++  void *(*dlopen) (const char *file, int mode, void *dl_caller);
++  int (*dlclose) (void *handle);
++  void *(*dlsym) (void *handle, const char *name, void *dl_caller);
++  void *(*dlvsym) (void *handle, const char *name, const char *version,
++		   void *dl_caller);
++  char *(*dlerror) (void);
++  int (*dladdr) (const void *address, Dl_info *info);
++  int (*dladdr1) (const void *address, Dl_info *info,
++		  void **extra_info, int flags);
++  int (*dlinfo) (void *handle, int request, void *arg, void *dl_caller);
++  void *(*dlmopen) (Lmid_t nsid, const char *file, int mode, void *dl_caller);
++  void *pad[4];
++};
++
++extern struct dlfcn_hook *_dlfcn_hook;
++libdl_hidden_proto (_dlfcn_hook)
++
++extern void *__dlopen (const char *file, int mode DL_CALLER_DECL)
++     attribute_hidden;
++extern void *__dlmopen (Lmid_t nsid, const char *file, int mode DL_CALLER_DECL)
++     attribute_hidden;
++extern int __dlclose (void *handle)
++     attribute_hidden;
++extern void *__dlsym (void *handle, const char *name DL_CALLER_DECL)
++     attribute_hidden;
++extern void *__dlvsym (void *handle, const char *name, const char *version
++		       DL_CALLER_DECL)
++     attribute_hidden;
++extern char *__dlerror (void)
++     attribute_hidden;
++extern int __dladdr (const void *address, Dl_info *info)
++     attribute_hidden;
++extern int __dladdr1 (const void *address, Dl_info *info,
++		      void **extra_info, int flags)
++     attribute_hidden;
++extern int __dlinfo (void *handle, int request, void *arg DL_CALLER_DECL)
++     attribute_hidden;
++
++#ifndef SHARED
++struct link_map;
++extern void * __libc_dlsym_private (struct link_map *map, const char *name)
++     attribute_hidden;
++extern void __libc_register_dl_open_hook (struct link_map *map)
++     attribute_hidden;
++extern void __libc_register_dlfcn_hook (struct link_map *map)
++     attribute_hidden;
++#endif
++
+ #endif
 --- glibc-20041018T0940/include/features.h	18 Oct 2004 04:17:16 -0000	1.36
-+++ glibc-20041018T0940-fedora/include/features.h	18 Oct 2004 09:58:43 -0000	1.35.2.2
++++ glibc-20041018T0940-fedora/include/features.h	18 Oct 2004 22:56:48 -0000	1.35.2.3
 @@ -181,8 +181,8 @@
  
  /* If none of the ANSI/POSIX macros are defined, use POSIX.1 and POSIX.2
@@ -529,6 +1749,44 @@
  # define _POSIX_SOURCE	1
  # if defined _XOPEN_SOURCE && (_XOPEN_SOURCE - 0) < 500
  #  define _POSIX_C_SOURCE	2
+@@ -262,7 +262,9 @@
+ # define __USE_REENTRANT	1
+ #endif
+ 
+-#if _FORTIFY_SOURCE > 0 && __GNUC_PREREQ (4, 1) && __OPTIMIZE__ > 0
++#if _FORTIFY_SOURCE > 0 && __OPTIMIZE__ > 0 \
++    && (__GNUC_PREREQ (4, 1) \
++        || (defined __GNUC_RH_RELEASE__ && __GNUC_PREREQ (4, 0)))
+ # if _FORTIFY_SOURCE == 1
+ #  define __USE_FORTIFY_LEVEL 1
+ # elif _FORTIFY_SOURCE > 1
+--- glibc-20041018T0940/include/libc-symbols.h	18 Oct 2004 05:07:45 -0000	1.65
++++ glibc-20041018T0940-fedora/include/libc-symbols.h	18 Oct 2004 23:30:22 -0000	1.64.2.2
+@@ -762,6 +762,24 @@ for linking")
+ # define libresolv_hidden_data_ver(local, name)
+ #endif
+ 
++#if defined NOT_IN_libc && defined IS_IN_libdl
++# define libdl_hidden_proto(name, attrs...) hidden_proto (name, ##attrs)
++# define libdl_hidden_def(name) hidden_def (name)
++# define libdl_hidden_weak(name) hidden_weak (name)
++# define libdl_hidden_ver(local, name) hidden_ver (local, name)
++# define libdl_hidden_data_def(name) hidden_data_def (name)
++# define libdl_hidden_data_weak(name) hidden_data_weak (name)
++# define libdl_hidden_data_ver(local, name) hidden_data_ver (local, name)
++#else
++# define libdl_hidden_proto(name, attrs...)
++# define libdl_hidden_def(name)
++# define libdl_hidden_weak(name)
++# define libdl_hidden_ver(local, name)
++# define libdl_hidden_data_def(name)
++# define libdl_hidden_data_weak(name)
++# define libdl_hidden_data_ver(local, name)
++#endif
++
+ #ifdef HAVE_BUILTIN_REDIRECTION
+ # define libc_hidden_builtin_proto(name, attrs...) libc_hidden_proto (name, ##attrs)
+ # define libc_hidden_builtin_def(name) libc_hidden_def (name)
 --- glibc-20041018T0940/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
 +++ glibc-20041018T0940-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
 @@ -58,8 +58,6 @@ korean		ko_KR.eucKR
@@ -1286,17 +2544,27 @@
  date       "2000-08-02"
  %
 --- glibc-20041018T0940/malloc/arena.c	14 Oct 2004 01:55:55 -0000	1.11
-+++ glibc-20041018T0940-fedora/malloc/arena.c	18 Oct 2004 11:56:08 -0000	1.8.2.4
++++ glibc-20041018T0940-fedora/malloc/arena.c	18 Oct 2004 23:30:23 -0000	1.8.2.5
 @@ -18,7 +18,7 @@
     write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
     Boston, MA 02111-1307, USA.  */
  
 -/* $Id: arena.c,v 1.11 2004/10/14 01:55:55 drepper Exp $ */
-+/* $Id: arena.c,v 1.8.2.4 2004/10/18 11:56:08 jakub Exp $ */
++/* $Id: arena.c,v 1.8.2.5 2004/10/18 23:30:23 jakub Exp $ */
  
  /* Compile-time constants.  */
  
-@@ -429,10 +429,16 @@ ptmalloc_init (void)
+@@ -347,6 +347,9 @@ __failing_morecore (ptrdiff_t d)
+ {
+   return (void *) MORECORE_FAILURE;
+ }
++
++extern struct dl_open_hook *_dl_open_hook;
++libc_hidden_proto (_dl_open_hook);
+ # endif
+ 
+ # if defined SHARED && defined USE_TLS && !USE___THREAD
+@@ -429,10 +432,14 @@ ptmalloc_init (void)
    main_arena.next = &main_arena;
  
  #if defined _LIBC && defined SHARED
@@ -1306,12 +2574,10 @@
    Dl_info di;
    struct link_map *l;
 -  if (_dl_addr (ptmalloc_init, &di, &l, NULL) != 0 && l->l_ns != LM_ID_BASE)
-+  extern struct dl_open_hook *_dl_open_hook;
-+  libc_hidden_proto (_dl_open_hook);
 +
 +  if (_dl_open_hook != NULL
 +      || (_dl_addr (ptmalloc_init, &di, &l, NULL) != 0
-+          && l->l_ns != LM_ID_BASE))
++	  && l->l_ns != LM_ID_BASE))
      __morecore = __failing_morecore;
  #endif
  
