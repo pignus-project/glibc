@@ -1,6 +1,12 @@
 --- glibc-20041005T0745/ChangeLog	4 Oct 2004 23:30:29 -0000	1.8863
-+++ glibc-20041005T0745-fedora/ChangeLog	5 Oct 2004 11:23:13 -0000	1.8782.2.15
-@@ -1,3 +1,20 @@
++++ glibc-20041005T0745-fedora/ChangeLog	5 Oct 2004 15:43:21 -0000	1.8782.2.16
+@@ -1,3 +1,26 @@
++2004-10-05  Ulrich Drepper  <drepper@redhat.com>
++
++	* grp/initgroups.c: Remove duplicate group IDs.
++	* grp/compat-initgroups.c: Likewise.
++	* nscd/initgrcache.c: Likewise.
++
 +2004-10-05  Jakub Jelinek  <jakub@redhat.com>
 +
 +	* sysdeps/unix/sysv/linux/s390/s390-32/sysdep.h: Include dl-sysdep.h.
@@ -21,7 +27,7 @@
  2004-10-04  Ulrich Drepper  <drepper@redhat.com>
  
  	* nscd/gai.c: Define __no_netlink_support if NEED_NETLINK is
-@@ -479,6 +496,22 @@
+@@ -479,6 +502,22 @@
  	* string/string.h: Add __nonnull annotations.
  	* stdlib/stdlib.h: Likewise.
  
@@ -44,7 +50,7 @@
  2004-09-20  H.J. Lu  <hongjiu.lu@intel.com>
  
  	* sysdeps/unix/sysv/linux/ia64/sysdep.h (DO_INLINE_SYSCALL):
-@@ -1208,6 +1241,23 @@
+@@ -1208,6 +1247,23 @@
  	before return type.
  	* locale/localename.c (__current_locale_name): Likewise.
  
@@ -68,7 +74,7 @@
  2004-08-30  Roland McGrath  <roland@frob.com>
  
  	* scripts/extract-abilist.awk: If `lastversion' variable defined, omit
-@@ -1364,6 +1414,22 @@
+@@ -1364,6 +1420,22 @@
  	* resolv/nss_dns/dns-canon.c (_nss_dns_getcanonname_r): Initialize
  	status to NSS_STATUS_UNAVAIL.
  
@@ -91,7 +97,7 @@
  2004-08-19  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/posix/getaddrinfo.c (gaih_inet): Use h->h_name in the
-@@ -1668,6 +1734,12 @@
+@@ -1668,6 +1740,12 @@
  
  	* iconvdata/testdata/ISO-2022-JP-3: Regenerated.
  
@@ -508,7 +514,7 @@
                  break;
                }
 --- glibc-20041005T0745/grp/initgroups.c	30 Sep 2004 02:14:32 -0000	1.32
-+++ glibc-20041005T0745-fedora/grp/initgroups.c	5 Oct 2004 12:09:42 -0000	1.31.2.3
++++ glibc-20041005T0745-fedora/grp/initgroups.c	5 Oct 2004 15:43:26 -0000	1.31.2.4
 @@ -73,7 +73,7 @@ internal_getgrouplist (const char *user,
    /* Start is one, because we have the first group as parameter.  */
    long int start = 1;
@@ -541,14 +547,27 @@
 +	      break;
 +
 +	  if (inner < prev_start)
-+	    ++cnt;
-+	  else
 +	    (*groupsp)[cnt] = (*groupsp)[--start];
++	  else
++	    ++cnt;
 +	}
 +
        /* This is really only for debugging.  */
        if (NSS_STATUS_TRYAGAIN > status || status > NSS_STATUS_RETURN)
  	__libc_fatal ("illegal status in internal_getgrouplist");
+@@ -124,10 +141,10 @@ int
+ getgrouplist (const char *user, gid_t group, gid_t *groups, int *ngroups)
+ {
+   gid_t *newgroups;
+-  long int size = *ngroups;
++  long int size = MAX (1, *ngroups);
+   int result;
+ 
+-  newgroups = (gid_t *) malloc (size * sizeof (gid_t));
++  newgroups = (gid_t *) malloc ((size + 1) * sizeof (gid_t));
+   if (__builtin_expect (newgroups == NULL, 0))
+     /* No more memory.  */
+     // XXX This is wrong.  The user provided memory, we have to use
 --- glibc-20041005T0745/iconv/iconvconfig.c	24 Sep 2004 17:09:04 -0000	1.20
 +++ glibc-20041005T0745-fedora/iconv/iconvconfig.c	22 Sep 2004 21:20:51 -0000	1.19.2.1
 @@ -989,6 +989,34 @@ next_prime (uint32_t seed)
@@ -1952,7 +1971,7 @@
 +}
 +
 --- glibc-20041005T0745/nscd/initgrcache.c	30 Sep 2004 02:18:04 -0000	1.1
-+++ glibc-20041005T0745-fedora/nscd/initgrcache.c	5 Oct 2004 12:09:43 -0000	1.1.2.3
++++ glibc-20041005T0745-fedora/nscd/initgrcache.c	5 Oct 2004 15:43:27 -0000	1.1.2.4
 @@ -117,6 +117,7 @@ addinitgroupsX (struct database_dyn *db,
    /* Nothing added yet.  */
    while (! no_more)
@@ -1975,9 +1994,9 @@
 +	      break;
 +
 +	  if (inner < prev_start)
-+	    ++cnt;
-+	  else
 +	    groups[cnt] = groups[--start];
++	  else
++	    ++cnt;
 +	}
 +
        if (status != NSS_STATUS_TRYAGAIN)
