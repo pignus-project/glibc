@@ -1,6 +1,6 @@
-%define glibcdate 20041208T1024
+%define glibcdate 20041210T0634
 %define glibcversion 2.3.3
-%define glibcrelease 89
+%define glibcrelease 90
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -288,6 +288,9 @@ cat > asm/unistd.h <<EOF
 #define __NR_mq_notify			436
 #define __NR_mq_getsetattr		437
 #endif
+#ifndef __NR_waitid
+#define __NR_waitid			438
+#endif
 %endif
 %ifarch %{ix86}
 #ifndef __NR_mq_open
@@ -321,6 +324,9 @@ cat > asm/unistd.h <<EOF
 #define __NR_mq_timedreceive		1265
 #define __NR_mq_notify			1266
 #define __NR_mq_getsetattr		1267
+#endif
+#ifndef __NR_waitid
+#define __NR_waitid			1270
 #endif
 %endif
 %ifarch ppc
@@ -1261,6 +1267,14 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Dec 10 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-90
+- update from CVS
+  - regex speedups
+  - use | cat in ldd if running under bash3+ to allow running
+    it on binaries that are not through SELinux allowed to access
+    console or tty
+- add __NR_waitid defines for alpha and ia64
+
 * Wed Dec  8 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-89
 - update from CVS
   - fix clone2 on ia64
