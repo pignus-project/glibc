@@ -1,4 +1,4 @@
-%define glibcrelease 3
+%define glibcrelease 6
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200312301455
+%define glibcdate 200401211454
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -19,6 +19,7 @@ Patch0: %{name}-redhat.patch
 Patch1: %{name}-nptl-check.patch
 Patch2: %{name}-ppc-assume.patch
 Patch3: %{name}-execstack-disable.patch
+Patch4: glibc-relro.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -258,6 +259,7 @@ gcc*\ 3.2.3*)
 %patch3 -p1
   ;; esac ;;
 esac
+%patch4 -p1
 
 %ifnarch %{ix86} alpha alphaev6 sparc sparcv9
 rm -rf glibc-compat
@@ -1007,6 +1009,22 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jan 23 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-6
+- rebuilt with fixed GCC on IA-64
+
+* Thu Jan 22 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-5
+- fix PT_GNU_RELRO support
+
+* Wed Jan 21 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-4
+- update from CVS
+  - some further regex speedups
+  - fix re.translate handling in regex (#112869)
+  - change regfree to match old regex behaviour (what is freed
+    and clearing of freed pointers)
+  - fix accesses to unitialized memory in regex (#113507, #113425,
+    #113421)
+  - PT_GNU_RELRO support
+
 * Tue Dec 30 2003 Jakub Jelinek <jakub@redhat.com> 2.3.3-3
 - update from CVS
   - fix pmap_set fd and memory leak (#112726)
