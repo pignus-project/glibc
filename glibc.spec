@@ -1,4 +1,4 @@
-%define glibcrelease 7
+%define glibcrelease 18
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200401270958
+%define glibcdate 200403181017
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -19,7 +19,6 @@ Patch0: %{name}-redhat.patch
 Patch1: %{name}-nptl-check.patch
 Patch2: %{name}-ppc-assume.patch
 Patch3: %{name}-execstack-disable.patch
-Patch4: %{name}-relro.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -259,7 +258,6 @@ gcc*\ 3.2.3*)
 %patch3 -p1
   ;; esac ;;
 esac
-%patch4 -p1
 
 %ifnarch %{ix86} alpha alphaev6 sparc sparcv9
 rm -rf glibc-compat
@@ -329,7 +327,7 @@ WithTls="--without-tls --without-__thread"
 %endif
 CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
 	--enable-add-ons=$Pthreads$AddOns --without-cvs $EnableKernel \
-	--with-headers=%{_prefix}/include \
+	--with-headers=%{_prefix}/include --enable-bind-now \
 	$WithTls --build %{_target_cpu}-redhat-linux --host %{_target_cpu}-redhat-linux
 if [ -x /usr/bin/getconf ] ; then
   numprocs=$(/usr/bin/getconf _NPROCESSORS_ONLN)
@@ -396,7 +394,7 @@ WithTls="--without-tls --without-__thread"
 %endif
 CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
 	--enable-add-ons=$Pthreads$AddOns --without-cvs $EnableKernel \
-	--with-headers=%{_prefix}/include \
+	--with-headers=%{_prefix}/include --enable-bind-now \
 	$WithTls --build %{_target_cpu}-redhat-linux --host %{_target_cpu}-redhat-linux
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
 mkdir -p $RPM_BUILD_ROOT/lib/$SubDir/
@@ -433,7 +431,7 @@ WithTls="--with-tls --with-__thread"
 SubDir=tls
 CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
 	--enable-add-ons=$Pthreads$AddOns --without-cvs $EnableKernel \
-	--with-headers=%{_prefix}/include \
+	--with-headers=%{_prefix}/include --enable-bind-now \
 	$WithTls --build %{_target_cpu}-redhat-linux --host %{_target_cpu}-redhat-linux
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/$SubDir/
@@ -534,8 +532,9 @@ install -m 755 nscd/nscd.init $RPM_BUILD_ROOT/etc/rc.d/init.d/nscd
 rm -f $RPM_BUILD_ROOT/etc/ld.so.cache
 
 # Include ld.so.conf
-> $RPM_BUILD_ROOT/etc/ld.so.conf
+echo 'include ld.so.conf.d/*.conf' > $RPM_BUILD_ROOT/etc/ld.so.conf
 chmod 644 $RPM_BUILD_ROOT/etc/ld.so.conf
+mkdir $RPM_BUILD_ROOT/etc/ld.so.conf.d
 
 # Include %{_prefix}/%{_lib}/gconv/gconv-modules.cache
 > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
@@ -893,6 +892,8 @@ done
 [ "x$save_trace" = xyes ] && set -x
 %endif
 
+touch $RPM_BUILD_ROOT/%{_prefix}/lib/locale/locale-archive
+
 %post -p /usr/sbin/glibc_post_upgrade
 
 %postun -p /sbin/ldconfig
@@ -957,6 +958,7 @@ rm -f *.filelist*
 %verify(not md5 size mtime) %config(noreplace) /etc/localtime
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/ld.so.conf
+%dir /etc/ld.so.conf.d
 %doc README NEWS INSTALL FAQ BUGS NOTES PROJECTS CONFORMANCE
 %doc COPYING COPYING.LIB README.libm LICENSES
 %doc hesiod/README.hesiod
@@ -964,6 +966,7 @@ rm -f *.filelist*
 %ifnarch %{auxarches}
 %files -f common.filelist common
 %defattr(-,root,root)
+%attr(0644,root,root) %verify(not md5 size mtime mode) %ghost %config(missingok,noreplace) %{_prefix}/lib/locale/locale-archive
 %doc documentation/*
 
 %files -f devel.filelist devel
@@ -1009,6 +1012,54 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Mar 18 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-18
+- update from CVS
+  - fix ia64 iopl (#118591)
+  - add support for /etc/ld.so.conf.d/*.conf
+  - fix x86-64 LD_DEBUG=statistics
+- fix hwcap handling when using ld.so.cache (#118518)
+
+* Mon Mar 15 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-17
+- update from CVS
+  - implement non-_l function on top of _l functions
+
+* Thu Mar 11 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-16
+- update from CVS
+- fix s390{,x} TLS handling
+
+* Wed Mar 10 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-15
+- update from CVS
+  - special section for compatibility code
+  - make getpid () work even in vfork () child
+- configure with --enable-bind-now to avoid lazy binding in ld.so
+  and libc.so
+
+* Fri Mar  5 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-14
+- update from CVS
+  - fix iconv -c (#117021)
+  - fix PIEs on sparc/sparc64
+  - fix posix_fadvise on 64-bit architectures
+- add locale-archive as %%ghost file (#117014)
+
+* Mon Mar  1 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-13
+- update from CVS
+
+* Fri Feb 27 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-12
+- update from CVS
+
+* Fri Feb 27 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-11
+- update from CVS
+  - fix ld.so when vDSO is randomized
+
+* Fri Feb 20 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-10
+- update from CVS
+
+* Fri Feb 20 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-9
+- update from CVS
+
+* Tue Feb 10 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-8
+- update from CVS
+
 * Tue Jan 27 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-7
 - update from CVS
   - dl_iterate_phdr extension to signal number of added/removed
