@@ -1,4 +1,4 @@
-%define glibcrelease 101.2
+%define glibcrelease 101.3
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -49,6 +49,8 @@ Patch31: glibc-amd64-ldouble.patch
 Patch32: glibc-ia64-gas-bug.patch
 Patch33: glibc-ld-use-load-bias.patch
 Patch34: glibc-execstack-fix.patch
+Patch35: glibc-regex-bkref.patch
+Patch36: glibc-pmap-set.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes:  linuxthreads, gencat, locale, ldconfig, locale-ja
@@ -318,6 +320,8 @@ esac
 %patch32 -p1
 %patch33 -p1
 %patch34 -p1
+%patch35 -p1
+%patch36 -p1
 
 %ifnarch %{ix86} alpha alphaev6 sparc sparcv9
 rm -rf glibc-compat
@@ -1065,6 +1069,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Dec 30 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-101.3
+- fix pmap_set fd and memory leak (#112726)
+- fix backreference handling in regex
+
 * Tue Dec 30 2003 Jakub Jelinek <jakub@redhat.com> 2.3.2-101.2
 - fix to make pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, )
   really disable cancellation (#112512)
