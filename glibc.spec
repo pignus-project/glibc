@@ -1,4 +1,4 @@
-%define glibcrelease 29
+%define glibcrelease 30
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -6,7 +6,7 @@
 %define withtlsarches i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
-%define glibcdate 200405190641
+%define glibcdate 200405211317
 Summary: The GNU libc libraries.
 Name: glibc
 Version: 2.3.3
@@ -1219,6 +1219,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri May 21 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-30
+- fix pthread_cond_wait on architectures other than IA-32 and
+  x86_64
+
 * Thu May 20 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-29
 - use lib64 instead of lib on ia64 if %%{_lib} is defined to lib64
 
