@@ -2,7 +2,7 @@
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 Summary: The GNU libc libraries.
 Name: glibc
-Version: 2.2.2
+Version: 2.2.3
 Release: %{glibcrelease}
 Copyright: LGPL
 Group: System Environment/Libraries
@@ -23,16 +23,34 @@ Provides: ld.so.2
 Obsoletes: libc
 %endif
 Prereq: basesystem
+# This is for building auxiliary programs like memusage
+# For initial glibc bootstraps it can be commented out
+BuildPreReq: gd-devel libpng-devel zlib-devel
+%ifarch ix86 sparc sparcv9 alpha alphaev6
+# This is to ensure that __frame_state_for exported by glibc
+# will be compatible with egcs 1.x.y
+BuildPreReq: gcc >= 2.96-84
+%endif
+%ifarch ia64
+# Earlier gcc's die compiling glibc
+BuildPreReq: gcc >= 2.96-82
+%endif
 Conflicts: rpm <= 4.0-0.65
 Patch: glibc-kernel-2.4.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
+Conflicts: glibc-devel < 2.2.3
 %define enablekernel 2.4.0
+%define enablemask [01].*|2.[0-3]*
 %else
 %define enablekernel 2.2.5
-%endif
+%ifarch i686
 %define enablekernel2 2.4.1
-%define __find_provides %{_builddir}/%{name}-%{version}/find_provides.sh
+%define enablemask [01].*|2.[0-3]*|2.4.0*
+%else
+%define enablemask [01].*|2.[0-1]*|2.2.[0-4]*
+%endif
+%endif
 
 %description
 The glibc package contains standard libraries which are used by
@@ -52,6 +70,11 @@ Obsoletes: libc-debug, libc-headers, libc-devel, linuxthreads-devel
 Obsoletes: glibc-debug
 Prereq: kernel-headers
 Requires: kernel-headers >= 2.2.1, %{name} = %{version}
+%ifarch x86
+# Earlier gcc's had atexit reference in crtendS.o, which does not
+# work with this glibc where atexit is in libc_nonshared.a
+Conflicts: gcc < 2.96-79
+%endif
 Autoreq: true
 
 %description devel
@@ -114,27 +137,19 @@ you're not using a version 2.0 kernel.
 
 %prep
 %setup -q
-%ifarch ia64 sparc64 s390x %{auxarches}
-# If we are building enablekernel 2.4.1 glibc on older kernel,
+# If we are building enablekernel 2.x.y glibc on older kernel,
 # we have to make sure no binaries compiled against that glibc
 # are ever run
 case `uname -r` in
-[01].*|2.[0-3]*|2.4.0*)
+%enablemask)
 %patch -p1
 ;; esac
-%endif
 
 %ifarch armv4l sparc64 ia64 s390 s390x
 rm -rf glibc-compat
 %endif
 
 find . -type f -size 0 -o -name "*.orig" -exec rm -f {} \;
-
-cat > find_provides.sh <<EOF
-#!/bin/sh
-/usr/lib/rpm/find-provides | grep -v GLIBC_2.2.3
-EOF
-chmod +x find_provides.sh
 
 %build
 rm -rf build-%{_target_cpu}-linux
@@ -275,19 +290,8 @@ strip -R .comment $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown || :
 strip -R .comment $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/* || :
 
 # Hardlink identical locale files together
-ALL_LC="LC_ADDRESS LC_COLLATE LC_CTYPE LC_IDENTIFICATION LC_MEASUREMENT \
-	LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME \
-	LC_MESSAGES/SYS_LC_MESSAGES"
-for i in $RPM_BUILD_ROOT%{_prefix}/lib/locale/*; do
-  if [ ! -d $i ]; then continue; fi
-  for j in $ALL_LC; do
-    for k in $RPM_BUILD_ROOT%{_prefix}/lib/locale/*; do
-      if [ ! -d $k ]; then continue; fi
-      if [ $i = $k ]; then break; fi
-      if cmp -s $i/$j $k/$j; then ln -f $k/$j $i/$j; break; fi
-    done
-  done
-done
+gcc -O2 -o build-%{_target_cpu}-linux/hardlink redhat/hardlink.c
+build-%{_target_cpu}-linux/hardlink -vc $RPM_BUILD_ROOT%{_prefix}/lib/locale
 
 # BUILD THE FILE LIST
 find $RPM_BUILD_ROOT -type f -or -type l |
@@ -433,6 +437,60 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue May 22 2001 Jakub Jelinek <jakub@redhat.com>
+- fix #include <signal.h> with -D_XOPEN_SOURCE=500 on ia64 (#35968)
+- fix a dlclose reldeps handling bug
+- some more profiling fixes
+- fix tgmath.h
+
+* Thu May 17 2001 Jakub Jelinek <jakub@redhat.com>
+- make ldconfig more quiet
+- fix LD_PROFILE on i686 (#41030)
+
+* Wed May 16 2001 Jakub Jelinek <jakub@redhat.com>
+- fix the hardlink program, so that it really catches all files with
+  identical content
+- add a s390x clone fix
+
+* Wed May 16 2001 Jakub Jelinek <jakub@redhat.com>
+- fix rpc for non-threaded apps using svc_fdset and similar variables (#40409)
+- fix nss compatibility DSO versions for alphaev6
+- add a hardlink program instead of the shell 3x for plus cmp -s/link
+  which takes a lot of time during build
+- rework BuildPreReq and Conflicts with gcc, so that
+  it applies only where it has to
+
+* Fri May 11 2001 Jakub Jelinek <jakub@redhat.com>
+- fix locale name of ja_JP in UTF-8 (#39783)
+- fix re_search_2 (#40244)
+- fix memusage script (#39138, #39823)
+- fix dlsym(RTLD_NEXT, ) from main program (#39803)
+- fix xtrace script (#39609)
+- make glibc conflict with glibc-devel 2.2.2 and below (to make sure
+  libc_nonshared.a has atexit)
+- fix getconf LFS_CFLAGS on 64bitters
+- recompile with gcc-2.96-84 or above to fix binary compatibility problem
+  with __frame_state_for function (#37933)
+
+* Fri Apr 27 2001 Jakub Jelinek <jakub@redhat.com>
+- glibc 2.2.3 release
+  - fix strcoll (#36539)
+- add BuildPreReqs (#36378)
+
+* Wed Apr 25 2001 Jakub Jelinek <jakub@redhat.com>
+- update from CVS
+
+* Fri Apr 20 2001 Jakub Jelinek <jakub@redhat.com>
+- update from CVS
+  - fix sparc64, ia64
+  - fix some locale syntax errors (#35982)
+
+* Wed Apr 18 2001 Jakub Jelinek <jakub@redhat.com>
+- update from CVS
+
+* Wed Apr 11 2001 Jakub Jelinek <jakub@redhat.com>
+- update from CVS
+
 * Fri Apr  6 2001 Jakub Jelinek <jakub@redhat.com>
 - support even 2.4.0 kernels on ia64, sparc64 and s390x
 - include UTF-8 locales
