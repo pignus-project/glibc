@@ -1,4 +1,4 @@
-%define glibcrelease 34
+%define glibcrelease 34.1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches i686 athlon alpha alphaev6
 %define prelinkdate 20020326
@@ -28,10 +28,11 @@ BuildPreReq: gd-devel libpng-devel zlib-devel
 BuildPreReq: libelf >= 0.7.0-2
 # This is to ensure that __frame_state_for exported by glibc
 # will be compatible with egcs 1.x.y
-BuildPreReq: gcc >= 2.96-84
 Conflicts: rpm <= 4.0-0.65
 Conflicts: glibc-devel < 2.2.3
 Patch: glibc-kernel-2.4.patch
+Patch1: glibc-2.2.4-s390-2.patch
+Patch2: glibc-2.2.4-s390-3.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
@@ -184,6 +185,8 @@ case `uname -r` in
 %enablemask)
 %patch -p1
 ;; esac
+%patch1 -p1
+%patch2 -p1
 
 %ifarch %{prelinkarches}
 mkdir prelink
