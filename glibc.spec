@@ -1,4 +1,4 @@
-%define glibcrelease 52
+%define glibcrelease 53
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -1260,11 +1260,14 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Sep 14 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-53
+- restore temporarily old definition of __P()/__PMT()
+  for third party apps
+
 * Tue Sep 14 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-52
 - update from CVS
   - nscd bi-arch fix
-  - restore old definition of __P() macro, remove all uses from
-    glibc
+  - remove all uses of __P()/__PMT() from glibc headers
 - update and reenable nscd SELinux patch
 - remove libnss1* and libnss*.so.1 compatibility NSS modules
   on IA-32, SPARC and Alpha
