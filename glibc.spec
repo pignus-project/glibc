@@ -1,6 +1,6 @@
 %define glibcdate 20041119T0003
 %define glibcversion 2.3.3
-%define glibcrelease 80
+%define glibcrelease 81
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -1258,6 +1258,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Nov 19 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-81
+- don't use chunksize in <= 2 * SIZE_SZ free () checks
+
 * Fri Nov 19 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-80
 - update from CVS
   - with -D_FORTIFY_SOURCE=2, prevent missing %N$ formats
