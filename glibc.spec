@@ -1,9 +1,9 @@
-%define glibcrelease 5
+%define glibcrelease 1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
-%define prelinkarches i686 athlon alpha alphaev6 sparc sparcv9
+%define prelinkarches i686 athlon alpha alphaev6
 Summary: The GNU libc libraries.
 Name: glibc
-Version: 2.2.93
+Version: 2.3
 Release: %{glibcrelease}
 Copyright: LGPL
 Group: System Environment/Libraries
@@ -185,12 +185,14 @@ case `uname -r` in
 %patch -p1
 ;; esac
 
-%ifarch armv4l sparc64 ia64 s390 s390x
+%ifnarch %{ix86} alpha alphaev6 sparc sparcv9
 rm -rf glibc-compat
 %endif
 
-# Waiting for explanation...
-rm -f sysdeps/powerpc/memset.S
+# A lot of programs still misuse memcpy when they have to use
+# memmove. The memcpy implementation below is not tolerant at
+# all.
+rm -f sysdeps/alpha/alphaev6/memcpy.S
 
 find . -type f -size 0 -o -name "*.orig" -exec rm -f {} \;
 cat > find_provides.sh <<EOF
@@ -199,7 +201,7 @@ cat > find_provides.sh <<EOF
 exit 0
 EOF
 chmod +x find_provides.sh
-touch sysdeps/*/elf/configure configure
+touch `find . -name configure`
 
 %build
 rm -rf build-%{_target_cpu}-linux
@@ -426,11 +428,6 @@ popd
 #  --mmap-region-start=0x0000020000000000 $RPM_BUILD_ROOT/%{_lib}/ld-*.so
 /usr/sbin/prelink --reloc-only=0x0000020010000000 $RPM_BUILD_ROOT/%{_lib}/libc-*.so
 %endif
-%ifarch sparc sparcv9
-# Prelink libc.so
-> prelink.conf
-/usr/sbin/prelink --reloc-only=0x72000000 $RPM_BUILD_ROOT/%{_lib}/libc-*.so
-%endif
 
 # rquota.x and rquota.h are now provided by quota
 rm -f $RPM_BUILD_ROOT%{_prefix}/include/rpcsvc/rquota.[hx]
@@ -654,6 +651,26 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Oct  3 2002 Jakub Jelinek <jakub@redhat.com> 2.3-1
+- update to 2.3 final
+  - fix freopen on libstdc++ <= 2.96 stdin/stdout/stderr (#74800)
+
+* Sun Sep 29 2002 Jakub Jelinek <jakub@redhat.com> 2.2.94-3
+- don't prelink -r libc.so on ppc/x86-64/sparc*, it doesn't
+  speed things up, because they are neither REL arches, nor
+  ELF_MACHINE_REL_RELATIVE
+- fix sparc64 build
+
+* Sun Sep 29 2002 Jakub Jelinek <jakub@redhat.com> 2.2.94-2
+- update from CVS
+
+* Sat Sep 28 2002 Jakub Jelinek <jakub@redhat.com> 2.2.94-1
+- update from CVS
+- prelink on ppc and x86-64 too
+- don't remove ppc memset
+- instead of listing on which arches to remove glibc-compat
+  list where it should stay
+
 * Fri Sep  6 2002 Jakub Jelinek <jakub@redhat.com> 2.2.93-5
 - fix wcsmbs functions with invalid character sets (or malloc
   failures)
