@@ -1,8 +1,8 @@
 %define linux24 0
-%define glibcrelease 2
+%define glibcrelease 1
 Summary: The GNU libc libraries.
 Name: glibc
-Version: 2.1.93
+Version: 2.1.95
 %if %{linux24}
 Release: %{glibcrelease}.2.4
 %else
@@ -38,8 +38,8 @@ Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
 %else
 %ifarch sparc64
-Conflicts: kernel < 2.3.40
-%define enablekernel 2.3.40
+Conflicts: kernel < 2.4.0
+%define enablekernel 2.4.0
 %else
 %define enablekernel 2.2.5
 %endif
@@ -170,7 +170,7 @@ else
   numprocs=1
 fi
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
-gcc -Os ../redhat/glibc_post_upgrade.c -o glibc_post_upgrade
+gcc -static -Os ../redhat/glibc_post_upgrade.c -o glibc_post_upgrade
 
 %install
 rm -rf $RPM_BUILD_ROOT
