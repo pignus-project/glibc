@@ -1,8 +1,8 @@
-%define glibcrelease 11
+%define glibcrelease 13
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 Summary: The GNU libc libraries.
 Name: glibc
-Version: 2.2.3
+Version: 2.2.4
 Release: %{glibcrelease}
 Copyright: LGPL
 Group: System Environment/Libraries
@@ -48,9 +48,10 @@ Conflicts: kernel < 2.4.0
 %define enablekernel2 2.4.1
 %define enablemask [01].*|2.[0-3]*|2.4.0*
 %else
-%define enablemask [01].*|2.[0-1]*|2.2.[0-4]*
+%define enablemask [01].*|2.[0-1]*|2.2.[0-4]|2.2.[0-4][^0-9]*
 %endif
 %endif
+%define __find_provides %{_builddir}/%{name}-%{version}/find_provides.sh
 
 %description
 The glibc package contains standard libraries which are used by
@@ -80,7 +81,7 @@ Autoreq: true
 %description devel
 The glibc-devel package contains the header and object files necessary
 for developing programs which use the standard C libraries (which are
-used by nearly all programs).  If you are developing programs which
+used by nearly all programs). If you are developing programs which
 will use the standard C libraries, your system needs to have these
 standard header and object files available in order to create the
 executables.
@@ -96,9 +97,9 @@ Autoreq: true
 
 %description profile
 The glibc-profile package includes the GNU libc libraries and support
-for profiling using the gprof program.  Profiling is analyzing a
+for profiling using the gprof program. Profiling is analyzing a
 program's functions to see how much CPU time they use and determining
-which functions are calling other functions during execution.  To use
+which functions are calling other functions during execution. To use
 gprof to profile a program, your program needs to use the GNU libc
 libraries included in glibc-profile (instead of the standard GNU libc
 libraries included in the glibc package).
@@ -107,7 +108,7 @@ If you are going to use the gprof program to profile a program, you'll
 need to install the glibc-profile program.
 
 %package common
-Summary: Common binaries and locale data for glibc
+Summary: Common binaries and locale data for glibc.
 Conflicts: %{name} < %{version}
 Conflicts: %{name} > %{version} 
 Autoreq: false
@@ -122,18 +123,12 @@ databases.
 Summary: A Name Service Caching Daemon (nscd).
 Group: System Environment/Daemons
 Conflicts: kernel < 2.2.0
-Prereq: /sbin/chkconfig, /usr/sbin/useradd, /usr/sbin/userdel
+Prereq: /sbin/chkconfig, /usr/sbin/useradd, /usr/sbin/userdel, sh-utils
 Autoreq: true
 
 %description -n nscd
-Nscd caches name service lookups and can dramatically improve
-performance with NIS+, and may help with DNS as well. Note that you
-can't use nscd with 2.0 kernels because of bugs in the kernel-side
-thread support. Unfortunately, nscd happens to hit these bugs
-particularly hard.
-
-Install nscd if you need a name service lookup caching daemon, and
-you're not using a version 2.0 kernel.
+Nscd caches name service lookups. It can dramatically improve
+performance with NIS+ and may help with DNS as well.
 
 %prep
 %setup -q
@@ -150,6 +145,11 @@ rm -rf glibc-compat
 %endif
 
 find . -type f -size 0 -o -name "*.orig" -exec rm -f {} \;
+cat > find_provides.sh <<EOF
+#!/bin/sh
+/usr/lib/rpm/find-provides | grep -v GLIBC_2.2.5
+EOF
+chmod +x find_provides.sh
 
 %build
 rm -rf build-%{_target_cpu}-linux
@@ -195,15 +195,25 @@ else
   numprocs=1
 fi
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
-gcc -static -Os ../redhat/glibc_post_upgrade.c -o glibc_post_upgrade
+gcc -static -Os ../redhat/glibc_post_upgrade.c -o glibc_post_upgrade '-DGCONV_MODULES_CACHE="%{_prefix}/%{_lib}/gconv/gconv-modules.cache"'
 
 %install
+if [ -x /usr/bin/getconf ] ; then
+  numprocs=$(/usr/bin/getconf _NPROCESSORS_ONLN)
+  if [ $numprocs -eq 0 ]; then
+    numprocs=1
+  fi
+else
+  numprocs=1
+fi
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT
 make install_root=$RPM_BUILD_ROOT install -C build-%{_target_cpu}-linux
+%ifnarch %{auxarches}
 cd build-%{_target_cpu}-linux && \
-    make install_root=$RPM_BUILD_ROOT install-locales -C ../localedata objdir=`pwd` && \
+    make -j$numprocs install_root=$RPM_BUILD_ROOT install-locales -C ../localedata objdir=`pwd` && \
     cd ..
+%endif
 
 %ifarch i686
 rm -rf build-%{_target_cpu}-linux2.4
@@ -279,6 +289,10 @@ rm -f $RPM_BUILD_ROOT/etc/ld.so.cache
 > $RPM_BUILD_ROOT/etc/ld.so.conf
 chmod 644 $RPM_BUILD_ROOT/etc/ld.so.conf
 
+# Include %{_prefix}/%{_lib}/gconv/gconv-modules.cache
+> $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
+chmod 644 $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
+
 # Install the upgrade program
 install -m 700 build-%{_target_cpu}-linux/glibc_post_upgrade $RPM_BUILD_ROOT/usr/sbin/glibc_post_upgrade
 
@@ -289,17 +303,24 @@ strip -R .comment $RPM_BUILD_ROOT%{_prefix}/sbin/* || :
 strip -R .comment $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown || :
 strip -R .comment $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/* || :
 
+# rquota.x and rquota.h are now provided by quota
+rm -f $RPM_BUILD_ROOT%{_prefix}/include/rpcsvc/rquota.[hx]
+
 # Hardlink identical locale files together
+%ifnarch %{auxarches}
 gcc -O2 -o build-%{_target_cpu}-linux/hardlink redhat/hardlink.c
 build-%{_target_cpu}-linux/hardlink -vc $RPM_BUILD_ROOT%{_prefix}/lib/locale
+%endif
 
 # BUILD THE FILE LIST
 find $RPM_BUILD_ROOT -type f -or -type l |
 	sed -e 's|.*/etc|%config &|' \
-	    -e 's|.*/gconv/gconv-modules|%verify(not md5 size mtime) %config(noreplace) &|' > rpm.filelist.in
+	    -e 's|.*/gconv/gconv-modules$|%verify(not md5 size mtime) %config(noreplace) &|' \
+	    -e 's|.*/gconv/gconv-modules.cache|%verify(not md5 size mtime) &|' > rpm.filelist.in
 for n in %{_prefix}/share %{_prefix}/include %{_prefix}/lib/locale; do 
     find ${RPM_BUILD_ROOT}${n} -type d | \
 	grep -v '%{_prefix}/share$' | \
+	grep -v '\(%{_mandir}\|%{_infodir}\)' | \
 	sed "s/^/%dir /" >> rpm.filelist.in
 done
 
@@ -334,18 +355,20 @@ grep -v '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist.full |
 	grep -v '%{_prefix}/%{_lib}/lib.*\.so'|
 	grep -v '%{_mandir}' | 
 	grep -v 'nscd' > rpm.filelist
-	
+
+%ifnarch %{auxarches}
 grep '%{_prefix}/bin' < rpm.filelist >> common.filelist
 grep '%{_prefix}/lib/locale' < rpm.filelist >> common.filelist
 grep '%{_prefix}/libexec' < rpm.filelist >> common.filelist
-grep '%{_prefix}/sbin/[^g]' < rpm.filelist >> common.filelist
+grep '%{_prefix}/sbin/[^gi]' < rpm.filelist >> common.filelist
 grep '%{_prefix}/share' < rpm.filelist >> common.filelist
+%endif
 
 mv rpm.filelist rpm.filelist.full
 grep -v '%{_prefix}/bin' < rpm.filelist.full |
 	grep -v '%{_prefix}/lib/locale' |
 	grep -v '%{_prefix}/libexec' | 
-	grep -v '%{_prefix}/sbin/[^g]' |
+	grep -v '%{_prefix}/sbin/[^gi]' |
 	grep -v '%{_prefix}/share' > rpm.filelist
 
 # /etc/localtime - we're proud of our timezone
@@ -411,6 +434,9 @@ rm -f *.filelist*
 
 %files -f rpm.filelist
 %defattr(-,root,root)
+%ifarch i686
+%dir /lib/i686
+%endif
 %verify(not md5 size mtime) %config(noreplace) /etc/localtime
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/ld.so.conf
@@ -437,6 +463,105 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Sep  3 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-13
+- fix iconvconfig
+
+* Mon Sep  3 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-12
+- add fam to /etc/rpc (#52863)
+- fix <inttypes.h> for C++ (#52960)
+- fix perror
+
+* Mon Aug 27 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-11
+- fix strnlen(x, -1)
+
+* Mon Aug 27 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-10
+- doh, <bits/libc-lock.h> should only define __libc_rwlock_t
+  if __USE_UNIX98.
+
+* Mon Aug 27 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-9
+- fix bits/libc-lock.h so that gcc can compile
+- fix s390 build
+
+* Fri Aug 24 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-8
+- kill stale library symlinks in ldconfig (#52350)
+- fix inttypes.h for G++ < 3.0
+- use DT_REL*COUNT
+
+* Wed Aug 22 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-7
+- fix strnlen on IA-64 (#50077)
+
+* Thu Aug 16 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-6
+- glibc 2.2.4 final
+- fix -lpthread -static (#51672)
+
+* Fri Aug 10 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-5
+- doh, include libio/tst-swscanf.c
+
+* Fri Aug 10 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-4
+- don't crash on catclose(-1)
+- fix wscanf %[] handling
+- fix return value from swprintf
+- handle year + %U/%W week + week day in strptime
+
+* Thu Aug  9 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-3
+- update from CVS to
+  - fix strcoll (#50548)
+  - fix seekdir (#51132)
+  - fix memusage (#50606)
+- don't make gconv-modules.cache %%config file, just don't verify
+  its content.
+
+* Mon Aug  6 2001 Jakub Jelinek <jakub@redhat.com>
+- fix strtod and *scanf (#50723, #50724)
+
+* Sat Aug  4 2001 Jakub Jelinek <jakub@redhat.com>
+- update from CVS
+  - fix iconv cache handling
+- glibc should not own %{_infodir}, %{_mandir} nor %{_mandir}/man3 (#50673)
+- add gconv-modules.cache as emtpy config file (#50699)
+- only run iconvconfig if /usr is mounted read-write (#50667)
+
+* Wed Jul 25 2001 Jakub Jelinek <jakub@redhat.com>
+- move iconvconfig from glibc-common into glibc subpackage,
+  call it from glibc_post_upgrade instead of common's post.
+
+* Tue Jul 24 2001 Jakub Jelinek <jakub@redhat.com>
+- turn off debugging printouts in iconvconfig
+
+* Tue Jul 24 2001 Jakub Jelinek <jakub@redhat.com>
+- update from CVS
+  - fix IA-32 makecontext
+  - make fflush(0) thread-safe (#46446)
+
+* Mon Jul 23 2001 Jakub Jelinek <jakub@redhat.com>
+- adjust prelinking DT_* and SHT_* values in elf.h
+- update from CVS
+  - iconv cache
+  - make iconv work in SUID/SGID programs (#34611)
+
+* Fri Jul 20 2001 Jakub Jelinek <jakub@redhat.com>
+- update from CVS
+  - kill non-pic code in libm.so
+  - fix getdate
+  - fix some locales (#49402)
+- rebuilt with binutils-2.11.90.0.8-5 to place .interp section
+  properly in libBrokenLocale.so, libNoVersion.so and libanl.so
+- add floating stacks on IA-64, Alpha, Sparc (#49308)
+
+* Mon Jul 16 2001 Jakub Jelinek <jakub@redhat.com>
+- make /lib/i686 directory owned by glibc*.i686.rpm
+
+* Mon Jul  9 2001 Jakub Jelinek <jakub@redhat.com>
+- remove rquota.[hx] headers which are now provided by quota (#47141)
+- add prelinking patch
+
+* Thu Jul  5 2001 Jakub Jelinek <jakub@redhat.com>
+- require sh-utils for nscd
+
+* Mon Jun 25 2001 Jakub Jelinek <jakub@redhat.com>
+- update from CVS (#43681, #43350, #44663, #45685)
+- fix ro_RO bug (#44644)
+
 * Wed Jun  6 2001 Jakub Jelinek <jakub@redhat.com>
 - fix a bunch of math bugs (#43210, #43345, #43346, #43347, #43348, #43355)
 - make rpc headers -ansi compilable (#42390)
