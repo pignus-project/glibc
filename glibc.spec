@@ -1,4 +1,4 @@
-%define glibcrelease 19.3m
+%define glibcrelease 24
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 Summary: The GNU libc libraries.
 Name: glibc
@@ -39,7 +39,10 @@ Conflicts: rpm <= 4.0-0.65
 Conflicts: glibc-devel < 2.2.3
 Patch: glibc-kernel-2.4.patch
 Patch2: glibc-2.2.4.patch
-Patch3: glibc-double-close.patch
+Patch3: glibc-2.2.4-fixes.patch
+Patch4: glibc-2.2.4-s390.patch
+Patch5: glibc-2.2.4-i386-postupgrade.patch
+Patch6: glibc-2.2.4-s390-2.patch
 %ifarch ia64 sparc64 s390x
 Conflicts: kernel < 2.4.0
 %define enablekernel 2.4.0
@@ -143,6 +146,11 @@ case `uname -r` in
 ;; esac
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%ifarch s390 s390x
+%patch6 -p1
+%endif
 
 %ifarch armv4l sparc64 ia64 s390 s390x
 rm -rf glibc-compat
@@ -202,7 +210,11 @@ else
   numprocs=1
 fi
 make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
-gcc -static -Os ../redhat/glibc_post_upgrade.c -o glibc_post_upgrade '-DGCONV_MODULES_CACHE="%{_prefix}/%{_lib}/gconv/gconv-modules.cache"'
+gcc -static -Os ../redhat/glibc_post_upgrade.c -o glibc_post_upgrade \
+%ifarch i386
+    -DARCH_386 '-DVERSION="%{version}"' '-DPVERSION="0.9"' \
+%endif
+    '-DGCONV_MODULES_CACHE="%{_prefix}/%{_lib}/gconv/gconv-modules.cache"'
 
 %install
 if [ -x /usr/bin/getconf ] ; then
@@ -483,6 +495,22 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Apr  2 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-24
+- remove nice(2) return value fix - too many apps broken,
+  so it is not appropriate for errata
+- add an s390 fix
+
+* Fri Mar 29 2002 Jakub Jelinek <jakub@redhat.com> 2.2.4-23
+- bug fixes from CVS HEAD, including
+  - fix nis from closing already closed fd (#61492)
+  - fix mutexes on IA-64 (#60674)
+  - fix ftime (#60350)
+  - fix tzset (#59951, #60747)
+- rebuilt with gcc-2.96-108.1 to fix accesses bellow sp on ia32
+  (#60763, #60745)
+- remove /lib/i686/ libraries in glibc_post_upgrade when
+  performing i386 glibc install
+
 * Sat Dec  8 2001 Jakub Jelinek <jakub@redhat.com> 2.2.4-19.3
 - fix inttypes.h typo (#57268)
 
