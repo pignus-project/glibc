@@ -1,6 +1,6 @@
-%define glibcdate 20041120T0949
+%define glibcdate 20041124T0741
 %define glibcversion 2.3.3
-%define glibcrelease 82
+%define glibcrelease 84
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -1258,6 +1258,23 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov 24 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-84
+- update from CVS
+  - fix memory leak in getaddrinfo if using nscd (#139559)
+  - handle large lines in /etc/hosts and /etc/networks
+    (#140378)
+  - add nonnull attributes to selected dirent.h and dlfcn.h
+    functions
+
+* Sun Nov 21 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-83
+- update from CVS
+  - add deprecated and/or nonnull attribute to some signal.h
+    functions
+  - speed up tzset () by only using stat instead of open/fstat
+    when calling tzset for the second and following time if
+    /etc/localtime has not changed
+- fix tgamma (BZ #552)
+
 * Sat Nov 20 2004 Jakub Jelinek <jakub@redhat.com> 2.3.3-82
 - update from CVS
   - some malloc () checking
