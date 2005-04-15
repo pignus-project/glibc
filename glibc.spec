@@ -1,7 +1,9 @@
-%define glibcdate 20050405T2114
+%define glibcdate 20050415T0909
 %define glibcname glibc
-%define glibcversion 2.3.4
-%define glibcrelease 21
+%define glibcsrcdir glibc-20050415T0909
+%define glibc_release_tarballs 0
+%define glibcversion 2.3.5
+%define glibcrelease 1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
@@ -15,9 +17,13 @@ Version: %{glibcversion}
 Release: %{glibcrelease}
 License: LGPL
 Group: System Environment/Libraries
-%define glibcsrcdir %{glibcname}-%{glibcdate}
 Source0: %{glibcsrcdir}.tar.bz2
-Source1: %{glibcname}-fedora-%{glibcdate}.tar.bz2
+%if %{glibc_release_tarballs}
+Source1: %(echo %{glibcsrcdir} | sed s/glibc-/glibc-linuxthreads-/).tar.bz2
+Source2: %(echo %{glibcsrcdir} | sed s/glibc-/glibc-libidn-/).tar.bz2
+%define glibc_release_unpack -a1 -a2
+%endif
+Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-nptl-check.patch
 Patch2: %{name}-ppc-assume.patch
@@ -256,7 +262,7 @@ package or when debugging this package.
 %endif
 
 %prep
-%setup -q -n %{glibcsrcdir} -a1
+%setup -q -n %{glibcsrcdir} %{glibc_release_unpack} -a3
 %patch0 -E -p1
 case "`gcc --version | head -1`" in
 gcc*\ 3.[34]*)
@@ -1263,6 +1269,14 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Apr 15 2005 Roland McGrath <roland@redhat.com> 2.3.5-1
+- update from CVS
+  - fix execvp regression (BZ#851)
+  - ia64 libm updates
+  - sparc updates
+  - grok PT_NOTE in vDSO for kernel version and extra hwcap dirs,
+    support "hwcap" keyword in ld.so.conf files
+
 * Tue Apr  4 2005 Jakub Jelinek <jakub@redhat.com> 2.3.4-21
 - update from CVS
   - fix xdr_rmtcall_args on 64-bit arches (#151686)
