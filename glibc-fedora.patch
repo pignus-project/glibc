@@ -3329,3 +3329,21 @@
 -    exp2l;
 -  }
 -}
+--- libc/linuxthreads/sysdeps/pthread/getcpuclockid.c	2005-04-27 13:04:55.000000000 +0200
++++ libc/linuxthreads/sysdeps/pthread/getcpuclockid.c	2005-04-27 14:52:42.000000000 +0200
+@@ -1,5 +1,5 @@
+ /* pthread_getcpuclockid -- Get POSIX clockid_t for a pthread_t.  Linux version
+-   Copyright (C) 2000, 2001, 2004 Free Software Foundation, Inc.
++   Copyright (C) 2000, 2001, 2004, 2005 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+ 
+    The GNU C Library is free software; you can redistribute it and/or
+@@ -23,7 +23,7 @@
+ #include <time.h>
+ #include <internals.h>
+ #include "kernel-features.h"
+-#include "posix-cpu-timers.h"
++#include "kernel-posix-cpu-timers.h"
+ 
+ 
+ #if !(__ASSUME_POSIX_CPU_TIMERS > 0)
