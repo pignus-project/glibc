@@ -3342,10 +3342,11 @@
  #include <sys/time.h>
  #include <time.h>
  #include <internals.h>
-+#include <spinlock.h>
- #include "kernel-features.h"
+-#include "kernel-features.h"
 -#include "posix-cpu-timers.h"
-+#include "kernel-posix-cpu-timers.h"
++#include <spinlock.h>
++#include <kernel-features.h>
++#include <kernel-posix-cpu-timers.h>
  
  
  #if !(__ASSUME_POSIX_CPU_TIMERS > 0)
@@ -3364,3 +3365,23 @@
        if (!INTERNAL_SYSCALL_ERROR_P (r, err))
  # endif
  	{
+--- libc/nptl/sysdeps/unix/sysv/linux/pthread_getcpuclockid.c	2005-04-27 13:05:16.000000000 +0200
++++ libc/nptl/sysdeps/unix/sysv/linux/pthread_getcpuclockid.c	2005-04-27 15:49:32.000000000 +0200
+@@ -1,5 +1,5 @@
+ /* pthread_getcpuclockid -- Get POSIX clockid_t for a pthread_t.  Linux version
+-   Copyright (C) 2000,2001,2002,2003,2004 Free Software Foundation, Inc.
++   Copyright (C) 2000,2001,2002,2003,2004,2005 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+ 
+    The GNU C Library is free software; you can redistribute it and/or
+@@ -21,8 +21,8 @@
+ #include <pthreadP.h>
+ #include <sys/time.h>
+ #include <tls.h>
+-#include "kernel-features.h"
+-#include "kernel-posix-cpu-timers.h"
++#include <kernel-features.h>
++#include <kernel-posix-cpu-timers.h>
+ 
+ 
+ #if !(__ASSUME_POSIX_CPU_TIMERS > 0)
