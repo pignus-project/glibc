@@ -1,14 +1,22 @@
-%define glibcdate 20050415T0909
+%define glibcdate 20050427T1043
 %define glibcname glibc
-%define glibcsrcdir glibc-20050415T0909
+%define glibcsrcdir glibc-20050427T1043
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.5
-%define glibcrelease 1
+%define glibcrelease 2
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 ppc ppc64
-%define rtkaioarches noarch
 %define withtlsarches i386 i686 athlon x86_64 ia64 s390 s390x alpha alphaev6 sparc sparcv9 ppc ppc64
+%define xenarches i686 athlon
+%ifarch %{xenarches}
+%define buildxen 1
+%define xenpackage 1
+%else
+%define buildxen 0
+%define xenpackage 0
+%endif
+%define rtkaioarches noarch
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
 Summary: The GNU libc libraries.
@@ -96,6 +104,20 @@ kept in one place and shared between programs. This particular package
 contains the most important sets of shared libraries: the standard C
 library and the standard math library. Without these two libraries, a
 Linux system will not function.
+
+%if %{xenpackage}
+%package xen
+Summary: The GNU libc libraries (optimized for running under Xen)
+Group: System Environment/Libraries
+Requires: glibc = %{version}-%{release}, glibc-utils = %{version}-%{release}
+
+%description xen
+The standard glibc package is optimized for native kernels and does not
+perform as well under the Xen hypervisor.  This package provides alternative
+library binaries that will be selected instead when running under Xen.
+
+Install glibc-xen if you might run your system under the Xen hypervisor.
+%endif
 
 %package devel
 Summary: Object files for development using standard C libraries.
@@ -573,18 +595,30 @@ cd ..
 %endif
 
 %ifarch %{nptlarches}
-rm -rf build-%{nptl_target_cpu}-linuxnptl
-mkdir build-%{nptl_target_cpu}-linuxnptl ; cd build-%{nptl_target_cpu}-linuxnptl
+build_nptl()
+{
+builddir=build-%{nptl_target_cpu}-$1
+shift
+rm -rf $builddir
+mkdir $builddir ; cd $builddir
 EnableKernel="--enable-kernel=%{enablekernelnptl} --disable-profile"
 Pthreads=nptl
 WithTls="--with-tls --with-__thread"
-CC="$GCC" CFLAGS="$BuildFlags -g -O3" ../configure --prefix=%{_prefix} \
+build_CFLAGS="$BuildFlags -g -O3 $*"
+CC="$GCC" CFLAGS="$build_CFLAGS" ../configure --prefix=%{_prefix} \
 	--enable-add-ons=$Pthreads$AddOns --without-cvs $EnableKernel \
 	--with-headers=%{_prefix}/include --enable-bind-now \
 	$WithTls --build %{nptl_target_cpu}-redhat-linux --host %{nptl_target_cpu}-redhat-linux
-make -j$numprocs -r CFLAGS="$BuildFlags -g -O3" PARALLELMFLAGS=-s
+make -j$numprocs -r CFLAGS="$build_CFLAGS" PARALLELMFLAGS=-s
 
 cd ..
+}
+
+build_nptl linuxnptl
+
+%if %{buildxen}
+build_nptl linuxnptl-nosegneg -mno-tls-direct-seg-refs
+%endif
 %endif
 
 %install
@@ -647,12 +681,14 @@ cd ..
 %endif
 
 %ifarch %{nptlarches}
-cd build-%{nptl_target_cpu}-linuxnptl
+ObsDir=obsolete/linuxthreads
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/obsolete/linuxthreads
 mv -f $RPM_BUILD_ROOT/%{_lib}/lib{c,m,pthread,rt,thread_db}[.-]*so* $RPM_BUILD_ROOT/%{_lib}/obsolete/linuxthreads/
+
+install_nptl() {
+cd build-%{nptl_target_cpu}-$1
 Pthreads=nptl
-SubDir=
-ObsDir=obsolete/linuxthreads
+SubDir=$2
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/$SubDir/
 cp -a libc.so $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/$ObsDir/libc-*.so`
 ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/$ObsDir/libc-*.so` $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/$ObsDir/libc.so.*`
@@ -671,6 +707,9 @@ ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/$ObsDir/librt-*.so` $RPM_BUILD_ROOT/%{_
 %endif
 cp -a ${Pthreads}_db/libthread_db.so $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/$ObsDir/libthread_db-*.so`
 ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/$ObsDir/libthread_db-*.so` $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/$ObsDir/libthread_db.so.*`
+}
+
+install_nptl linuxnptl
 
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/%{_lib}/linuxthreads
 mv -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/{libc,libpthread,libpthread_nonshared,librt}.a \
@@ -706,6 +745,12 @@ popd
 rm -rf $RPM_BUILD_ROOT/nptl
 
 cd ..
+
+%if %{buildxen}
+%define nosegneg_subdir i686/nosegneg
+install_nptl linuxnptl-nosegneg %{nosegneg_subdir}
+cd ..
+%endif
 
 %endif
 
@@ -876,6 +921,13 @@ grep -v '%{_prefix}/bin' < rpm.filelist.full |
 	grep -v '%{_prefix}/sbin/[^gi]' |
 	grep -v '%{_prefix}/share' > rpm.filelist
 
+> nosegneg.filelist
+%if %{xenpackage}
+grep '/%{_lib}/%{nosegneg_subdir}' < rpm.filelist >> nosegneg.filelist
+mv rpm.filelist rpm.filelist.full
+grep -v '/%{_lib}/%{nosegneg_subdir}' < rpm.filelist.full > rpm.filelist
+%endif
+
 echo '%{_prefix}/sbin/build-locale-archive' >> common.filelist
 echo '%{_prefix}/sbin/nscd' > nscd.filelist
 
@@ -948,6 +1000,12 @@ echo ====================TESTING NPTL====================
 cd build-%{nptl_target_cpu}-linuxnptl
 make -j$numprocs -k check PARALLELMFLAGS=-s 2>&1 | tee check.log || :
 cd ..
+%if %{buildxen}
+echo ====================TESTING NPTL -mno-tls-direct-seg-refs=============
+cd build-%{nptl_target_cpu}-linuxnptl-nosegneg
+make -j$numprocs -k check PARALLELMFLAGS=-s 2>&1 | tee check.log || :
+cd ..
+%endif
 %endif
 echo ====================TESTING DETAILS=================
 for i in `sed -n 's|^.*\*\*\* \[\([^]]*\.out\)\].*$|\1|p' build-*-linux*/check.log`; do
@@ -1004,7 +1062,8 @@ echo -n > $csf
 strip $RPM_BUILD_ROOT/{sbin/ldconfig,usr/sbin/glibc_post_upgrade.%{_target_cpu},usr/sbin/build-locale-archive}
 
 # Strip ELF binaries
-for f in `grep -v '%%\(dir\|lang\|config\|verify\)' rpm.filelist`; do
+for f in `cat rpm.filelist nosegneg.filelist \
+	  | grep -v '%%\(dir\|lang\|config\|verify\)'`; do
   bf=$RPM_BUILD_ROOT$f
   if [ -f $bf -a -x $bf -a ! -h $bf ]; then
     if `file $bf 2>/dev/null | grep 'ELF.*, not stripped' | grep -vq 'statically linked'`; then
@@ -1165,6 +1224,11 @@ if [ "$1" -ge "1" ]; then
     service nscd condrestart > /dev/null 2>&1 || :
 fi
 
+%if %{xenpackage}
+%post xen -p /sbin/ldconfig
+%postun xen -p /sbin/ldconfig
+%endif
+
 %clean
 rm -rf "$RPM_BUILD_ROOT"
 rm -f *.filelist*
@@ -1181,6 +1245,9 @@ rm -f *.filelist*
 %ifarch i686 athlon
 %dir /lib/i686
 %endif
+%endif
+%if %{buildxen} && !%{xenpackage}
+%dir /%{_lib}/%{nosegneg_subdir}
 %endif
 %ifarch s390x
 %dir /lib
@@ -1202,6 +1269,12 @@ rm -f *.filelist*
 %doc README NEWS INSTALL FAQ BUGS NOTES PROJECTS CONFORMANCE
 %doc COPYING COPYING.LIB README.libm LICENSES
 %doc hesiod/README.hesiod
+
+%if %{xenpackage}
+%files -f nosegneg.filelist xen
+%defattr(-,root,root)
+%dir /%{_lib}/%{nosegneg_subdir}
+%endif
 
 %ifnarch %{auxarches}
 %files -f common.filelist common
@@ -1269,11 +1342,29 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Apr 27 2005 Jakub Jelinek <jakub@redhat.com> 2.3.5-2
+- update from CVS
+  - with MALLOC_CHECK_=N N>0 (#153003)
+  - fix recursive dlclose (#154641)
+  - handle %z in strptime (#154804)
+  - automatically append /%{_lib}/obsolete/linuxthreads/
+    to standard library search path if LD_ASSUME_KERNEL=N N <= 2.4.19
+    or for glibc 2.0 binaries (or broken ones that don't use errno/h_errno
+    properly).  Warning: all those will stop working when LinuxThreads
+    is finally nuked, which is not very far away
+  - remove nonnull attribute from acct prototype (BZ#877)
+  - kernel CPU clocks support
+  - fix *scanf in locales with multi-byte decimal point
+
+* Wed Apr 27 2005 Roland McGrath <roland@redhat.com>
+- glibc-xen subpackage for i686
+
 * Fri Apr 15 2005 Roland McGrath <roland@redhat.com> 2.3.5-1
 - update from CVS
   - fix execvp regression (BZ#851)
   - ia64 libm updates
   - sparc updates
+  - fix initstate{,_r}/strfry (#154504)
   - grok PT_NOTE in vDSO for kernel version and extra hwcap dirs,
     support "hwcap" keyword in ld.so.conf files
 
