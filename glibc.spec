@@ -1,9 +1,9 @@
-%define glibcdate 20050427T1912
+%define glibcdate 20050428T0846
 %define glibcname glibc
-%define glibcsrcdir glibc-20050427T1912
+%define glibcsrcdir glibc-20050428T0846
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.5
-%define glibcrelease 3
+%define glibcrelease 4
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 sparc64 ppc ppc64
@@ -1346,6 +1346,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Apr 28 2005 Jakub Jelinek <jakub@redhat.com> 2.3.5-4
+- update from CVS
+  - fix nscd cache pruning (#150748)
+
 * Wed Apr 27 2005 Jakub Jelinek <jakub@redhat.com> 2.3.5-3
 - update from CVS
   - fix linuxthreads clocks
