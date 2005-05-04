@@ -1,9 +1,9 @@
-%define glibcdate 20050503T0852
+%define glibcdate 20050504T1818
 %define glibcname glibc
-%define glibcsrcdir glibc-20050503T0852
+%define glibcsrcdir glibc-20050504T1818
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.5
-%define glibcrelease 5
+%define glibcrelease 6
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 sparc64 ppc ppc64
@@ -499,10 +499,10 @@ rm -rf build-%{_target_cpu}-linux
 mkdir build-%{_target_cpu}-linux ; cd build-%{_target_cpu}-linux
 GCC=gcc
 %ifarch %{ix86}
-BuildFlags="-march=%{_target_cpu}"
+BuildFlags="-march=%{_target_cpu} -fasynchronous-unwind-tables"
 %endif
 %ifarch i686
-BuildFlags="-march=i686 -mtune=pentium4"
+BuildFlags="-march=i686 -mtune=pentium4 -fasynchronous-unwind-tables"
 %endif
 %ifarch alphaev6
 BuildFlags="-mcpu=ev6"
@@ -1344,6 +1344,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed May  4 2005 Jakub Jelinek <jakub@redhat.com> 2.3.5-6
+- update from CVS
+  - fix cancellation on i?86
+  - add call frame information to i?86 assembly
+  - build i?86 glibc with -fasynchronous-unwind-tables
+
 * Tue May  3 2005 Jakub Jelinek <jakub@redhat.com> 2.3.5-5
 - update from CVS
   - add some more UTF-8 locales (#156115)
