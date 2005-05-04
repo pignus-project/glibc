@@ -499,10 +499,10 @@ rm -rf build-%{_target_cpu}-linux
 mkdir build-%{_target_cpu}-linux ; cd build-%{_target_cpu}-linux
 GCC=gcc
 %ifarch %{ix86}
-BuildFlags="-march=%{_target_cpu} -fasynchronous-unwind-tables"
+BuildFlags="-march=%{_target_cpu}"
 %endif
 %ifarch i686
-BuildFlags="-march=i686 -mtune=pentium4 -fasynchronous-unwind-tables"
+BuildFlags="-march=i686 -mtune=pentium4"
 %endif
 %ifarch alphaev6
 BuildFlags="-mcpu=ev6"
@@ -1348,7 +1348,6 @@ rm -f *.filelist*
 - update from CVS
   - fix cancellation on i?86
   - add call frame information to i?86 assembly
-  - build i?86 glibc with -fasynchronous-unwind-tables
 
 * Tue May  3 2005 Jakub Jelinek <jakub@redhat.com> 2.3.5-5
 - update from CVS
