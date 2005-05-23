@@ -1,6 +1,22 @@
 --- glibc-20050523T1354/ChangeLog	22 May 2005 23:03:25 -0000	1.9367
-+++ glibc-20050523T1354-fedora/ChangeLog	23 May 2005 14:28:19 -0000	1.8782.2.104
-@@ -1,3 +1,9 @@
++++ glibc-20050523T1354-fedora/ChangeLog	23 May 2005 17:53:08 -0000	1.8782.2.106
+@@ -1,3 +1,25 @@
++2005-05-23  Ulrich Drepper  <drepper@redhat.com>
++
++	* sunrpc/pm_getport.c (__get_socket): New function.
++	(pmap_getport): Use it to open a non-reserved socket to the portmapper
++	for TCP.
++	* include/rpc/pmap_clnt.h (__get_socket): Declare.
++	* sunrpc/pm_getmaps.c (pmap_getmaps): Use __get_socket to get an
++	non-reserved socket for the portmapper.
++	Based on a patch by Steve Dickson <steved@redhat.com>.
++
++	* sunrpc/bindrsvprt.c (bindresvport): Try harder to find a port.
++	If we tried looking at the usual range without success extend the
++	range to even lower ports.
++
++	* sysdeps/unix/clock_gettime.c (clock_gettime): Revert last patch.
++
 +2005-05-22  Dmitry V. Levin  <ldv@altlinux.org>
 +
 +	[BZ #961]
@@ -10,7 +26,7 @@
  2005-05-22  Andreas Schwab  <schwab@suse.de>
  
  	* elf/rtld.c: Include <dl-osinfo.h>.
-@@ -364,6 +370,14 @@
+@@ -364,6 +386,14 @@
  	* nscd/connections.c (nscd_run): Use time() value in prune_cache
  	call, not timeout value, since the latter might be from another clock.
  
@@ -25,7 +41,7 @@
  2005-04-27  Roland McGrath  <roland@redhat.com>
  
  	[BZ #877]
-@@ -979,17 +993,6 @@
+@@ -979,17 +1009,6 @@
  
  2005-03-28  Roland McGrath  <roland@redhat.com>
  
@@ -43,7 +59,7 @@
  	* locale/langinfo.h (_NL_LOCALE_NAME): New macro.
  	[__USE_GNU] (NL_LOCALE_NAME): New macro.
  	* locale/nl_langinfo.c: Grok special item value for _NL_LOCALE_NAME,
-@@ -2058,6 +2061,18 @@
+@@ -2058,6 +2077,18 @@
  
  	* scripts/soversions.awk: Fix default version set handling.
  
@@ -866,6 +882,17 @@
  
  #define __GLIBC_PREREQ(maj, min) \
  	((__GLIBC__ << 16) + __GLIBC_MINOR__ >= ((maj) << 16) + (min))
+--- glibc-20050523T1354/include/rpc/pmap_clnt.h	6 Aug 2002 01:23:20 -0000	1.2
++++ glibc-20050523T1354-fedora/include/rpc/pmap_clnt.h	23 May 2005 17:53:18 -0000	1.2.2.1
+@@ -5,4 +5,8 @@ libc_hidden_proto (pmap_getport)
+ libc_hidden_proto (pmap_set)
+ libc_hidden_proto (pmap_unset)
+ 
++/* Defined in pm_getport.c.  */
++extern int __get_socket (struct sockaddr_in *saddr)
++     attribute_hidden internal_function;
++
+ #endif
 --- glibc-20050523T1354/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
 +++ glibc-20050523T1354-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
 @@ -58,8 +58,6 @@ korean		ko_KR.eucKR
@@ -990,8 +1017,18 @@
  }
  #endif
 --- glibc-20050523T1354/linuxthreads/ChangeLog	21 May 2005 19:28:24 -0000	1.849
-+++ glibc-20050523T1354-fedora/linuxthreads/ChangeLog	23 May 2005 14:27:05 -0000	1.817.2.25
-@@ -830,6 +830,12 @@
++++ glibc-20050523T1354-fedora/linuxthreads/ChangeLog	23 May 2005 17:00:29 -0000	1.817.2.26
+@@ -1,3 +1,9 @@
++2005-05-23  Jakub Jelinek  <jakub@redhat.com>
++
++	* sysdeps/unix/sysv/linux/powerpc/powerpc32/sysdep-cancel.h
++	[IS_IN_librt] (CENABLE, CDISABLE): Use JUMPTARGET instead of
++	bl __librt_*_asynccancel@local.
++
+ 2005-05-17  Alan Modra  <amodra@bigpond.net.au>
+ 
+ 	* sysdeps/unix/sysv/linux/powerpc/powerpc32/sysdep-cancel.h: Delete
+@@ -830,6 +836,12 @@
  	(pthread_barrierattr_setpshared): Return EINVAL if pshared
  	is neither PTHREAD_PROCESS_PRIVATE nor PTHREAD_PROCESS_SHARED.
  
@@ -1004,7 +1041,7 @@
  2003-09-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/unix/sysv/linux/i386/dl-sysdep.h
-@@ -962,6 +968,34 @@
+@@ -962,6 +974,34 @@
  
  2003-07-22  Jakub Jelinek  <jakub@redhat.com>
  
@@ -1346,6 +1383,25 @@
  
  /* Alignment requirements for the TCB.  */
  #  define TLS_TCB_ALIGN __alignof__ (struct _pthread_descr_struct)
+--- glibc-20050523T1354/linuxthreads/sysdeps/unix/sysv/linux/powerpc/powerpc32/sysdep-cancel.h	21 May 2005 19:27:09 -0000	1.9
++++ glibc-20050523T1354-fedora/linuxthreads/sysdeps/unix/sysv/linux/powerpc/powerpc32/sysdep-cancel.h	23 May 2005 17:36:13 -0000	1.8.2.3
+@@ -1,4 +1,4 @@
+-/* Copyright (C) 2003 Free Software Foundation, Inc.
++/* Copyright (C) 2003, 2005 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+    Contributed by Franz Sirl <Franz.Sirl-kernel@lauterbach.com>, 2003.
+ 
+@@ -82,8 +82,8 @@
+ #  define CENABLE	bl __libc_enable_asynccancel@local
+ #  define CDISABLE	bl __libc_disable_asynccancel@local
+ # else
+-#  define CENABLE	bl __librt_enable_asynccancel@local
+-#  define CDISABLE	bl __librt_disable_asynccancel@local
++#  define CENABLE	bl JUMPTARGET(__librt_enable_asynccancel)
++#  define CDISABLE	bl JUMPTARGET(__librt_disable_asynccancel)
+ # endif
+ 
+ # ifdef HAVE_TLS_SUPPORT
 --- glibc-20050523T1354/linuxthreads/sysdeps/x86_64/tls.h	9 Jan 2005 20:01:15 -0000	1.7
 +++ glibc-20050523T1354-fedora/linuxthreads/sysdeps/x86_64/tls.h	8 Feb 2005 10:04:16 -0000	1.6.2.2
 @@ -71,7 +71,14 @@ typedef struct
@@ -1719,8 +1775,18 @@
 -  }
  }
 --- glibc-20050523T1354/nptl/ChangeLog	21 May 2005 19:27:42 -0000	1.781
-+++ glibc-20050523T1354-fedora/nptl/ChangeLog	23 May 2005 14:27:11 -0000	1.706.2.46
-@@ -652,6 +652,11 @@
++++ glibc-20050523T1354-fedora/nptl/ChangeLog	23 May 2005 17:00:25 -0000	1.706.2.47
+@@ -1,3 +1,9 @@
++2005-05-23  Jakub Jelinek  <jakub@redhat.com>
++
++	* sysdeps/unix/sysv/linux/powerpc/powerpc32/sysdep-cancel.h
++	[IS_IN_librt] (CENABLE, CDISABLE): Use JUMPTARGET instead of
++	bl __librt_*_asynccancel@local.
++
+ 2005-05-17  Alan Modra  <amodra@bigpond.net.au>
+ 
+ 	* sysdeps/unix/sysv/linux/powerpc/powerpc32/sysdep-cancel.h: Delete
+@@ -652,6 +658,11 @@
  	Move definition inside libpthread, libc, librt check.  Provide
  	definition for rtld.
  
@@ -1732,7 +1798,7 @@
  2004-09-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/alpha/jmpbuf-unwind.h: Define __libc_unwind_longjmp.
-@@ -2726,6 +2731,11 @@
+@@ -2726,6 +2737,11 @@
  
  	* Makefile [$(build-shared) = yes] (tests): Depend on $(test-modules).
  
@@ -1836,6 +1902,26 @@
 +#ifndef __ASSUME_CLONE_THREAD_FLAGS
 +# define __ASSUME_CLONE_THREAD_FLAGS	1
 +#endif
+--- glibc-20050523T1354/nptl/sysdeps/unix/sysv/linux/powerpc/powerpc32/sysdep-cancel.h	21 May 2005 19:27:09 -0000	1.9
++++ glibc-20050523T1354-fedora/nptl/sysdeps/unix/sysv/linux/powerpc/powerpc32/sysdep-cancel.h	23 May 2005 17:36:13 -0000	1.8.2.3
+@@ -1,5 +1,5 @@
+ /* Cancellable system call stubs.  Linux/PowerPC version.
+-   Copyright (C) 2003, 2004 Free Software Foundation, Inc.
++   Copyright (C) 2003, 2004, 2005 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+    Contributed by Franz Sirl <Franz.Sirl-kernel@lauterbach.com>, 2003.
+ 
+@@ -91,8 +91,8 @@
+ #  define CENABLE	bl __libc_enable_asynccancel@local
+ #  define CDISABLE	bl __libc_disable_asynccancel@local
+ # elif defined IS_IN_librt
+-#  define CENABLE	bl __librt_enable_asynccancel@local
+-#  define CDISABLE	bl __librt_disable_asynccancel@local
++#  define CENABLE	bl JUMPTARGET(__librt_enable_asynccancel)
++#  define CDISABLE	bl JUMPTARGET(__librt_disable_asynccancel)
+ # else
+ #  error Unsupported library
+ # endif
 --- glibc-20050523T1354/nscd/connections.c	28 Apr 2005 06:26:10 -0000	1.67
 +++ glibc-20050523T1354-fedora/nscd/connections.c	28 Apr 2005 09:10:12 -0000	1.55.2.8
 @@ -21,6 +21,7 @@
@@ -2195,6 +2281,191 @@
 +  if (__bos0 (__buf) != (size_t) -1 && __n > __bos0 (__buf))
 +    __chk_fail ();
    return __recvfrom_alias (__fd, __buf, __n, __flags, __addr, __addr_len);
+ }
+--- glibc-20050523T1354/sunrpc/bindrsvprt.c	6 Aug 2002 04:29:36 -0000	1.7
++++ glibc-20050523T1354-fedora/sunrpc/bindrsvprt.c	23 May 2005 17:53:19 -0000	1.7.2.1
+@@ -43,14 +43,15 @@
+ int
+ bindresvport (int sd, struct sockaddr_in *sin)
+ {
+-  int res;
+   static short port;
+   struct sockaddr_in myaddr;
+   int i;
+ 
+ #define STARTPORT 600
++#define LOWPORT 200
+ #define ENDPORT (IPPORT_RESERVED - 1)
+ #define NPORTS	(ENDPORT - STARTPORT + 1)
++  static short startport = STARTPORT;
+ 
+   if (sin == (struct sockaddr_in *) 0)
+     {
+@@ -68,17 +69,29 @@ bindresvport (int sd, struct sockaddr_in
+     {
+       port = (__getpid () % NPORTS) + STARTPORT;
+     }
+-  res = -1;
+-  __set_errno (EADDRINUSE);
+ 
+-  for (i = 0; i < NPORTS && res < 0 && errno == EADDRINUSE; ++i)
++  /* Initialize to make gcc happy.  */
++  int res = -1;
++
++  int nports = ENDPORT - startport + 1;
++ again:
++  for (i = 0; i < nports; ++i)
+     {
+       sin->sin_port = htons (port++);
+       if (port > ENDPORT)
+ 	{
+-	  port = STARTPORT;
++	  port = startport;
+ 	}
+       res = __bind (sd, sin, sizeof (struct sockaddr_in));
++      if (res >= 0 || errno != EADDRINUSE)
++	break;
++    }
++
++  if (i == nports && startport != LOWPORT)
++    {
++      startport = LOWPORT;
++      nports = STARTPORT - LOWPORT;
++      goto again;
+     }
+ 
+   return res;
+--- glibc-20050523T1354/sunrpc/pm_getmaps.c	15 May 2002 00:21:00 -0000	1.10
++++ glibc-20050523T1354-fedora/sunrpc/pm_getmaps.c	23 May 2005 17:53:19 -0000	1.10.2.1
+@@ -44,9 +44,12 @@ static char sccsid[] = "@(#)pmap_getmaps
+ #include <rpc/pmap_clnt.h>
+ #include <sys/socket.h>
+ #include <netdb.h>
++#include <stdbool.h>
+ #include <stdio.h>
+ #include <errno.h>
+ #include <libintl.h>
++#include <unistd.h>
++
+ 
+ /*
+  * Get a copy of the current port maps.
+@@ -56,13 +59,19 @@ struct pmaplist *
+ pmap_getmaps (struct sockaddr_in *address)
+ {
+   struct pmaplist *head = (struct pmaplist *) NULL;
+-  int socket = -1;
+   struct timeval minutetimeout;
+   CLIENT *client;
++  bool closeit = false;
+ 
+   minutetimeout.tv_sec = 60;
+   minutetimeout.tv_usec = 0;
+   address->sin_port = htons (PMAPPORT);
++
++  /* Don't need a reserved port to get ports from the portmapper.  */
++  int socket = __get_socket (address);
++  if (socket != -1)
++    closeit = true;
++
+   client = INTUSE(clnttcp_create) (address, PMAPPROG,
+ 				   PMAPVERS, &socket, 50, 500);
+   if (client != (CLIENT *) NULL)
+@@ -75,7 +84,9 @@ pmap_getmaps (struct sockaddr_in *addres
+ 	}
+       CLNT_DESTROY (client);
+     }
+-  /* (void)close(socket); CLNT_DESTROY already closed it */
++  /* We only need to close the socket here if we opened  it.  */
++  if (closeit)
++    (void) __close (socket);
+   address->sin_port = 0;
+   return head;
+ }
+--- glibc-20050523T1354/sunrpc/pm_getport.c	14 Jan 2003 19:46:27 -0000	1.11
++++ glibc-20050523T1354-fedora/sunrpc/pm_getport.c	23 May 2005 17:53:19 -0000	1.11.2.1
+@@ -38,6 +38,8 @@ static char sccsid[] = "@(#)pmap_getport
+  * Copyright (C) 1984, Sun Microsystems, Inc.
+  */
+ 
++#include <stdbool.h>
++#include <unistd.h>
+ #include <rpc/rpc.h>
+ #include <rpc/pmap_prot.h>
+ #include <rpc/pmap_clnt.h>
+@@ -49,6 +51,41 @@ static const struct timeval tottimeout =
+ {60, 0};
+ 
+ /*
++ * Create a socket that is locally bound to a non-reserve port. For
++ * any failures, -1 is returned which will cause the RPC code to
++ * create the socket.
++ */
++int
++internal_function
++__get_socket (struct sockaddr_in *saddr)
++{
++  int so = __socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
++  if (so < 0)
++    return -1;
++
++  struct sockaddr_in laddr;
++  socklen_t namelen = sizeof (laddr);
++  laddr.sin_family = AF_INET;
++  laddr.sin_port = 0;
++  laddr.sin_addr.s_addr = htonl (INADDR_ANY);
++
++  int cc = __bind (so, (struct sockaddr *) &laddr, namelen);
++  if (__builtin_expect (cc < 0, 0))
++    {
++    fail:
++      __close (so);
++      return -1;
++    }
++
++  cc = __connect (so, (struct sockaddr *) saddr, namelen);
++  if (__builtin_expect (cc < 0, 0))
++    goto fail;
++
++  return so;
++}
++
++
++/*
+  * Find the mapped port for program,version.
+  * Calls the pmap service remotely to do the lookup.
+  * Returns 0 if no map exists.
+@@ -64,11 +101,18 @@ pmap_getport (address, program, version,
+   int socket = -1;
+   CLIENT *client;
+   struct pmap parms;
++  bool closeit = false;
+ 
+   address->sin_port = htons (PMAPPORT);
+   if (protocol == IPPROTO_TCP)
+-    client = INTUSE(clnttcp_create) (address, PMAPPROG, PMAPVERS, &socket,
+-				     RPCSMALLMSGSIZE, RPCSMALLMSGSIZE);
++    {
++      /* Don't need a reserved port to get ports from the portmapper.  */
++      socket = __get_socket(address);
++      if (socket != -1)
++	closeit = true;
++      client = INTUSE(clnttcp_create) (address, PMAPPROG, PMAPVERS, &socket,
++				       RPCSMALLMSGSIZE, RPCSMALLMSGSIZE);
++    }
+   else
+     client = INTUSE(clntudp_bufcreate) (address, PMAPPROG, PMAPVERS, timeout,
+ 					&socket, RPCSMALLMSGSIZE,
+@@ -93,7 +137,9 @@ pmap_getport (address, program, version,
+ 	}
+       CLNT_DESTROY (client);
+     }
+-  /* (void)close(socket); CLNT_DESTROY already closed it */
++  /* We only need to close the socket here if we opened  it.  */
++  if (closeit)
++    (void) __close (socket);
+   address->sin_port = 0;
+   return port;
  }
 --- glibc-20050523T1354/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
 +++ glibc-20050523T1354-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
