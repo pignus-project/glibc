@@ -1,9 +1,9 @@
-%define glibcdate 20050520T0919
+%define glibcdate 20050523T1354
 %define glibcname glibc
-%define glibcsrcdir glibc-20050520T0919
+%define glibcsrcdir glibc-20050523T1354
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.5
-%define glibcrelease 7
+%define glibcrelease 8
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 sparc64 ppc ppc64
@@ -1344,6 +1344,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon May 23 2005 Jakub Jelinek <jakub@redhat.com> 2.3.5-8
+- update from CVS
+  - fix kernel version check in ld.so
+- fix sendfile{,64} prototypes (BZ#961)
+
 * Fri May 20 2005 Jakub Jelinek <jakub@redhat.com> 2.3.5-7
 - update from CVS
   - make regexec thread safe (BZ#934)
