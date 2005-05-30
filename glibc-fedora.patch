@@ -1,6 +1,16 @@
 --- glibc-20050524T1606/ChangeLog	24 May 2005 06:18:21 -0000	1.9374
-+++ glibc-20050524T1606-fedora/ChangeLog	24 May 2005 16:31:24 -0000	1.8782.2.107
-@@ -398,6 +398,14 @@
++++ glibc-20050524T1606-fedora/ChangeLog	30 May 2005 09:42:27 -0000	1.8782.2.108
+@@ -1,3 +1,9 @@
++2005-05-30  Jakub Jelinek  <jakub@redhat.com>
++
++	* sysdeps/unix/sysv/linux/dl-osinfo.h (DL_SYSDEP_OSCHECK): If
++	GLRO(dl_osversion) has been already set to a value smaller than
++	_dl_discover_osversion (), don't overwrite it here.
++
+ 2005-05-23  Roland McGrath  <roland@redhat.com>
+ 
+ 	* sysdeps/arm, sysdeps/unix/arm, sysdeps/unix/sysv/linux/arm:
+@@ -398,6 +404,14 @@
  	* nscd/connections.c (nscd_run): Use time() value in prune_cache
  	call, not timeout value, since the latter might be from another clock.
  
@@ -15,7 +25,7 @@
  2005-04-27  Roland McGrath  <roland@redhat.com>
  
  	[BZ #877]
-@@ -1013,17 +1021,6 @@
+@@ -1013,17 +1027,6 @@
  
  2005-03-28  Roland McGrath  <roland@redhat.com>
  
@@ -33,7 +43,7 @@
  	* locale/langinfo.h (_NL_LOCALE_NAME): New macro.
  	[__USE_GNU] (NL_LOCALE_NAME): New macro.
  	* locale/nl_langinfo.c: Grok special item value for _NL_LOCALE_NAME,
-@@ -2092,6 +2089,18 @@
+@@ -2092,6 +2095,18 @@
  
  	* scripts/soversions.awk: Fix default version set handling.
  
@@ -955,8 +965,22 @@
  }
  #endif
 --- glibc-20050524T1606/linuxthreads/ChangeLog	24 May 2005 06:18:26 -0000	1.851
-+++ glibc-20050524T1606-fedora/linuxthreads/ChangeLog	24 May 2005 16:31:27 -0000	1.817.2.27
-@@ -841,6 +841,12 @@
++++ glibc-20050524T1606-fedora/linuxthreads/ChangeLog	30 May 2005 09:15:05 -0000	1.817.2.28
+@@ -1,3 +1,13 @@
++2005-05-30  Jakub Jelinek  <jakub@redhat.com>
++
++	* man/Makefile (SOURCES): Remove all man pages but
++	pthread_cleanup_push.man, pthread_kill_other_threads_np.man
++	and pthread_mutexattr_setkind_np.man.
++	* man/pthread_cleanup_push.man: Replace (3) with (3p) where man page
++	was not kept.
++	* man/pthread_kill_other_threads_np.man: Likewise.
++	* man/pthread_mutexattr_setkind_np.man: Likewise.
++
+ 2005-05-23  Roland McGrath  <roland@redhat.com>
+ 
+ 	* sysdeps/arm, sysdeps/unix/sysv/linux/arm: Subdirectories moved to
+@@ -841,6 +851,12 @@
  	(pthread_barrierattr_setpshared): Return EINVAL if pshared
  	is neither PTHREAD_PROCESS_PRIVATE nor PTHREAD_PROCESS_SHARED.
  
@@ -969,7 +993,7 @@
  2003-09-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/unix/sysv/linux/i386/dl-sysdep.h
-@@ -973,6 +979,34 @@
+@@ -973,6 +989,34 @@
  
  2003-07-22  Jakub Jelinek  <jakub@redhat.com>
  
@@ -1072,6 +1096,116 @@
  
  struct tls_obj
  {
+--- glibc-20050524T1606/linuxthreads/man/Makefile	6 Apr 2002 01:04:38 -0000	1.2
++++ glibc-20050524T1606-fedora/linuxthreads/man/Makefile	30 May 2005 09:15:07 -0000	1.2.2.1
+@@ -1,10 +1,4 @@
+-SOURCES=pthread_atfork.man pthread_attr_init.man pthread_cancel.man \
+-  pthread_cleanup_push.man pthread_cond_init.man \
+-  pthread_condattr_init.man pthread_create.man pthread_detach.man \
+-  pthread_equal.man pthread_exit.man pthread_join.man \
+-  pthread_key_create.man pthread_mutex_init.man \
+-  pthread_mutexattr_init.man pthread_once.man pthread_self.man \
+-  pthread_setschedparam.man pthread_sigmask.man sem_init.man \
++SOURCES= pthread_cleanup_push.man \
+   pthread_kill_other_threads_np.man pthread_mutexattr_setkind_np.man
+ 
+ MANPAGES=$(SOURCES:.man=.3thr)
+--- glibc-20050524T1606/linuxthreads/man/pthread_cleanup_push.man	11 Mar 1998 12:42:23 -0000	1.1
++++ glibc-20050524T1606-fedora/linuxthreads/man/pthread_cleanup_push.man	30 May 2005 09:15:07 -0000	1.1.6.1
+@@ -21,7 +21,7 @@ void pthread_cleanup_pop_restore_np(int 
+ .SH DESCRIPTION
+ 
+ Cleanup handlers are functions that get called when a thread
+-terminates, either by calling !pthread_exit!(3) or because of
++terminates, either by calling !pthread_exit!(3p) or because of
+ cancellation. Cleanup handlers are installed and removed following a
+ stack-like discipline.
+ 
+@@ -37,7 +37,7 @@ with !malloc!(3) or close file descripto
+ !pthread_cleanup_push! installs the |routine| function with argument
+ |arg| as a cleanup handler. From this point on to the matching
+ !pthread_cleanup_pop!, the function |routine| will be called with
+-arguments |arg| when the thread terminates, either through !pthread_exit!(3)
++arguments |arg| when the thread terminates, either through !pthread_exit!(3p)
+ or by cancellation. If several cleanup handlers are active at that
+ point, they are called in LIFO order: the most recently installed
+ handler is called first.
+@@ -56,7 +56,7 @@ with the matching closing brace !}! bein
+ of the matching !pthread_cleanup_pop!.
+ 
+ !pthread_cleanup_push_defer_np! is a non-portable extension that
+-combines !pthread_cleanup_push! and !pthread_setcanceltype!(3).
++combines !pthread_cleanup_push! and !pthread_setcanceltype!(3p).
+ It pushes a cleanup handler just as !pthread_cleanup_push! does, but
+ also saves the current cancellation type and sets it to deferred
+ cancellation. This ensures that the cleanup mechanism is effective
+@@ -113,9 +113,9 @@ None.
+ Xavier Leroy <Xavier.Leroy@inria.fr>
+ 
+ .SH "SEE ALSO"
+-!pthread_exit!(3),
+-!pthread_cancel!(3),
+-!pthread_setcanceltype!(3).
++!pthread_exit!(3p),
++!pthread_cancel!(3p),
++!pthread_setcanceltype!(3p).
+ 
+ .SH EXAMPLE
+ 
+@@ -149,7 +149,7 @@ pthread_cleanup_pop(1);
+ .fi
+ 
+ Notice that the code above is safe only in deferred cancellation mode
+-(see !pthread_setcanceltype!(3)). In asynchronous cancellation mode,
++(see !pthread_setcanceltype!(3p)). In asynchronous cancellation mode,
+ a cancellation can occur between !pthread_cleanup_push! and
+ !pthread_mutex_lock!, or between !pthread_mutex_unlock! and
+ !pthread_cleanup_pop!, resulting in both cases in the thread trying to
+--- glibc-20050524T1606/linuxthreads/man/pthread_kill_other_threads_np.man	11 Mar 1998 12:42:23 -0000	1.1
++++ glibc-20050524T1606-fedora/linuxthreads/man/pthread_kill_other_threads_np.man	30 May 2005 09:15:07 -0000	1.1.6.1
+@@ -16,7 +16,7 @@ called just before a thread calls one of
+ e.g. !execve!(2).
+ 
+ Termination of the other threads is not performed through
+-!pthread_cancel!(3) and completely bypasses the cancellation
++!pthread_cancel!(3p) and completely bypasses the cancellation
+ mechanism. Hence, the current settings for cancellation state and
+ cancellation type are ignored, and the cleanup handlers are not
+ executed in the terminated threads.
+@@ -26,9 +26,9 @@ Xavier Leroy <Xavier.Leroy@inria.fr>
+ 
+ .SH "SEE ALSO"
+ !execve!(2),
+-!pthread_setcancelstate!(3),
+-!pthread_setcanceltype!(3),
+-!pthread_cancel!(3).
++!pthread_setcancelstate!(3p),
++!pthread_setcanceltype!(3p),
++!pthread_cancel!(3p).
+ 
+ .SH BUGS
+ 
+--- glibc-20050524T1606/linuxthreads/man/pthread_mutexattr_setkind_np.man	6 Apr 2002 01:05:27 -0000	1.1
++++ glibc-20050524T1606-fedora/linuxthreads/man/pthread_mutexattr_setkind_np.man	30 May 2005 09:15:07 -0000	1.1.2.1
+@@ -14,8 +14,8 @@ int pthread_mutexattr_getkind_np(const p
+ 
+ .SH DESCRIPTION
+ 
+-These functions are deprecated, use !pthread_mutexattr_settype!(3)
+-and !pthread_mutexattr_gettype!(3) instead.
++These functions are deprecated, use !pthread_mutexattr_settype!(3p)
++and !pthread_mutexattr_gettype!(3p) instead.
+ 
+ .SH "RETURN VALUE"
+ !pthread_mutexattr_getkind_np! always returns 0.
+@@ -35,5 +35,5 @@ nor !PTHREAD_MUTEX_ERRORCHECK_NP!
+ Xavier Leroy <Xavier.Leroy@inria.fr>
+ 
+ .SH "SEE ALSO"
+-!pthread_mutexattr_settype!(3),
+-!pthread_mutexattr_gettype!(3).
++!pthread_mutexattr_settype!(3p),
++!pthread_mutexattr_gettype!(3p).
 --- glibc-20050524T1606/linuxthreads/sysdeps/alpha/tls.h	9 Jan 2005 20:01:12 -0000	1.6
 +++ glibc-20050524T1606-fedora/linuxthreads/sysdeps/alpha/tls.h	8 Feb 2005 10:04:11 -0000	1.5.2.2
 @@ -58,54 +58,76 @@ typedef struct
@@ -3133,6 +3267,19 @@
    if (result != -1)
      return getpriority (PRIO_PROCESS, 0);
    else
+--- glibc-20050524T1606/sysdeps/unix/sysv/linux/dl-osinfo.h	7 Apr 2005 20:56:50 -0000	1.19
++++ glibc-20050524T1606-fedora/sysdeps/unix/sysv/linux/dl-osinfo.h	30 May 2005 09:42:34 -0000	1.14.2.4
+@@ -145,7 +145,9 @@ _dl_discover_osversion (void)
+     int version = _dl_discover_osversion ();				      \
+     if (__builtin_expect (version >= 0, 1))				      \
+       {									      \
+-	GLRO(dl_osversion) = version;					      \
++	if (__builtin_expect (GLRO(dl_osversion) == 0, 1)		      \
++	    || GLRO(dl_osversion) > version)				      \
++	  GLRO(dl_osversion) = version;					      \
+ 									      \
+ 	/* Now we can test with the required version.  */		      \
+ 	if (__LINUX_KERNEL_VERSION > 0 && version < __LINUX_KERNEL_VERSION)   \
 --- glibc-20050524T1606/sysdeps/unix/sysv/linux/paths.h	15 Nov 2000 23:06:47 -0000	1.11
 +++ glibc-20050524T1606-fedora/sysdeps/unix/sysv/linux/paths.h	22 Sep 2004 21:21:08 -0000	1.11.4.1
 @@ -61,7 +61,7 @@
