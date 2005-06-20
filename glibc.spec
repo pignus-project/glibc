@@ -1,9 +1,9 @@
-%define glibcdate 20050524T1606
+%define glibcdate 20050620T1530
 %define glibcname glibc
-%define glibcsrcdir glibc-20050524T1606
+%define glibcsrcdir glibc-20050620T1530
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.5
-%define glibcrelease 10
+%define glibcrelease 11
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define nptlarches i386 i686 athlon x86_64 ia64 s390 s390x sparcv9 sparc64 ppc ppc64
@@ -1344,6 +1344,18 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jun 20 2005 Jakub Jelinek <jakub@redhat.com> 2.3.5-11
+- update from CVS
+  - PPC32 -msecure-plt support
+  - support classes keyword in /etc/hesiod.conf (#150350)
+  - add RLIMIT_NICE and RLIMIT_RTPRIO to <sys/resources.h> (#157049)
+  - decrease number of .plt relocations in libc.so
+  - use -laudit in nscd (#159217)
+  - handle big amounts of networking interfaces in getifaddrs/if_nameindex
+    (#159399)
+  - fix pa_IN locale's am_pm (#158715, BZ#622)
+  - fix debugging of PIEs
+
 * Mon May 30 2005 Jakub Jelinek <jakub@redhat.com> 2.3.5-10
 - fix LD_ASSUME_KERNEL (since 2.3.5-8 GLRO(dl_osversion)
   has been always overwritten with the version of currently
