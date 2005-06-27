@@ -477,13 +477,13 @@ if gcc -v 2>&1 | grep -q 'gcc version 3.[0123]'; then
   BuildFlags="$BuildFlags -finline-limit=2000"
 fi
 EnableKernel="--enable-kernel=%{enablekernel}"
-echo "$BuildFlags" > ../BuildFlags
-echo "$GCC" > ../Gcc
+echo "$BuildFlags" > BuildFlags
+echo "$GCC" > Gcc
 AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(linuxthreads\|nptl\|rtkaio\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
 %ifarch %{rtkaioarches}
 AddOns=,rtkaio$AddOns
 %endif
-echo "$AddOns" > ../AddOns
+echo "$AddOns" > AddOns
 
 build_nptl()
 {
