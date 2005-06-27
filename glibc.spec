@@ -652,7 +652,7 @@ find $RPM_BUILD_ROOT -type f -or -type l |
 for n in %{_prefix}/share %{_prefix}/include %{_prefix}/lib/locale; do
     find ${RPM_BUILD_ROOT}${n} -type d | \
 	grep -v '%{_prefix}/share$' | \
-	grep -v '\(%{_mandir}\|%{_infodir}\)' | \
+	grep -v '%{_infodir}' | \
 	sed "s/^/%dir /" >> rpm.filelist.in
 done
 
@@ -693,14 +693,12 @@ grep -v '%{_prefix}/%{_lib}/lib.*_p.a' rpm.filelist.full |
 grep '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist >> devel.filelist
 grep '%{_prefix}/%{_lib}/.*\.o' < rpm.filelist >> devel.filelist
 grep '%{_prefix}/%{_lib}/lib.*\.so' < rpm.filelist >> devel.filelist
-grep '%{_mandir}' < rpm.filelist >> devel.filelist
 
 mv rpm.filelist rpm.filelist.full
 grep -v '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist.full |
 	grep -v '%{_prefix}/%{_lib}/.*\.o' |
 	grep -v '%{_prefix}/%{_lib}/lib.*\.so'|
 	grep -v '%{_prefix}/%{_lib}/linuxthreads' |
-	grep -v '%{_mandir}' |
 	grep -v 'nscd' > rpm.filelist
 
 grep '%{_prefix}/bin' < rpm.filelist >> common.filelist
