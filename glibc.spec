@@ -775,7 +775,7 @@ ln -sf /%{_lib}/ld-linux-ia64.so.2 $RPM_BUILD_ROOT/lib/ld-linux-ia64.so.2
 # Increase timeouts
 export TIMEOUTFACTOR=16
 echo ====================TESTING=========================
-cd build-%{_target_cpu}-linuxnptl
+cd build-%{nptl_target_cpu}-linuxnptl
 make %{?_smp_mflags} -k check PARALLELMFLAGS=-s 2>&1 | tee check.log || :
 cd ..
 %if %{buildxen}
