@@ -1,9 +1,9 @@
-%define glibcdate 20050627T0850
+%define glibcdate 20050708T0811
 %define glibcname glibc
-%define glibcsrcdir glibc-20050627T0850
+%define glibcsrcdir glibc-20050708T0811
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 1
+%define glibcrelease 2
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -477,13 +477,13 @@ if gcc -v 2>&1 | grep -q 'gcc version 3.[0123]'; then
   BuildFlags="$BuildFlags -finline-limit=2000"
 fi
 EnableKernel="--enable-kernel=%{enablekernel}"
-echo "$BuildFlags" > BuildFlags
-echo "$GCC" > Gcc
-AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(linuxthreads\|nptl\|rtkaio\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
+echo "$BuildFlags" > ../BuildFlags
+echo "$GCC" > ../Gcc
+AddOns=`cd .. && echo */configure | sed -e 's!/configure!!g;s!\(linuxthreads\|nptl\|rtkaio\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
 %ifarch %{rtkaioarches}
 AddOns=,rtkaio$AddOns
 %endif
-echo "$AddOns" > AddOns
+echo "$AddOns" > ../AddOns
 
 build_nptl()
 {
@@ -569,6 +569,10 @@ mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/locale/ru_RU/LC_MESSAGES
 rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libNoVersion*
 rm -f $RPM_BUILD_ROOT/%{_lib}/libNoVersion*
 
+# NPTL <bits/stdio-lock.h> is not usable outside of glibc, so include
+# the generic one (#162634)
+cp -a ../sysdeps/generic/bits/stdio-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/stdio-lock.h
+
 if [ -d $RPM_BUILD_ROOT%{_prefix}/info -a "%{_infodir}" != "%{_prefix}/info" ]; then
     mkdir -p $RPM_BUILD_ROOT%{_infodir}
     mv -f $RPM_BUILD_ROOT%{_prefix}/info/* $RPM_BUILD_ROOT%{_infodir}
@@ -652,7 +656,7 @@ find $RPM_BUILD_ROOT -type f -or -type l |
 for n in %{_prefix}/share %{_prefix}/include %{_prefix}/lib/locale; do
     find ${RPM_BUILD_ROOT}${n} -type d | \
 	grep -v '%{_prefix}/share$' | \
-	grep -v '%{_infodir}' | \
+	grep -v '\(%{_mandir}\|%{_infodir}\)' | \
 	sed "s/^/%dir /" >> rpm.filelist.in
 done
 
@@ -693,12 +697,14 @@ grep -v '%{_prefix}/%{_lib}/lib.*_p.a' rpm.filelist.full |
 grep '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist >> devel.filelist
 grep '%{_prefix}/%{_lib}/.*\.o' < rpm.filelist >> devel.filelist
 grep '%{_prefix}/%{_lib}/lib.*\.so' < rpm.filelist >> devel.filelist
+grep '%{_mandir}' < rpm.filelist >> devel.filelist
 
 mv rpm.filelist rpm.filelist.full
 grep -v '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist.full |
 	grep -v '%{_prefix}/%{_lib}/.*\.o' |
 	grep -v '%{_prefix}/%{_lib}/lib.*\.so'|
 	grep -v '%{_prefix}/%{_lib}/linuxthreads' |
+	grep -v '%{_mandir}' |
 	grep -v 'nscd' > rpm.filelist
 
 grep '%{_prefix}/bin' < rpm.filelist >> common.filelist
@@ -775,7 +781,7 @@ ln -sf /%{_lib}/ld-linux-ia64.so.2 $RPM_BUILD_ROOT/lib/ld-linux-ia64.so.2
 # Increase timeouts
 export TIMEOUTFACTOR=16
 echo ====================TESTING=========================
-cd build-%{nptl_target_cpu}-linuxnptl
+cd build-%{_target_cpu}-linuxnptl
 make %{?_smp_mflags} -k check PARALLELMFLAGS=-s 2>&1 | tee check.log || :
 cd ..
 %if %{buildxen}
@@ -1075,6 +1081,19 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jul  8 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-2
+- update from CVS
+  - ia64 stack protector support
+  - handle DNS referral results as server errors (#162625)
+  - ctan{,h}{,f,l} fixes (#160759)
+  - pass argc, argv and envp also to executable's *ni_array
+    functions (BZ#974)
+  - add ellipsis to clone prototype (#161593)
+  - fix glibc-profile (#162601)
+  - nss_compat fixes
+- use sysdeps/generic version of <bits/stdio-lock.h> in installed
+  headers instead of NPTL version (#162634)
+
 * Mon Jun 27 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-1
 - update from CVS
   - stack protector support
