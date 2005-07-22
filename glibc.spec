@@ -3,7 +3,7 @@
 %define glibcsrcdir glibc-20050722T0433
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 4
+%define glibcrelease 5
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1079,6 +1079,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jul 22 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-5
+- update from CVS
+  - fix stubs.h generation
+- don't use _G_va_list in bits/wchar2.h
+
 * Fri Jul 22 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-4
 - update from CVS
   - make sure bits/wchar2.h header is installed

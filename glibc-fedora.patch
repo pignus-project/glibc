@@ -1,6 +1,24 @@
 --- glibc-20050722T0433/ChangeLog	22 Jul 2005 04:25:52 -0000	1.9445
-+++ glibc-20050722T0433-fedora/ChangeLog	22 Jul 2005 05:26:02 -0000	1.8782.2.115
-@@ -2957,6 +2957,18 @@
++++ glibc-20050722T0433-fedora/ChangeLog	22 Jul 2005 08:58:04 -0000	1.8782.2.117
+@@ -1,5 +1,17 @@
++2005-07-22  Jakub Jelinek  <jakub@redhat.com>
++
++	* wcsmbs/bits/wchar2.h (__vfwprintf_chk, __vwprintf_chk): Use
++	__gnuc_va_list rather than _G_va_list.
++
++2005-07-22  Roland McGrath  <roland@redhat.com>
++
++	[BZ #869]
++	* Makerules ($(objpfx)stubs): Fix last change.
++
+ 2005-07-21  Roland McGrath  <roland@redhat.com>
+ 
++	* nscd/Makefile ($(objpfx)nscd): Pass $(nscd-cflags) to $(LINK.o).
++
+ 	* stdlib/Makefile (headers): Move bits/wchar.h to ...
+ 	* wcsmbs/Makefile (headers): ... here.  Add bits/wchar2.h too.
+ 
+@@ -2957,6 +2969,18 @@
  
  	* scripts/soversions.awk: Fix default version set handling.
  
@@ -180,6 +198,17 @@
  2004-08-30  Roland McGrath  <roland@frob.com>
  
  	* scripts/extract-abilist.awk: If `lastversion' variable defined, omit
+--- glibc-20050722T0433/Makerules	19 Jul 2005 03:54:55 -0000	1.431
++++ glibc-20050722T0433-fedora/Makerules	22 Jul 2005 08:57:11 -0000	1.423.2.7
+@@ -1390,7 +1390,7 @@ objs-for-stubs := $(foreach o,$(object-s
+ 		  $(addprefix $(objpfx),$(extra-objs))
+ $(objpfx)stubs: $(objs-for-stubs)
+ ifneq (,$(strip $(objs-for-stubs)))
+-	(cd $(objdir); $(OBJDUMP) -h $(patsubst $(objpfx)%,%,$^)) | \
++	(cd $(objpfx).; $(OBJDUMP) -h $(patsubst $(objpfx)%,%,$^)) | \
+ 	$(AWK) '/\.gnu\.glibc-stub\./ { \
+ 	          sub(/\.gnu\.glibc-stub\./, "", $$2); \
+ 		  stubs[$$2] = 1; } \
 --- glibc-20050722T0433/csu/elf-init.c	7 Jul 2005 22:56:11 -0000	1.7
 +++ glibc-20050722T0433-fedora/csu/elf-init.c	8 Jul 2005 09:09:45 -0000	1.3.2.4
 @@ -48,6 +48,24 @@ extern void (*__init_array_end []) (int,
@@ -896,6 +925,17 @@
 +#ifndef __ASSUME_CLONE_THREAD_FLAGS
 +# define __ASSUME_CLONE_THREAD_FLAGS	1
 +#endif
+--- glibc-20050722T0433/nscd/Makefile	19 Jul 2005 15:31:57 -0000	1.46
++++ glibc-20050722T0433-fedora/nscd/Makefile	22 Jul 2005 08:57:19 -0000	1.28.2.13
+@@ -122,7 +122,7 @@ relro-LDFLAGS += -Wl,-z,now
+ endif
+ 
+ $(objpfx)nscd: $(addprefix $(objpfx),$(nscd-modules:=.o))
+-	$(LINK.o) -pie -Wl,-O1 \
++	$(LINK.o) -pie -Wl,-O1 $(nscd-cflags) \
+ 	  $(sysdep-LDFLAGS) $(config-LDFLAGS) $(relro-LDFLAGS) \
+ 	  $(extra-B-$(@F:lib%.so=%).so) -B$(csu-objpfx) \
+ 	  $(extra-B-$(@F:lib%.so=%).so) $(load-map-file) \
 --- glibc-20050722T0433/nscd/connections.c	18 Jul 2005 22:25:16 -0000	1.70
 +++ glibc-20050722T0433-fedora/nscd/connections.c	21 Jul 2005 08:25:48 -0000	1.55.2.11
 @@ -1628,3 +1628,18 @@ finish_drop_privileges (void)
@@ -1678,3 +1718,17 @@
 @@ -1 +1 @@
 -s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 \2\3"_
 +s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 /emul/ia32-linux\2\3"_
+--- glibc-20050722T0433/wcsmbs/bits/wchar2.h	21 Jul 2005 16:21:28 -0000	1.4
++++ glibc-20050722T0433-fedora/wcsmbs/bits/wchar2.h	22 Jul 2005 08:58:07 -0000	1.3.2.3
+@@ -236,9 +236,9 @@ extern int __wprintf_chk (int __flag, __
+ 			  ...);
+ extern int __vfwprintf_chk (FILE *__restrict __stream, int __flag,
+ 			    __const wchar_t *__restrict __format,
+-			    _G_va_list __ap);
++			    __gnuc_va_list __ap);
+ extern int __vwprintf_chk (int __flag, __const wchar_t *__restrict __format,
+-			   _G_va_list __ap);
++			   __gnuc_va_list __ap);
+ 
+ # define wprintf(...) \
+   __wprintf_chk (__USE_FORTIFY_LEVEL - 1, __VA_ARGS__)
