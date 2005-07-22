@@ -1,9 +1,9 @@
-%define glibcdate 20050721T0814
+%define glibcdate 20050722T0433
 %define glibcname glibc
-%define glibcsrcdir glibc-20050721T0814
+%define glibcsrcdir glibc-20050722T0433
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 3
+%define glibcrelease 4
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1079,6 +1079,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jul 22 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-4
+- update from CVS
+  - make sure bits/wchar2.h header is installed
+  - fix __getgroups_chk return type
+
 * Thu Jul 21 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-3
 - update from CVS
   - make sure nscd cmsg buffers aren't misaligned, handle EINTR from
