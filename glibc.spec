@@ -1,9 +1,9 @@
-%define glibcdate 20050722T0433
+%define glibcdate 20050725T0627
 %define glibcname glibc
-%define glibcsrcdir glibc-20050722T0433
+%define glibcsrcdir glibc-20050725T0627
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 5
+%define glibcrelease 6
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1079,6 +1079,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jul 25 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-6
+- update from CVS
+  - fix execvp if PATH is not in environment and the call is going
+    to fail (BZ#1125)
+  - another bits/wchar2.h fix (#163990)
+
 * Fri Jul 22 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-5
 - update from CVS
   - fix stubs.h generation
