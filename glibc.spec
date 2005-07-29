@@ -1,9 +1,9 @@
-%define glibcdate 20050725T0627
+%define glibcdate 20050729T1531
 %define glibcname glibc
-%define glibcsrcdir glibc-20050725T0627
+%define glibcsrcdir glibc-20050729T1531
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 6
+%define glibcrelease 7
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1079,6 +1079,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jul 29 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-7
+- update from CVS
+- do some poor man's stack guard randomization even without
+  the costly --enable-stackguard-randomization
+- rebuilt with new GCC to make it use -msecure-plt on PPC32
+
 * Mon Jul 25 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-6
 - update from CVS
   - fix execvp if PATH is not in environment and the call is going
