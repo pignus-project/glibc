@@ -1,9 +1,9 @@
-%define glibcdate 20050729T1531
+%define glibcdate 20050808T2126
 %define glibcname glibc
-%define glibcsrcdir glibc-20050729T1531
+%define glibcsrcdir glibc-20050808T2126
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 7
+%define glibcrelease 8
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -108,7 +108,7 @@ Conflicts: texinfo < 3.11
 # Need AS_NEEDED directive
 Conflicts: binutils < 2.15.94.0.2-1
 Prereq: /sbin/install-info
-Obsoletes: libc-debug, libc-headers, libc-devel
+Obsoletes: libc-debug, libc-headers, libc-devel, linuxthreads-devel
 Obsoletes: glibc-debug, nptl-devel
 Prereq: %{name}-headers
 Requires: %{name}-headers = %{version}-%{release}, %{name} = %{version}-%{release}
@@ -1079,6 +1079,16 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug  8 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-8
+- update from CVS
+  - nscd persistent database verifier (#164001)
+  - cleanup _FORTIFY_SOURCE bits/*.h headers (#165000)
+  - handle EINTR in sigwait properly
+- make sure poor man's stack guard randomization keeps first
+  byte 0 even on big-endian 32-bit arches
+- fix {elf,nptl}/tst-stackguard1
+- obsolete linuxthreads-devel in glibc-devel
+
 * Fri Jul 29 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-7
 - update from CVS
 - do some poor man's stack guard randomization even without
