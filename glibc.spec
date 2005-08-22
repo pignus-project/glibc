@@ -1,9 +1,9 @@
-%define glibcdate 20050808T2126
+%define glibcdate 20050822T0727
 %define glibcname glibc
-%define glibcsrcdir glibc-20050808T2126
+%define glibcsrcdir glibc-20050822T0727
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 8
+%define glibcrelease 9
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1079,6 +1079,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug 22 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-9
+- update from CVS
+  - fix resolving over TCP (#161181, #165802)
+  - on ia64 don't abort on unhandled math function exception codes
+    (#165693)
+
 * Mon Aug  8 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-8
 - update from CVS
   - nscd persistent database verifier (#164001)
