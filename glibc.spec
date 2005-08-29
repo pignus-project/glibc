@@ -1,9 +1,9 @@
-%define glibcdate 20050824T0705
+%define glibcdate 20050829T1854
 %define glibcname glibc
-%define glibcsrcdir glibc-20050824T0705
+%define glibcsrcdir glibc-20050829T1854
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 10
+%define glibcrelease 11
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1079,6 +1079,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug 29 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-11
+- FUTEX_WAKE_OP support to speed up pthread_cond_signal
+
 * Wed Aug 24 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-10
 - update from CVS
   - fix growing of nscd persistent database (BZ#1204)
