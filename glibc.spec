@@ -1,9 +1,9 @@
-%define glibcdate 20050829T1854
+%define glibcdate 20050912T0656
 %define glibcname glibc
-%define glibcsrcdir glibc-20050829T1854
+%define glibcsrcdir glibc-20050912T0656
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 11
+%define glibcrelease 12
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -605,6 +605,8 @@ echo 'include ld.so.conf.d/*.conf' > $RPM_BUILD_ROOT/etc/ld.so.conf
 touch $RPM_BUILD_ROOT/etc/ld.so.cache
 chmod 644 $RPM_BUILD_ROOT/etc/ld.so.conf
 mkdir -p $RPM_BUILD_ROOT/etc/ld.so.conf.d
+mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
+touch $RPM_BUILD_ROOT/etc/sysconfig/nscd
 
 # Include %{_prefix}/%{_lib}/gconv/gconv-modules.cache
 > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
@@ -727,6 +729,7 @@ grep -v '/%{_lib}/%{nosegneg_subdir}' < rpm.filelist.full > rpm.filelist
 %endif
 
 echo '%{_prefix}/sbin/build-locale-archive' >> common.filelist
+echo '%{_prefix}/sbin/tzdata-update' >> common.filelist
 echo '%{_prefix}/sbin/nscd' > nscd.filelist
 
 cat > utils.filelist <<EOF
@@ -753,6 +756,9 @@ $GCC -Os -static -o build-locale-archive build-locale-archive.c \
   -DDATADIR=\"%{_datadir}\" -DPREFIX=\"%{_prefix}\" \
   -L../build-%{nptl_target_cpu}-linuxnptl
 install -m 700 build-locale-archive $RPM_BUILD_ROOT/usr/sbin/build-locale-archive
+$GCC -Os -static -o tzdata-update tzdata-update.c \
+  -L../build-%{nptl_target_cpu}-linuxnptl
+install -m 700 tzdata-update $RPM_BUILD_ROOT/usr/sbin/tzdata-update
 cd ..
 
 # the last bit: more documentation
@@ -942,6 +948,8 @@ touch $RPM_BUILD_ROOT/%{_prefix}/lib/locale/locale-archive
 
 %post common -p /usr/sbin/build-locale-archive
 
+%triggerin common -p /usr/sbin/tzdata-update -- tzdata
+
 %post devel
 /sbin/install-info %{_infodir}/libc.info.gz %{_infodir}/dir
 
@@ -1056,6 +1064,7 @@ rm -f *.filelist*
 %attr(0600,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/db/nscd/passwd
 %attr(0600,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/db/nscd/group
 %attr(0600,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/db/nscd/hosts
+%ghost %config(missingok,noreplace) /etc/sysconfig/nscd
 %endif
 
 %if "%{_enable_debug_packages}" == "1"
@@ -1079,6 +1088,23 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Sep 12 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-12
+- update from CVS
+  - netgrp handling fixes (#167728)
+  - fix memory leak in setlocale (BZ#1318)
+  - fix hwcaps computation
+  - several regex portability improvements (#167019)
+  - hypotf fix
+  - fix *printf return code if underlying write fails (BZ#1146)
+  - PPC64 dl{,v}sym fixes for new ABI .opd symbols
+- fix calloc with MALLOC_PERTURB_ in environment on 64-bit architectures
+  (#166719)
+- source /etc/sysconfig/nscd (if it exists) in /etc/rc.d/init.d/nscd
+  (#167083)
+- add %%triggerin for tzdata to glibc-common, so that tzdata updates
+  update /etc/localtime and /var/spool/postfix/etc/localtime if they
+  exist (#167787)
+
 * Mon Aug 29 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-11
 - FUTEX_WAKE_OP support to speed up pthread_cond_signal
 
