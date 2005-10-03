@@ -1,9 +1,9 @@
-%define glibcdate 20050912T0656
+%define glibcdate 20051003T2040
 %define glibcname glibc
-%define glibcsrcdir glibc-20050912T0656
+%define glibcsrcdir glibc-20051003T2040
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 12
+%define glibcrelease 13
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1088,6 +1088,14 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Oct  3 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-13
+- update from CVS
+  - fix setuid etc. hangs if some thread exits during the call (#167766)
+  - fix innetgr memory leak (#169051)
+  - support > 2GB nscd log files (#168851)
+  - too many other changes to list here
+- include errno in nscd message if audit_open failed (#169148)
+
 * Mon Sep 12 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-12
 - update from CVS
   - netgrp handling fixes (#167728)
