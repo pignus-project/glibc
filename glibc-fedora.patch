@@ -861,8 +861,17 @@
  date       "2000-08-02"
  %
 --- glibc-20051003T2040/nptl/ChangeLog	2 Oct 2005 15:40:54 -0000	1.799
-+++ glibc-20051003T2040-fedora/nptl/ChangeLog	3 Oct 2005 20:44:16 -0000	1.706.2.59
-@@ -70,6 +70,15 @@
++++ glibc-20051003T2040-fedora/nptl/ChangeLog	3 Oct 2005 21:49:07 -0000	1.706.2.60
+@@ -1,3 +1,8 @@
++2005-10-03  Jakub Jelinek  <jakub@redhat.com>
++
++	* allocatestack.c (setxid_signal_thread): Add
++	INTERNAL_SYSCALL_DECL (err).
++
+ 2005-10-02  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	* allocatestack.c (setxid_signal_thread): Need to use
+@@ -70,6 +75,15 @@
  	Use __sigfillset.  Document that sigfillset does the right thing wrt
  	to SIGSETXID.
  
@@ -878,7 +887,7 @@
  2005-07-11  Jakub Jelinek  <jakub@redhat.com>
  
  	[BZ #1102]
-@@ -805,6 +814,11 @@
+@@ -805,6 +819,11 @@
  	Move definition inside libpthread, libc, librt check.  Provide
  	definition for rtld.
  
@@ -890,7 +899,7 @@
  2004-09-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/alpha/jmpbuf-unwind.h: Define __libc_unwind_longjmp.
-@@ -2879,6 +2893,11 @@
+@@ -2879,6 +2898,11 @@
  
  	* Makefile [$(build-shared) = yes] (tests): Depend on $(test-modules).
  
@@ -926,6 +935,33 @@
  else
  $(addprefix $(objpfx),$(tests) $(test-srcs)): $(objpfx)libpthread.a
  endif
+--- glibc-20051003T2040/nptl/allocatestack.c	2 Oct 2005 15:39:21 -0000	1.58
++++ glibc-20051003T2040-fedora/nptl/allocatestack.c	3 Oct 2005 21:49:07 -0000	1.51.2.7
+@@ -839,6 +839,7 @@ setxid_signal_thread (struct xid_command
+     }
+ 
+   int val;
++  INTERNAL_SYSCALL_DECL (err);
+ #if __ASSUME_TGKILL
+   val = INTERNAL_SYSCALL (tgkill, err, 3, THREAD_GETMEM (THREAD_SELF, pid),
+ 			  t->tid, SIGSETXID);
+@@ -867,8 +868,6 @@ __nptl_setxid (struct xid_command *cmdp)
+   __xidcmd = cmdp;
+   cmdp->cntr = 0;
+ 
+-  INTERNAL_SYSCALL_DECL (err);
+-
+   struct pthread *self = THREAD_SELF;
+ 
+   /* Iterate over the list with system-allocated threads first.  */
+@@ -901,6 +900,7 @@ __nptl_setxid (struct xid_command *cmdp)
+ 
+   /* This must be last, otherwise the current thread might not have
+      permissions to send SIGSETXID syscall to the other threads.  */
++  INTERNAL_SYSCALL_DECL (err);
+   result = INTERNAL_SYSCALL_NCS (cmdp->syscall_no, err, 3,
+ 				 cmdp->id[0], cmdp->id[1], cmdp->id[2]);
+   if (INTERNAL_SYSCALL_ERROR_P (result, err))
 --- glibc-20051003T2040/nptl/tst-stackguard1.c	26 Jun 2005 17:44:14 -0000	1.1
 +++ glibc-20051003T2040-fedora/nptl/tst-stackguard1.c	8 Aug 2005 21:24:28 -0000	1.1.2.3
 @@ -190,17 +190,21 @@ do_test (void)
