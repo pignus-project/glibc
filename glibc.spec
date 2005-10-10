@@ -1,9 +1,9 @@
-%define glibcdate 20051003T2040
+%define glibcdate 20051010T1417
 %define glibcname glibc
-%define glibcsrcdir glibc-20051003T2040
+%define glibcsrcdir glibc-20051010T1417
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 13
+%define glibcrelease 14
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1088,6 +1088,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Oct 10 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-14
+- update from CVS
+  - fix malloc bug after fork introduced in the last update
+  - fix getent hosts IP for IPv4 IPs (#169831)
+
 * Mon Oct  3 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-13
 - update from CVS
   - fix setuid etc. hangs if some thread exits during the call (#167766)
