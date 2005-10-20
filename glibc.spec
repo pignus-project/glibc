@@ -1,9 +1,9 @@
-%define glibcdate 20051010T1417
+%define glibcdate 20051020T0651
 %define glibcname glibc
-%define glibcsrcdir glibc-20051010T1417
+%define glibcsrcdir glibc-20051020T0651
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 14
+%define glibcrelease 15
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1088,6 +1088,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Oct 20 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-15
+- update from CVS
+  - be permissive in %n check because of kernel bug #165351 (#171240)
+  - don't misalign stack in pthread_once on x86_64 (#170786, IT#81521)
+  - many locale fixes
+
 * Mon Oct 10 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-14
 - update from CVS
   - fix malloc bug after fork introduced in the last update
