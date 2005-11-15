@@ -1,9 +1,9 @@
-%define glibcdate 20051020T0651
+%define glibcdate 20051115T0809
 %define glibcname glibc
-%define glibcsrcdir glibc-20051020T0651
+%define glibcsrcdir glibc-20051115T0809
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 15
+%define glibcrelease 16
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -338,6 +338,9 @@ cat > asm/unistd.h <<EOF
 #define __NR_mq_notify		266
 #define __NR_mq_getsetattr	267
 #endif
+#ifndef __NR_waitid
+#define __NR_waitid		272
+#endif
 %endif
 %ifarch ppc64
 #ifndef __NR_utimes
@@ -350,6 +353,9 @@ cat > asm/unistd.h <<EOF
 #define __NR_mq_timedreceive	265
 #define __NR_mq_notify		266
 #define __NR_mq_getsetattr	267
+#endif
+#ifndef __NR_waitid
+#define __NR_waitid		272
 #endif
 %endif
 %ifarch s390
@@ -379,6 +385,9 @@ cat > asm/unistd.h <<EOF
 #define __NR_mq_notify		275
 #define __NR_mq_getsetattr	276
 #endif
+#ifndef __NR_waitid
+#define __NR_waitid		281
+#endif
 %endif
 %ifarch s390x
 #ifndef __NR_timer_create
@@ -399,6 +408,9 @@ cat > asm/unistd.h <<EOF
 #define __NR_mq_timedreceive	274
 #define __NR_mq_notify		275
 #define __NR_mq_getsetattr	276
+#endif
+#ifndef __NR_waitid
+#define __NR_waitid		281
 #endif
 %endif
 %ifarch sparc sparc64
@@ -1088,6 +1100,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Nov 15 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-16
+- update from CVS
+- make sure waitid syscall is used on ppc*/s390*
+
 * Thu Oct 20 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-15
 - update from CVS
   - be permissive in %n check because of kernel bug #165351 (#171240)
