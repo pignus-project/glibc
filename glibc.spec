@@ -1,9 +1,9 @@
-%define glibcdate 20051115T0809
+%define glibcdate 20051116T0829
 %define glibcname glibc
-%define glibcsrcdir glibc-20051115T0809
+%define glibcsrcdir glibc-20051116T0829
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 16
+%define glibcrelease 17
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1100,6 +1100,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov 16 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-17
+- update from CVS
+  - fix <sys/stat.h> in C++
+  - {fstat,fchown,rename,unlink}at fixes
+  - epoll_wait is now a cancellation point
+
 * Tue Nov 15 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-16
 - update from CVS
 - make sure waitid syscall is used on ppc*/s390*
