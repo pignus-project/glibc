@@ -3,7 +3,7 @@
 %define glibcsrcdir glibc-20051119T1959
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 18
+%define glibcrelease 18.1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -33,6 +33,7 @@ Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ppc-assume.patch
 Patch2: %{name}-ia64-lib64.patch
+Patch3: glibc-_Pragma-hack.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja
@@ -258,6 +259,7 @@ package or when debugging this package.
 %patch2 -p1
 %endif
 %endif
+%patch3 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir asm
@@ -1100,6 +1102,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Dec 19 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-18.1
+- rebuilt with GCC 4.1
+- work around http://gcc.gnu.org/PR25240
+
 * Sat Nov 19 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-18
 - update from CVS
   - change <sys/stat.h> for broken apps that #define const /**/,
