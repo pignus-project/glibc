@@ -876,8 +876,8 @@ for f in `find $RPM_BUILD_ROOT/%{_lib} -type l`; do
 done
 
 echo Sorting source file lists. Might take a while...
-xargs -0 -n 1 echo < $sf | LC_ALL=C grep -v '/<internal>$' | LC_ALL=C sort -u > $sf.sorted
-xargs -0 -n 1 echo < $csf | LC_ALL=C grep -v '/<internal>$' | LC_ALL=C sort -u > $csf.sorted
+xargs -0 -n 1 echo < $sf | LC_ALL=C grep -v '/<internal>$\|\.gperf$' | LC_ALL=C sort -u > $sf.sorted
+xargs -0 -n 1 echo < $csf | LC_ALL=C grep -v '/<internal>$\|\.gperf$' | LC_ALL=C sort -u > $csf.sorted
 mkdir -p $RPM_BUILD_ROOT/usr/src/debug
 cat $sf.sorted $csf.sorted \
   | (cd $RPM_BUILD_DIR; LC_ALL=C sort -u | cpio -pdm ${RPM_BUILD_ROOT}/usr/src/debug)
