@@ -1,9 +1,9 @@
-%define glibcdate 20051119T1959
+%define glibcdate 20051219T1003
 %define glibcname glibc
-%define glibcsrcdir glibc-20051119T1959
+%define glibcsrcdir glibc-20051219T1003
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 18.1
+%define glibcrelease 19
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -33,10 +33,9 @@ Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ppc-assume.patch
 Patch2: %{name}-ia64-lib64.patch
-Patch3: glibc-_Pragma-hack.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
-Obsoletes: gencat, locale, ldconfig, locale-ja
+Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
 Provides: ldconfig
 Autoreq: false
 Requires: glibc-common = %{version}-%{release}
@@ -156,24 +155,6 @@ executables.
 Install glibc-headers if you are going to develop programs which will
 use the standard C libraries.
 
-%package profile
-Summary: The GNU libc libraries, including support for gprof profiling.
-Group: Development/Libraries
-Obsoletes: libc-profile
-Autoreq: true
-
-%description profile
-The glibc-profile package includes the GNU libc libraries and support
-for profiling using the gprof program.  Profiling is analyzing a
-program's functions to see how much CPU time they use and determining
-which functions are calling other functions during execution.  To use
-gprof to profile a program, your program needs to use the GNU libc
-libraries included in glibc-profile (instead of the standard GNU libc
-libraries included in the glibc package).
-
-If you are going to use the gprof program to profile a program, you'll
-need to install the glibc-profile package.
-
 %package common
 Summary: Common binaries and locale data for glibc
 Conflicts: %{name} < %{version}
@@ -259,7 +240,6 @@ package or when debugging this package.
 %patch2 -p1
 %endif
 %endif
-%patch3 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir asm
@@ -510,7 +490,8 @@ CC="$GCC" CFLAGS="$build_CFLAGS" ../configure --prefix=%{_prefix} \
 	--enable-add-ons=nptl$AddOns --without-cvs $EnableKernel \
 	--with-headers=%{_prefix}/include --enable-bind-now \
 	--with-tls --with-__thread --build %{nptl_target_cpu}-redhat-linux \
-	--host %{nptl_target_cpu}-redhat-linux
+	--host %{nptl_target_cpu}-redhat-linux \
+	--disable-profile
 make %{?_smp_mflags} -r CFLAGS="$build_CFLAGS" PARALLELMFLAGS=-s
 
 cd ..
@@ -519,7 +500,6 @@ cd ..
 build_nptl linuxnptl
 
 %if %{buildxen}
-EnableKernel="$EnableKernel --disable-profile"
 build_nptl linuxnptl-nosegneg -mno-tls-direct-seg-refs
 %endif
 
@@ -698,7 +678,6 @@ for i in $RPM_BUILD_ROOT%{_prefix}/bin/{xtrace,memusage}; do
   chmod 755 $i; rm -f $i.tmp
 done
 
-grep '%{_prefix}/%{_lib}/lib.*_p\.a' < rpm.filelist > profile.filelist || :
 grep '%{_infodir}' < rpm.filelist | grep -v '%{_infodir}/dir' > devel.filelist
 grep '%{_prefix}/include/gnu/stubs-[32164]\+\.h' < rpm.filelist >> devel.filelist || :
 
@@ -941,7 +920,7 @@ case "$-" in *x*) save_trace=yes;; esac
 set +x
 echo Cutting down the list of unpackaged files
 for i in `sed '/%%dir/d;/%%config/d;/%%verify/d;s/%%lang([^)]*) //' \
-	  common.filelist devel.filelist headers.filelist profile.filelist \
+	  common.filelist devel.filelist headers.filelist \
 	  utils.filelist nscd.filelist`; do
   [ -f "$RPM_BUILD_ROOT$i" ] && rm -f "$RPM_BUILD_ROOT$i" || :
 done
@@ -1058,9 +1037,6 @@ rm -f *.filelist*
 %files -f headers.filelist headers
 %defattr(-,root,root)
 
-%files -f profile.filelist profile
-%defattr(-,root,root)
-
 %files -f utils.filelist utils
 %defattr(-,root,root)
 
@@ -1102,9 +1078,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Mon Dec 19 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-18.1
-- rebuilt with GCC 4.1
-- work around http://gcc.gnu.org/PR25240
+* Mon Dec 19 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-19
+- update from CVS
+  - sysdeps/generic reorg
+  - setjmp/longjmp jump pointer mangling
+- rebuilt with GCC 4.1-RH prerelease, worked around broken _Pragma ()
+  handling in it
+- remove glibc-profile subpackage
 
 * Sat Nov 19 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-18
 - update from CVS
