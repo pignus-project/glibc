@@ -33,6 +33,9 @@ Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ppc-assume.patch
 Patch2: %{name}-ia64-lib64.patch
+Patch3: glibc-_Pragma-hack.patch
+Patch4: glibc-setjmp-mangling.patch
+Patch5: glibc-mtrace-recursion.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -240,6 +243,9 @@ package or when debugging this package.
 %patch2 -p1
 %endif
 %endif
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir asm
@@ -1085,6 +1091,9 @@ rm -f *.filelist*
 - rebuilt with GCC 4.1-RH prerelease, worked around broken _Pragma ()
   handling in it
 - remove glibc-profile subpackage
+- use non-PLT calls for malloc/free/realloc/memalign invocations in
+  mtrace and mcheck hooks (#175261)
+- setjmp/longjmp jump pointer mangling on ppc{,64}/ia64/s390{,x}
 
 * Sat Nov 19 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-18
 - update from CVS
