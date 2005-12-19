@@ -443,6 +443,7 @@ exit 0
 EOF
 chmod +x find_provides.sh
 touch `find . -name configure`
+touch locale/programs/*-kw.h
 
 %build
 GCC=gcc
