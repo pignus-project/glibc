@@ -34,6 +34,7 @@ Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ppc-assume.patch
 Patch2: %{name}-ia64-lib64.patch
 Patch3: glibc-ia64-ulps.patch
+Patch4: glibc-time.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -242,6 +243,7 @@ package or when debugging this package.
 %endif
 %endif
 %patch3 -p1
+%patch4 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir asm
