@@ -1,9 +1,9 @@
-%define glibcdate 20051220T1028
+%define glibcdate 20051220T1751
 %define glibcname glibc
-%define glibcsrcdir glibc-20051220T1028
+%define glibcsrcdir glibc-20051220T1751
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 20
+%define glibcrelease 21
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -33,8 +33,6 @@ Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ppc-assume.patch
 Patch2: %{name}-ia64-lib64.patch
-Patch3: glibc-ia64-ulps.patch
-Patch4: glibc-time.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -242,8 +240,6 @@ package or when debugging this package.
 %patch2 -p1
 %endif
 %endif
-%patch3 -p1
-%patch4 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir asm
@@ -1083,6 +1079,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Dec 20 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-21
+- update from CVS
+  - fix pointer (de)mangling in gconv_cache.c
+
 * Tue Dec 20 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-20
 - update from CVS
   - time ((void *) 1) should segfault, not return -EFAULT (#174856, BZ#1952)
