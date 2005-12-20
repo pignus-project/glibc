@@ -33,6 +33,7 @@ Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ppc-assume.patch
 Patch2: %{name}-ia64-lib64.patch
+Patch3: glibc-ia64-ulps.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -240,6 +241,7 @@ package or when debugging this package.
 %patch2 -p1
 %endif
 %endif
+%patch3 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir asm
@@ -1083,7 +1085,7 @@ rm -f *.filelist*
 - update from CVS
   - time ((void *) 1) should segfault, not return -EFAULT (#174856, BZ#1952)
   - fix errlist generation
-- update ulps for GCC 4.1
+- update ulps for GCC 4.1 on IA-64
 
 * Mon Dec 19 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-19
 - update from CVS
