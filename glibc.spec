@@ -1,9 +1,9 @@
-%define glibcdate 20051220T1751
+%define glibcdate 20051221T0931
 %define glibcname glibc
-%define glibcsrcdir glibc-20051220T1751
+%define glibcsrcdir glibc-20051221T0931
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 21
+%define glibcrelease 22
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1079,6 +1079,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Dec 21 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-22
+- update from CVS
+  - minor fts fixes
+- revert broken _Pragma () workaround
+
 * Tue Dec 20 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-21
 - update from CVS
   - fix pointer (de)mangling in gconv_cache.c
