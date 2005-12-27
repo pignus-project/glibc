@@ -1,9 +1,9 @@
-%define glibcdate 20051221T0931
+%define glibcdate 20051227T1426
 %define glibcname glibc
-%define glibcsrcdir glibc-20051221T0931
+%define glibcsrcdir glibc-20051227T1426
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 22
+%define glibcrelease 23
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -33,7 +33,6 @@ Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ppc-assume.patch
 Patch2: %{name}-ia64-lib64.patch
-Patch3: glibc-ldconfig.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -241,7 +240,6 @@ package or when debugging this package.
 %patch2 -p1
 %endif
 %endif
-%patch3 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir asm
@@ -397,7 +395,7 @@ cat > asm/unistd.h <<EOF
 #define __NR_waitid		281
 #endif
 %endif
-%ifarch sparc sparc64
+%ifarch sparc sparcv9 sparc64
 #ifndef __NR_mq_open
 #define __NR_mq_open		273
 #define __NR_mq_unlink		274
@@ -421,6 +419,47 @@ cat > asm/unistd.h <<EOF
 #endif
 #ifndef __NR_waitid
 #define __NR_waitid		247
+#endif
+%endif
+#endif
+EOF
+cat > asm/errno.h <<EOF
+#ifndef _HACK_ASM_ERRNO_H
+#include_next <asm/errno.h>
+%ifarch alpha
+#ifndef ENOKEY
+#define ENOKEY		132
+#define EKEYEXPIRED	133
+#define EKEYREVOKED	134
+#define EKEYREJECTED	135
+#endif
+#ifndef EOWNERDEAD
+#define EOWNERDEAD	136
+#define ENOTRECOVERABLE	137
+#endif
+%endif
+%ifarch %{ix86} ia64 ppc ppc64 s390 s390x x86_64
+#ifndef ENOKEY
+#define ENOKEY		126
+#define EKEYEXPIRED	127
+#define EKEYREVOKED	128
+#define EKEYREJECTED	129
+#endif
+#ifndef EOWNERDEAD
+#define EOWNERDEAD	130
+#define ENOTRECOVERABLE	131
+#endif
+%endif
+%ifarch sparc sparcv9 sparc64
+#ifndef ENOKEY
+#define ENOKEY		128
+#define EKEYEXPIRED	129
+#define EKEYREVOKED	130
+#define EKEYREJECTED	131
+#endif
+#ifndef EOWNERDEAD
+#define EOWNERDEAD	132
+#define ENOTRECOVERABLE	133
 #endif
 %endif
 #endif
@@ -1081,11 +1120,16 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Dec 27 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-23
+- update from CVS
+  - robust mutexes
+- fix transliteration segfaults (#176573, #176583)
+- ignore prelink temporaries in ldconfig (#176570)
+
 * Wed Dec 21 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-22
 - update from CVS
   - minor fts fixes
 - revert broken _Pragma () workaround
-- fix ldconfig on bi-arch architectures (#176316)
 
 * Tue Dec 20 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-21
 - update from CVS
