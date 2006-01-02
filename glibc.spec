@@ -609,7 +609,7 @@ rm -f $RPM_BUILD_ROOT/%{_lib}/libNoVersion*
 # the generic one (#162634)
 cp -a bits/stdio-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/stdio-lock.h
 # And <bits/libc-lock.h> needs sanitizing as well.
-cp -a redhat/libc-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/libc-lock.h
+cp -a fedora/libc-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/libc-lock.h
 
 if [ -d $RPM_BUILD_ROOT%{_prefix}/info -a "%{_infodir}" != "%{_prefix}/info" ]; then
     mkdir -p $RPM_BUILD_ROOT%{_infodir}
@@ -1125,7 +1125,7 @@ rm -f *.filelist*
 * Mon Jan  2 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-25
 - update from CVS
   - s390{,x} and sparc{,64} pointer mangling fixes
-  - install a sanitized LinuxThreads <bits/libc-lock.h>
+- install a sanitized LinuxThreads <bits/libc-lock.h>
 
 * Mon Jan  2 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-24
 - update from CVS
