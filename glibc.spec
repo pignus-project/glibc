@@ -1,9 +1,9 @@
-%define glibcdate 20051227T1426
+%define glibcdate 20060102T1045
 %define glibcname glibc
-%define glibcsrcdir glibc-20051227T1426
+%define glibcsrcdir glibc-20060102T1045
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 23
+%define glibcrelease 24
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1120,6 +1120,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jan  2 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-24
+- update from CVS
+  - nscd audit changes (#174422)
+  - ppc{32,64} vDSO support and ppc32 hp-timing
+
 * Tue Dec 27 2005 Jakub Jelinek <jakub@redhat.com> 2.3.90-23
 - update from CVS
   - robust mutexes
