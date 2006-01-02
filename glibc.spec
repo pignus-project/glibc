@@ -1,9 +1,9 @@
-%define glibcdate 20060102T1045
+%define glibcdate 20060102T2114
 %define glibcname glibc
-%define glibcsrcdir glibc-20060102T1045
+%define glibcsrcdir glibc-20060102T2114
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 24
+%define glibcrelease 25
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -33,7 +33,6 @@ Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ppc-assume.patch
 Patch2: %{name}-ia64-lib64.patch
-Patch3: glibc-s390-mangling.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -241,7 +240,6 @@ package or when debugging this package.
 %patch2 -p1
 %endif
 %endif
-%patch3 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir asm
@@ -610,6 +608,8 @@ rm -f $RPM_BUILD_ROOT/%{_lib}/libNoVersion*
 # NPTL <bits/stdio-lock.h> is not usable outside of glibc, so include
 # the generic one (#162634)
 cp -a bits/stdio-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/stdio-lock.h
+# And <bits/libc-lock.h> needs sanitizing as well.
+cp -a redhat/libc-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/libc-lock.h
 
 if [ -d $RPM_BUILD_ROOT%{_prefix}/info -a "%{_infodir}" != "%{_prefix}/info" ]; then
     mkdir -p $RPM_BUILD_ROOT%{_infodir}
@@ -1122,6 +1122,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jan  2 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-25
+- update from CVS
+  - s390{,x} and sparc{,64} pointer mangling fixes
+  - install a sanitized LinuxThreads <bits/libc-lock.h>
+
 * Mon Jan  2 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-24
 - update from CVS
   - nscd audit changes (#174422)
