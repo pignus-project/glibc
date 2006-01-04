@@ -242,6 +242,12 @@ package or when debugging this package.
 %endif
 
 # Hack till glibc-kernheaders get updated, argh
+mkdir linux
+cat > linux/version.h <<EOF
+#define UTS_RELEASE "2.6.9"
+#define LINUX_VERSION_CODE 132617
+#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
+EOF
 mkdir asm
 cat > asm/unistd.h <<EOF
 #ifndef _HACK_ASM_UNISTD_H
