@@ -1,9 +1,9 @@
-%define glibcdate 20060102T2114
+%define glibcdate 20060104T0754
 %define glibcname glibc
-%define glibcsrcdir glibc-20060102T2114
+%define glibcsrcdir glibc-20060104T0754
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 25
+%define glibcrelease 26
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -61,8 +61,8 @@ Conflicts: gcc4 <= 4.0.0-0.6
 # /etc/default
 Conflicts: shadow-utils < 2:4.0.3-20
 Conflicts: nscd < 2.3.3-52
-Conflicts: kernel < 2.4.20
-%define enablekernel 2.4.20
+Conflicts: kernel < 2.6.9
+%define enablekernel 2.6.9
 %ifarch i386
 %define nptl_target_cpu i486
 %else
@@ -482,6 +482,7 @@ touch locale/programs/*-kw.h
 
 %build
 GCC=gcc
+GXX=g++
 %ifarch %{ix86}
 BuildFlags="-march=%{_target_cpu}"
 %endif
@@ -494,18 +495,22 @@ BuildFlags="-mcpu=ev6"
 %ifarch sparc
 BuildFlags="-fcall-used-g6"
 GCC="gcc -m32"
+GXX="g++ -m32"
 %endif
 %ifarch sparcv9
 BuildFlags="-mcpu=ultrasparc -fcall-used-g6"
 GCC="gcc -m32"
+GXX="g++ -m32"
 %endif
 %ifarch sparc64
 BuildFlags="-mcpu=ultrasparc -mvis -fcall-used-g6"
 GCC="gcc -m64"
+GXX="g++ -m64"
 %endif
 %ifarch ppc64
 BuildFlags="-mno-minimal-toc"
 GCC="gcc -m64"
+GXX="g++ -m64"
 %endif
 
 BuildFlags="$BuildFlags -DNDEBUG=1"
@@ -528,7 +533,7 @@ shift
 rm -rf $builddir
 mkdir $builddir ; cd $builddir
 build_CFLAGS="$BuildFlags -g -O3 $*"
-CC="$GCC" CFLAGS="$build_CFLAGS" ../configure --prefix=%{_prefix} \
+CC="$GCC" CXX="$GXX" CFLAGS="$build_CFLAGS" ../configure --prefix=%{_prefix} \
 	--enable-add-ons=nptl$AddOns --without-cvs $EnableKernel \
 	--with-headers=%{_prefix}/include --enable-bind-now \
 	--with-tls --with-__thread --build %{nptl_target_cpu}-redhat-linux \
@@ -1122,6 +1127,16 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jan  4 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-26
+- update from CVS
+  - for newly linked lio_listio* callers, send per request
+    notifications (#170116)
+  - fixup nscd -S option removal changes (#176860)
+  - remove nonnull attribute from ctermid (#176753)
+  - fix PTHREAD_*_INITIALIZER{,_NP} on 64-bit arches
+  - SPARC NPTL support for pre-v9 CPUs
+- drop support for 2.4.xx and < 2.6.9 kernels
+
 * Mon Jan  2 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-25
 - update from CVS
   - s390{,x} and sparc{,64} pointer mangling fixes
