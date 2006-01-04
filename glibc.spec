@@ -242,14 +242,14 @@ package or when debugging this package.
 %endif
 
 # Hack till glibc-kernheaders get updated, argh
-mkdir linux
-cat > linux/version.h <<EOF
+mkdir -p override_headers/linux
+cat > override_headers/linux/version.h <<EOF
 #define UTS_RELEASE "2.6.9"
 #define LINUX_VERSION_CODE 132617
 #define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 EOF
-mkdir asm
-cat > asm/unistd.h <<EOF
+mkdir -p override_headers/asm
+cat > override_headers/asm/unistd.h <<EOF
 #ifndef _HACK_ASM_UNISTD_H
 #include_next <asm/unistd.h>
 %ifarch alpha
@@ -429,7 +429,7 @@ cat > asm/unistd.h <<EOF
 %endif
 #endif
 EOF
-cat > asm/errno.h <<EOF
+cat > override_headers/asm/errno.h <<EOF
 #ifndef _HACK_ASM_ERRNO_H
 #include_next <asm/errno.h>
 %ifarch alpha
@@ -541,7 +541,7 @@ mkdir $builddir ; cd $builddir
 build_CFLAGS="$BuildFlags -g -O3 $*"
 CC="$GCC" CXX="$GXX" CFLAGS="$build_CFLAGS" ../configure --prefix=%{_prefix} \
 	--enable-add-ons=nptl$AddOns --without-cvs $EnableKernel \
-	--with-headers=%{_prefix}/include --enable-bind-now \
+	--with-headers=`cd ..; pwd`/override_headers:%{_prefix}/include --enable-bind-now \
 	--with-tls --with-__thread --build %{nptl_target_cpu}-redhat-linux \
 	--host %{nptl_target_cpu}-redhat-linux \
 	--disable-profile
