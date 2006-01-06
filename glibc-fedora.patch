@@ -1120,6 +1120,17 @@
  else
  $(addprefix $(objpfx),$(tests) $(test-srcs)): $(objpfx)libpthread.a
  endif
+--- glibc-20060106T2148/nptl/descr.h	6 Jan 2006 21:42:24 -0000	1.29
++++ glibc-20060106T2148-fedora/nptl/descr.h	6 Jan 2006 23:04:24 -0000	1.23.2.9
+@@ -165,7 +165,7 @@ struct pthread
+   } while (0)
+ # define DEQUEUE_MUTEX(mutex) \
+   do {									      \
+-    struct pthread_mutex_s *runp = THREAD_GETMEM (THREAD_SELF, robust_list);  \
++    struct __pthread_mutex_s *runp = THREAD_GETMEM (THREAD_SELF, robust_list);\
+     if (runp == &mutex->__data)						      \
+       THREAD_SETMEM (THREAD_SELF, robust_list, runp->__next);		      \
+     else								      \
 --- glibc-20060106T2148/nptl/tst-stackguard1.c	26 Jun 2005 17:44:14 -0000	1.1
 +++ glibc-20060106T2148-fedora/nptl/tst-stackguard1.c	8 Aug 2005 21:24:28 -0000	1.1.2.3
 @@ -190,17 +190,21 @@ do_test (void)
