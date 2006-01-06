@@ -3,7 +3,7 @@
 %define glibcsrcdir glibc-20060104T0754
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 26
+%define glibcrelease 27
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1135,6 +1135,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jan  6 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-27
+- only rely on d_type in 32-bit getdents on s390 for 2.6.11+
+
 * Wed Jan  4 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-26
 - update from CVS
   - for newly linked lio_listio* callers, send per request
