@@ -1,9 +1,9 @@
-%define glibcdate 20060104T0754
+%define glibcdate 20060106T0916
 %define glibcname glibc
-%define glibcsrcdir glibc-20060104T0754
+%define glibcsrcdir glibc-20060106T0916
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 27
+%define glibcrelease 28
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -33,7 +33,6 @@ Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ppc-assume.patch
 Patch2: %{name}-ia64-lib64.patch
-Patch3: glibc-s390-waitid.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -241,7 +240,6 @@ package or when debugging this package.
 %patch2 -p1
 %endif
 %endif
-%patch3 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir -p override_headers/linux
@@ -1135,6 +1133,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jan  6 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-28
+- update from CVS
+  - make aio_suspend interruptible by signals (#171968)
+
 * Fri Jan  6 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-27
 - only rely on d_type in 32-bit getdents on s390 for 2.6.11+
 
