@@ -1,9 +1,9 @@
-%define glibcdate 20060106T0916
+%define glibcdate 20060106T2148
 %define glibcname glibc
-%define glibcsrcdir glibc-20060106T0916
+%define glibcsrcdir glibc-20060106T2148
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 28
+%define glibcrelease 29
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1133,6 +1133,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jan  6 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-29
+- update from CVS
+  - make pthread_mutex_t an unnamed union again, as it affects
+    libstdc++ ABI mangling
+
 * Fri Jan  6 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-28
 - update from CVS
   - make aio_suspend interruptible by signals (#171968)
