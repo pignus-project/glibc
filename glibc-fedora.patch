@@ -2026,3 +2026,15 @@
 @@ -1 +1 @@
 -s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 \2\3"_
 +s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 /emul/ia32-linux\2\3"_
+--- glibc-20060106T2148/sysdeps/unix/sysv/linux/ia64/sysdep.h	20 Dec 2005 06:53:38 -0000	1.24
++++ glibc-20060106T2148-fedora/sysdeps/unix/sysv/linux/ia64/sysdep.h	6 Jan 2006 22:24:17 -0000	1.22.2.3
+@@ -205,7 +205,8 @@
+     register long _r8 __asm ("r8");					      \
+     register long _r10 __asm ("r10");					      \
+     register long _r15 __asm ("r15") = name;				      \
+-    register void *_b7 __asm ("b7") = ((tcbhead_t *) __thread_self)->private; \
++    register void *_b7 __asm ("b7")					      \
++      = ((tcbhead_t *) __thread_self)->__private;			      \
+     long _retval;							      \
+     LOAD_REGS_##nr							      \
+     /*									      \
