@@ -32,6 +32,7 @@ Source2: %(echo %{glibcsrcdir} | sed s/glibc-/glibc-libidn-/).tar.bz2
 Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
+Patch2: glibc-rodata.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -238,6 +239,7 @@ package or when debugging this package.
 %patch1 -p1
 %endif
 %endif
+%patch2 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir -p override_headers/linux
@@ -1140,7 +1142,7 @@ rm -f *.filelist*
 - update from CVS
   - <pthread.h> initializer fixes for -std=c{8,9}9 on 32-bit
     arches
-  - 
+- avoid writable .rodata (#177121)
 
 * Fri Jan  6 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-29
 - update from CVS
