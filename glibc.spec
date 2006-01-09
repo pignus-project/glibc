@@ -31,8 +31,7 @@ Source2: %(echo %{glibcsrcdir} | sed s/glibc-/glibc-libidn-/).tar.bz2
 %endif
 Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
-Patch1: %{name}-ppc-assume.patch
-Patch2: %{name}-ia64-lib64.patch
+Patch1: %{name}-ia64-lib64.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -234,10 +233,9 @@ package or when debugging this package.
 %prep
 %setup -q -n %{glibcsrcdir} %{glibc_release_unpack} -a3
 %patch0 -E -p1
-%patch1 -p1
 %ifarch ia64
 %if "%{_lib}" == "lib64"
-%patch2 -p1
+%patch1 -p1
 %endif
 %endif
 
