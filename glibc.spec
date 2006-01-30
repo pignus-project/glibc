@@ -35,6 +35,7 @@ Patch1: %{name}-ia64-lib64.patch
 Patch2: glibc-ppc-fpu.patch
 Patch3: glibc-ppc-ulps.patch
 Patch4: glibc-s390-ldbl.patch
+Patch5: glibc-ldbl-include.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -247,6 +248,7 @@ package or when debugging this package.
 %patch2 -p1 -E
 %patch3 -p1 -E
 %patch4 -p1 -E
+%patch5 -p1 -E
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir -p override_headers/linux
