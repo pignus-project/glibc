@@ -1,9 +1,9 @@
-%define glibcdate 20060109T2152
+%define glibcdate 20060130T0922
 %define glibcname glibc
-%define glibcsrcdir glibc-20060109T2152
+%define glibcsrcdir glibc-20060130T0922
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 30
+%define glibcrelease 31
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -32,7 +32,6 @@ Source2: %(echo %{glibcsrcdir} | sed s/glibc-/glibc-libidn-/).tar.bz2
 Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
-Patch2: glibc-rodata.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -71,6 +70,9 @@ Conflicts: kernel < 2.6.9
 # Need AS_NEEDED directive
 BuildRequires: binutils >= 2.15.94.0.2-1
 BuildRequires: gcc >= 3.2.1-5
+%ifarch ppc s390 s390x
+BuildRequires: gcc >= 4.1.0-0.17
+%endif
 %if "%{_enable_debug_packages}" == "1"
 BuildPreReq: elfutils >= 0.72
 BuildPreReq: rpm >= 4.2-0.56
@@ -239,7 +241,6 @@ package or when debugging this package.
 %patch1 -p1
 %endif
 %endif
-%patch2 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir -p override_headers/linux
@@ -281,6 +282,25 @@ cat > override_headers/asm/unistd.h <<EOF
 #endif
 #ifndef __NR_waitid
 #define __NR_waitid		284
+#endif
+#ifndef __NR_openat
+#define __NR_openat		295
+#define __NR_mkdirat		296
+#define __NR_mknodat		297
+#define __NR_fchownat		298
+#define __NR_futimesat		299
+#define __NR_newfstatat		300
+#define __NR_unlinkat		301
+#define __NR_renameat		302
+#define __NR_linkat		303
+#define __NR_symlinkat		304
+#define __NR_readlinkat		305
+#define __NR_fchmodat		306
+#define __NR_faccessat		307
+#endif
+#ifndef __NR_pselect6
+#define __NR_pselect6		308
+#define __NR_ppoll		309
 #endif
 %endif
 %ifarch ia64
@@ -329,6 +349,10 @@ cat > override_headers/asm/unistd.h <<EOF
 #ifndef __NR_waitid
 #define __NR_waitid		272
 #endif
+#ifndef __NR_pselect6
+#define __NR_pselect6		280
+#define __NR_ppoll		281
+#endif
 %endif
 %ifarch ppc64
 #ifndef __NR_utimes
@@ -344,6 +368,10 @@ cat > override_headers/asm/unistd.h <<EOF
 #endif
 #ifndef __NR_waitid
 #define __NR_waitid		272
+#endif
+#ifndef __NR_pselect6
+#define __NR_pselect6		280
+#define __NR_ppoll		281
 #endif
 %endif
 %ifarch s390
@@ -418,6 +446,25 @@ cat > override_headers/asm/unistd.h <<EOF
 #define __NR_lstat64		132
 #define __NR_stat64		139
 #endif
+#ifndef __NR_openat
+#define __NR_openat		284
+#define __NR_mkdirat		285
+#define __NR_mknodat		286
+#define __NR_fchownat		287
+#define __NR_futimesat		288
+#define __NR_newfstatat		289
+#define __NR_unlinkat		290
+#define __NR_renameat		291
+#define __NR_linkat		292
+#define __NR_symlinkat		293
+#define __NR_readlinkat		294
+#define __NR_fchmodat		295
+#define __NR_faccessat		296
+#endif
+#ifndef __NR_pselect6
+#define __NR_pselect6		297
+#define __NR_ppoll		298
+#endif
 %endif
 %ifarch x86_64
 #ifndef __NR_mq_open
@@ -430,6 +477,21 @@ cat > override_headers/asm/unistd.h <<EOF
 #endif
 #ifndef __NR_waitid
 #define __NR_waitid		247
+#endif
+#ifndef __NR_openat
+#define __NR_openat		257
+#define __NR_mkdirat		258
+#define __NR_mknodat		259
+#define __NR_fchownat		260
+#define __NR_futimesat		261
+#define __NR_newfstatat		262
+#define __NR_unlinkat		263
+#define __NR_renameat		264
+#define __NR_linkat		265
+#define __NR_symlinkat		266
+#define __NR_readlinkat		267
+#define __NR_fchmodat		268
+#define __NR_faccessat		269
 #endif
 %endif
 #endif
@@ -1138,6 +1200,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jan 30 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-31
+- update from CVS
+  - 128-bit long double on ppc, ppc64, s390, s390x and sparc{,v9}
+- add some new syscall numbers to the override <asm/unistd.h>
+  headers
+
 * Mon Jan  9 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-30
 - update from CVS
   - <pthread.h> initializer fixes for -std=c{8,9}9 on 32-bit
