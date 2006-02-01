@@ -1,9 +1,9 @@
-%define glibcdate 20060130T0922
+%define glibcdate 20060201T0846
 %define glibcname glibc
-%define glibcsrcdir glibc-20060130T0922
+%define glibcsrcdir glibc-20060201T0846
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 31
+%define glibcrelease 32
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -32,10 +32,6 @@ Source2: %(echo %{glibcsrcdir} | sed s/glibc-/glibc-libidn-/).tar.bz2
 Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
-Patch2: glibc-ppc-fpu.patch
-Patch3: glibc-ppc-ulps.patch
-Patch4: glibc-s390-ldbl.patch
-Patch5: glibc-ldbl-include.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -245,10 +241,6 @@ package or when debugging this package.
 %patch1 -p1
 %endif
 %endif
-%patch2 -p1 -E
-%patch3 -p1 -E
-%patch4 -p1 -E
-%patch5 -p1 -E
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir -p override_headers/linux
@@ -278,6 +270,11 @@ cat > override_headers/asm/unistd.h <<EOF
 #ifndef __NR_waitid
 #define __NR_waitid			438
 #endif
+#ifndef __NR_inotify_init
+#define __NR_inotify_init		444
+#define __NR_inotify_add_watch		445
+#define __NR_inotify_rm_watch		446
+#endif
 %endif
 %ifarch %{ix86}
 #ifndef __NR_mq_open
@@ -290,6 +287,11 @@ cat > override_headers/asm/unistd.h <<EOF
 #endif
 #ifndef __NR_waitid
 #define __NR_waitid		284
+#endif
+#ifndef __NR_inotify_init
+#define __NR_inotify_init	291
+#define __NR_inotify_add_watch	292
+#define __NR_inotify_rm_watch	293
 #endif
 #ifndef __NR_openat
 #define __NR_openat		295
@@ -334,6 +336,11 @@ cat > override_headers/asm/unistd.h <<EOF
 #ifndef __NR_waitid
 #define __NR_waitid			1270
 #endif
+#ifndef __NR_inotify_init
+#define __NR_inotify_init		1277
+#define __NR_inotify_add_watch		1278
+#define __NR_inotify_rm_watch		1279
+#endif
 %endif
 %ifarch ppc
 #ifndef __NR_utimes
@@ -357,6 +364,11 @@ cat > override_headers/asm/unistd.h <<EOF
 #ifndef __NR_waitid
 #define __NR_waitid		272
 #endif
+#ifndef __NR_inotify_init
+#define __NR_inotify_init	275
+#define __NR_inotify_add_watch	276
+#define __NR_inotify_rm_watch	277
+#endif
 #ifndef __NR_pselect6
 #define __NR_pselect6		280
 #define __NR_ppoll		281
@@ -376,6 +388,11 @@ cat > override_headers/asm/unistd.h <<EOF
 #endif
 #ifndef __NR_waitid
 #define __NR_waitid		272
+#endif
+#ifndef __NR_inotify_init
+#define __NR_inotify_init	275
+#define __NR_inotify_add_watch	276
+#define __NR_inotify_rm_watch	277
 #endif
 #ifndef __NR_pselect6
 #define __NR_pselect6		280
@@ -412,6 +429,11 @@ cat > override_headers/asm/unistd.h <<EOF
 #ifndef __NR_waitid
 #define __NR_waitid		281
 #endif
+#ifndef __NR_inotify_init
+#define __NR_inotify_init	284
+#define __NR_inotify_add_watch	285
+#define __NR_inotify_rm_watch	286
+#endif
 %endif
 %ifarch s390x
 #ifndef __NR_timer_create
@@ -436,6 +458,11 @@ cat > override_headers/asm/unistd.h <<EOF
 #ifndef __NR_waitid
 #define __NR_waitid		281
 #endif
+#ifndef __NR_inotify_init
+#define __NR_inotify_init	284
+#define __NR_inotify_add_watch	285
+#define __NR_inotify_rm_watch	286
+#endif
 %endif
 %ifarch sparc sparcv9 sparc64
 #ifndef __NR_mq_open
@@ -453,6 +480,11 @@ cat > override_headers/asm/unistd.h <<EOF
 #define __NR_fstat64		63
 #define __NR_lstat64		132
 #define __NR_stat64		139
+#endif
+#ifndef __NR_inotify_init
+#define __NR_inotify_init	151
+#define __NR_inotify_add_watch	152
+#define __NR_inotify_rm_watch	156
 #endif
 #ifndef __NR_openat
 #define __NR_openat		284
@@ -485,6 +517,11 @@ cat > override_headers/asm/unistd.h <<EOF
 #endif
 #ifndef __NR_waitid
 #define __NR_waitid		247
+#endif
+#ifndef __NR_inotify_init
+#define __NR_inotify_init	253
+#define __NR_inotify_add_watch	254
+#define __NR_inotify_rm_watch	255
 #endif
 #ifndef __NR_openat
 #define __NR_openat		257
@@ -1208,6 +1245,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Feb  1 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-32
+- update from CVS
+  - 128-bit long double fixes for ppc{,64}, s390{,x} and sparc{,v9},
+    alpha 128-bit long double support
+- add inotify syscall numbers to the override <asm/unistd.h> headers
+  (#179366)
+
 * Mon Jan 30 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-31
 - update from CVS
   - 128-bit long double on ppc, ppc64, s390, s390x and sparc{,v9}
