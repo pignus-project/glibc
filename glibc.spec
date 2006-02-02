@@ -3,7 +3,7 @@
 %define glibcsrcdir glibc-20060202T0507
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 33
+%define glibcrelease 34
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -32,6 +32,7 @@ Source2: %(echo %{glibcsrcdir} | sed s/glibc-/glibc-libidn-/).tar.bz2
 Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
+Patch2: glibc-math_h.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -241,6 +242,7 @@ package or when debugging this package.
 %patch1 -p1
 %endif
 %endif
+%patch2 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir -p override_headers/linux
@@ -1245,6 +1247,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Feb  2 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-34
+- fix <math.h> with C++ and -mlong-double-64 (#179742)
+- add nexttowardl redirect for -mlong-double-64
+
 * Thu Feb  2 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-33
 - update from CVS
   - long double support fixes
