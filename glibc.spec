@@ -1,9 +1,9 @@
-%define glibcdate 20060201T0846
+%define glibcdate 20060202T0507
 %define glibcname glibc
-%define glibcsrcdir glibc-20060201T0846
+%define glibcsrcdir glibc-20060202T0507
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 32
+%define glibcrelease 33
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1245,6 +1245,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Feb  2 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-33
+- update from CVS
+  - long double support fixes
+
 * Wed Feb  1 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-32
 - update from CVS
   - 128-bit long double fixes for ppc{,64}, s390{,x} and sparc{,v9},
