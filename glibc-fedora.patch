@@ -1,30 +1,31 @@
---- glibc-20060202T0507/ChangeLog	1 Feb 2006 22:44:44 -0000	1.9974
-+++ glibc-20060202T0507-fedora/ChangeLog	2 Feb 2006 09:24:43 -0000	1.8782.2.156
-@@ -1,3 +1,23 @@
-+2006-02-02  Roland McGrath  <roland@redhat.com>
+--- glibc-20060203T0932/ChangeLog	3 Feb 2006 05:28:06 -0000	1.9983
++++ glibc-20060203T0932-fedora/ChangeLog	3 Feb 2006 09:47:53 -0000	1.8782.2.160
+@@ -1,3 +1,24 @@
++2006-02-03  Jakub Jelinek  <jakub@redhat.com>
 +
-+	* timezone/private.h: Update from tzcode2006a.
-+	* timezone/scheck.c: Likewise.
-+	* timezone/asia: Update from tzdata2006a.
-+	* timezone/northamerica: Likewise.
-+	* timezone/zone.tab: Likewise.
++	* stdlib/bits/stdlib-ldbl.h (qecvt, qfcvt, qgcvt, qecvt_r,
++	qfcvt_r): Guard with #if defined __USE_SVID || defined
++	__USE_XOPEN_EXTENDED.
 +
-+	* sysdeps/powerpc/powerpc64/Makefile (no-special-regs): New variable.
-+	(CFLAGS-mcount.c): Use it instead of -msoft-float.
-+	* sysdeps/powerpc/powerpc64/elf/Makefile
-+	(CFLAGS-dl-runtime.os, CFLAGS-dl-lookup.os, CFLAGS-dl-misc.os,
-+	CFLAGS-rtld-mempcpy.os, CFLAGS-rtld-memmove.os, CFLAGS-rtld-memchr.os,
-+	CFLAGS-rtld-strnlen.os): LIkewise
++	* sysdeps/unix/sysv/linux/futimesat.c (futimesat): If
++	file == NULL, use __futimes unconditionally.
 +
-+2006-02-01  Roland McGrath  <roland@redhat.com>
++	* manual/filesys.texi (futimes): Fix prototype.
 +
-+	* sysdeps/ieee754/ldbl-opt/Makefile (sysdep-CFLAGS): Avoid adding
-+	-mlong-double-128 when it's already there.
++2006-02-02  Jakub Jelinek  <jakub@redhat.com>
 +
- 2006-02-01  Roland McGrath  <roland@frob.com>
++	* math/math.h (__nldbl_nexttowardf): Put __THROW before
++	__attribute__ ((__const__)).
++	(__MATHDECL_2): Use __REDIRECT_NTH instead of __REDIRECT
++	followed by __THROW.
++
++	* math/math.h [__LDBL_COMPAT && __USE_ISOC99] (nexttowardl): New
++	prototype.
++
+ 2006-02-02  Ulrich Drepper  <drepper@redhat.com>
  
- 	* mach/Machrules ($(objpfx)%.uh, $(objpfx)%.__h): Use static pattern
-@@ -20,6 +40,11 @@
+ 	* sysdeps/unix/sysv/linux/futimesat.c [__NR_futimesat]
+@@ -57,6 +78,11 @@
  	* sysdeps/ieee754/ldbl-128/s_llrintl.c (__llrintl): Fix a typo.
  	* sysdeps/s390/fpu/libm-test-ulps: Remove llrint ulps.
  
@@ -36,7 +37,7 @@
  2006-01-19  Thomas Schwinge  <tschwinge@gnu.org>
  
  	* libio/genops.c: Include <stdbool.h>.
-@@ -2445,6 +2470,10 @@
+@@ -2483,6 +2509,10 @@
  
  	* elf/order2mod2.c (init): Cast ignored value to void.
  
@@ -47,7 +48,7 @@
  2005-12-27  Ulrich Drepper  <drepper@redhat.com>
  
  	* elf/tst-tls13.c (do_test): Avoid using the library path when
-@@ -2728,6 +2757,26 @@
+@@ -2766,6 +2796,26 @@
  	* sysdeps/unix/sysv/linux/time.c: If __NR_time is not defined,
  	use sysdeps/unix/time.c implementation.
  
@@ -74,7 +75,7 @@
  2005-12-19  Ulrich Drepper  <drepper@redhat.com>
  
  	[BZ #1955]
-@@ -5846,6 +5895,11 @@
+@@ -5884,6 +5934,11 @@
  	R_ARM_TLS_TPOFF32, R_ARM_TLS_GD32, R_ARM_TLS_LDM32,
  	R_ARM_TLS_LDO32, R_ARM_TLS_IE32, R_ARM_TLS_LE32): New macros.
  
@@ -86,7 +87,7 @@
  2005-10-03  Roland McGrath  <roland@redhat.com>
  
  	* sysdeps/powerpc/nofpu: Directory removed, saved in ports repository.
-@@ -6840,6 +6894,12 @@
+@@ -6878,6 +6933,12 @@
  	* argp/argp-help.c (__argp_error): __asprintf -> vasprintf.
  	(__argp_failure): Likewise.
  
@@ -99,7 +100,7 @@
  2005-08-08  Ulrich Drepper  <drepper@redhat.com>
  
  	* nscd/cache.c (cache_add): Commit hash table and header to disk.
-@@ -6964,6 +7024,17 @@
+@@ -7002,6 +7063,17 @@
  	__syslog_chk.
  	* misc/Versions: Export __syslog_chk and __vsyslog_chk.
  
@@ -117,7 +118,7 @@
  2005-07-28  Thomas Schwinge  <schwinge@nic-nac-project.de>
  
  	[BZ #1137]
-@@ -10024,6 +10095,18 @@
+@@ -10062,6 +10134,18 @@
  
  	* scripts/soversions.awk: Fix default version set handling.
  
@@ -136,8 +137,8 @@
  2005-02-10  Roland McGrath  <roland@redhat.com>
  
  	[BZ #157]
---- glibc-20060202T0507/ChangeLog.11	10 Nov 2000 03:31:36 -0000	1.1
-+++ glibc-20060202T0507-fedora/ChangeLog.11	22 Sep 2004 21:20:47 -0000	1.1.4.1
+--- glibc-20060203T0932/ChangeLog.11	10 Nov 2000 03:31:36 -0000	1.1
++++ glibc-20060203T0932-fedora/ChangeLog.11	22 Sep 2004 21:20:47 -0000	1.1.4.1
 @@ -1352,6 +1352,11 @@
  	* sysdeps/unix/sysv/linux/mips/sys/tas.h: Add missing .mips0 at the
  	end of inline assembler code.
@@ -187,8 +188,8 @@
  	* sysdeps/arm/bits/huge_val.h (HUGE_VAL, HUGE_VALF): Add
  	__extension__ to hexadecimal floating constant notation.
  	* sysdeps/i386/bits/huge_val.h (HUGE_VAL, HUGE_VALF, HUGE_VALL):
---- glibc-20060202T0507/ChangeLog.12	16 Aug 2001 05:24:54 -0000	1.1
-+++ glibc-20060202T0507-fedora/ChangeLog.12	22 Sep 2004 21:20:47 -0000	1.1.4.1
+--- glibc-20060203T0932/ChangeLog.12	16 Aug 2001 05:24:54 -0000	1.1
++++ glibc-20060203T0932-fedora/ChangeLog.12	22 Sep 2004 21:20:47 -0000	1.1.4.1
 @@ -7729,6 +7729,13 @@
  
  	* Versions.def [ld]: Add GLIBC_2.2.1.
@@ -215,8 +216,8 @@
  2001-01-02  Franz Sirl	<Franz.Sirl-kernel@lauterbach.com>
  
  	* sysdeps/powerpc/dl-machine.c (__process_machine_rela): Fix typo.
---- glibc-20060202T0507/ChangeLog.15	16 Feb 2005 07:34:17 -0000	1.1
-+++ glibc-20060202T0507-fedora/ChangeLog.15	3 Mar 2005 17:29:57 -0000	1.1.6.2
+--- glibc-20060203T0932/ChangeLog.15	16 Feb 2005 07:34:17 -0000	1.1
++++ glibc-20060203T0932-fedora/ChangeLog.15	3 Mar 2005 17:29:57 -0000	1.1.6.2
 @@ -477,6 +477,14 @@
  
  2004-11-26  Jakub Jelinek  <jakub@redhat.com>
@@ -297,8 +298,8 @@
  2004-08-30  Roland McGrath  <roland@frob.com>
  
  	* scripts/extract-abilist.awk: If `lastversion' variable defined, omit
---- glibc-20060202T0507/csu/elf-init.c	5 Nov 2005 17:41:38 -0000	1.8
-+++ glibc-20060202T0507-fedora/csu/elf-init.c	15 Nov 2005 09:54:10 -0000	1.3.2.6
+--- glibc-20060203T0932/csu/elf-init.c	5 Nov 2005 17:41:38 -0000	1.8
++++ glibc-20060203T0932-fedora/csu/elf-init.c	15 Nov 2005 09:54:10 -0000	1.3.2.6
 @@ -49,6 +49,23 @@ extern void (*__init_array_end []) (int,
  extern void (*__fini_array_start []) (void) attribute_hidden;
  extern void (*__fini_array_end []) (void) attribute_hidden;
@@ -323,8 +324,8 @@
  
  /* These function symbols are provided for the .init/.fini section entry
     points automagically by the linker.  */
---- glibc-20060202T0507/debug/tst-chk1.c	22 Aug 2005 15:12:34 -0000	1.14
-+++ glibc-20060202T0507-fedora/debug/tst-chk1.c	24 Aug 2005 07:23:26 -0000	1.1.2.15
+--- glibc-20060203T0932/debug/tst-chk1.c	22 Aug 2005 15:12:34 -0000	1.14
++++ glibc-20060203T0932-fedora/debug/tst-chk1.c	24 Aug 2005 07:23:26 -0000	1.1.2.15
 @@ -17,6 +17,9 @@
     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
     02111-1307 USA.  */
@@ -353,8 +354,8 @@
  # define O 0
  #else
  # define O 1
---- glibc-20060202T0507/elf/ldconfig.c	1 Jan 2006 19:15:56 -0000	1.52
-+++ glibc-20060202T0507-fedora/elf/ldconfig.c	2 Jan 2006 10:52:50 -0000	1.47.2.7
+--- glibc-20060203T0932/elf/ldconfig.c	1 Jan 2006 19:15:56 -0000	1.52
++++ glibc-20060203T0932-fedora/elf/ldconfig.c	2 Jan 2006 10:52:50 -0000	1.47.2.7
 @@ -693,7 +693,18 @@ search_dir (const struct dir_entry *entr
  #endif
  	      !is_hwcap_platform (direntry->d_name)))
@@ -456,8 +457,8 @@
      }
  
    search_dirs ();
---- glibc-20060202T0507/elf/tst-stackguard1.c	26 Jun 2005 18:08:36 -0000	1.1
-+++ glibc-20060202T0507-fedora/elf/tst-stackguard1.c	8 Aug 2005 21:24:27 -0000	1.1.2.3
+--- glibc-20060203T0932/elf/tst-stackguard1.c	26 Jun 2005 18:08:36 -0000	1.1
++++ glibc-20060203T0932-fedora/elf/tst-stackguard1.c	8 Aug 2005 21:24:27 -0000	1.1.2.3
 @@ -160,17 +160,21 @@ do_test (void)
       the 16 runs, something is very wrong.  */
    int ndifferences = 0;
@@ -482,8 +483,8 @@
      {
        puts ("stack guard canaries are not randomized enough");
        puts ("nor equal to the default canary value");
---- glibc-20060202T0507/iconv/iconvconfig.c	1 Jan 2006 19:15:56 -0000	1.25
-+++ glibc-20060202T0507-fedora/iconv/iconvconfig.c	2 Jan 2006 10:52:50 -0000	1.19.2.6
+--- glibc-20060203T0932/iconv/iconvconfig.c	1 Jan 2006 19:15:56 -0000	1.25
++++ glibc-20060203T0932-fedora/iconv/iconvconfig.c	2 Jan 2006 10:52:50 -0000	1.19.2.6
 @@ -1011,6 +1011,34 @@ next_prime (uint32_t seed)
                                module name offset
                           (following last entry with step count 0)
@@ -560,8 +561,8 @@
    /* Open the output file.  */
    if (output_file == NULL)
      {
---- glibc-20060202T0507/include/features.h	5 Jan 2006 12:25:35 -0000	1.42
-+++ glibc-20060202T0507-fedora/include/features.h	6 Jan 2006 09:23:23 -0000	1.35.2.11
+--- glibc-20060203T0932/include/features.h	5 Jan 2006 12:25:35 -0000	1.42
++++ glibc-20060203T0932-fedora/include/features.h	6 Jan 2006 09:23:23 -0000	1.35.2.11
 @@ -275,7 +275,13 @@
  #endif
  
@@ -577,16 +578,16 @@
  # if _FORTIFY_SOURCE > 1
  #  define __USE_FORTIFY_LEVEL 2
  # else
---- glibc-20060202T0507/include/bits/stdlib-ldbl.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060202T0507-fedora/include/bits/stdlib-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
+--- glibc-20060203T0932/include/bits/stdlib-ldbl.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060203T0932-fedora/include/bits/stdlib-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
 @@ -0,0 +1 @@
 +#include <stdlib/bits/stdlib-ldbl.h>
---- glibc-20060202T0507/include/bits/wchar-ldbl.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060202T0507-fedora/include/bits/wchar-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
+--- glibc-20060203T0932/include/bits/wchar-ldbl.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060203T0932-fedora/include/bits/wchar-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
 @@ -0,0 +1 @@
 +#include <wcsmbs/bits/wchar-ldbl.h>
---- glibc-20060202T0507/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
-+++ glibc-20060202T0507-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
+--- glibc-20060203T0932/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
++++ glibc-20060203T0932-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
 @@ -58,8 +58,6 @@ korean		ko_KR.eucKR
  korean.euc 	ko_KR.eucKR
  ko_KR		ko_KR.eucKR
@@ -596,8 +597,8 @@
  norwegian       nb_NO.ISO-8859-1
  nynorsk		nn_NO.ISO-8859-1
  polish          pl_PL.ISO-8859-2
---- glibc-20060202T0507/libio/stdio.h	16 Jan 2006 20:12:21 -0000	1.86
-+++ glibc-20060202T0507-fedora/libio/stdio.h	30 Jan 2006 09:29:46 -0000	1.78.2.8
+--- glibc-20060203T0932/libio/stdio.h	16 Jan 2006 20:12:21 -0000	1.86
++++ glibc-20060203T0932-fedora/libio/stdio.h	30 Jan 2006 09:29:46 -0000	1.78.2.8
 @@ -142,10 +142,12 @@ typedef _G_fpos64_t fpos64_t;
  extern struct _IO_FILE *stdin;		/* Standard input stream.  */
  extern struct _IO_FILE *stdout;		/* Standard output stream.  */
@@ -611,8 +612,8 @@
  
  __BEGIN_NAMESPACE_STD
  /* Remove file FILENAME.  */
---- glibc-20060202T0507/libio/bits/stdio2.h	19 Mar 2005 00:14:58 -0000	1.4
-+++ glibc-20060202T0507-fedora/libio/bits/stdio2.h	27 Jun 2005 13:04:16 -0000	1.1.2.6
+--- glibc-20060203T0932/libio/bits/stdio2.h	19 Mar 2005 00:14:58 -0000	1.4
++++ glibc-20060203T0932-fedora/libio/bits/stdio2.h	27 Jun 2005 13:04:16 -0000	1.1.2.6
 @@ -61,14 +61,25 @@ extern int __vfprintf_chk (FILE *__restr
  extern int __vprintf_chk (int __flag, __const char *__restrict __format,
  			  _G_va_list __ap);
@@ -643,8 +644,8 @@
  
  #endif
  
---- glibc-20060202T0507/locale/iso-4217.def	23 Sep 2005 19:07:54 -0000	1.18
-+++ glibc-20060202T0507-fedora/locale/iso-4217.def	3 Oct 2005 20:44:15 -0000	1.15.2.3
+--- glibc-20060203T0932/locale/iso-4217.def	23 Sep 2005 19:07:54 -0000	1.18
++++ glibc-20060203T0932-fedora/locale/iso-4217.def	3 Oct 2005 20:44:15 -0000	1.15.2.3
 @@ -8,6 +8,7 @@
   *
   * !!! The list has to be sorted !!!
@@ -736,8 +737,8 @@
  DEFINE_INT_CURR("PYG")		/* Paraguay Guarani  */
  DEFINE_INT_CURR("QAR")		/* Qatar Rial  */
  DEFINE_INT_CURR("ROL")		/* Romanian Leu  */
---- glibc-20060202T0507/locale/programs/3level.h	7 Dec 2005 05:47:27 -0000	1.6
-+++ glibc-20060202T0507-fedora/locale/programs/3level.h	19 Dec 2005 12:11:15 -0000	1.5.2.2
+--- glibc-20060203T0932/locale/programs/3level.h	7 Dec 2005 05:47:27 -0000	1.6
++++ glibc-20060203T0932-fedora/locale/programs/3level.h	19 Dec 2005 12:11:15 -0000	1.5.2.2
 @@ -202,6 +202,42 @@ CONCAT(TABLE,_iterate) (struct TABLE *t,
  	}
      }
@@ -781,8 +782,8 @@
  #endif
  
  #ifndef NO_FINALIZE
---- glibc-20060202T0507/localedata/Makefile	25 Sep 2005 17:01:12 -0000	1.102
-+++ glibc-20060202T0507-fedora/localedata/Makefile	3 Oct 2005 20:44:15 -0000	1.101.2.2
+--- glibc-20060203T0932/localedata/Makefile	25 Sep 2005 17:01:12 -0000	1.102
++++ glibc-20060203T0932-fedora/localedata/Makefile	3 Oct 2005 20:44:15 -0000	1.101.2.2
 @@ -222,6 +222,7 @@ $(INSTALL-SUPPORTED-LOCALES): install-lo
  	echo -n '...'; \
  	input=`echo $$locale | sed 's/\([^.]*\)[^@]*\(.*\)/\1\2/'`; \
@@ -791,8 +792,8 @@
  		     -i locales/$$input -c -f charmaps/$$charset \
  		     $(addprefix --prefix=,$(install_root)) $$locale; \
  	echo ' done'; \
---- glibc-20060202T0507/localedata/SUPPORTED	5 Nov 2005 16:25:49 -0000	1.87
-+++ glibc-20060202T0507-fedora/localedata/SUPPORTED	15 Nov 2005 08:21:56 -0000	1.71.2.8
+--- glibc-20060203T0932/localedata/SUPPORTED	5 Nov 2005 16:25:49 -0000	1.87
++++ glibc-20060203T0932-fedora/localedata/SUPPORTED	15 Nov 2005 08:21:56 -0000	1.71.2.8
 @@ -69,6 +69,7 @@ cy_GB.UTF-8/UTF-8 \
  cy_GB/ISO-8859-14 \
  da_DK.UTF-8/UTF-8 \
@@ -834,8 +835,8 @@
  ta_IN/UTF-8 \
  te_IN/UTF-8 \
  tg_TJ.UTF-8/UTF-8 \
---- glibc-20060202T0507/localedata/locales/cy_GB	28 Sep 2004 04:37:33 -0000	1.4
-+++ glibc-20060202T0507-fedora/localedata/locales/cy_GB	29 Sep 2004 08:48:23 -0000	1.3.2.2
+--- glibc-20060203T0932/localedata/locales/cy_GB	28 Sep 2004 04:37:33 -0000	1.4
++++ glibc-20060203T0932-fedora/localedata/locales/cy_GB	29 Sep 2004 08:48:23 -0000	1.3.2.2
 @@ -248,8 +248,11 @@ mon         "<U0049><U006F><U006E><U0061
  d_t_fmt     "<U0044><U0079><U0064><U0064><U0020><U0025><U0041><U0020><U0025><U0064><U0020><U006d><U0069><U0073><U0020><U0025><U0042><U0020><U0025><U0059><U0020><U0025><U0054><U0020><U0025><U005A>"
  d_fmt       "<U0025><U0064><U002E><U0025><U006D><U002E><U0025><U0079>"
@@ -850,8 +851,8 @@
  END LC_TIME
  
  LC_MESSAGES
---- glibc-20060202T0507/localedata/locales/en_GB	31 Oct 2004 23:42:26 -0000	1.12
-+++ glibc-20060202T0507-fedora/localedata/locales/en_GB	2 Nov 2004 12:25:47 -0000	1.10.2.2
+--- glibc-20060203T0932/localedata/locales/en_GB	31 Oct 2004 23:42:26 -0000	1.12
++++ glibc-20060203T0932-fedora/localedata/locales/en_GB	2 Nov 2004 12:25:47 -0000	1.10.2.2
 @@ -112,8 +112,8 @@ mon         "<U004A><U0061><U006E><U0075
  d_t_fmt     "<U0025><U0061><U0020><U0025><U0064><U0020><U0025><U0062><U0020><U0025><U0059><U0020><U0025><U0054><U0020><U0025><U005A>"
  d_fmt       "<U0025><U0064><U002F><U0025><U006D><U002F><U0025><U0079>"
@@ -863,8 +864,8 @@
  date_fmt	"<U0025><U0061><U0020><U0025><U0062><U0020><U0025><U0065>/
  <U0020><U0025><U0048><U003A><U0025><U004D><U003A><U0025><U0053><U0020>/
  <U0025><U005A><U0020><U0025><U0059>"
---- glibc-20060202T0507/localedata/locales/no_NO 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060202T0507-fedora/localedata/locales/no_NO	22 Sep 2004 21:21:01 -0000	1.11.2.1
+--- glibc-20060203T0932/localedata/locales/no_NO 1 Jan 1970 00:00:00 -0000
++++ glibc-20060203T0932-fedora/localedata/locales/no_NO	22 Sep 2004 21:21:01 -0000	1.11.2.1
 @@ -0,0 +1,69 @@
 +escape_char	/
 +comment_char    %
@@ -935,8 +936,8 @@
 +LC_ADDRESS
 +copy "nb_NO"
 +END LC_ADDRESS
---- glibc-20060202T0507/localedata/locales/zh_TW	31 Oct 2004 23:42:28 -0000	1.7
-+++ glibc-20060202T0507-fedora/localedata/locales/zh_TW	2 Nov 2004 12:25:57 -0000	1.5.2.2
+--- glibc-20060203T0932/localedata/locales/zh_TW	31 Oct 2004 23:42:28 -0000	1.7
++++ glibc-20060203T0932-fedora/localedata/locales/zh_TW	2 Nov 2004 12:25:57 -0000	1.5.2.2
 @@ -1,7 +1,7 @@
  comment_char %
  escape_char /
@@ -964,8 +965,8 @@
  revision   "0.2"
  date       "2000-08-02"
  %
---- glibc-20060202T0507/malloc/mcheck.c	8 Sep 2004 20:36:02 -0000	1.18
-+++ glibc-20060202T0507-fedora/malloc/mcheck.c	20 Dec 2005 10:59:21 -0000	1.18.2.1
+--- glibc-20060203T0932/malloc/mcheck.c	8 Sep 2004 20:36:02 -0000	1.18
++++ glibc-20060203T0932-fedora/malloc/mcheck.c	20 Dec 2005 10:59:21 -0000	1.18.2.1
 @@ -24,9 +24,25 @@
  # include <mcheck.h>
  # include <stdint.h>
@@ -1041,8 +1042,8 @@
  
        old_free_hook = __free_hook;
        __free_hook = freehook;
---- glibc-20060202T0507/malloc/mtrace.c	14 Sep 2004 04:24:46 -0000	1.41
-+++ glibc-20060202T0507-fedora/malloc/mtrace.c	20 Dec 2005 10:59:21 -0000	1.41.2.1
+--- glibc-20060203T0932/malloc/mtrace.c	14 Sep 2004 04:24:46 -0000	1.41
++++ glibc-20060203T0932-fedora/malloc/mtrace.c	20 Dec 2005 10:59:21 -0000	1.41.2.1
 @@ -40,6 +40,18 @@
  # include <libio/iolibio.h>
  # define setvbuf(s, b, f, l) INTUSE(_IO_setvbuf) (s, b, f, l)
@@ -1098,8 +1099,50 @@
    __memalign_hook = tr_memalignhook;
    __malloc_hook = tr_mallochook;
  
---- glibc-20060202T0507/nptl/ChangeLog	20 Jan 2006 16:49:36 -0000	1.857
-+++ glibc-20060202T0507-fedora/nptl/ChangeLog	30 Jan 2006 09:29:47 -0000	1.706.2.75
+--- glibc-20060203T0932/manual/filesys.texi	31 Dec 2005 13:11:27 -0000	1.99
++++ glibc-20060203T0932-fedora/manual/filesys.texi	3 Feb 2006 09:43:54 -0000	1.96.2.4
+@@ -2806,7 +2806,7 @@ function.
+ 
+ @comment sys/time.h
+ @comment BSD
+-@deftypefun int futimes (int *@var{fd}, struct timeval @var{tvp}@t{[2]})
++@deftypefun int futimes (int @var{fd}, struct timeval @var{tvp}@t{[2]})
+ This function is like @code{utimes}, except that it takes an open file
+ descriptor as an argument instead of a file name.  @xref{Low-Level
+ I/O}.  This function comes from FreeBSD, and is not available on all
+--- glibc-20060203T0932/math/math.h	14 Jan 2006 12:09:22 -0000	1.70
++++ glibc-20060203T0932-fedora/math/math.h	3 Feb 2006 09:40:56 -0000	1.68.2.3
+@@ -103,13 +103,16 @@ __BEGIN_DECLS
+ 
+ #   ifdef __USE_ISOC99 
+ extern float __nldbl_nexttowardf (float __x, long double __y)
+-				  __attribute__ ((__const__)) __THROW;
++				  __THROW __attribute__ ((__const__));
+ #    ifdef __REDIRECT_NTH
+ extern float __REDIRECT_NTH (nexttowardf, (float __x, long double __y),
+ 			     __nldbl_nexttowardf)
+      __attribute__ ((__const__));
+ extern double __REDIRECT_NTH (nexttoward, (double __x, long double __y),
+ 			      nextafter) __attribute__ ((__const__));
++extern long double __REDIRECT_NTH (nexttowardl,
++				   (long double __x, long double __y),
++				   nextafter) __attribute__ ((__const__));
+ #    endif
+ #   endif
+ 
+@@ -118,8 +121,8 @@ extern double __REDIRECT_NTH (nexttoward
+ 
+ #   undef __MATHDECL_1
+ #   define __MATHDECL_2(type, function,suffix, args, alias) \
+-  extern type __REDIRECT(__MATH_PRECNAME(function,suffix), \
+-			 args, alias) __THROW
++  extern type __REDIRECT_NTH(__MATH_PRECNAME(function,suffix), \
++			     args, alias)
+ #   define __MATHDECL_1(type, function,suffix, args) \
+   __MATHDECL_2(type, function,suffix, args, __CONCAT(function,suffix))
+ #  endif
+--- glibc-20060203T0932/nptl/ChangeLog	20 Jan 2006 16:49:36 -0000	1.857
++++ glibc-20060203T0932-fedora/nptl/ChangeLog	30 Jan 2006 09:29:47 -0000	1.706.2.75
 @@ -497,6 +497,15 @@
  	Use __sigfillset.  Document that sigfillset does the right thing wrt
  	to SIGSETXID.
@@ -1140,8 +1183,8 @@
  2003-07-25  Jakub Jelinek  <jakub@redhat.com>
  
  	* tst-cancel17.c (do_test): Check if aio_cancel failed.
---- glibc-20060202T0507/nptl/Makefile	9 Jan 2006 23:04:44 -0000	1.176
-+++ glibc-20060202T0507-fedora/nptl/Makefile	30 Jan 2006 09:29:47 -0000	1.157.2.17
+--- glibc-20060203T0932/nptl/Makefile	9 Jan 2006 23:04:44 -0000	1.176
++++ glibc-20060203T0932-fedora/nptl/Makefile	30 Jan 2006 09:29:47 -0000	1.157.2.17
 @@ -514,15 +514,19 @@ $(addprefix $(objpfx), \
      $(tests) $(xtests) $(test-srcs))): $(objpfx)libpthread.so \
  				       $(objpfx)libpthread_nonshared.a
@@ -1164,8 +1207,8 @@
  else
  $(addprefix $(objpfx),$(tests) $(test-srcs)): $(objpfx)libpthread.a
  endif
---- glibc-20060202T0507/nptl/tst-stackguard1.c	26 Jun 2005 17:44:14 -0000	1.1
-+++ glibc-20060202T0507-fedora/nptl/tst-stackguard1.c	8 Aug 2005 21:24:28 -0000	1.1.2.3
+--- glibc-20060203T0932/nptl/tst-stackguard1.c	26 Jun 2005 17:44:14 -0000	1.1
++++ glibc-20060203T0932-fedora/nptl/tst-stackguard1.c	8 Aug 2005 21:24:28 -0000	1.1.2.3
 @@ -190,17 +190,21 @@ do_test (void)
       the 16 runs, something is very wrong.  */
    int ndifferences = 0;
@@ -1190,8 +1233,8 @@
      {
        puts ("stack guard canaries are not randomized enough");
        puts ("nor equal to the default canary value");
---- glibc-20060202T0507/nptl/sysdeps/unix/sysv/linux/kernel-features.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060202T0507-fedora/nptl/sysdeps/unix/sysv/linux/kernel-features.h	22 Sep 2004 21:21:02 -0000	1.1.2.1
+--- glibc-20060203T0932/nptl/sysdeps/unix/sysv/linux/kernel-features.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060203T0932-fedora/nptl/sysdeps/unix/sysv/linux/kernel-features.h	22 Sep 2004 21:21:02 -0000	1.1.2.1
 @@ -0,0 +1,6 @@
 +#include_next <kernel-features.h>
 +
@@ -1199,8 +1242,8 @@
 +#ifndef __ASSUME_CLONE_THREAD_FLAGS
 +# define __ASSUME_CLONE_THREAD_FLAGS	1
 +#endif
---- glibc-20060202T0507/nscd/connections.c	3 Jan 2006 21:26:28 -0000	1.82
-+++ glibc-20060202T0507-fedora/nscd/connections.c	4 Jan 2006 07:58:21 -0000	1.55.2.19
+--- glibc-20060203T0932/nscd/connections.c	3 Jan 2006 21:26:28 -0000	1.82
++++ glibc-20060203T0932-fedora/nscd/connections.c	4 Jan 2006 07:58:21 -0000	1.55.2.19
 @@ -1873,3 +1873,18 @@ finish_drop_privileges (void)
        exit (4);
      }
@@ -1220,8 +1263,8 @@
 +    prune_cache (&dbs[hstdb], LONG_MAX);
 +}
 +
---- glibc-20060202T0507/nscd/nscd.c	1 Jan 2006 19:15:56 -0000	1.51
-+++ glibc-20060202T0507-fedora/nscd/nscd.c	2 Jan 2006 10:52:53 -0000	1.38.2.11
+--- glibc-20060203T0932/nscd/nscd.c	1 Jan 2006 19:15:56 -0000	1.51
++++ glibc-20060203T0932-fedora/nscd/nscd.c	2 Jan 2006 10:52:53 -0000	1.38.2.11
 @@ -119,6 +119,9 @@ static struct argp argp =
    options, parse_opt, NULL, doc,
  };
@@ -1240,8 +1283,8 @@
    signal (SIGPIPE, SIG_IGN);
  
    /* Cleanup files created by a previous 'bind'.  */
---- glibc-20060202T0507/nscd/nscd.conf	23 Aug 2005 23:17:32 -0000	1.11
-+++ glibc-20060202T0507-fedora/nscd/nscd.conf	24 Aug 2005 07:23:30 -0000	1.8.2.3
+--- glibc-20060203T0932/nscd/nscd.conf	23 Aug 2005 23:17:32 -0000	1.11
++++ glibc-20060203T0932-fedora/nscd/nscd.conf	24 Aug 2005 07:23:30 -0000	1.8.2.3
 @@ -32,8 +32,8 @@
  #	logfile			/var/log/nscd.log
  #	threads			6
@@ -1253,8 +1296,8 @@
  	debug-level		0
  #	reload-count		5
  	paranoia		no
---- glibc-20060202T0507/nscd/nscd.init	20 Jun 2005 15:47:52 -0000	1.9
-+++ glibc-20060202T0507-fedora/nscd/nscd.init	12 Sep 2005 12:53:20 -0000	1.6.2.4
+--- glibc-20060203T0932/nscd/nscd.init	20 Jun 2005 15:47:52 -0000	1.9
++++ glibc-20060203T0932-fedora/nscd/nscd.init	12 Sep 2005 12:53:20 -0000	1.6.2.4
 @@ -9,6 +9,7 @@
  #		slow naming services like NIS, NIS+, LDAP, or hesiod.
  # processname: /usr/sbin/nscd
@@ -1295,8 +1338,8 @@
      RETVAL=$?
      echo
      [ $RETVAL -eq 0 ] && touch /var/lock/subsys/nscd
---- glibc-20060202T0507/nscd/selinux.c	29 Dec 2005 00:44:09 -0000	1.6
-+++ glibc-20060202T0507-fedora/nscd/selinux.c	2 Jan 2006 10:52:53 -0000	1.1.2.6
+--- glibc-20060203T0932/nscd/selinux.c	29 Dec 2005 00:44:09 -0000	1.6
++++ glibc-20060203T0932-fedora/nscd/selinux.c	2 Jan 2006 10:52:53 -0000	1.1.2.6
 @@ -147,7 +147,7 @@ audit_init (void)
    if (audit_fd < 0
        /* If kernel doesn't support audit, bail out */
@@ -1306,8 +1349,8 @@
  }
  #endif /* HAVE_LIBAUDIT */
  
---- glibc-20060202T0507/posix/Makefile	8 Jan 2006 09:39:15 -0000	1.188
-+++ glibc-20060202T0507-fedora/posix/Makefile	9 Jan 2006 21:55:00 -0000	1.171.2.16
+--- glibc-20060203T0932/posix/Makefile	8 Jan 2006 09:39:15 -0000	1.188
++++ glibc-20060203T0932-fedora/posix/Makefile	9 Jan 2006 21:55:00 -0000	1.171.2.16
 @@ -107,7 +107,8 @@ generated := $(addprefix wordexp-test-re
  	     bug-regex21-mem bug-regex21.mtrace \
  	     tst-rxspencer-mem tst-rxspencer.mtrace tst-getconf.out \
@@ -1341,8 +1384,8 @@
 +	  | sed -n -e '/START_OF_STRINGS/,$${/POSIX_V6_/{s/^[^"]*"//;s/".*$$//;p}}' \
 +	  > $@.new
 +	mv -f $@.new $@
---- glibc-20060202T0507/posix/getconf.speclist.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060202T0507-fedora/posix/getconf.speclist.h	13 Dec 2004 23:32:37 -0000	1.1.2.2
+--- glibc-20060203T0932/posix/getconf.speclist.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060203T0932-fedora/posix/getconf.speclist.h	13 Dec 2004 23:32:37 -0000	1.1.2.2
 @@ -0,0 +1,15 @@
 +#include <unistd.h>
 +const char *START_OF_STRINGS =
@@ -1359,8 +1402,24 @@
 +"POSIX_V6_LPBIG_OFFBIG"
 +#endif
 +"";
---- glibc-20060202T0507/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
-+++ glibc-20060202T0507-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
+--- glibc-20060203T0932/stdlib/bits/stdlib-ldbl.h	14 Jan 2006 20:14:36 -0000	1.2
++++ glibc-20060203T0932-fedora/stdlib/bits/stdlib-ldbl.h	3 Feb 2006 09:47:53 -0000	1.2.2.2
+@@ -33,10 +33,12 @@ __LDBL_REDIR1_DECL (strtold_l, strtod_l)
+ 
+ __LDBL_REDIR1_DECL (__strtold_internal, __strtod_internal)
+ 
+-#ifdef __USE_MISC
++#if defined __USE_SVID || defined __USE_XOPEN_EXTENDED
++# ifdef __USE_MISC
+ __LDBL_REDIR1_DECL (qecvt, ecvt)
+ __LDBL_REDIR1_DECL (qfcvt, fcvt)
+ __LDBL_REDIR1_DECL (qgcvt, gcvt)
+ __LDBL_REDIR1_DECL (qecvt_r, ecvt_r)
+ __LDBL_REDIR1_DECL (qfcvt_r, fcvt_r)
++# endif
+ #endif
+--- glibc-20060203T0932/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
++++ glibc-20060203T0932-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
 @@ -36,6 +36,14 @@
  # define add_system_dir(dir) add_dir (dir)
  #endif
@@ -1376,8 +1435,8 @@
  #define CACHEMAGIC "ld.so-1.7.0"
  
  /* libc5 and glibc 2.0/2.1 use the same format.  For glibc 2.2 another
---- glibc-20060202T0507/sysdeps/ia64/Makefile	16 Aug 2004 06:46:14 -0000	1.10
-+++ glibc-20060202T0507-fedora/sysdeps/ia64/Makefile	22 Sep 2004 21:21:07 -0000	1.10.2.1
+--- glibc-20060203T0932/sysdeps/ia64/Makefile	16 Aug 2004 06:46:14 -0000	1.10
++++ glibc-20060203T0932-fedora/sysdeps/ia64/Makefile	22 Sep 2004 21:21:07 -0000	1.10.2.1
 @@ -12,8 +12,8 @@ elide-routines.os += hp-timing
  
  ifeq (yes,$(build-shared))
@@ -1389,8 +1448,8 @@
  endif
  endif
  
---- glibc-20060202T0507/sysdeps/ia64/ia64libgcc.S	11 May 2002 05:12:35 -0000	1.2
-+++ glibc-20060202T0507-fedora/sysdeps/ia64/ia64libgcc.S	22 Sep 2004 21:21:07 -0000	1.2.2.1
+--- glibc-20060203T0932/sysdeps/ia64/ia64libgcc.S	11 May 2002 05:12:35 -0000	1.2
++++ glibc-20060203T0932-fedora/sysdeps/ia64/ia64libgcc.S	22 Sep 2004 21:21:07 -0000	1.2.2.1
 @@ -1,350 +0,0 @@
 -/* From the Intel IA-64 Optimization Guide, choose the minimum latency
 -   alternative.  */
@@ -1742,8 +1801,8 @@
 -	.symver	___multi3, __multi3@GLIBC_2.2
 -
 -#endif
---- glibc-20060202T0507/sysdeps/ia64/libgcc-compat.c 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060202T0507-fedora/sysdeps/ia64/libgcc-compat.c	22 Sep 2004 21:21:08 -0000	1.1.2.1
+--- glibc-20060203T0932/sysdeps/ia64/libgcc-compat.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20060203T0932-fedora/sysdeps/ia64/libgcc-compat.c	22 Sep 2004 21:21:08 -0000	1.1.2.1
 @@ -0,0 +1,84 @@
 +/* pre-.hidden libgcc compatibility
 +   Copyright (C) 2002 Free Software Foundation, Inc.
@@ -1829,68 +1888,8 @@
 +symbol_version (INTUSE (__multi3), __multi3, GLIBC_2.2);
 +
 +#endif
---- glibc-20060202T0507/sysdeps/ieee754/ldbl-opt/Makefile	14 Jan 2006 12:08:46 -0000	1.1
-+++ glibc-20060202T0507-fedora/sysdeps/ieee754/ldbl-opt/Makefile	2 Feb 2006 09:24:43 -0000	1.1.2.2
-@@ -2,7 +2,9 @@
- # -mlong-double-128 option is used (or when it becomes a default
- # when -mlong-double-64 is not used).
- long-double-fcts = yes
-+ifeq (,$(filter -mlong-double-128,$(sysdep-CFLAGS)))
- sysdep-CFLAGS += -mlong-double-128
-+endif
- 
- ifeq ($(subdir),math)
- libm-routines += s_nexttowardfd
---- glibc-20060202T0507/sysdeps/powerpc/powerpc64/Makefile	1 Nov 2005 02:12:56 -0000	1.7
-+++ glibc-20060202T0507-fedora/sysdeps/powerpc/powerpc64/Makefile	2 Feb 2006 09:24:43 -0000	1.4.2.4
-@@ -10,6 +10,18 @@ ifeq (yes,$(build-shared))
- pic-ccflag = -fpic
- endif
- 
-+# These flags prevent FPU or Altivec registers from being used,
-+# for code called in contexts that is not allowed to touch those registers.
-+# Stupid GCC requires us to pass all these ridiculous switches.
-+no-special-regs := $(sort $(foreach n,40 41 50 51 60 61 62 63 \
-+				      $(foreach m,2 3 4 5 6 7 8 9, \
-+						  3$m 4$m 5$m),\
-+				    -ffixed-$n)) \
-+		   $(sort $(foreach n,$(foreach m,0 1 2 3 4 5 6 7 8 9,\
-+						$m 1$m 2$m) 30 31,\
-+				    -ffixed-v$n)) \
-+		   -ffixed-vrsave -ffixed-vscr
-+
- ifeq ($(subdir),csu)
- sysdep_routines += hp-timing
- elide-routines.os += hp-timing
-@@ -29,5 +41,5 @@ ifeq ($(subdir),gmon)
- # The assembly functions assume that fp arg regs are not trashed.
- # Compiling with -msoft-float ensures that fp regs are not used
- # for moving memory around.
--CFLAGS-mcount.c += -msoft-float
-+CFLAGS-mcount.c += $(no-special-regs)
- endif
---- glibc-20060202T0507/sysdeps/powerpc/powerpc64/elf/Makefile	27 Aug 2003 04:35:46 -0000	1.1
-+++ glibc-20060202T0507-fedora/sysdeps/powerpc/powerpc64/elf/Makefile	2 Feb 2006 09:24:43 -0000	1.1.2.1
-@@ -2,10 +2,10 @@
- 
- # Need to prevent gcc from using fprs in code used during dynamic linking.
- 
--CFLAGS-dl-runtime.os := -msoft-float
--CFLAGS-dl-lookup.os := -msoft-float
--CFLAGS-dl-misc.os := -msoft-float
--CFLAGS-rtld-mempcpy.os := -msoft-float
--CFLAGS-rtld-memmove.os := -msoft-float
--CFLAGS-rtld-memchr.os := -msoft-float
--CFLAGS-rtld-strnlen.os := -msoft-float
-+CFLAGS-dl-runtime.os = $(no-special-regs)
-+CFLAGS-dl-lookup.os = $(no-special-regs)
-+CFLAGS-dl-misc.os = $(no-special-regs)
-+CFLAGS-rtld-mempcpy.os = $(no-special-regs)
-+CFLAGS-rtld-memmove.os = $(no-special-regs)
-+CFLAGS-rtld-memchr.os = $(no-special-regs)
-+CFLAGS-rtld-strnlen.os = $(no-special-regs)
---- glibc-20060202T0507/sysdeps/unix/nice.c	28 Sep 2002 19:13:13 -0000	1.6
-+++ glibc-20060202T0507-fedora/sysdeps/unix/nice.c	22 Sep 2004 21:21:08 -0000	1.6.2.1
+--- glibc-20060203T0932/sysdeps/unix/nice.c	28 Sep 2002 19:13:13 -0000	1.6
++++ glibc-20060203T0932-fedora/sysdeps/unix/nice.c	22 Sep 2004 21:21:08 -0000	1.6.2.1
 @@ -41,7 +41,12 @@ nice (int incr)
  	__set_errno (save);
      }
@@ -1905,8 +1904,8 @@
    if (result != -1)
      return getpriority (PRIO_PROCESS, 0);
    else
---- glibc-20060202T0507/sysdeps/unix/sysv/linux/dl-osinfo.h	8 Jan 2006 08:21:15 -0000	1.22
-+++ glibc-20060202T0507-fedora/sysdeps/unix/sysv/linux/dl-osinfo.h	9 Jan 2006 21:55:08 -0000	1.14.2.8
+--- glibc-20060203T0932/sysdeps/unix/sysv/linux/dl-osinfo.h	8 Jan 2006 08:21:15 -0000	1.22
++++ glibc-20060203T0932-fedora/sysdeps/unix/sysv/linux/dl-osinfo.h	9 Jan 2006 21:55:08 -0000	1.14.2.8
 @@ -18,12 +18,15 @@
     02111-1307 USA.  */
  
@@ -1955,8 +1954,52 @@
 +  ret ^= stk;
    return ret;
  }
---- glibc-20060202T0507/sysdeps/unix/sysv/linux/paths.h	15 Nov 2000 23:06:47 -0000	1.11
-+++ glibc-20060202T0507-fedora/sysdeps/unix/sysv/linux/paths.h	22 Sep 2004 21:21:08 -0000	1.11.4.1
+--- glibc-20060203T0932/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 05:26:34 -0000	1.6
++++ glibc-20060203T0932-fedora/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 09:43:55 -0000	1.1.2.7
+@@ -37,14 +37,14 @@ futimesat (fd, file, tvp)
+ {
+   int result;
+ 
++  if (file == NULL)
++    return __futimes (fd, tvp);
++
+ #ifdef __NR_futimesat
+ # ifndef __ASSUME_ATFCTS
+   if (__have_atfcts >= 0)
+ # endif
+     {
+-      if (file == NULL)
+-	return __futimes (fd, tvp);
+-
+       result = INLINE_SYSCALL (futimesat, 3, fd, file, tvp);
+ # ifndef __ASSUME_ATFCTS
+       if (result == -1 && errno == ENOSYS)
+@@ -58,22 +58,7 @@ futimesat (fd, file, tvp)
+ #ifndef __ASSUME_ATFCTS
+   char *buf = NULL;
+ 
+-  if (file == NULL)
+-    {
+-      static const char procfd[] = "/proc/self/fd/%d";
+-      /* Buffer for the path name we are going to use.  It consists of
+-	 - the string /proc/self/fd/
+-	 - the file descriptor number.
+-	 The final NUL is included in the sizeof.   A bit of overhead
+-	 due to the format elements compensates for possible negative
+-	 numbers.  */
+-      size_t buflen = sizeof (procfd) + sizeof (int) * 3;
+-      buf = alloca (buflen);
+-
+-      __snprintf (buf, buflen, procfd, fd);
+-      file = buf;
+-    }
+-  else if (fd != AT_FDCWD && file[0] != '/')
++  if (fd != AT_FDCWD && file[0] != '/')
+     {
+       size_t filelen = strlen (file);
+       static const char procfd[] = "/proc/self/fd/%d/%s";
+--- glibc-20060203T0932/sysdeps/unix/sysv/linux/paths.h	15 Nov 2000 23:06:47 -0000	1.11
++++ glibc-20060203T0932-fedora/sysdeps/unix/sysv/linux/paths.h	22 Sep 2004 21:21:08 -0000	1.11.4.1
 @@ -61,7 +61,7 @@
  #define	_PATH_TTY	"/dev/tty"
  #define	_PATH_UNIX	"/boot/vmlinux"
@@ -1966,8 +2009,8 @@
  #define _PATH_WTMP	"/var/log/wtmp"
  
  /* Provide trailing slash, since mostly used for building pathnames. */
---- glibc-20060202T0507/sysdeps/unix/sysv/linux/tcsetattr.c	10 Sep 2003 19:16:07 -0000	1.16
-+++ glibc-20060202T0507-fedora/sysdeps/unix/sysv/linux/tcsetattr.c	22 Sep 2004 21:21:08 -0000	1.16.2.1
+--- glibc-20060203T0932/sysdeps/unix/sysv/linux/tcsetattr.c	10 Sep 2003 19:16:07 -0000	1.16
++++ glibc-20060203T0932-fedora/sysdeps/unix/sysv/linux/tcsetattr.c	22 Sep 2004 21:21:08 -0000	1.16.2.1
 @@ -49,6 +49,7 @@ tcsetattr (fd, optional_actions, termios
  {
    struct __kernel_termios k_termios;
@@ -2013,8 +2056,8 @@
 +  return retval;
  }
  libc_hidden_def (tcsetattr)
---- glibc-20060202T0507/sysdeps/unix/sysv/linux/i386/dl-cache.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060202T0507-fedora/sysdeps/unix/sysv/linux/i386/dl-cache.h	22 Sep 2004 21:21:08 -0000	1.1.2.1
+--- glibc-20060203T0932/sysdeps/unix/sysv/linux/i386/dl-cache.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060203T0932-fedora/sysdeps/unix/sysv/linux/i386/dl-cache.h	22 Sep 2004 21:21:08 -0000	1.1.2.1
 @@ -0,0 +1,59 @@
 +/* Support for reading /etc/ld.so.cache files written by Linux ldconfig.
 +   Copyright (C) 2004 Free Software Foundation, Inc.
@@ -2075,8 +2118,8 @@
 +  } while (0)
 +
 +#include_next <dl-cache.h>
---- glibc-20060202T0507/sysdeps/unix/sysv/linux/ia64/dl-cache.h	6 Jul 2001 04:56:17 -0000	1.2
-+++ glibc-20060202T0507-fedora/sysdeps/unix/sysv/linux/ia64/dl-cache.h	22 Sep 2004 21:21:09 -0000	1.2.4.1
+--- glibc-20060203T0932/sysdeps/unix/sysv/linux/ia64/dl-cache.h	6 Jul 2001 04:56:17 -0000	1.2
++++ glibc-20060203T0932-fedora/sysdeps/unix/sysv/linux/ia64/dl-cache.h	22 Sep 2004 21:21:09 -0000	1.2.4.1
 @@ -22,4 +22,31 @@
  #define _dl_cache_check_flags(flags) \
    ((flags) == _DL_CACHE_DEFAULT_ID)
@@ -2109,467 +2152,24 @@
 +  } while (0)
 +
  #include_next <dl-cache.h>
---- glibc-20060202T0507/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060202T0507-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c	22 Sep 2004 21:21:09 -0000	1.1.2.1
+--- glibc-20060203T0932/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20060203T0932-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c	22 Sep 2004 21:21:09 -0000	1.1.2.1
 @@ -0,0 +1,5 @@
 +#ifdef IS_IN_ldconfig
 +#include <sysdeps/i386/dl-procinfo.c>
 +#else
 +#include <sysdeps/generic/dl-procinfo.c>
 +#endif
---- glibc-20060202T0507/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060202T0507-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h	22 Sep 2004 21:21:09 -0000	1.1.2.1
+--- glibc-20060203T0932/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060203T0932-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h	22 Sep 2004 21:21:09 -0000	1.1.2.1
 @@ -0,0 +1,5 @@
 +#ifdef IS_IN_ldconfig
 +#include <sysdeps/unix/sysv/linux/i386/dl-procinfo.h>
 +#else
 +#include <sysdeps/generic/dl-procinfo.h>
 +#endif
---- glibc-20060202T0507/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	17 Jan 2002 06:49:28 -0000	1.2
-+++ glibc-20060202T0507-fedora/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	22 Sep 2004 21:21:09 -0000	1.2.2.1
+--- glibc-20060203T0932/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	17 Jan 2002 06:49:28 -0000	1.2
++++ glibc-20060203T0932-fedora/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	22 Sep 2004 21:21:09 -0000	1.2.2.1
 @@ -1 +1 @@
 -s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 \2\3"_
 +s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 /emul/ia32-linux\2\3"_
---- glibc-20060202T0507/timezone/asia	10 Jan 2006 07:55:37 -0000	1.35
-+++ glibc-20060202T0507-fedora/timezone/asia	2 Feb 2006 09:24:43 -0000	1.28.2.8
-@@ -1,4 +1,4 @@
--# @(#)asia	7.90
-+# @(#)asia	7.91
- # <pre>
- 
- # This data is by no means authoritative; if you think you know better,
-@@ -934,6 +934,10 @@ Zone	Asia/Tokyo	9:18:59	-	LMT	1887 Dec 3
- # From Paul Eggert (2005-11-22):
- # Starting 2003 transitions are from Steffen Thorsen's web site timeanddate.com.
- #
-+# From Steffen Thorsen (2005-11-23):
-+# For Jordan I have received multiple independent user reports every year
-+# about DST end dates, as the end-rule is different every year.
-+#
- # Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
- Rule	Jordan	1973	only	-	Jun	6	0:00	1:00	S
- Rule	Jordan	1973	1975	-	Oct	1	0:00	0	-
-@@ -1433,6 +1437,12 @@ Zone	Asia/Karachi	4:28:12 -	LMT	1907
- # From Paul Eggert (2005-11-22):
- # Starting 2004 transitions are from Steffen Thorsen's web site timeanddate.com.
- 
-+# From Steffen Thorsen (2005-11-23):
-+# A user from Gaza reported that Gaza made the change early because of
-+# the Ramadan.  Next year Ramadan will be even earlier, so I think
-+# there is a good chance next year's end date will be around two weeks
-+# earlier--the same goes for Jordan.
-+
- # The rules for Egypt are stolen from the `africa' file.
- # Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
- Rule EgyptAsia	1957	only	-	May	10	0:00	1:00	S
-@@ -1445,7 +1455,7 @@ Rule EgyptAsia	1966	only	-	Oct	 1	3:00	0
- Rule Palestine	1999	max	-	Apr	Fri>=15	0:00	1:00	S
- Rule Palestine	1999	2003	-	Oct	Fri>=15	0:00	0	-
- Rule Palestine	2004	only	-	Oct	 1	1:00	0	-
--Rule Palestine	2005	max	-	Oct	 4	1:00	0	-
-+Rule Palestine	2005	max	-	Oct	 4	2:00	0	-
- 
- # Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
- Zone	Asia/Gaza	2:17:52	-	LMT	1900 Oct
---- glibc-20060202T0507/timezone/northamerica	10 Jan 2006 07:55:37 -0000	1.29
-+++ glibc-20060202T0507-fedora/timezone/northamerica	2 Feb 2006 09:24:43 -0000	1.23.2.7
-@@ -1,4 +1,4 @@
--# @(#)northamerica	7.87
-+# @(#)northamerica	7.88
- # <pre>
- 
- # also includes Central America and the Caribbean
-@@ -321,6 +321,14 @@ Zone America/Chicago	-5:50:36 -	LMT	1883
- Zone America/North_Dakota/Center -6:45:12 - LMT	1883 Nov 18 12:14:48
- 			-7:00	US	M%sT	1992 Oct 25 02:00
- 			-6:00	US	C%sT
-+# From Paul Eggert (2006-01-20):
-+# The following is not implemented yet.
-+# What is the most populous city in that area?
-+# From http://www.statoids.com/tus.html (2006-01-20):
-+# 2003-10-26 02:00: All of Morton County, ND, and the part of Sioux
-+# County, ND east of ND route 31 moved from MT to CT.  (The area
-+# around Fort Yates in Sioux County and the area around Mandan in
-+# Morton County were already in CT.)
- 
- # US mountain time, represented by Denver
- #
-@@ -519,9 +527,9 @@ Zone America/Boise	-7:44:49 -	LMT	1883 N
- # For a map of Indiana's time zone regions, see:
- # <a href="http://www.mccsc.edu/time.html">
- # What time is it in Indiana?
--# </a> (2005-05-03)
-+# </a> (2005-10-30)
- #
--# From Paul Eggert (2005-08-22):
-+# From Paul Eggert (2006-01-20):
- # Since 1970, most of Indiana has been like America/Indiana/Indianapolis,
- # with the following exceptions:
- #
-@@ -533,11 +541,14 @@ Zone America/Boise	-7:44:49 -	LMT	1883 N
- # - Clark, Floyd, and Harrison counties have been like
- #   America/Kentucky/Louisville.
- #
--# - Crawford, Starke, and Switzerland counties have their own time zone
-+# - Daviess, Dubois, Knox, Martin, Perry, and Pulaski counties
-+#   have been like America/Indiana/Vincennes.
-+#
-+# - Crawford, Pike, Starke, and Switzerland counties have their own time zone
- #   histories as noted below.
- #
--# Shanks partitions Indiana into 345 regions, each with its own time history,
--# and writes ``Even newspaper reports present contradictory information.''
-+# Shanks partitioned Indiana into 345 regions, each with its own time history,
-+# and wrote ``Even newspaper reports present contradictory information.''
- # Fortunately, most of the complexity occurred before our cutoff date of 1970.
- #
- # Other than Indianapolis, the Indiana place names are so nondescript
-@@ -545,11 +556,19 @@ Zone America/Boise	-7:44:49 -	LMT	1883 N
- # So we reluctantly put them all in a subdirectory `America/Indiana'.
- 
- # From Paul Eggert (2005-08-16):
--# http://www.mccsc.edu/time.html says that Indiana will use DST starting 2006,
--# and that many counties may switch either to Central or to Eastern time.
--# The county-by-county decisions have not been made yet, so for now assume
--# that no counties will switch: this assumption is most likely wrong,
--# but it's the best we can do for now.
-+# http://www.mccsc.edu/time.html says that Indiana will use DST starting 2006.
-+
-+# From Deborah Goldsmith (2006-01-18):
-+# http://dmses.dot.gov/docimages/pdf95/382329_web.pdf
-+# From Paul Eggert (2006-01-20):
-+# It says "DOT is relocating the time zone boundary in Indiana to move Starke,
-+# Pulaski, Knox, Daviess, Martin, Pike, Dubois, and Perry Counties from the
-+# Eastern Time Zone to the Central Time Zone.... The effective date of
-+# this rule is 2:OO a.m. EST Sunday, April 2, 2006, which is the
-+# changeover date from standard time to Daylight Saving Time."
-+# Strictly speaking, this means the affected counties will change their
-+# clocks twice that night, but this obviously is in error.  The intent
-+# is that 01:59:59 EST be followed by 02:00:00 CDT.
- 
- # Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
- Rule Indianapolis 1941	only	-	Jun	22	2:00	1:00	D
-@@ -568,8 +587,8 @@ Zone America/Indiana/Indianapolis -5:44:
- 			-5:00	-	EST	2006
- 			-5:00	US	E%sT
- #
--# Part of Crawford County, Indiana, last observed DST in 1975,
--# and left its clocks alone in 1974.
-+# Eastern Crawford County, Indiana, left its clocks alone in 1974,
-+# as well as from 1976 through 2005.
- # Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
- Rule	Marengo	1951	only	-	Apr	lastSun	2:00	1:00	D
- Rule	Marengo	1951	only	-	Sep	lastSun	2:00	0	S
-@@ -586,7 +605,45 @@ Zone America/Indiana/Marengo -5:45:23 -	
- 			-5:00	-	EST	2006
- 			-5:00	US	E%sT
- #
--# Starke County, Indiana
-+# Daviess, Dubois, Knox, Martin, Perry, and Pulaski Counties, Indiana,
-+# switched from eastern to central time in April 2006.
-+# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
-+Rule Vincennes	1946	only	-	Apr	lastSun	2:00	1:00	D
-+Rule Vincennes	1946	only	-	Sep	lastSun	2:00	0	S
-+Rule Vincennes	1953	1954	-	Apr	lastSun	2:00	1:00	D
-+Rule Vincennes	1953	1959	-	Sep	lastSun	2:00	0	S
-+Rule Vincennes	1955	only	-	May	 1	0:00	1:00	D
-+Rule Vincennes	1956	1963	-	Apr	lastSun	2:00	1:00	D
-+Rule Vincennes	1960	only	-	Oct	lastSun	2:00	0	S
-+Rule Vincennes	1961	only	-	Sep	lastSun	2:00	0	S
-+Rule Vincennes	1962	1963	-	Oct	lastSun	2:00	0	S
-+# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-+Zone America/Indiana/Vincennes -5:50:07 - LMT	1883 Nov 18 12:09:53
-+			-6:00	US	C%sT	1946
-+			-6:00 Vincennes	C%sT	1964 Apr 26 2:00
-+			-5:00	-	EST	1969
-+			-5:00	US	E%sT	1971
-+			-5:00	-	EST	2006 Apr  2 2:00
-+			-6:00	US	C%sT
-+# 
-+# Pike County, Indiana moved from central to eastern time in 1977,
-+# then switched back in 2006.
-+# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
-+Rule	Pike	1955	only	-	May	 1	0:00	1:00	D
-+Rule	Pike	1955	1960	-	Sep	lastSun	2:00	0	S
-+Rule	Pike	1956	1964	-	Apr	lastSun	2:00	1:00	D
-+Rule	Pike	1961	1964	-	Oct	lastSun	2:00	0	S
-+# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-+Zone America/Indiana/Petersburg -5:49:07 - LMT	1883 Nov 18 12:10:53
-+			-6:00	US	C%sT	1955
-+			-6:00	Pike	C%sT	1965 Apr 25 2:00
-+			-5:00	-	EST	1966 Oct 30 2:00
-+			-6:00	US	C%sT	1977 Oct 30 2:00
-+			-5:00	-	EST	2006 Apr  2 2:00
-+			-6:00	US	C%sT
-+#
-+# Starke County, Indiana moved from central to eastern time in 1991,
-+# then switched back in 2006.
- # From Arthur David Olson (1991-10-28):
- # An article on page A3 of the Sunday, 1991-10-27 Washington Post
- # notes that Starke County switched from Central time to Eastern time as of
-@@ -603,10 +660,10 @@ Zone America/Indiana/Knox -5:46:30 -	LMT
- 			-6:00	Starke	C%sT	1962 Apr 29 2:00
- 			-5:00	-	EST	1963 Oct 27 2:00
- 			-6:00	US	C%sT	1991 Oct 27 2:00
--			-5:00	-	EST	2006
--			-5:00	US	E%sT
-+			-5:00	-	EST	2006 Apr  2 2:00
-+			-6:00	US	C%sT
- #
--# Switzerland County, Indiana, last observed DST in 1972.
-+# Switzerland County, Indiana, did not observe DST from 1973 through 2005.
- # Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
- Zone America/Indiana/Vevay -5:40:16 -	LMT	1883 Nov 18 12:19:44
- 			-6:00	US	C%sT	1954 Apr 25 2:00
-@@ -636,7 +693,7 @@ Zone America/Kentucky/Louisville -5:43:0
- 			-6:00	1:00	CDT	1974 Oct 27 2:00
- 			-5:00	US	E%sT
- #
--# Wayne, Clinton, and Russell Counties, Kentucky
-+# Wayne County, Kentucky
- #
- # From
- # <a href="http://www.lake-cumberland.com/life/archive/news990129time.shtml">
-@@ -733,7 +790,8 @@ Zone America/Detroit	-5:32:11 -	LMT	1905
- 			-5:00	-	EST	1975 Apr 27 2:00
- 			-5:00	US	E%sT
- #
--# The Michigan border with Wisconsin switched from EST to CST/CDT in 1973.
-+# Dickinson, Gogebic, Iron, and Menominee Counties, Michigan,
-+# switched from EST to CST/CDT in 1973.
- # Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
- Rule Menominee	1946	only	-	Apr	lastSun	2:00	1:00	D
- Rule Menominee	1946	only	-	Sep	lastSun	2:00	0	S
-@@ -929,7 +987,7 @@ Zone America/Goose_Bay	-4:01:40 -	LMT	18
- 			-4:00	StJohns	A%sT
- 
- 
--# west Labrador, New Brunswick, Nova Scotia, Prince Edward I
-+# west Labrador, Nova Scotia, Prince Edward I
- 
- # From Paul Eggert (1996-06-12):
- # Shanks writes that since 1970 most of this region has been like Halifax.
-@@ -938,53 +996,48 @@ Zone America/Goose_Bay	-4:01:40 -	LMT	18
- # Shanks also writes that Liverpool, NS was the only town in Canada to observe
- # DST in 1971 but not 1970; for now we'll assume this is a typo.
- 
--# From Paul Eggert (2000-10-02):
--# INMS (2000-09-12) says that, since 1988 at least, New Brunswick switches
--# at 00:01 local time.  FIXME: verify and create a new Zone for this.
--
--
- # Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
--Rule Halifax	1916	only	-	Apr	 1	0:00	1:00	D
--Rule Halifax	1916	only	-	Oct	 1	0:00	0	S
--Rule Halifax	1920	only	-	May	 9	0:00	1:00	D
--Rule Halifax	1920	only	-	Aug	29	0:00	0	S
--Rule Halifax	1921	only	-	May	 6	0:00	1:00	D
--Rule Halifax	1921	1922	-	Sep	 5	0:00	0	S
--Rule Halifax	1922	only	-	Apr	30	0:00	1:00	D
--Rule Halifax	1923	1925	-	May	Sun>=1	0:00	1:00	D
--Rule Halifax	1923	only	-	Sep	 4	0:00	0	S
--Rule Halifax	1924	only	-	Sep	15	0:00	0	S
--Rule Halifax	1925	only	-	Sep	28	0:00	0	S
--Rule Halifax	1926	only	-	May	16	0:00	1:00	D
--Rule Halifax	1926	only	-	Sep	13	0:00	0	S
--Rule Halifax	1927	only	-	May	 1	0:00	1:00	D
--Rule Halifax	1927	only	-	Sep	26	0:00	0	S
--Rule Halifax	1928	1931	-	May	Sun>=8	0:00	1:00	D
--Rule Halifax	1928	only	-	Sep	 9	0:00	0	S
--Rule Halifax	1929	only	-	Sep	 3	0:00	0	S
--Rule Halifax	1930	only	-	Sep	15	0:00	0	S
--Rule Halifax	1931	1932	-	Sep	Mon>=24	0:00	0	S
--Rule Halifax	1932	only	-	May	 1	0:00	1:00	D
--Rule Halifax	1933	only	-	Apr	30	0:00	1:00	D
--Rule Halifax	1933	only	-	Oct	 2	0:00	0	S
--Rule Halifax	1934	only	-	May	20	0:00	1:00	D
--Rule Halifax	1934	only	-	Sep	16	0:00	0	S
--Rule Halifax	1935	only	-	Jun	 2	0:00	1:00	D
--Rule Halifax	1935	only	-	Sep	30	0:00	0	S
--Rule Halifax	1936	only	-	Jun	 1	0:00	1:00	D
--Rule Halifax	1936	only	-	Sep	14	0:00	0	S
--Rule Halifax	1937	1938	-	May	Sun>=1	0:00	1:00	D
--Rule Halifax	1937	1941	-	Sep	Mon>=24	0:00	0	S
--Rule Halifax	1939	only	-	May	28	0:00	1:00	D
--Rule Halifax	1940	1941	-	May	Sun>=1	0:00	1:00	D
--Rule Halifax	1946	1949	-	Sep	lastSun	2:00	0	S
--Rule Halifax	1946	1949	-	Apr	lastSun	2:00	1:00	D
--Rule Halifax	1951	1954	-	Sep	lastSun	2:00	0	S
--Rule Halifax	1951	1954	-	Apr	lastSun	2:00	1:00	D
--Rule Halifax	1956	1959	-	Sep	lastSun	2:00	0	S
--Rule Halifax	1956	1959	-	Apr	lastSun	2:00	1:00	D
--Rule Halifax	1962	1973	-	Apr	lastSun	2:00	1:00	D
--Rule Halifax	1962	1973	-	Oct	lastSun	2:00	0	S
-+Rule	Halifax	1916	only	-	Apr	 1	0:00	1:00	D
-+Rule	Halifax	1916	only	-	Oct	 1	0:00	0	S
-+Rule	Halifax	1920	only	-	May	 9	0:00	1:00	D
-+Rule	Halifax	1920	only	-	Aug	29	0:00	0	S
-+Rule	Halifax	1921	only	-	May	 6	0:00	1:00	D
-+Rule	Halifax	1921	1922	-	Sep	 5	0:00	0	S
-+Rule	Halifax	1922	only	-	Apr	30	0:00	1:00	D
-+Rule	Halifax	1923	1925	-	May	Sun>=1	0:00	1:00	D
-+Rule	Halifax	1923	only	-	Sep	 4	0:00	0	S
-+Rule	Halifax	1924	only	-	Sep	15	0:00	0	S
-+Rule	Halifax	1925	only	-	Sep	28	0:00	0	S
-+Rule	Halifax	1926	only	-	May	16	0:00	1:00	D
-+Rule	Halifax	1926	only	-	Sep	13	0:00	0	S
-+Rule	Halifax	1927	only	-	May	 1	0:00	1:00	D
-+Rule	Halifax	1927	only	-	Sep	26	0:00	0	S
-+Rule	Halifax	1928	1931	-	May	Sun>=8	0:00	1:00	D
-+Rule	Halifax	1928	only	-	Sep	 9	0:00	0	S
-+Rule	Halifax	1929	only	-	Sep	 3	0:00	0	S
-+Rule	Halifax	1930	only	-	Sep	15	0:00	0	S
-+Rule	Halifax	1931	1932	-	Sep	Mon>=24	0:00	0	S
-+Rule	Halifax	1932	only	-	May	 1	0:00	1:00	D
-+Rule	Halifax	1933	only	-	Apr	30	0:00	1:00	D
-+Rule	Halifax	1933	only	-	Oct	 2	0:00	0	S
-+Rule	Halifax	1934	only	-	May	20	0:00	1:00	D
-+Rule	Halifax	1934	only	-	Sep	16	0:00	0	S
-+Rule	Halifax	1935	only	-	Jun	 2	0:00	1:00	D
-+Rule	Halifax	1935	only	-	Sep	30	0:00	0	S
-+Rule	Halifax	1936	only	-	Jun	 1	0:00	1:00	D
-+Rule	Halifax	1936	only	-	Sep	14	0:00	0	S
-+Rule	Halifax	1937	1938	-	May	Sun>=1	0:00	1:00	D
-+Rule	Halifax	1937	1941	-	Sep	Mon>=24	0:00	0	S
-+Rule	Halifax	1939	only	-	May	28	0:00	1:00	D
-+Rule	Halifax	1940	1941	-	May	Sun>=1	0:00	1:00	D
-+Rule	Halifax	1946	1949	-	Apr	lastSun	2:00	1:00	D
-+Rule	Halifax	1946	1949	-	Sep	lastSun	2:00	0	S
-+Rule	Halifax	1951	1954	-	Apr	lastSun	2:00	1:00	D
-+Rule	Halifax	1951	1954	-	Sep	lastSun	2:00	0	S
-+Rule	Halifax	1956	1959	-	Apr	lastSun	2:00	1:00	D
-+Rule	Halifax	1956	1959	-	Sep	lastSun	2:00	0	S
-+Rule	Halifax	1962	1973	-	Apr	lastSun	2:00	1:00	D
-+Rule	Halifax	1962	1973	-	Oct	lastSun	2:00	0	S
- # Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
- Zone America/Halifax	-4:14:24 -	LMT	1902 Jun 15
- 			-4:00	Halifax	A%sT	1918
-@@ -1000,6 +1053,43 @@ Zone America/Glace_Bay	-3:59:48 -	LMT	19
- 			-4:00	Halifax	A%sT	1974
- 			-4:00	Canada	A%sT
- 
-+# New Brunswick
-+
-+# From Paul Eggert (2006-01-20):
-+# New Brunswick's Time Definition Act
-+# <http://www.gnb.ca/0062/PDF-acts/t-06.pdf> says they change at 00:01, and
-+# <http://www.canlii.org/nb/laws/sta/t-6/20030127/whole.html> makes it
-+# clear that this has been the case since at least 1993.
-+# For now, assume it started in 1993.  The Office of the Premier announced
-+# <http://www.gnb.ca/cnb/news/pre/2005e1737pr.htm> (2005-12-23)
-+# that they will bring forward proposed amendments to harmonize with the US;
-+# for now assume that this will happen, but they'll still switch at 00:01.
-+
-+# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
-+Rule	Moncton	1933	1935	-	Jun	Sun>=8	1:00	1:00	D
-+Rule	Moncton	1933	1935	-	Sep	Sun>=8	1:00	0	S
-+Rule	Moncton	1936	1938	-	Jun	Sun>=1	1:00	1:00	D
-+Rule	Moncton	1936	1938	-	Sep	Sun>=1	1:00	0	S
-+Rule	Moncton	1939	only	-	May	27	1:00	1:00	D
-+Rule	Moncton	1939	1941	-	Sep	Sat>=21	1:00	0	S
-+Rule	Moncton	1940	only	-	May	19	1:00	1:00	D
-+Rule	Moncton	1941	only	-	May	 4	1:00	1:00	D
-+Rule	Moncton	1946	1972	-	Apr	lastSun	2:00	1:00	D
-+Rule	Moncton	1946	1956	-	Sep	lastSun	2:00	0	S
-+Rule	Moncton	1956	1972	-	Oct	lastSun	2:00	0	S
-+Rule	Moncton	1993	2006	-	Apr	Sun>=1	0:01	1:00	D
-+Rule	Moncton	1993	2006	-	Oct	lastSun	0:01	0	S
-+Rule	Moncton	2007	max	-	Mar	Sun>=8	0:01	1:00	D
-+Rule	Moncton	2007	max	-	Nov	Sun>=1	0:01	0	S
-+# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-+Zone America/Moncton	-4:19:08 -	LMT	1883 Dec  9
-+			-5:00	-	EST	1902 Jun 15
-+			-4:00	Canada	A%sT	1933
-+			-4:00	Moncton	A%sT	1942
-+			-4:00	Canada	A%sT	1946
-+			-4:00	Moncton	A%sT	1973
-+			-4:00	Canada	A%sT	1993
-+			-4:00	Moncton	A%sT
- 
- # Ontario, Quebec
- 
---- glibc-20060202T0507/timezone/private.h	10 Jan 2006 07:55:37 -0000	1.11
-+++ glibc-20060202T0507-fedora/timezone/private.h	2 Feb 2006 09:24:43 -0000	1.7.2.5
-@@ -218,7 +218,7 @@ char *	imalloc P((int n));
- void *	irealloc P((void * pointer, int size));
- void	icfree P((char * pointer));
- void	ifree P((char * pointer));
--char *	scheck P((const char *string, char *format));
-+const char *scheck P((const char *string, const char *format));
- 
- /*
- ** Finally, some convenience items.
---- glibc-20060202T0507/timezone/scheck.c	6 Aug 2005 05:40:57 -0000	1.3
-+++ glibc-20060202T0507-fedora/timezone/scheck.c	2 Feb 2006 09:24:43 -0000	1.1.6.3
-@@ -1,6 +1,6 @@
- #ifndef lint
- #ifndef NOID
--static char	elsieid[] = "@(#)scheck.c	8.16";
-+static char	elsieid[] = "@(#)scheck.c	8.17";
- #endif /* !defined lint */
- #endif /* !defined NOID */
- 
-@@ -8,20 +8,19 @@ static char	elsieid[] = "@(#)scheck.c	8.
- 
- #include "private.h"
- 
--char *
-+const char *
- scheck(string, format)
- const char * const	string;
--char * const		format;
-+const char * const	format;
- {
- 	register char *		fbuf;
- 	register const char *	fp;
- 	register char *		tp;
- 	register int		c;
--	register char *		result;
-+	register const char *	result;
- 	char			dummy;
--	static char		nada;
- 
--	result = &nada;
-+	result = "";
- 	if (string == NULL || format == NULL)
- 		return result;
- 	fbuf = imalloc((int) (2 * strlen(format) + 4));
---- glibc-20060202T0507/timezone/zone.tab	7 Sep 2005 07:00:55 -0000	1.23
-+++ glibc-20060202T0507-fedora/timezone/zone.tab	2 Feb 2006 09:24:43 -0000	1.21.2.3
-@@ -1,4 +1,4 @@
--# @(#)zone.tab	1.32
-+# @(#)zone.tab	1.33
- #
- # TZ zone descriptions
- #
-@@ -100,8 +100,9 @@ BW	-2545+02555	Africa/Gaborone
- BY	+5354+02734	Europe/Minsk
- BZ	+1730-08812	America/Belize
- CA	+4734-05243	America/St_Johns	Newfoundland Island
--CA	+4439-06336	America/Halifax	Atlantic Time - Nova Scotia (most places), NB, W Labrador, E Quebec & PEI
-+CA	+4439-06336	America/Halifax	Atlantic Time - Nova Scotia (most places), W Labrador, E Quebec & PEI
- CA	+4612-05957	America/Glace_Bay	Atlantic Time - Nova Scotia - places that did not observe DST 1966-1971
-+CA	+4606-06447	America/Moncton	Atlantic Time - New Brunswick
- CA	+5320-06025	America/Goose_Bay	Atlantic Time - E Labrador
- CA	+4531-07334	America/Montreal	Eastern Time - Quebec - most locations
- CA	+4339-07923	America/Toronto	Eastern Time - Ontario - most locations
-@@ -370,12 +371,14 @@ US	+404251-0740023	America/New_York	East
- US	+421953-0830245	America/Detroit	Eastern Time - Michigan - most locations
- US	+381515-0854534	America/Kentucky/Louisville	Eastern Time - Kentucky - Louisville area
- US	+364947-0845057	America/Kentucky/Monticello	Eastern Time - Kentucky - Wayne County
--US	+394606-0860929	America/Indiana/Indianapolis	Eastern Standard Time - Indiana - most locations
--US	+382232-0862041	America/Indiana/Marengo	Eastern Standard Time - Indiana - Crawford County
--US	+411745-0863730	America/Indiana/Knox	Eastern Standard Time - Indiana - Starke County
--US	+384452-0850402	America/Indiana/Vevay	Eastern Standard Time - Indiana - Switzerland County
-+US	+394606-0860929	America/Indiana/Indianapolis	Eastern Time - Indiana - most locations
-+US	+382232-0862041	America/Indiana/Marengo	Eastern Time - Indiana - Crawford County
-+US	+411745-0863730	America/Indiana/Knox	Eastern Time - Indiana - Starke County
-+US	+384452-0850402	America/Indiana/Vevay	Eastern Time - Indiana - Switzerland County
- US	+415100-0873900	America/Chicago	Central Time
--US	+450628-0873651	America/Menominee	Central Time - Michigan - Wisconsin border
-+US	+384038-0873143	America/Indiana/Vincennes	Central Time - Indiana - Daviess, Dubois, Knox, Martin, Perry & Pulaski
-+US	+382931-0871643	America/Indiana/Petersburg	Central Time - Indiana - Pike County
-+US	+450628-0873651	America/Menominee	Central Time - Michigan - Dickinson, Gogebic, Iron & Menominee Counties
- US	+470659-1011757	America/North_Dakota/Center	Central Time - North Dakota - Oliver County
- US	+394421-1045903	America/Denver	Mountain Time
- US	+433649-1161209	America/Boise	Mountain Time - south Idaho & east Oregon
