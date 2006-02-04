@@ -1,9 +1,9 @@
-%define glibcdate 20060203T0932
+%define glibcdate 20060204T0758
 %define glibcname glibc
-%define glibcsrcdir glibc-20060203T0932
+%define glibcsrcdir glibc-20060204T0758
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 35
+%define glibcrelease 36
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1245,6 +1245,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Feb  4 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-36
+- update from CVS
+  - fix frequency setting for ITIMER_PROF (#179938, BZ#2268)
+  - fix powerpc inline fegetround ()
+  - fix nptl_db (#179946)
+
 * Fri Feb  3 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-35
 - update from CVS
   - handle futimesat (fd, NULL, tvp) as futimes (fd, tvp)
