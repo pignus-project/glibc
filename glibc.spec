@@ -20,7 +20,7 @@
 Summary: The GNU libc libraries.
 Name: glibc
 Version: %{glibcversion}
-Release: %{glibcrelease}
+Release: %{glibcrelease}.1
 License: LGPL
 Group: System Environment/Libraries
 Source0: %{glibcsrcdir}.tar.bz2
@@ -1245,6 +1245,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb 10 2006 Jesse Keating <jkeating@redhat.com> - 2.3.90-36.1
+- bump again for double-long bug on ppc(64)
+
 * Sat Feb  4 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-36
 - update from CVS
   - fix frequency setting for ITIMER_PROF (#179938, BZ#2268)
