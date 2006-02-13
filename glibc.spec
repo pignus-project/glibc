@@ -1,9 +1,9 @@
-%define glibcdate 20060204T0758
+%define glibcdate 20060213T0650
 %define glibcname glibc
-%define glibcsrcdir glibc-20060204T0758
+%define glibcsrcdir glibc-20060213T0650
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 36
+%define glibcrelease 37
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -20,7 +20,7 @@
 Summary: The GNU libc libraries.
 Name: glibc
 Version: %{glibcversion}
-Release: %{glibcrelease}.1
+Release: %{glibcrelease}
 License: LGPL
 Group: System Environment/Libraries
 Source0: %{glibcsrcdir}.tar.bz2
@@ -299,7 +299,7 @@ cat > override_headers/asm/unistd.h <<EOF
 #define __NR_mknodat		297
 #define __NR_fchownat		298
 #define __NR_futimesat		299
-#define __NR_newfstatat		300
+#define __NR_fstatat64		300
 #define __NR_unlinkat		301
 #define __NR_renameat		302
 #define __NR_linkat		303
@@ -312,34 +312,61 @@ cat > override_headers/asm/unistd.h <<EOF
 #define __NR_pselect6		308
 #define __NR_ppoll		309
 #endif
+#ifndef __NR_unshare
+#define __NR_unshare		310
+#endif
 %endif
 %ifarch ia64
 #ifndef __NR_timer_create
-#define __NR_timer_create		1248
-#define __NR_timer_settime		1249
-#define __NR_timer_gettime		1250
-#define __NR_timer_getoverrun		1251
-#define __NR_timer_delete		1252
-#define __NR_clock_settime		1253
-#define __NR_clock_gettime		1254
-#define __NR_clock_getres		1255
-#define __NR_clock_nanosleep		1256
+#define __NR_timer_create	1248
+#define __NR_timer_settime	1249
+#define __NR_timer_gettime	1250
+#define __NR_timer_getoverrun	1251
+#define __NR_timer_delete	1252
+#define __NR_clock_settime	1253
+#define __NR_clock_gettime	1254
+#define __NR_clock_getres	1255
+#define __NR_clock_nanosleep	1256
 #endif
 #ifndef __NR_mq_open
-#define __NR_mq_open			1262
-#define __NR_mq_unlink			1263
-#define __NR_mq_timedsend		1264
-#define __NR_mq_timedreceive		1265
-#define __NR_mq_notify			1266
-#define __NR_mq_getsetattr		1267
+#define __NR_mq_open		1262
+#define __NR_mq_unlink		1263
+#define __NR_mq_timedsend	1264
+#define __NR_mq_timedreceive	1265
+#define __NR_mq_notify		1266
+#define __NR_mq_getsetattr	1267
 #endif
 #ifndef __NR_waitid
-#define __NR_waitid			1270
+#define __NR_waitid		1270
 #endif
 #ifndef __NR_inotify_init
-#define __NR_inotify_init		1277
-#define __NR_inotify_add_watch		1278
-#define __NR_inotify_rm_watch		1279
+#define __NR_inotify_init	1277
+#define __NR_inotify_add_watch	1278
+#define __NR_inotify_rm_watch	1279
+#endif
+#ifndef __NR_openat
+#define __NR_openat		1281
+#define __NR_mkdirat		1282
+#define __NR_mknodat		1283
+#define __NR_fchownat		1284
+#define __NR_futimesat		1285
+#define __NR_newfstatat		1286
+#define __NR_unlinkat		1287
+#define __NR_renameat		1288
+#define __NR_linkat		1289
+#define __NR_symlinkat		1290
+#define __NR_readlinkat		1291
+#define __NR_fchmodat		1292
+#define __NR_faccessat		1293
+#endif
+#if 0
+#ifndef __NR_pselect6
+#define __NR_pselect6		1294
+#define __NR_ppoll		1295
+#endif
+#endif
+#ifndef __NR_unshare
+#define __NR_unshare		1296
 #endif
 %endif
 %ifarch ppc
@@ -373,6 +400,9 @@ cat > override_headers/asm/unistd.h <<EOF
 #define __NR_pselect6		280
 #define __NR_ppoll		281
 #endif
+#ifndef __NR_unshare
+#define __NR_unshare		282
+#endif
 %endif
 %ifarch ppc64
 #ifndef __NR_utimes
@@ -397,6 +427,9 @@ cat > override_headers/asm/unistd.h <<EOF
 #ifndef __NR_pselect6
 #define __NR_pselect6		280
 #define __NR_ppoll		281
+#endif
+#ifndef __NR_unshare
+#define __NR_unshare		282
 #endif
 %endif
 %ifarch s390
@@ -434,6 +467,28 @@ cat > override_headers/asm/unistd.h <<EOF
 #define __NR_inotify_add_watch	285
 #define __NR_inotify_rm_watch	286
 #endif
+#ifndef __NR_openat
+#define __NR_openat		288
+#define __NR_mkdirat		289
+#define __NR_mknodat		290
+#define __NR_fchownat		291
+#define __NR_futimesat		292
+#define __NR_fstatat64		293
+#define __NR_unlinkat		294
+#define __NR_renameat		295
+#define __NR_linkat		296
+#define __NR_symlinkat		297
+#define __NR_readlinkat		298
+#define __NR_fchmodat		299
+#define __NR_faccessat		300
+#endif
+#ifndef __NR_pselect6
+#define __NR_pselect6		301
+#define __NR_ppoll		302
+#endif
+#ifndef __NR_unshare
+#define __NR_unshare		303
+#endif
 %endif
 %ifarch s390x
 #ifndef __NR_timer_create
@@ -462,6 +517,28 @@ cat > override_headers/asm/unistd.h <<EOF
 #define __NR_inotify_init	284
 #define __NR_inotify_add_watch	285
 #define __NR_inotify_rm_watch	286
+#endif
+#ifndef __NR_openat
+#define __NR_openat		288
+#define __NR_mkdirat		289
+#define __NR_mknodat		290
+#define __NR_fchownat		291
+#define __NR_futimesat		292
+#define __NR_newfstatat		293
+#define __NR_unlinkat		294
+#define __NR_renameat		295
+#define __NR_linkat		296
+#define __NR_symlinkat		297
+#define __NR_readlinkat		298
+#define __NR_fchmodat		299
+#define __NR_faccessat		300
+#endif
+#ifndef __NR_pselect6
+#define __NR_pselect6		301
+#define __NR_ppoll		302
+#endif
+#ifndef __NR_unshare
+#define __NR_unshare		303
 #endif
 %endif
 %ifarch sparc sparcv9 sparc64
@@ -505,6 +582,9 @@ cat > override_headers/asm/unistd.h <<EOF
 #define __NR_pselect6		297
 #define __NR_ppoll		298
 #endif
+#ifndef __NR_unshare
+#define __NR_unshare		299
+#endif
 %endif
 %ifarch x86_64
 #ifndef __NR_mq_open
@@ -538,6 +618,18 @@ cat > override_headers/asm/unistd.h <<EOF
 #define __NR_fchmodat		268
 #define __NR_faccessat		269
 #endif
+#ifndef __NR_pselect6
+#define __NR_pselect6		270
+#define __NR_ppoll		271
+#endif
+#ifndef __NR_unshare
+#define __NR_unshare		272
+#endif
+%endif
+%ifnarch %{ix86} x86_64
+/* FIXME: Reenable it when the kernel side is more stable.  */
+#undef __NR_newfstatat
+#undef __NR_fstatat64
 %endif
 #endif
 EOF
@@ -1245,8 +1337,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri Feb 10 2006 Jesse Keating <jkeating@redhat.com> - 2.3.90-36.1
-- bump again for double-long bug on ppc(64)
+* Mon Feb 13 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-37
+- update from CVS
+  - *at fixes
+  - unshare syscall wrapper
 
 * Sat Feb  4 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-36
 - update from CVS
