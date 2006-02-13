@@ -1098,8 +1098,33 @@
  descriptor as an argument instead of a file name.  @xref{Low-Level
  I/O}.  This function comes from FreeBSD, and is not available on all
 --- glibc-20060213T0650/nptl/ChangeLog	13 Feb 2006 01:27:41 -0000	1.860
-+++ glibc-20060213T0650-fedora/nptl/ChangeLog	13 Feb 2006 07:30:04 -0000	1.706.2.76
-@@ -519,6 +519,15 @@
++++ glibc-20060213T0650-fedora/nptl/ChangeLog	13 Feb 2006 08:21:20 -0000	1.706.2.77
+@@ -1,3 +1,24 @@
++2006-02-13  Jakub Jelinek  <jakub@redhat.com>
++
++	* sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
++	(__pthread_list_t): New typedef.
++	(pthread_mutex_t): Replace __next and __prev fields with __list.
++	* sysdeps/unix/sysv/linux/ia64/bits/pthreadtypes.h
++	(__pthread_list_t): New typedef.
++	(pthread_mutex_t): Replace __next and __prev fields with __list.
++	* sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
++	(__pthread_list_t, __pthread_slist_t): New typedefs.
++	(pthread_mutex_t): Replace __next and __prev fields with __list.
++	* sysdeps/unix/sysv/linux/s390/bits/pthreadtypes.h
++	(__pthread_list_t, __pthread_slist_t): New typedefs.
++	(pthread_mutex_t): Replace __next and __prev fields with __list.
++	* sysdeps/unix/sysv/linux/sparc/bits/pthreadtypes.h
++	(__pthread_list_t, __pthread_slist_t): New typedefs.
++	(pthread_mutex_t): Replace __next and __prev fields with __list.
++	* sysdeps/unix/sysv/linux/sh/bits/pthreadtypes.h
++	(__pthread_slist_t): New typedef.
++	(pthread_mutex_t): Replace __next field with __list.
++
+ 2006-02-12  Ulrich Drepper  <drepper@redhat.com>
+ 
+ 	* allocatestack.c (allocate_stack): Initialize robust_list.
+@@ -519,6 +540,15 @@
  	Use __sigfillset.  Document that sigfillset does the right thing wrt
  	to SIGSETXID.
  
@@ -1115,7 +1140,7 @@
  2005-07-11  Jakub Jelinek  <jakub@redhat.com>
  
  	[BZ #1102]
-@@ -1255,6 +1264,11 @@
+@@ -1255,6 +1285,11 @@
  	Move definition inside libpthread, libc, librt check.  Provide
  	definition for rtld.
  
@@ -1127,7 +1152,7 @@
  2004-09-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/alpha/jmpbuf-unwind.h: Define __libc_unwind_longjmp.
-@@ -3329,6 +3343,11 @@
+@@ -3329,6 +3364,11 @@
  
  	* Makefile [$(build-shared) = yes] (tests): Depend on $(test-modules).
  
@@ -1198,6 +1223,205 @@
 +#ifndef __ASSUME_CLONE_THREAD_FLAGS
 +# define __ASSUME_CLONE_THREAD_FLAGS	1
 +#endif
+--- glibc-20060213T0650/nptl/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h	9 Jan 2006 23:38:27 -0000	1.11
++++ glibc-20060213T0650-fedora/nptl/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h	13 Feb 2006 08:21:21 -0000	1.7.2.5
+@@ -43,6 +43,13 @@ typedef union
+ } pthread_attr_t;
+ 
+ 
++typedef struct __pthread_internal_list
++{
++  struct __pthread_internal_list *__prev;
++  struct __pthread_internal_list *__next;
++} __pthread_list_t;
++
++
+ /* Data structures for mutex handling.  The structure of the attribute
+    type is deliberately not exposed.  */
+ typedef union
+@@ -57,8 +64,7 @@ typedef union
+        binary compatibility.  */
+     int __kind;
+     int __spins;
+-    struct __pthread_mutex_s *__next;
+-    struct __pthread_mutex_s *__prev;
++    __pthread_list_t __list;
+ #define __PTHREAD_MUTEX_HAVE_PREV	1
+   } __data;
+   char __size[__SIZEOF_PTHREAD_MUTEX_T];
+--- glibc-20060213T0650/nptl/sysdeps/unix/sysv/linux/ia64/bits/pthreadtypes.h	6 Jan 2006 21:37:18 -0000	1.16
++++ glibc-20060213T0650-fedora/nptl/sysdeps/unix/sysv/linux/ia64/bits/pthreadtypes.h	13 Feb 2006 08:21:21 -0000	1.13.2.4
+@@ -43,6 +43,13 @@ typedef union
+ } pthread_attr_t;
+ 
+ 
++typedef struct __pthread_internal_list
++{
++  struct __pthread_internal_list *__prev;
++  struct __pthread_internal_list *__next;
++} __pthread_list_t;
++
++
+ /* Data structures for mutex handling.  The structure of the attribute
+    type is not exposed on purpose.  */
+ typedef union
+@@ -57,8 +64,7 @@ typedef union
+        binary compatibility.  */
+     int __kind;
+     int __spins;
+-    struct __pthread_mutex_s *__next;
+-    struct __pthread_mutex_s *__prev;
++    __pthread_list_t __list;
+ #define __PTHREAD_MUTEX_HAVE_PREV	1
+   } __data;
+   char __size[__SIZEOF_PTHREAD_MUTEX_T];
+--- glibc-20060213T0650/nptl/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h	9 Jan 2006 21:12:31 -0000	1.18
++++ glibc-20060213T0650-fedora/nptl/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h	13 Feb 2006 08:21:21 -0000	1.14.2.5
+@@ -58,6 +58,20 @@ typedef union
+ } pthread_attr_t;
+ 
+ 
++#if __WORDSIZE == 64
++typedef struct __pthread_internal_list
++{
++  struct __pthread_internal_list *__prev;
++  struct __pthread_internal_list *__next;
++} __pthread_list_t;
++#else
++typedef struct __pthread_internal_slist
++{
++  struct __pthread_internal_slist *__next;
++} __pthread_slist_t;
++#endif
++
++
+ /* Data structures for mutex handling.  The structure of the attribute
+    type is deliberately not exposed.  */
+ typedef union
+@@ -75,15 +89,14 @@ typedef union
+     int __kind;
+ #if __WORDSIZE == 64
+     int __spins;
+-    struct __pthread_mutex_s *__next;
+-    struct __pthread_mutex_s *__prev;
++    __pthread_list_t __list;
+ # define __PTHREAD_MUTEX_HAVE_PREV	1
+ #else
+     unsigned int __nusers;
+     __extension__ union
+     {
+       int __spins;
+-      struct __pthread_mutex_s *__next;
++      __pthread_slist_t __list;
+     };
+ #endif
+   } __data;
+--- glibc-20060213T0650/nptl/sysdeps/unix/sysv/linux/s390/bits/pthreadtypes.h	9 Jan 2006 21:12:31 -0000	1.17
++++ glibc-20060213T0650-fedora/nptl/sysdeps/unix/sysv/linux/s390/bits/pthreadtypes.h	13 Feb 2006 08:21:21 -0000	1.13.2.5
+@@ -57,6 +57,20 @@ typedef union
+ } pthread_attr_t;
+ 
+ 
++#if __WORDSIZE == 64
++typedef struct __pthread_internal_list
++{
++  struct __pthread_internal_list *__prev;
++  struct __pthread_internal_list *__next;
++} __pthread_list_t;
++#else
++typedef struct __pthread_internal_slist
++{
++  struct __pthread_internal_slist *__next;
++} __pthread_slist_t;
++#endif
++
++
+ /* Data structures for mutex handling.  The structure of the attribute
+    type is not exposed on purpose.  */
+ typedef union
+@@ -74,15 +88,14 @@ typedef union
+     int __kind;
+ #if __WORDSIZE == 64
+     int __spins;
+-    struct __pthread_mutex_s *__next;
+-    struct __pthread_mutex_s *__prev;
++    __pthread_list_t __list;
+ # define __PTHREAD_MUTEX_HAVE_PREV	1
+ #else
+     unsigned int __nusers;
+     __extension__ union
+     {
+       int __spins;
+-      struct __pthread_mutex_s *__next;
++      __pthread_slist_t __list;
+     };
+ #endif
+   } __data;
+--- glibc-20060213T0650/nptl/sysdeps/unix/sysv/linux/sh/bits/pthreadtypes.h	9 Jan 2006 23:38:27 -0000	1.14
++++ glibc-20060213T0650-fedora/nptl/sysdeps/unix/sysv/linux/sh/bits/pthreadtypes.h	13 Feb 2006 08:21:21 -0000	1.10.2.5
+@@ -44,6 +44,12 @@ typedef union
+ } pthread_attr_t;
+ 
+ 
++typedef struct __pthread_internal_slist
++{
++  struct __pthread_internal_slist *__next;
++} __pthread_slist_t;
++
++
+ /* Data structures for mutex handling.  The structure of the attribute
+    type is not exposed on purpose.  */
+ typedef union
+@@ -60,7 +66,7 @@ typedef union
+     __extension__ union
+     {
+       int __spins;
+-      struct __pthread_mutex_s *__next;
++      __pthread_slist_t __list;
+     };
+   } __data;
+   char __size[__SIZEOF_PTHREAD_MUTEX_T];
+--- glibc-20060213T0650/nptl/sysdeps/unix/sysv/linux/sparc/bits/pthreadtypes.h	9 Jan 2006 23:38:27 -0000	1.11
++++ glibc-20060213T0650-fedora/nptl/sysdeps/unix/sysv/linux/sparc/bits/pthreadtypes.h	13 Feb 2006 08:21:21 -0000	1.7.2.5
+@@ -58,6 +58,20 @@ typedef union
+ } pthread_attr_t;
+ 
+ 
++#if __WORDSIZE == 64
++typedef struct __pthread_internal_list
++{
++  struct __pthread_internal_list *__prev;
++  struct __pthread_internal_list *__next;
++} __pthread_list_t;
++#else
++typedef struct __pthread_internal_slist
++{
++  struct __pthread_internal_slist *__next;
++} __pthread_slist_t;
++#endif
++
++
+ /* Data structures for mutex handling.  The structure of the attribute
+    type is deliberately not exposed.  */
+ typedef union
+@@ -75,15 +89,14 @@ typedef union
+     int __kind;
+ #if __WORDSIZE == 64
+     int __spins;
+-    struct __pthread_mutex_s *__next;
+-    struct __pthread_mutex_s *__prev;
++    __pthread_list_t __list;
+ # define __PTHREAD_MUTEX_HAVE_PREV	1
+ #else
+     unsigned int __nusers;
+     __extension__ union
+     {
+       int __spins;
+-      struct __pthread_mutex_s *__next;
++      __pthread_slist_t __list;
+     };
+ #endif
+   } __data;
 --- glibc-20060213T0650/nscd/connections.c	3 Jan 2006 21:26:28 -0000	1.82
 +++ glibc-20060213T0650-fedora/nscd/connections.c	4 Jan 2006 07:58:21 -0000	1.55.2.19
 @@ -1873,3 +1873,18 @@ finish_drop_privileges (void)
