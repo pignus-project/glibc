@@ -631,6 +631,10 @@ cat > override_headers/asm/unistd.h <<EOF
 #undef __NR_newfstatat
 #undef __NR_fstatat64
 %endif
+%ifarch s390 s390x
+/* FIXME: Handle pselect6 on s390/s390x.  */
+#undef __NR_pselect6
+%endif
 #endif
 EOF
 cat > override_headers/asm/errno.h <<EOF
