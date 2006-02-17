@@ -1,9 +1,9 @@
-%define glibcdate 20060213T0650
+%define glibcdate 20060217T1609
 %define glibcname glibc
-%define glibcsrcdir glibc-20060213T0650
+%define glibcsrcdir glibc-20060217T1609
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.90
-%define glibcrelease 37
+%define glibcrelease 38
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -630,10 +630,6 @@ cat > override_headers/asm/unistd.h <<EOF
 /* FIXME: Reenable it when the kernel side is more stable.  */
 #undef __NR_newfstatat
 #undef __NR_fstatat64
-%endif
-%ifarch s390 s390x
-/* FIXME: Handle pselect6 on s390/s390x.  */
-#undef __NR_pselect6
 %endif
 #endif
 EOF
@@ -1341,6 +1337,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb 17 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-38
+- update from CVS
+  - robust mutexes rewrite
+
 * Mon Feb 13 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-37
 - update from CVS
   - *at fixes

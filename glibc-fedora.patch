@@ -1,6 +1,14 @@
---- glibc-20060213T0650/ChangeLog	12 Feb 2006 21:41:44 -0000	1.9989
-+++ glibc-20060213T0650-fedora/ChangeLog	13 Feb 2006 07:30:01 -0000	1.8782.2.162
-@@ -73,6 +73,11 @@
+--- glibc-20060217T1609/ChangeLog	15 Feb 2006 18:14:59 -0000	1.9991
++++ glibc-20060217T1609-fedora/ChangeLog	17 Feb 2006 16:18:18 -0000	1.8782.2.164
+@@ -1,3 +1,7 @@
++2006-02-17  Jakub Jelinek  <jakub@redhat.com>
++
++	* include/atomic.h (atomic_and, atomic_or): Define.
++
+ 2006-02-15  Ulrich Drepper  <drepper@redhat.com>
+ 
+ 	* sysdeps/unix/sysv/linux/sparc/bits/mman.h: Define MADV_DONTFORK
+@@ -94,6 +98,11 @@
  	(__MATHDECL_2): Use __REDIRECT_NTH instead of __REDIRECT
  	followed by __THROW.
  
@@ -12,7 +20,7 @@
  2006-02-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/unix/sysv/linux/futimesat.c [__NR_futimesat]
-@@ -132,6 +137,11 @@
+@@ -153,6 +162,11 @@
  	* sysdeps/ieee754/ldbl-128/s_llrintl.c (__llrintl): Fix a typo.
  	* sysdeps/s390/fpu/libm-test-ulps: Remove llrint ulps.
  
@@ -24,7 +32,7 @@
  2006-01-19  Thomas Schwinge  <tschwinge@gnu.org>
  
  	* libio/genops.c: Include <stdbool.h>.
-@@ -2558,6 +2568,10 @@
+@@ -2579,6 +2593,10 @@
  
  	* elf/order2mod2.c (init): Cast ignored value to void.
  
@@ -35,7 +43,7 @@
  2005-12-27  Ulrich Drepper  <drepper@redhat.com>
  
  	* elf/tst-tls13.c (do_test): Avoid using the library path when
-@@ -2841,6 +2855,26 @@
+@@ -2862,6 +2880,26 @@
  	* sysdeps/unix/sysv/linux/time.c: If __NR_time is not defined,
  	use sysdeps/unix/time.c implementation.
  
@@ -62,7 +70,7 @@
  2005-12-19  Ulrich Drepper  <drepper@redhat.com>
  
  	[BZ #1955]
-@@ -5959,6 +5993,11 @@
+@@ -5980,6 +6018,11 @@
  	R_ARM_TLS_TPOFF32, R_ARM_TLS_GD32, R_ARM_TLS_LDM32,
  	R_ARM_TLS_LDO32, R_ARM_TLS_IE32, R_ARM_TLS_LE32): New macros.
  
@@ -74,7 +82,7 @@
  2005-10-03  Roland McGrath  <roland@redhat.com>
  
  	* sysdeps/powerpc/nofpu: Directory removed, saved in ports repository.
-@@ -6953,6 +6992,12 @@
+@@ -6974,6 +7017,12 @@
  	* argp/argp-help.c (__argp_error): __asprintf -> vasprintf.
  	(__argp_failure): Likewise.
  
@@ -87,7 +95,7 @@
  2005-08-08  Ulrich Drepper  <drepper@redhat.com>
  
  	* nscd/cache.c (cache_add): Commit hash table and header to disk.
-@@ -7077,6 +7122,17 @@
+@@ -7098,6 +7147,17 @@
  	__syslog_chk.
  	* misc/Versions: Export __syslog_chk and __vsyslog_chk.
  
@@ -105,7 +113,7 @@
  2005-07-28  Thomas Schwinge  <schwinge@nic-nac-project.de>
  
  	[BZ #1137]
-@@ -10137,6 +10193,18 @@
+@@ -10158,6 +10218,18 @@
  
  	* scripts/soversions.awk: Fix default version set handling.
  
@@ -124,8 +132,8 @@
  2005-02-10  Roland McGrath  <roland@redhat.com>
  
  	[BZ #157]
---- glibc-20060213T0650/ChangeLog.11	10 Nov 2000 03:31:36 -0000	1.1
-+++ glibc-20060213T0650-fedora/ChangeLog.11	22 Sep 2004 21:20:47 -0000	1.1.4.1
+--- glibc-20060217T1609/ChangeLog.11	10 Nov 2000 03:31:36 -0000	1.1
++++ glibc-20060217T1609-fedora/ChangeLog.11	22 Sep 2004 21:20:47 -0000	1.1.4.1
 @@ -1352,6 +1352,11 @@
  	* sysdeps/unix/sysv/linux/mips/sys/tas.h: Add missing .mips0 at the
  	end of inline assembler code.
@@ -175,8 +183,8 @@
  	* sysdeps/arm/bits/huge_val.h (HUGE_VAL, HUGE_VALF): Add
  	__extension__ to hexadecimal floating constant notation.
  	* sysdeps/i386/bits/huge_val.h (HUGE_VAL, HUGE_VALF, HUGE_VALL):
---- glibc-20060213T0650/ChangeLog.12	16 Aug 2001 05:24:54 -0000	1.1
-+++ glibc-20060213T0650-fedora/ChangeLog.12	22 Sep 2004 21:20:47 -0000	1.1.4.1
+--- glibc-20060217T1609/ChangeLog.12	16 Aug 2001 05:24:54 -0000	1.1
++++ glibc-20060217T1609-fedora/ChangeLog.12	22 Sep 2004 21:20:47 -0000	1.1.4.1
 @@ -7729,6 +7729,13 @@
  
  	* Versions.def [ld]: Add GLIBC_2.2.1.
@@ -203,8 +211,8 @@
  2001-01-02  Franz Sirl	<Franz.Sirl-kernel@lauterbach.com>
  
  	* sysdeps/powerpc/dl-machine.c (__process_machine_rela): Fix typo.
---- glibc-20060213T0650/ChangeLog.15	16 Feb 2005 07:34:17 -0000	1.1
-+++ glibc-20060213T0650-fedora/ChangeLog.15	3 Mar 2005 17:29:57 -0000	1.1.6.2
+--- glibc-20060217T1609/ChangeLog.15	16 Feb 2005 07:34:17 -0000	1.1
++++ glibc-20060217T1609-fedora/ChangeLog.15	3 Mar 2005 17:29:57 -0000	1.1.6.2
 @@ -477,6 +477,14 @@
  
  2004-11-26  Jakub Jelinek  <jakub@redhat.com>
@@ -285,8 +293,8 @@
  2004-08-30  Roland McGrath  <roland@frob.com>
  
  	* scripts/extract-abilist.awk: If `lastversion' variable defined, omit
---- glibc-20060213T0650/csu/elf-init.c	5 Nov 2005 17:41:38 -0000	1.8
-+++ glibc-20060213T0650-fedora/csu/elf-init.c	15 Nov 2005 09:54:10 -0000	1.3.2.6
+--- glibc-20060217T1609/csu/elf-init.c	5 Nov 2005 17:41:38 -0000	1.8
++++ glibc-20060217T1609-fedora/csu/elf-init.c	15 Nov 2005 09:54:10 -0000	1.3.2.6
 @@ -49,6 +49,23 @@ extern void (*__init_array_end []) (int,
  extern void (*__fini_array_start []) (void) attribute_hidden;
  extern void (*__fini_array_end []) (void) attribute_hidden;
@@ -311,8 +319,8 @@
  
  /* These function symbols are provided for the .init/.fini section entry
     points automagically by the linker.  */
---- glibc-20060213T0650/debug/tst-chk1.c	22 Aug 2005 15:12:34 -0000	1.14
-+++ glibc-20060213T0650-fedora/debug/tst-chk1.c	24 Aug 2005 07:23:26 -0000	1.1.2.15
+--- glibc-20060217T1609/debug/tst-chk1.c	22 Aug 2005 15:12:34 -0000	1.14
++++ glibc-20060217T1609-fedora/debug/tst-chk1.c	24 Aug 2005 07:23:26 -0000	1.1.2.15
 @@ -17,6 +17,9 @@
     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
     02111-1307 USA.  */
@@ -341,8 +349,8 @@
  # define O 0
  #else
  # define O 1
---- glibc-20060213T0650/elf/ldconfig.c	1 Jan 2006 19:15:56 -0000	1.52
-+++ glibc-20060213T0650-fedora/elf/ldconfig.c	2 Jan 2006 10:52:50 -0000	1.47.2.7
+--- glibc-20060217T1609/elf/ldconfig.c	1 Jan 2006 19:15:56 -0000	1.52
++++ glibc-20060217T1609-fedora/elf/ldconfig.c	2 Jan 2006 10:52:50 -0000	1.47.2.7
 @@ -693,7 +693,18 @@ search_dir (const struct dir_entry *entr
  #endif
  	      !is_hwcap_platform (direntry->d_name)))
@@ -444,8 +452,8 @@
      }
  
    search_dirs ();
---- glibc-20060213T0650/elf/tst-stackguard1.c	26 Jun 2005 18:08:36 -0000	1.1
-+++ glibc-20060213T0650-fedora/elf/tst-stackguard1.c	8 Aug 2005 21:24:27 -0000	1.1.2.3
+--- glibc-20060217T1609/elf/tst-stackguard1.c	26 Jun 2005 18:08:36 -0000	1.1
++++ glibc-20060217T1609-fedora/elf/tst-stackguard1.c	8 Aug 2005 21:24:27 -0000	1.1.2.3
 @@ -160,17 +160,21 @@ do_test (void)
       the 16 runs, something is very wrong.  */
    int ndifferences = 0;
@@ -470,8 +478,8 @@
      {
        puts ("stack guard canaries are not randomized enough");
        puts ("nor equal to the default canary value");
---- glibc-20060213T0650/iconv/iconvconfig.c	1 Jan 2006 19:15:56 -0000	1.25
-+++ glibc-20060213T0650-fedora/iconv/iconvconfig.c	2 Jan 2006 10:52:50 -0000	1.19.2.6
+--- glibc-20060217T1609/iconv/iconvconfig.c	1 Jan 2006 19:15:56 -0000	1.25
++++ glibc-20060217T1609-fedora/iconv/iconvconfig.c	2 Jan 2006 10:52:50 -0000	1.19.2.6
 @@ -1011,6 +1011,34 @@ next_prime (uint32_t seed)
                                module name offset
                           (following last entry with step count 0)
@@ -548,8 +556,59 @@
    /* Open the output file.  */
    if (output_file == NULL)
      {
---- glibc-20060213T0650/include/features.h	5 Jan 2006 12:25:35 -0000	1.42
-+++ glibc-20060213T0650-fedora/include/features.h	6 Jan 2006 09:23:23 -0000	1.35.2.11
+--- glibc-20060217T1609/include/atomic.h	20 Aug 2005 01:14:07 -0000	1.16
++++ glibc-20060217T1609-fedora/include/atomic.h	17 Feb 2006 16:18:19 -0000	1.15.2.2
+@@ -1,5 +1,5 @@
+ /* Internal macros for atomic operations for GNU C Library.
+-   Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
++   Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
+ 
+@@ -273,6 +273,41 @@
+      __oldval & __mask; })
+ #endif
+ 
++/* Atomically *mem &= mask and return the old value of *mem.  */
++#ifndef atomic_and
++# define atomic_and(mem, mask) \
++  ({ __typeof (*(mem)) __oldval;					      \
++     __typeof (mem) __memp = (mem);					      \
++     __typeof (*(mem)) __mask = (mask);					      \
++									      \
++     do									      \
++       __oldval = (*__memp);						      \
++     while (__builtin_expect (atomic_compare_and_exchange_bool_acq (__memp,   \
++								    __oldval  \
++								    & __mask, \
++								    __oldval),\
++			      0));					      \
++									      \
++     __oldval; })
++#endif
++
++/* Atomically *mem |= mask and return the old value of *mem.  */
++#ifndef atomic_or
++# define atomic_or(mem, mask) \
++  ({ __typeof (*(mem)) __oldval;					      \
++     __typeof (mem) __memp = (mem);					      \
++     __typeof (*(mem)) __mask = (mask);					      \
++									      \
++     do									      \
++       __oldval = (*__memp);						      \
++     while (__builtin_expect (atomic_compare_and_exchange_bool_acq (__memp,   \
++								    __oldval  \
++								    | __mask, \
++								    __oldval),\
++			      0));					      \
++									      \
++     __oldval; })
++#endif
+ 
+ #ifndef atomic_full_barrier
+ # define atomic_full_barrier() __asm ("" ::: "memory")
+--- glibc-20060217T1609/include/features.h	5 Jan 2006 12:25:35 -0000	1.42
++++ glibc-20060217T1609-fedora/include/features.h	6 Jan 2006 09:23:23 -0000	1.35.2.11
 @@ -275,7 +275,13 @@
  #endif
  
@@ -565,16 +624,16 @@
  # if _FORTIFY_SOURCE > 1
  #  define __USE_FORTIFY_LEVEL 2
  # else
---- glibc-20060213T0650/include/bits/stdlib-ldbl.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060213T0650-fedora/include/bits/stdlib-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
+--- glibc-20060217T1609/include/bits/stdlib-ldbl.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060217T1609-fedora/include/bits/stdlib-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
 @@ -0,0 +1 @@
 +#include <stdlib/bits/stdlib-ldbl.h>
---- glibc-20060213T0650/include/bits/wchar-ldbl.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060213T0650-fedora/include/bits/wchar-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
+--- glibc-20060217T1609/include/bits/wchar-ldbl.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060217T1609-fedora/include/bits/wchar-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
 @@ -0,0 +1 @@
 +#include <wcsmbs/bits/wchar-ldbl.h>
---- glibc-20060213T0650/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
-+++ glibc-20060213T0650-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
+--- glibc-20060217T1609/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
++++ glibc-20060217T1609-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
 @@ -58,8 +58,6 @@ korean		ko_KR.eucKR
  korean.euc 	ko_KR.eucKR
  ko_KR		ko_KR.eucKR
@@ -584,8 +643,8 @@
  norwegian       nb_NO.ISO-8859-1
  nynorsk		nn_NO.ISO-8859-1
  polish          pl_PL.ISO-8859-2
---- glibc-20060213T0650/libio/stdio.h	16 Jan 2006 20:12:21 -0000	1.86
-+++ glibc-20060213T0650-fedora/libio/stdio.h	30 Jan 2006 09:29:46 -0000	1.78.2.8
+--- glibc-20060217T1609/libio/stdio.h	16 Jan 2006 20:12:21 -0000	1.86
++++ glibc-20060217T1609-fedora/libio/stdio.h	30 Jan 2006 09:29:46 -0000	1.78.2.8
 @@ -142,10 +142,12 @@ typedef _G_fpos64_t fpos64_t;
  extern struct _IO_FILE *stdin;		/* Standard input stream.  */
  extern struct _IO_FILE *stdout;		/* Standard output stream.  */
@@ -599,8 +658,8 @@
  
  __BEGIN_NAMESPACE_STD
  /* Remove file FILENAME.  */
---- glibc-20060213T0650/libio/bits/stdio2.h	19 Mar 2005 00:14:58 -0000	1.4
-+++ glibc-20060213T0650-fedora/libio/bits/stdio2.h	27 Jun 2005 13:04:16 -0000	1.1.2.6
+--- glibc-20060217T1609/libio/bits/stdio2.h	19 Mar 2005 00:14:58 -0000	1.4
++++ glibc-20060217T1609-fedora/libio/bits/stdio2.h	27 Jun 2005 13:04:16 -0000	1.1.2.6
 @@ -61,14 +61,25 @@ extern int __vfprintf_chk (FILE *__restr
  extern int __vprintf_chk (int __flag, __const char *__restrict __format,
  			  _G_va_list __ap);
@@ -631,8 +690,8 @@
  
  #endif
  
---- glibc-20060213T0650/locale/iso-4217.def	23 Sep 2005 19:07:54 -0000	1.18
-+++ glibc-20060213T0650-fedora/locale/iso-4217.def	3 Oct 2005 20:44:15 -0000	1.15.2.3
+--- glibc-20060217T1609/locale/iso-4217.def	23 Sep 2005 19:07:54 -0000	1.18
++++ glibc-20060217T1609-fedora/locale/iso-4217.def	3 Oct 2005 20:44:15 -0000	1.15.2.3
 @@ -8,6 +8,7 @@
   *
   * !!! The list has to be sorted !!!
@@ -724,8 +783,8 @@
  DEFINE_INT_CURR("PYG")		/* Paraguay Guarani  */
  DEFINE_INT_CURR("QAR")		/* Qatar Rial  */
  DEFINE_INT_CURR("ROL")		/* Romanian Leu  */
---- glibc-20060213T0650/locale/programs/3level.h	7 Dec 2005 05:47:27 -0000	1.6
-+++ glibc-20060213T0650-fedora/locale/programs/3level.h	19 Dec 2005 12:11:15 -0000	1.5.2.2
+--- glibc-20060217T1609/locale/programs/3level.h	7 Dec 2005 05:47:27 -0000	1.6
++++ glibc-20060217T1609-fedora/locale/programs/3level.h	19 Dec 2005 12:11:15 -0000	1.5.2.2
 @@ -202,6 +202,42 @@ CONCAT(TABLE,_iterate) (struct TABLE *t,
  	}
      }
@@ -769,8 +828,8 @@
  #endif
  
  #ifndef NO_FINALIZE
---- glibc-20060213T0650/localedata/Makefile	25 Sep 2005 17:01:12 -0000	1.102
-+++ glibc-20060213T0650-fedora/localedata/Makefile	3 Oct 2005 20:44:15 -0000	1.101.2.2
+--- glibc-20060217T1609/localedata/Makefile	25 Sep 2005 17:01:12 -0000	1.102
++++ glibc-20060217T1609-fedora/localedata/Makefile	3 Oct 2005 20:44:15 -0000	1.101.2.2
 @@ -222,6 +222,7 @@ $(INSTALL-SUPPORTED-LOCALES): install-lo
  	echo -n '...'; \
  	input=`echo $$locale | sed 's/\([^.]*\)[^@]*\(.*\)/\1\2/'`; \
@@ -779,8 +838,8 @@
  		     -i locales/$$input -c -f charmaps/$$charset \
  		     $(addprefix --prefix=,$(install_root)) $$locale; \
  	echo ' done'; \
---- glibc-20060213T0650/localedata/SUPPORTED	5 Nov 2005 16:25:49 -0000	1.87
-+++ glibc-20060213T0650-fedora/localedata/SUPPORTED	15 Nov 2005 08:21:56 -0000	1.71.2.8
+--- glibc-20060217T1609/localedata/SUPPORTED	5 Nov 2005 16:25:49 -0000	1.87
++++ glibc-20060217T1609-fedora/localedata/SUPPORTED	15 Nov 2005 08:21:56 -0000	1.71.2.8
 @@ -69,6 +69,7 @@ cy_GB.UTF-8/UTF-8 \
  cy_GB/ISO-8859-14 \
  da_DK.UTF-8/UTF-8 \
@@ -822,8 +881,8 @@
  ta_IN/UTF-8 \
  te_IN/UTF-8 \
  tg_TJ.UTF-8/UTF-8 \
---- glibc-20060213T0650/localedata/locales/cy_GB	28 Sep 2004 04:37:33 -0000	1.4
-+++ glibc-20060213T0650-fedora/localedata/locales/cy_GB	29 Sep 2004 08:48:23 -0000	1.3.2.2
+--- glibc-20060217T1609/localedata/locales/cy_GB	28 Sep 2004 04:37:33 -0000	1.4
++++ glibc-20060217T1609-fedora/localedata/locales/cy_GB	29 Sep 2004 08:48:23 -0000	1.3.2.2
 @@ -248,8 +248,11 @@ mon         "<U0049><U006F><U006E><U0061
  d_t_fmt     "<U0044><U0079><U0064><U0064><U0020><U0025><U0041><U0020><U0025><U0064><U0020><U006d><U0069><U0073><U0020><U0025><U0042><U0020><U0025><U0059><U0020><U0025><U0054><U0020><U0025><U005A>"
  d_fmt       "<U0025><U0064><U002E><U0025><U006D><U002E><U0025><U0079>"
@@ -838,8 +897,8 @@
  END LC_TIME
  
  LC_MESSAGES
---- glibc-20060213T0650/localedata/locales/en_GB	31 Oct 2004 23:42:26 -0000	1.12
-+++ glibc-20060213T0650-fedora/localedata/locales/en_GB	2 Nov 2004 12:25:47 -0000	1.10.2.2
+--- glibc-20060217T1609/localedata/locales/en_GB	31 Oct 2004 23:42:26 -0000	1.12
++++ glibc-20060217T1609-fedora/localedata/locales/en_GB	2 Nov 2004 12:25:47 -0000	1.10.2.2
 @@ -112,8 +112,8 @@ mon         "<U004A><U0061><U006E><U0075
  d_t_fmt     "<U0025><U0061><U0020><U0025><U0064><U0020><U0025><U0062><U0020><U0025><U0059><U0020><U0025><U0054><U0020><U0025><U005A>"
  d_fmt       "<U0025><U0064><U002F><U0025><U006D><U002F><U0025><U0079>"
@@ -851,8 +910,8 @@
  date_fmt	"<U0025><U0061><U0020><U0025><U0062><U0020><U0025><U0065>/
  <U0020><U0025><U0048><U003A><U0025><U004D><U003A><U0025><U0053><U0020>/
  <U0025><U005A><U0020><U0025><U0059>"
---- glibc-20060213T0650/localedata/locales/no_NO 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060213T0650-fedora/localedata/locales/no_NO	22 Sep 2004 21:21:01 -0000	1.11.2.1
+--- glibc-20060217T1609/localedata/locales/no_NO 1 Jan 1970 00:00:00 -0000
++++ glibc-20060217T1609-fedora/localedata/locales/no_NO	22 Sep 2004 21:21:01 -0000	1.11.2.1
 @@ -0,0 +1,69 @@
 +escape_char	/
 +comment_char    %
@@ -923,8 +982,8 @@
 +LC_ADDRESS
 +copy "nb_NO"
 +END LC_ADDRESS
---- glibc-20060213T0650/localedata/locales/zh_TW	31 Oct 2004 23:42:28 -0000	1.7
-+++ glibc-20060213T0650-fedora/localedata/locales/zh_TW	2 Nov 2004 12:25:57 -0000	1.5.2.2
+--- glibc-20060217T1609/localedata/locales/zh_TW	31 Oct 2004 23:42:28 -0000	1.7
++++ glibc-20060217T1609-fedora/localedata/locales/zh_TW	2 Nov 2004 12:25:57 -0000	1.5.2.2
 @@ -1,7 +1,7 @@
  comment_char %
  escape_char /
@@ -952,8 +1011,8 @@
  revision   "0.2"
  date       "2000-08-02"
  %
---- glibc-20060213T0650/malloc/mcheck.c	8 Sep 2004 20:36:02 -0000	1.18
-+++ glibc-20060213T0650-fedora/malloc/mcheck.c	20 Dec 2005 10:59:21 -0000	1.18.2.1
+--- glibc-20060217T1609/malloc/mcheck.c	8 Sep 2004 20:36:02 -0000	1.18
++++ glibc-20060217T1609-fedora/malloc/mcheck.c	20 Dec 2005 10:59:21 -0000	1.18.2.1
 @@ -24,9 +24,25 @@
  # include <mcheck.h>
  # include <stdint.h>
@@ -1029,8 +1088,8 @@
  
        old_free_hook = __free_hook;
        __free_hook = freehook;
---- glibc-20060213T0650/malloc/mtrace.c	14 Sep 2004 04:24:46 -0000	1.41
-+++ glibc-20060213T0650-fedora/malloc/mtrace.c	20 Dec 2005 10:59:21 -0000	1.41.2.1
+--- glibc-20060217T1609/malloc/mtrace.c	14 Sep 2004 04:24:46 -0000	1.41
++++ glibc-20060217T1609-fedora/malloc/mtrace.c	20 Dec 2005 10:59:21 -0000	1.41.2.1
 @@ -40,6 +40,18 @@
  # include <libio/iolibio.h>
  # define setvbuf(s, b, f, l) INTUSE(_IO_setvbuf) (s, b, f, l)
@@ -1086,8 +1145,8 @@
    __memalign_hook = tr_memalignhook;
    __malloc_hook = tr_mallochook;
  
---- glibc-20060213T0650/manual/filesys.texi	31 Dec 2005 13:11:27 -0000	1.99
-+++ glibc-20060213T0650-fedora/manual/filesys.texi	3 Feb 2006 09:43:54 -0000	1.96.2.4
+--- glibc-20060217T1609/manual/filesys.texi	31 Dec 2005 13:11:27 -0000	1.99
++++ glibc-20060217T1609-fedora/manual/filesys.texi	3 Feb 2006 09:43:54 -0000	1.96.2.4
 @@ -2806,7 +2806,7 @@ function.
  
  @comment sys/time.h
@@ -1097,34 +1156,25 @@
  This function is like @code{utimes}, except that it takes an open file
  descriptor as an argument instead of a file name.  @xref{Low-Level
  I/O}.  This function comes from FreeBSD, and is not available on all
---- glibc-20060213T0650/nptl/ChangeLog	13 Feb 2006 01:27:41 -0000	1.860
-+++ glibc-20060213T0650-fedora/nptl/ChangeLog	13 Feb 2006 08:21:20 -0000	1.706.2.77
-@@ -1,3 +1,24 @@
-+2006-02-13  Jakub Jelinek  <jakub@redhat.com>
+--- glibc-20060217T1609/nptl/ChangeLog	17 Feb 2006 15:37:51 -0000	1.864
++++ glibc-20060217T1609-fedora/nptl/ChangeLog	17 Feb 2006 16:18:19 -0000	1.706.2.79
+@@ -1,3 +1,15 @@
++2006-02-17  Jakub Jelinek  <jakub@redhat.com>
 +
-+	* sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
-+	(__pthread_list_t): New typedef.
-+	(pthread_mutex_t): Replace __next and __prev fields with __list.
-+	* sysdeps/unix/sysv/linux/ia64/bits/pthreadtypes.h
-+	(__pthread_list_t): New typedef.
-+	(pthread_mutex_t): Replace __next and __prev fields with __list.
-+	* sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
-+	(__pthread_list_t, __pthread_slist_t): New typedefs.
-+	(pthread_mutex_t): Replace __next and __prev fields with __list.
-+	* sysdeps/unix/sysv/linux/s390/bits/pthreadtypes.h
-+	(__pthread_list_t, __pthread_slist_t): New typedefs.
-+	(pthread_mutex_t): Replace __next and __prev fields with __list.
-+	* sysdeps/unix/sysv/linux/sparc/bits/pthreadtypes.h
-+	(__pthread_list_t, __pthread_slist_t): New typedefs.
-+	(pthread_mutex_t): Replace __next and __prev fields with __list.
-+	* sysdeps/unix/sysv/linux/sh/bits/pthreadtypes.h
-+	(__pthread_slist_t): New typedef.
-+	(pthread_mutex_t): Replace __next field with __list.
++	* sysdeps/unix/sysv/linux/alpha/lowlevellock.h (lll_robust_mutex_dead,
++	lll_robust_mutex_trylock, lll_robust_mutex_lock,
++	lll_robust_mutex_cond_lock, lll_robust_mutex_timedlock,
++	lll_robust_mutex_unlock): New macros.
++	(__lll_robust_lock_wait, __lll_robust_timedlock_wait): New prototypes.
++	* sysdeps/unix/sysv/linux/s390/lowlevellock.h: Likewise.
++	* sysdeps/unix/sysv/linux/powerpc/lowlevellock.h: Likewise.
++	* sysdeps/unix/sysv/linux/ia64/lowlevellock.h: Likewise.
++	* sysdeps/unix/sysv/linux/lowlevelrobustlock.c: New file.
 +
- 2006-02-12  Ulrich Drepper  <drepper@redhat.com>
+ 2006-02-17  Kaz Kojima  <kkojima@rr.iij4u.or.jp>
  
- 	* allocatestack.c (allocate_stack): Initialize robust_list.
-@@ -519,6 +540,15 @@
+ 	* sysdeps/unix/sysv/linux/sh/lowlevellock.h: Add lll_robust_mutex_*
+@@ -582,6 +594,15 @@
  	Use __sigfillset.  Document that sigfillset does the right thing wrt
  	to SIGSETXID.
  
@@ -1140,7 +1190,7 @@
  2005-07-11  Jakub Jelinek  <jakub@redhat.com>
  
  	[BZ #1102]
-@@ -1255,6 +1285,11 @@
+@@ -1318,6 +1339,11 @@
  	Move definition inside libpthread, libc, librt check.  Provide
  	definition for rtld.
  
@@ -1152,7 +1202,7 @@
  2004-09-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/alpha/jmpbuf-unwind.h: Define __libc_unwind_longjmp.
-@@ -3329,6 +3364,11 @@
+@@ -3392,6 +3418,11 @@
  
  	* Makefile [$(build-shared) = yes] (tests): Depend on $(test-modules).
  
@@ -1164,8 +1214,8 @@
  2003-07-25  Jakub Jelinek  <jakub@redhat.com>
  
  	* tst-cancel17.c (do_test): Check if aio_cancel failed.
---- glibc-20060213T0650/nptl/Makefile	9 Jan 2006 23:04:44 -0000	1.176
-+++ glibc-20060213T0650-fedora/nptl/Makefile	30 Jan 2006 09:29:47 -0000	1.157.2.17
+--- glibc-20060217T1609/nptl/Makefile	15 Feb 2006 16:52:28 -0000	1.177
++++ glibc-20060217T1609-fedora/nptl/Makefile	17 Feb 2006 16:15:52 -0000	1.157.2.18
 @@ -514,15 +514,19 @@ $(addprefix $(objpfx), \
      $(tests) $(xtests) $(test-srcs))): $(objpfx)libpthread.so \
  				       $(objpfx)libpthread_nonshared.a
@@ -1188,8 +1238,8 @@
  else
  $(addprefix $(objpfx),$(tests) $(test-srcs)): $(objpfx)libpthread.a
  endif
---- glibc-20060213T0650/nptl/tst-stackguard1.c	26 Jun 2005 17:44:14 -0000	1.1
-+++ glibc-20060213T0650-fedora/nptl/tst-stackguard1.c	8 Aug 2005 21:24:28 -0000	1.1.2.3
+--- glibc-20060217T1609/nptl/tst-stackguard1.c	26 Jun 2005 17:44:14 -0000	1.1
++++ glibc-20060217T1609-fedora/nptl/tst-stackguard1.c	8 Aug 2005 21:24:28 -0000	1.1.2.3
 @@ -190,17 +190,21 @@ do_test (void)
       the 16 runs, something is very wrong.  */
    int ndifferences = 0;
@@ -1214,8 +1264,8 @@
      {
        puts ("stack guard canaries are not randomized enough");
        puts ("nor equal to the default canary value");
---- glibc-20060213T0650/nptl/sysdeps/unix/sysv/linux/kernel-features.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060213T0650-fedora/nptl/sysdeps/unix/sysv/linux/kernel-features.h	22 Sep 2004 21:21:02 -0000	1.1.2.1
+--- glibc-20060217T1609/nptl/sysdeps/unix/sysv/linux/kernel-features.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060217T1609-fedora/nptl/sysdeps/unix/sysv/linux/kernel-features.h	22 Sep 2004 21:21:02 -0000	1.1.2.1
 @@ -0,0 +1,6 @@
 +#include_next <kernel-features.h>
 +
@@ -1223,207 +1273,619 @@
 +#ifndef __ASSUME_CLONE_THREAD_FLAGS
 +# define __ASSUME_CLONE_THREAD_FLAGS	1
 +#endif
---- glibc-20060213T0650/nptl/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h	9 Jan 2006 23:38:27 -0000	1.11
-+++ glibc-20060213T0650-fedora/nptl/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h	13 Feb 2006 08:21:21 -0000	1.7.2.5
-@@ -43,6 +43,13 @@ typedef union
- } pthread_attr_t;
- 
- 
-+typedef struct __pthread_internal_list
+--- glibc-20060217T1609/nptl/sysdeps/unix/sysv/linux/lowlevelrobustlock.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20060217T1609-fedora/nptl/sysdeps/unix/sysv/linux/lowlevelrobustlock.c	17 Feb 2006 16:18:19 -0000	1.1.2.1
+@@ -0,0 +1,95 @@
++/* Copyright (C) 2006 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++   Contributed by Jakub Jelinek <jakub@redhat.com>, 2006.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++#include <errno.h>
++#include <sysdep.h>
++#include <lowlevellock.h>
++#include <sys/time.h>
++#include <pthreadP.h>
++
++
++int
++__lll_robust_lock_wait (int *futex)
 +{
-+  struct __pthread_internal_list *__prev;
-+  struct __pthread_internal_list *__next;
-+} __pthread_list_t;
++  int oldval = *futex;
++  int tid = THREAD_GETMEM (THREAD_SELF, tid);
++
++  do
++    {
++      if (__builtin_expect (oldval & FUTEX_OWNER_DIED, 0))
++	return oldval;
++
++      int newval = oldval | FUTEX_WAITERS;
++      if (oldval != newval
++	  && atomic_compare_and_exchange_bool_acq (futex, newval, oldval))
++	continue;
++
++      lll_futex_wait (futex, newval);
++    }
++  while ((oldval = atomic_compare_and_exchange_val_acq (futex, tid, 0)) != 0);
++  return 0;
++}
 +
 +
- /* Data structures for mutex handling.  The structure of the attribute
-    type is deliberately not exposed.  */
- typedef union
-@@ -57,8 +64,7 @@ typedef union
-        binary compatibility.  */
-     int __kind;
-     int __spins;
--    struct __pthread_mutex_s *__next;
--    struct __pthread_mutex_s *__prev;
-+    __pthread_list_t __list;
- #define __PTHREAD_MUTEX_HAVE_PREV	1
-   } __data;
-   char __size[__SIZEOF_PTHREAD_MUTEX_T];
---- glibc-20060213T0650/nptl/sysdeps/unix/sysv/linux/ia64/bits/pthreadtypes.h	6 Jan 2006 21:37:18 -0000	1.16
-+++ glibc-20060213T0650-fedora/nptl/sysdeps/unix/sysv/linux/ia64/bits/pthreadtypes.h	13 Feb 2006 08:21:21 -0000	1.13.2.4
-@@ -43,6 +43,13 @@ typedef union
- } pthread_attr_t;
- 
- 
-+typedef struct __pthread_internal_list
++int
++__lll_robust_timedlock_wait (int *futex, const struct timespec *abstime)
 +{
-+  struct __pthread_internal_list *__prev;
-+  struct __pthread_internal_list *__next;
-+} __pthread_list_t;
++  /* Reject invalid timeouts.  */
++  if (abstime->tv_nsec < 0 || abstime->tv_nsec >= 1000000000)
++    return EINVAL;
 +
++  int tid = THREAD_GETMEM (THREAD_SELF, tid);
 +
- /* Data structures for mutex handling.  The structure of the attribute
-    type is not exposed on purpose.  */
- typedef union
-@@ -57,8 +64,7 @@ typedef union
-        binary compatibility.  */
-     int __kind;
-     int __spins;
--    struct __pthread_mutex_s *__next;
--    struct __pthread_mutex_s *__prev;
-+    __pthread_list_t __list;
- #define __PTHREAD_MUTEX_HAVE_PREV	1
-   } __data;
-   char __size[__SIZEOF_PTHREAD_MUTEX_T];
---- glibc-20060213T0650/nptl/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h	9 Jan 2006 21:12:31 -0000	1.18
-+++ glibc-20060213T0650-fedora/nptl/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h	13 Feb 2006 08:21:21 -0000	1.14.2.5
-@@ -58,6 +58,20 @@ typedef union
- } pthread_attr_t;
++  do
++    {
++      struct timeval tv;
++      struct timespec rt;
++
++      /* Get the current time.  */
++      (void) __gettimeofday (&tv, NULL);
++
++      /* Compute relative timeout.  */
++      rt.tv_sec = abstime->tv_sec - tv.tv_sec;
++      rt.tv_nsec = abstime->tv_nsec - tv.tv_usec * 1000;
++      if (rt.tv_nsec < 0)
++	{
++	  rt.tv_nsec += 1000000000;
++	  --rt.tv_sec;
++	}
++
++      /* Already timed out?  */
++      if (rt.tv_sec < 0)
++	return ETIMEDOUT;
++
++      /* Wait.  */
++      int oldval = *futex;
++      if (__builtin_expect (oldval & FUTEX_OWNER_DIED, 0))
++	return oldval;
++
++      int newval = oldval | FUTEX_WAITERS;
++      if (oldval != newval
++	  && atomic_compare_and_exchange_bool_acq (futex, newval, oldval))
++	continue;
++
++      lll_futex_timed_wait (futex, newval, &rt);
++    }
++  while (atomic_compare_and_exchange_bool_acq (futex, tid, 0));
++
++  return 0;
++}
+--- glibc-20060217T1609/nptl/sysdeps/unix/sysv/linux/alpha/lowlevellock.h	8 Sep 2005 17:39:04 -0000	1.6
++++ glibc-20060217T1609-fedora/nptl/sysdeps/unix/sysv/linux/alpha/lowlevellock.h	17 Feb 2006 16:18:19 -0000	1.5.2.2
+@@ -1,4 +1,4 @@
+-/* Copyright (C) 2003, 2004 Free Software Foundation, Inc.
++/* Copyright (C) 2003, 2004, 2006 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+ 
+    The GNU C Library is free software; you can redistribute it and/or
+@@ -64,6 +64,15 @@
+     INTERNAL_SYSCALL_ERROR_P (__ret, __err)? -__ret : __ret;		      \
+   })
+ 
++#define lll_robust_mutex_dead(futexv) \
++  do									      \
++    {									      \
++      int *__futexp = &(futexv);					      \
++      atomic_or (__futexp, FUTEX_OWNER_DIED);				      \
++      lll_futex_wake (__futexp, 1);					      \
++    }									      \
++  while (0)
++
+ /* Returns non-zero if error happened, zero if success.  */
+ #define lll_futex_requeue(futexp, nr_wake, nr_move, mutex, val) \
+   ({									      \
+@@ -106,7 +115,16 @@ __lll_mutex_cond_trylock(int *futex)
+ #define lll_mutex_cond_trylock(lock)	__lll_mutex_cond_trylock (&(lock))
  
  
-+#if __WORDSIZE == 64
-+typedef struct __pthread_internal_list
++static inline int __attribute__((always_inline))
++__lll_robust_mutex_trylock(int *futex, int id)
 +{
-+  struct __pthread_internal_list *__prev;
-+  struct __pthread_internal_list *__next;
-+} __pthread_list_t;
-+#else
-+typedef struct __pthread_internal_slist
++  return atomic_compare_and_exchange_val_acq (futex, id, 0) != 0;
++}
++#define lll_robust_mutex_trylock(lock, id) \
++  __lll_robust_mutex_trylock (&(lock), id)
++
+ extern void __lll_lock_wait (int *futex) attribute_hidden;
++extern int __lll_robust_lock_wait (int *futex) attribute_hidden;
+ 
+ static inline void __attribute__((always_inline))
+ __lll_mutex_lock(int *futex)
+@@ -117,6 +135,18 @@ __lll_mutex_lock(int *futex)
+ #define lll_mutex_lock(futex) __lll_mutex_lock (&(futex))
+ 
+ 
++static inline int __attribute__ ((always_inline))
++__lll_robust_mutex_lock (int *futex, int id)
 +{
-+  struct __pthread_internal_slist *__next;
-+} __pthread_slist_t;
-+#endif
++  int result = 0;
++  if (atomic_compare_and_exchange_bool_acq (futex, id, 0) != 0)
++    result = __lll_robust_lock_wait (futex);
++  return result;
++}
++#define lll_robust_mutex_lock(futex, id) \
++  __lll_robust_mutex_lock (&(futex), id)
 +
 +
- /* Data structures for mutex handling.  The structure of the attribute
-    type is deliberately not exposed.  */
- typedef union
-@@ -75,15 +89,14 @@ typedef union
-     int __kind;
- #if __WORDSIZE == 64
-     int __spins;
--    struct __pthread_mutex_s *__next;
--    struct __pthread_mutex_s *__prev;
-+    __pthread_list_t __list;
- # define __PTHREAD_MUTEX_HAVE_PREV	1
- #else
-     unsigned int __nusers;
-     __extension__ union
-     {
-       int __spins;
--      struct __pthread_mutex_s *__next;
-+      __pthread_slist_t __list;
-     };
+ static inline void __attribute__ ((always_inline))
+ __lll_mutex_cond_lock (int *futex)
+ {
+@@ -126,8 +156,14 @@ __lll_mutex_cond_lock (int *futex)
+ #define lll_mutex_cond_lock(futex) __lll_mutex_cond_lock (&(futex))
+ 
+ 
++#define lll_robust_mutex_cond_lock(futex, id) \
++  __lll_robust_mutex_lock (&(futex), (id) | FUTEX_WAITERS)
++
++
+ extern int __lll_timedlock_wait (int *futex, const struct timespec *)
+ 	attribute_hidden;
++extern int __lll_robust_timedlock_wait (int *futex, const struct timespec *)
++	attribute_hidden;
+ 
+ static inline int __attribute__ ((always_inline))
+ __lll_mutex_timedlock (int *futex, const struct timespec *abstime)
+@@ -141,6 +177,19 @@ __lll_mutex_timedlock (int *futex, const
+   __lll_mutex_timedlock (&(futex), abstime)
+ 
+ 
++static inline int __attribute__ ((always_inline))
++__lll_robust_mutex_timedlock (int *futex, const struct timespec *abstime,
++			      int id)
++{
++  int result = 0;
++  if (atomic_compare_and_exchange_bool_acq (futex, id, 0) != 0)
++    result = __lll_robust_timedlock_wait (futex, abstime);
++  return result;
++}
++#define lll_robust_mutex_timedlock(futex, abstime, id) \
++  __lll_robust_mutex_timedlock (&(futex), abstime, id)
++
++
+ static inline void __attribute__ ((always_inline))
+ __lll_mutex_unlock (int *futex)
+ {
+@@ -152,6 +201,16 @@ __lll_mutex_unlock (int *futex)
+ 
+ 
+ static inline void __attribute__ ((always_inline))
++__lll_robust_mutex_unlock (int *futex)
++{
++  int val = atomic_exchange_rel (futex, 0);
++  if (__builtin_expect (val & FUTEX_WAITERS, 0))
++    lll_futex_wake (futex, 1);
++}
++#define lll_robust_mutex_unlock(futex) __lll_robust_mutex_unlock(&(futex))
++
++
++static inline void __attribute__ ((always_inline))
+ __lll_mutex_unlock_force (int *futex)
+ {
+   (void) atomic_exchange_rel (futex, 0);
+--- glibc-20060217T1609/nptl/sysdeps/unix/sysv/linux/ia64/lowlevellock.h	8 Sep 2005 17:39:05 -0000	1.18
++++ glibc-20060217T1609-fedora/nptl/sysdeps/unix/sysv/linux/ia64/lowlevellock.h	17 Feb 2006 16:18:19 -0000	1.17.2.2
+@@ -1,4 +1,4 @@
+-/* Copyright (C) 2003, 2004 Free Software Foundation, Inc.
++/* Copyright (C) 2003, 2004, 2006 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+    Contributed by Jakub Jelinek <jakub@redhat.com>, 2003.
+ 
+@@ -55,6 +55,15 @@
+    _r10 == -1 ? -_retval : _retval;					\
+ })
+ 
++#define lll_robust_mutex_dead(futexv)					\
++do									\
++  {									\
++    int *__futexp = &(futexv);						\
++    atomic_or (__futexp, FUTEX_OWNER_DIED);				\
++    DO_INLINE_SYSCALL(futex, 3, (long) __futexp, FUTEX_WAKE, 1);	\
++  }									\
++while (0)
++
+ /* Returns non-zero if error happened, zero if success.  */
+ #define lll_futex_requeue(ftx, nr_wake, nr_move, mutex, val)		     \
+ ({									     \
+@@ -79,12 +88,19 @@
+ #define lll_mutex_trylock(futex) __lll_mutex_trylock (&(futex))
+ 
+ 
++#define __lll_robust_mutex_trylock(futex, id) \
++  (atomic_compare_and_exchange_val_acq (futex, id, 0) != 0)
++#define lll_robust_mutex_trylock(futex, id) \
++  __lll_robust_mutex_trylock (&(futex), id)
++
++
+ #define __lll_mutex_cond_trylock(futex) \
+   (atomic_compare_and_exchange_val_acq (futex, 2, 0) != 0)
+ #define lll_mutex_cond_trylock(futex) __lll_mutex_cond_trylock (&(futex))
+ 
+ 
+ extern void __lll_lock_wait (int *futex) attribute_hidden;
++extern int __lll_robust_lock_wait (int *futex) attribute_hidden;
+ 
+ 
+ #define __lll_mutex_lock(futex)						\
+@@ -96,6 +112,18 @@ extern void __lll_lock_wait (int *futex)
+ #define lll_mutex_lock(futex) __lll_mutex_lock (&(futex))
+ 
+ 
++#define __lll_robust_mutex_lock(futex, id)				\
++  ({									\
++    int *__futex = (futex);						\
++    int __val = 0;							\
++									\
++    if (atomic_compare_and_exchange_bool_acq (__futex, id, 0) != 0)	\
++      __val = __lll_robust_lock_wait (__futex);				\
++    __val;								\
++  }))
++#define lll_robust_mutex_lock(futex, id) __lll_robust_mutex_lock (&(futex), id)
++
++
+ #define __lll_mutex_cond_lock(futex)					\
+   ((void) ({								\
+     int *__futex = (futex);						\
+@@ -105,8 +133,24 @@ extern void __lll_lock_wait (int *futex)
+ #define lll_mutex_cond_lock(futex) __lll_mutex_cond_lock (&(futex))
+ 
+ 
++#define __lll_robust_mutex_cond_lock(futex, id)				\
++  ({									\
++    int *__futex = (futex);						\
++    int __val = 0;							\
++    int __id = (id) | FUTEX_WAITERS;					\
++									\
++    if (atomic_compare_and_exchange_bool_acq (__futex, __id, 0) != 0)	\
++      __val = __lll_robust_lock_wait (__futex);				\
++    __val;								\
++  }))
++#define lll_robust_mutex_cond_lock(futex, id) \
++  __lll_robust_mutex_cond_lock (&(futex), id)
++
++
+ extern int __lll_timedlock_wait (int *futex, const struct timespec *)
+      attribute_hidden;
++extern int __lll_robust_timedlock_wait (int *futex, const struct timespec *)
++     attribute_hidden;
+ 
+ 
+ #define __lll_mutex_timedlock(futex, abstime)				\
+@@ -122,6 +166,19 @@ extern int __lll_timedlock_wait (int *fu
+   __lll_mutex_timedlock (&(futex), abstime)
+ 
+ 
++#define __lll_robust_mutex_timedlock(futex, abstime, id)		\
++  ({									\
++    int *__futex = (futex);						\
++    int __val = 0;							\
++									\
++    if (atomic_compare_and_exchange_bool_acq (__futex, id, 0) != 0)	\
++      __val = __lll_robust_timedlock_wait (__futex, abstime);		\
++    __val;								\
++  }))
++#define lll_robust_mutex_timedlock(futex, abstime, id) \
++  __lll_robust_mutex_timedlock (&(futex), abstime, id)
++
++
+ #define __lll_mutex_unlock(futex)			\
+   ((void) ({						\
+     int *__futex = (futex);				\
+@@ -134,6 +191,18 @@ extern int __lll_timedlock_wait (int *fu
+   __lll_mutex_unlock(&(futex))
+ 
+ 
++#define __lll_robust_mutex_unlock(futex)		\
++  ((void) ({						\
++    int *__futex = (futex);				\
++    int __val = atomic_exchange_rel (__futex, 0);	\
++							\
++    if (__builtin_expect (__val & FUTEX_WAITERS, 0))	\
++      lll_futex_wake (__futex, 1);			\
++  }))
++#define lll_robust_mutex_unlock(futex) \
++  __lll_robust_mutex_unlock(&(futex))
++
++
+ #define __lll_mutex_unlock_force(futex)		\
+   ((void) ({					\
+     int *__futex = (futex);			\
+--- glibc-20060217T1609/nptl/sysdeps/unix/sysv/linux/powerpc/lowlevellock.h	8 Sep 2005 17:39:06 -0000	1.20
++++ glibc-20060217T1609-fedora/nptl/sysdeps/unix/sysv/linux/powerpc/lowlevellock.h	17 Feb 2006 16:18:19 -0000	1.18.2.3
+@@ -1,4 +1,4 @@
+-/* Copyright (C) 2003, 2004 Free Software Foundation, Inc.
++/* Copyright (C) 2003, 2004, 2006 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+    Contributed by Paul Mackerras <paulus@au.ibm.com>, 2003.
+ 
+@@ -69,6 +69,17 @@
+     INTERNAL_SYSCALL_ERROR_P (__ret, __err) ? -__ret : __ret;		      \
+   })
+ 
++#define lll_robust_mutex_dead(futexv) \
++  do									      \
++    {									      \
++      INTERNAL_SYSCALL_DECL (__err);					      \
++      int *__futexp = &(futexv);					      \
++									      \
++      atomic_or (__futexp, FUTEX_OWNER_DIED);				      \
++      INTERNAL_SYSCALL (futex, __err, 4, __futexp, FUTEX_WAKE, 1, 0);	      \
++    }									      \
++  while (0)
++
+ /* Returns non-zero if error happened, zero if success.  */
+ #define lll_futex_requeue(futexp, nr_wake, nr_move, mutex, val) \
+   ({									      \
+@@ -102,8 +113,8 @@
+ # define __lll_rel_instr	"sync"
  #endif
-   } __data;
---- glibc-20060213T0650/nptl/sysdeps/unix/sysv/linux/s390/bits/pthreadtypes.h	9 Jan 2006 21:12:31 -0000	1.17
-+++ glibc-20060213T0650-fedora/nptl/sysdeps/unix/sysv/linux/s390/bits/pthreadtypes.h	13 Feb 2006 08:21:21 -0000	1.13.2.5
-@@ -57,6 +57,20 @@ typedef union
- } pthread_attr_t;
+ 
+-/* Set *futex to 1 if it is 0, atomically.  Returns the old value */
+-#define __lll_trylock(futex) \
++/* Set *futex to ID if it is 0, atomically.  Returns the old value */
++#define __lll_robust_trylock(futex, id) \
+   ({ int __val;								      \
+      __asm __volatile ("1:	lwarx	%0,0,%2\n"			      \
+ 		       "	cmpwi	0,%0,0\n"			      \
+@@ -112,31 +123,26 @@
+ 		       "	bne-	1b\n"				      \
+ 		       "2:	" __lll_acq_instr			      \
+ 		       : "=&r" (__val), "=m" (*futex)			      \
+-		       : "r" (futex), "r" (1), "m" (*futex)		      \
++		       : "r" (futex), "r" (id), "m" (*futex)		      \
+ 		       : "cr0", "memory");				      \
+      __val;								      \
+   })
+ 
++#define lll_robust_mutex_trylock(lock, id) __lll_robust_trylock (&(lock), id)
++
++/* Set *futex to 1 if it is 0, atomically.  Returns the old value */
++#define __lll_trylock(futex) __lll_robust_trylock (futex, 1)
++
+ #define lll_mutex_trylock(lock)	__lll_trylock (&(lock))
+ 
+ /* Set *futex to 2 if it is 0, atomically.  Returns the old value */
+-#define __lll_cond_trylock(futex) \
+-  ({ int __val;								      \
+-     __asm __volatile ("1:	lwarx	%0,0,%2\n"			      \
+-		       "	cmpwi	0,%0,0\n"			      \
+-		       "	bne	2f\n"				      \
+-		       "	stwcx.	%3,0,%2\n"			      \
+-		       "	bne-	1b\n"				      \
+-		       "2:	" __lll_acq_instr			      \
+-		       : "=&r" (__val), "=m" (*futex)			      \
+-		       : "r" (futex), "r" (2), "m" (*futex)		      \
+-		       : "cr0", "memory");				      \
+-     __val;								      \
+-  })
++#define __lll_cond_trylock(futex) __lll_robust_trylock (futex, 2)
++
+ #define lll_mutex_cond_trylock(lock)	__lll_cond_trylock (&(lock))
  
  
-+#if __WORDSIZE == 64
-+typedef struct __pthread_internal_list
+ extern void __lll_lock_wait (int *futex) attribute_hidden;
++extern int __lll_robust_lock_wait (int *futex) attribute_hidden;
+ 
+ #define lll_mutex_lock(lock) \
+   (void) ({								      \
+@@ -146,6 +152,16 @@ extern void __lll_lock_wait (int *futex)
+       __lll_lock_wait (__futex);					      \
+   })
+ 
++#define lll_robust_mutex_lock(lock, id) \
++  ({									      \
++    int *__futex = &(lock);						      \
++    int __val = 0;							      \
++    if (__builtin_expect (atomic_compare_and_exchange_bool_acq (__futex, id,  \
++								0), 0))	      \
++      __val = __lll_robust_lock_wait (__futex);				      \
++    __val;								      \
++  })
++
+ #define lll_mutex_cond_lock(lock) \
+   (void) ({								      \
+     int *__futex = &(lock);						      \
+@@ -154,8 +170,22 @@ extern void __lll_lock_wait (int *futex)
+       __lll_lock_wait (__futex);					      \
+   })
+ 
++#define lll_robust_mutex_cond_lock(lock, id) \
++  ({									      \
++    int *__futex = &(lock);						      \
++    int __val = 0;							      \
++    int __id = id | FUTEX_WAITERS;					      \
++    if (__builtin_expect (atomic_compare_and_exchange_bool_acq (__futex, __id,\
++								0), 0))	      \
++      __val = __lll_robust_lock_wait (__futex);				      \
++    __val;								      \
++  })
++
++
+ extern int __lll_timedlock_wait
+   (int *futex, const struct timespec *) attribute_hidden;
++extern int __lll_robust_timedlock_wait
++  (int *futex, const struct timespec *) attribute_hidden;
+ 
+ #define lll_mutex_timedlock(lock, abstime) \
+   ({									      \
+@@ -167,6 +197,16 @@ extern int __lll_timedlock_wait
+     __val;								      \
+   })
+ 
++#define lll_robust_mutex_timedlock(lock, abstime, id) \
++  ({									      \
++    int *__futex = &(lock);						      \
++    int __val = 0;							      \
++    if (__builtin_expect (atomic_compare_and_exchange_bool_acq (__futex, id,  \
++								0), 0))	      \
++      __val = __lll_robust_timedlock_wait (__futex, abstime);		      \
++    __val;								      \
++  })
++
+ #define lll_mutex_unlock(lock) \
+   ((void) ({								      \
+     int *__futex = &(lock);						      \
+@@ -175,6 +215,14 @@ extern int __lll_timedlock_wait
+       lll_futex_wake (__futex, 1);					      \
+   }))
+ 
++#define lll_robust_mutex_unlock(lock) \
++  ((void) ({								      \
++    int *__futex = &(lock);						      \
++    int __val = atomic_exchange_rel (__futex, 0);			      \
++    if (__builtin_expect (__val & FUTEX_WAITERS, 0))			      \
++      lll_futex_wake (__futex, 1);					      \
++  }))
++
+ #define lll_mutex_unlock_force(lock) \
+   ((void) ({								      \
+     int *__futex = &(lock);						      \
+--- glibc-20060217T1609/nptl/sysdeps/unix/sysv/linux/s390/lowlevellock.h	8 Sep 2005 17:39:06 -0000	1.13
++++ glibc-20060217T1609-fedora/nptl/sysdeps/unix/sysv/linux/s390/lowlevellock.h	17 Feb 2006 16:18:21 -0000	1.12.2.2
+@@ -1,4 +1,4 @@
+-/* Copyright (C) 2003, 2004 Free Software Foundation, Inc.
++/* Copyright (C) 2003, 2004, 2006 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+    Contributed by Martin Schwidefsky <schwidefsky@de.ibm.com>, 2003.
+ 
+@@ -85,6 +85,17 @@
+   })
+ 
+ 
++#define lll_robust_mutex_dead(futexv) \
++  do									      \
++    {									      \
++      int *__futexp = &(futexv);					      \
++									      \
++      atomic_or (__futexp, FUTEX_OWNER_DIED);				      \
++      lll_futex_wake (__futexp, 1);					      \
++    }									      \
++  while (0)
++
++
+ /* Returns non-zero if error happened, zero if success.  */
+ #define lll_futex_requeue(futex, nr_wake, nr_move, mutex, val) \
+   ({									      \
+@@ -167,7 +178,23 @@ __lll_mutex_cond_trylock (int *futex)
+ #define lll_mutex_cond_trylock(futex) __lll_mutex_cond_trylock (&(futex))
+ 
+ 
++static inline int
++__attribute__ ((always_inline))
++__lll_robust_mutex_trylock (int *futex, int id)
 +{
-+  struct __pthread_internal_list *__prev;
-+  struct __pthread_internal_list *__next;
-+} __pthread_list_t;
-+#else
-+typedef struct __pthread_internal_slist
-+{
-+  struct __pthread_internal_slist *__next;
-+} __pthread_slist_t;
-+#endif
++    unsigned int old;
++
++    __asm __volatile ("cs %0,%3,%1"
++		       : "=d" (old), "=Q" (*futex)
++		       : "0" (0), "d" (id), "m" (*futex) : "cc", "memory" );
++    return old != 0;
++}
++#define lll_robust_mutex_trylock(futex, id) \
++  __lll_robust_mutex_trylock (&(futex), id)
 +
 +
- /* Data structures for mutex handling.  The structure of the attribute
-    type is not exposed on purpose.  */
- typedef union
-@@ -74,15 +88,14 @@ typedef union
-     int __kind;
- #if __WORDSIZE == 64
-     int __spins;
--    struct __pthread_mutex_s *__next;
--    struct __pthread_mutex_s *__prev;
-+    __pthread_list_t __list;
- # define __PTHREAD_MUTEX_HAVE_PREV	1
- #else
-     unsigned int __nusers;
-     __extension__ union
-     {
-       int __spins;
--      struct __pthread_mutex_s *__next;
-+      __pthread_slist_t __list;
-     };
- #endif
-   } __data;
---- glibc-20060213T0650/nptl/sysdeps/unix/sysv/linux/sh/bits/pthreadtypes.h	9 Jan 2006 23:38:27 -0000	1.14
-+++ glibc-20060213T0650-fedora/nptl/sysdeps/unix/sysv/linux/sh/bits/pthreadtypes.h	13 Feb 2006 08:21:21 -0000	1.10.2.5
-@@ -44,6 +44,12 @@ typedef union
- } pthread_attr_t;
+ extern void __lll_lock_wait (int *futex) attribute_hidden;
++extern int __lll_robust_lock_wait (int *futex) attribute_hidden;
  
+ static inline void
+ __attribute__ ((always_inline))
+@@ -178,6 +205,17 @@ __lll_mutex_lock (int *futex)
+ }
+ #define lll_mutex_lock(futex) __lll_mutex_lock (&(futex))
  
-+typedef struct __pthread_internal_slist
++static inline int
++__attribute__ ((always_inline))
++__lll_robust_mutex_lock (int *futex, int id)
 +{
-+  struct __pthread_internal_slist *__next;
-+} __pthread_slist_t;
++  int result = 0;
++  if (atomic_compare_and_exchange_bool_acq (futex, id, 0) != 0)
++    result = __lll_robust_lock_wait (futex);
++  return result;
++}
++#define lll_robust_mutex_lock(futex, id) __lll_robust_mutex_lock (&(futex), id)
 +
-+
- /* Data structures for mutex handling.  The structure of the attribute
-    type is not exposed on purpose.  */
- typedef union
-@@ -60,7 +66,7 @@ typedef union
-     __extension__ union
-     {
-       int __spins;
--      struct __pthread_mutex_s *__next;
-+      __pthread_slist_t __list;
-     };
-   } __data;
-   char __size[__SIZEOF_PTHREAD_MUTEX_T];
---- glibc-20060213T0650/nptl/sysdeps/unix/sysv/linux/sparc/bits/pthreadtypes.h	9 Jan 2006 23:38:27 -0000	1.11
-+++ glibc-20060213T0650-fedora/nptl/sysdeps/unix/sysv/linux/sparc/bits/pthreadtypes.h	13 Feb 2006 08:21:21 -0000	1.7.2.5
-@@ -58,6 +58,20 @@ typedef union
- } pthread_attr_t;
+ static inline void
+ __attribute__ ((always_inline))
+ __lll_mutex_cond_lock (int *futex)
+@@ -187,8 +225,13 @@ __lll_mutex_cond_lock (int *futex)
+ }
+ #define lll_mutex_cond_lock(futex) __lll_mutex_cond_lock (&(futex))
  
++#define lll_robust_mutex_cond_lock(futex, id) \
++  __lll_robust_mutex_lock (&(futex), (id) | FUTEX_WAITERS)
++
+ extern int __lll_timedlock_wait
+   (int *futex, const struct timespec *) attribute_hidden;
++extern int __lll_robust_timedlock_wait
++  (int *futex, const struct timespec *) attribute_hidden;
  
-+#if __WORDSIZE == 64
-+typedef struct __pthread_internal_list
+ static inline int
+ __attribute__ ((always_inline))
+@@ -202,6 +245,19 @@ __lll_mutex_timedlock (int *futex, const
+ #define lll_mutex_timedlock(futex, abstime) \
+   __lll_mutex_timedlock (&(futex), abstime)
+ 
++static inline int
++__attribute__ ((always_inline))
++__lll_robust_mutex_timedlock (int *futex, const struct timespec *abstime,
++			      int id)
 +{
-+  struct __pthread_internal_list *__prev;
-+  struct __pthread_internal_list *__next;
-+} __pthread_list_t;
-+#else
-+typedef struct __pthread_internal_slist
++  int result = 0;
++  if (atomic_compare_and_exchange_bool_acq (futex, id, 0) != 0)
++    result = __lll_robust_timedlock_wait (futex, abstime);
++  return result;
++}
++#define lll_robust_mutex_timedlock(futex, abstime, id) \
++  __lll_robust_mutex_timedlock (&(futex), abstime, id)
++
+ 
+ static inline void
+ __attribute__ ((always_inline))
+@@ -220,6 +276,21 @@ __lll_mutex_unlock (int *futex)
+ 
+ static inline void
+ __attribute__ ((always_inline))
++__lll_robust_mutex_unlock (int *futex)
 +{
-+  struct __pthread_internal_slist *__next;
-+} __pthread_slist_t;
-+#endif
++  int oldval;
++  int newval = 0;
++
++  lll_compare_and_swap (futex, oldval, newval, "slr %2,%2");
++  if (oldval & FUTEX_WAITERS)
++    lll_futex_wake (futex, 1);
++}
++#define lll_robust_mutex_unlock(futex) \
++  __lll_robust_mutex_unlock(&(futex))
 +
 +
- /* Data structures for mutex handling.  The structure of the attribute
-    type is deliberately not exposed.  */
- typedef union
-@@ -75,15 +89,14 @@ typedef union
-     int __kind;
- #if __WORDSIZE == 64
-     int __spins;
--    struct __pthread_mutex_s *__next;
--    struct __pthread_mutex_s *__prev;
-+    __pthread_list_t __list;
- # define __PTHREAD_MUTEX_HAVE_PREV	1
- #else
-     unsigned int __nusers;
-     __extension__ union
-     {
-       int __spins;
--      struct __pthread_mutex_s *__next;
-+      __pthread_slist_t __list;
-     };
- #endif
-   } __data;
---- glibc-20060213T0650/nscd/connections.c	3 Jan 2006 21:26:28 -0000	1.82
-+++ glibc-20060213T0650-fedora/nscd/connections.c	4 Jan 2006 07:58:21 -0000	1.55.2.19
++static inline void
++__attribute__ ((always_inline))
+ __lll_mutex_unlock_force (int *futex)
+ {
+   *futex = 0;
+--- glibc-20060217T1609/nscd/connections.c	3 Jan 2006 21:26:28 -0000	1.82
++++ glibc-20060217T1609-fedora/nscd/connections.c	4 Jan 2006 07:58:21 -0000	1.55.2.19
 @@ -1873,3 +1873,18 @@ finish_drop_privileges (void)
        exit (4);
      }
@@ -1443,8 +1905,8 @@
 +    prune_cache (&dbs[hstdb], LONG_MAX);
 +}
 +
---- glibc-20060213T0650/nscd/nscd.c	1 Jan 2006 19:15:56 -0000	1.51
-+++ glibc-20060213T0650-fedora/nscd/nscd.c	2 Jan 2006 10:52:53 -0000	1.38.2.11
+--- glibc-20060217T1609/nscd/nscd.c	1 Jan 2006 19:15:56 -0000	1.51
++++ glibc-20060217T1609-fedora/nscd/nscd.c	2 Jan 2006 10:52:53 -0000	1.38.2.11
 @@ -119,6 +119,9 @@ static struct argp argp =
    options, parse_opt, NULL, doc,
  };
@@ -1463,8 +1925,8 @@
    signal (SIGPIPE, SIG_IGN);
  
    /* Cleanup files created by a previous 'bind'.  */
---- glibc-20060213T0650/nscd/nscd.conf	23 Aug 2005 23:17:32 -0000	1.11
-+++ glibc-20060213T0650-fedora/nscd/nscd.conf	24 Aug 2005 07:23:30 -0000	1.8.2.3
+--- glibc-20060217T1609/nscd/nscd.conf	23 Aug 2005 23:17:32 -0000	1.11
++++ glibc-20060217T1609-fedora/nscd/nscd.conf	24 Aug 2005 07:23:30 -0000	1.8.2.3
 @@ -32,8 +32,8 @@
  #	logfile			/var/log/nscd.log
  #	threads			6
@@ -1476,8 +1938,8 @@
  	debug-level		0
  #	reload-count		5
  	paranoia		no
---- glibc-20060213T0650/nscd/nscd.init	20 Jun 2005 15:47:52 -0000	1.9
-+++ glibc-20060213T0650-fedora/nscd/nscd.init	12 Sep 2005 12:53:20 -0000	1.6.2.4
+--- glibc-20060217T1609/nscd/nscd.init	20 Jun 2005 15:47:52 -0000	1.9
++++ glibc-20060217T1609-fedora/nscd/nscd.init	12 Sep 2005 12:53:20 -0000	1.6.2.4
 @@ -9,6 +9,7 @@
  #		slow naming services like NIS, NIS+, LDAP, or hesiod.
  # processname: /usr/sbin/nscd
@@ -1518,8 +1980,8 @@
      RETVAL=$?
      echo
      [ $RETVAL -eq 0 ] && touch /var/lock/subsys/nscd
---- glibc-20060213T0650/nscd/selinux.c	29 Dec 2005 00:44:09 -0000	1.6
-+++ glibc-20060213T0650-fedora/nscd/selinux.c	2 Jan 2006 10:52:53 -0000	1.1.2.6
+--- glibc-20060217T1609/nscd/selinux.c	29 Dec 2005 00:44:09 -0000	1.6
++++ glibc-20060217T1609-fedora/nscd/selinux.c	2 Jan 2006 10:52:53 -0000	1.1.2.6
 @@ -147,7 +147,7 @@ audit_init (void)
    if (audit_fd < 0
        /* If kernel doesn't support audit, bail out */
@@ -1529,8 +1991,8 @@
  }
  #endif /* HAVE_LIBAUDIT */
  
---- glibc-20060213T0650/posix/Makefile	8 Jan 2006 09:39:15 -0000	1.188
-+++ glibc-20060213T0650-fedora/posix/Makefile	9 Jan 2006 21:55:00 -0000	1.171.2.16
+--- glibc-20060217T1609/posix/Makefile	8 Jan 2006 09:39:15 -0000	1.188
++++ glibc-20060217T1609-fedora/posix/Makefile	9 Jan 2006 21:55:00 -0000	1.171.2.16
 @@ -107,7 +107,8 @@ generated := $(addprefix wordexp-test-re
  	     bug-regex21-mem bug-regex21.mtrace \
  	     tst-rxspencer-mem tst-rxspencer.mtrace tst-getconf.out \
@@ -1564,8 +2026,8 @@
 +	  | sed -n -e '/START_OF_STRINGS/,$${/POSIX_V6_/{s/^[^"]*"//;s/".*$$//;p}}' \
 +	  > $@.new
 +	mv -f $@.new $@
---- glibc-20060213T0650/posix/getconf.speclist.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060213T0650-fedora/posix/getconf.speclist.h	13 Dec 2004 23:32:37 -0000	1.1.2.2
+--- glibc-20060217T1609/posix/getconf.speclist.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060217T1609-fedora/posix/getconf.speclist.h	13 Dec 2004 23:32:37 -0000	1.1.2.2
 @@ -0,0 +1,15 @@
 +#include <unistd.h>
 +const char *START_OF_STRINGS =
@@ -1582,8 +2044,8 @@
 +"POSIX_V6_LPBIG_OFFBIG"
 +#endif
 +"";
---- glibc-20060213T0650/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
-+++ glibc-20060213T0650-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
+--- glibc-20060217T1609/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
++++ glibc-20060217T1609-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
 @@ -36,6 +36,14 @@
  # define add_system_dir(dir) add_dir (dir)
  #endif
@@ -1599,8 +2061,8 @@
  #define CACHEMAGIC "ld.so-1.7.0"
  
  /* libc5 and glibc 2.0/2.1 use the same format.  For glibc 2.2 another
---- glibc-20060213T0650/sysdeps/ia64/Makefile	16 Aug 2004 06:46:14 -0000	1.10
-+++ glibc-20060213T0650-fedora/sysdeps/ia64/Makefile	22 Sep 2004 21:21:07 -0000	1.10.2.1
+--- glibc-20060217T1609/sysdeps/ia64/Makefile	16 Aug 2004 06:46:14 -0000	1.10
++++ glibc-20060217T1609-fedora/sysdeps/ia64/Makefile	22 Sep 2004 21:21:07 -0000	1.10.2.1
 @@ -12,8 +12,8 @@ elide-routines.os += hp-timing
  
  ifeq (yes,$(build-shared))
@@ -1612,8 +2074,8 @@
  endif
  endif
  
---- glibc-20060213T0650/sysdeps/ia64/ia64libgcc.S	11 May 2002 05:12:35 -0000	1.2
-+++ glibc-20060213T0650-fedora/sysdeps/ia64/ia64libgcc.S	22 Sep 2004 21:21:07 -0000	1.2.2.1
+--- glibc-20060217T1609/sysdeps/ia64/ia64libgcc.S	11 May 2002 05:12:35 -0000	1.2
++++ glibc-20060217T1609-fedora/sysdeps/ia64/ia64libgcc.S	22 Sep 2004 21:21:07 -0000	1.2.2.1
 @@ -1,350 +0,0 @@
 -/* From the Intel IA-64 Optimization Guide, choose the minimum latency
 -   alternative.  */
@@ -1965,8 +2427,8 @@
 -	.symver	___multi3, __multi3@GLIBC_2.2
 -
 -#endif
---- glibc-20060213T0650/sysdeps/ia64/libgcc-compat.c 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060213T0650-fedora/sysdeps/ia64/libgcc-compat.c	22 Sep 2004 21:21:08 -0000	1.1.2.1
+--- glibc-20060217T1609/sysdeps/ia64/libgcc-compat.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20060217T1609-fedora/sysdeps/ia64/libgcc-compat.c	22 Sep 2004 21:21:08 -0000	1.1.2.1
 @@ -0,0 +1,84 @@
 +/* pre-.hidden libgcc compatibility
 +   Copyright (C) 2002 Free Software Foundation, Inc.
@@ -2052,8 +2514,8 @@
 +symbol_version (INTUSE (__multi3), __multi3, GLIBC_2.2);
 +
 +#endif
---- glibc-20060213T0650/sysdeps/unix/nice.c	28 Sep 2002 19:13:13 -0000	1.6
-+++ glibc-20060213T0650-fedora/sysdeps/unix/nice.c	22 Sep 2004 21:21:08 -0000	1.6.2.1
+--- glibc-20060217T1609/sysdeps/unix/nice.c	28 Sep 2002 19:13:13 -0000	1.6
++++ glibc-20060217T1609-fedora/sysdeps/unix/nice.c	22 Sep 2004 21:21:08 -0000	1.6.2.1
 @@ -41,7 +41,12 @@ nice (int incr)
  	__set_errno (save);
      }
@@ -2068,8 +2530,8 @@
    if (result != -1)
      return getpriority (PRIO_PROCESS, 0);
    else
---- glibc-20060213T0650/sysdeps/unix/sysv/linux/dl-osinfo.h	8 Jan 2006 08:21:15 -0000	1.22
-+++ glibc-20060213T0650-fedora/sysdeps/unix/sysv/linux/dl-osinfo.h	9 Jan 2006 21:55:08 -0000	1.14.2.8
+--- glibc-20060217T1609/sysdeps/unix/sysv/linux/dl-osinfo.h	8 Jan 2006 08:21:15 -0000	1.22
++++ glibc-20060217T1609-fedora/sysdeps/unix/sysv/linux/dl-osinfo.h	9 Jan 2006 21:55:08 -0000	1.14.2.8
 @@ -18,12 +18,15 @@
     02111-1307 USA.  */
  
@@ -2118,8 +2580,8 @@
 +  ret ^= stk;
    return ret;
  }
---- glibc-20060213T0650/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 05:26:34 -0000	1.6
-+++ glibc-20060213T0650-fedora/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 09:43:55 -0000	1.1.2.7
+--- glibc-20060217T1609/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 05:26:34 -0000	1.6
++++ glibc-20060217T1609-fedora/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 09:43:55 -0000	1.1.2.7
 @@ -37,14 +37,14 @@ futimesat (fd, file, tvp)
  {
    int result;
@@ -2162,8 +2624,8 @@
      {
        size_t filelen = strlen (file);
        static const char procfd[] = "/proc/self/fd/%d/%s";
---- glibc-20060213T0650/sysdeps/unix/sysv/linux/paths.h	15 Nov 2000 23:06:47 -0000	1.11
-+++ glibc-20060213T0650-fedora/sysdeps/unix/sysv/linux/paths.h	22 Sep 2004 21:21:08 -0000	1.11.4.1
+--- glibc-20060217T1609/sysdeps/unix/sysv/linux/paths.h	15 Nov 2000 23:06:47 -0000	1.11
++++ glibc-20060217T1609-fedora/sysdeps/unix/sysv/linux/paths.h	22 Sep 2004 21:21:08 -0000	1.11.4.1
 @@ -61,7 +61,7 @@
  #define	_PATH_TTY	"/dev/tty"
  #define	_PATH_UNIX	"/boot/vmlinux"
@@ -2173,8 +2635,8 @@
  #define _PATH_WTMP	"/var/log/wtmp"
  
  /* Provide trailing slash, since mostly used for building pathnames. */
---- glibc-20060213T0650/sysdeps/unix/sysv/linux/tcsetattr.c	10 Sep 2003 19:16:07 -0000	1.16
-+++ glibc-20060213T0650-fedora/sysdeps/unix/sysv/linux/tcsetattr.c	22 Sep 2004 21:21:08 -0000	1.16.2.1
+--- glibc-20060217T1609/sysdeps/unix/sysv/linux/tcsetattr.c	10 Sep 2003 19:16:07 -0000	1.16
++++ glibc-20060217T1609-fedora/sysdeps/unix/sysv/linux/tcsetattr.c	22 Sep 2004 21:21:08 -0000	1.16.2.1
 @@ -49,6 +49,7 @@ tcsetattr (fd, optional_actions, termios
  {
    struct __kernel_termios k_termios;
@@ -2220,8 +2682,8 @@
 +  return retval;
  }
  libc_hidden_def (tcsetattr)
---- glibc-20060213T0650/sysdeps/unix/sysv/linux/i386/dl-cache.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060213T0650-fedora/sysdeps/unix/sysv/linux/i386/dl-cache.h	22 Sep 2004 21:21:08 -0000	1.1.2.1
+--- glibc-20060217T1609/sysdeps/unix/sysv/linux/i386/dl-cache.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060217T1609-fedora/sysdeps/unix/sysv/linux/i386/dl-cache.h	22 Sep 2004 21:21:08 -0000	1.1.2.1
 @@ -0,0 +1,59 @@
 +/* Support for reading /etc/ld.so.cache files written by Linux ldconfig.
 +   Copyright (C) 2004 Free Software Foundation, Inc.
@@ -2282,8 +2744,8 @@
 +  } while (0)
 +
 +#include_next <dl-cache.h>
---- glibc-20060213T0650/sysdeps/unix/sysv/linux/ia64/dl-cache.h	6 Jul 2001 04:56:17 -0000	1.2
-+++ glibc-20060213T0650-fedora/sysdeps/unix/sysv/linux/ia64/dl-cache.h	22 Sep 2004 21:21:09 -0000	1.2.4.1
+--- glibc-20060217T1609/sysdeps/unix/sysv/linux/ia64/dl-cache.h	6 Jul 2001 04:56:17 -0000	1.2
++++ glibc-20060217T1609-fedora/sysdeps/unix/sysv/linux/ia64/dl-cache.h	22 Sep 2004 21:21:09 -0000	1.2.4.1
 @@ -22,4 +22,31 @@
  #define _dl_cache_check_flags(flags) \
    ((flags) == _DL_CACHE_DEFAULT_ID)
@@ -2316,71 +2778,24 @@
 +  } while (0)
 +
  #include_next <dl-cache.h>
---- glibc-20060213T0650/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060213T0650-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c	22 Sep 2004 21:21:09 -0000	1.1.2.1
+--- glibc-20060217T1609/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20060217T1609-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c	22 Sep 2004 21:21:09 -0000	1.1.2.1
 @@ -0,0 +1,5 @@
 +#ifdef IS_IN_ldconfig
 +#include <sysdeps/i386/dl-procinfo.c>
 +#else
 +#include <sysdeps/generic/dl-procinfo.c>
 +#endif
---- glibc-20060213T0650/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060213T0650-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h	22 Sep 2004 21:21:09 -0000	1.1.2.1
+--- glibc-20060217T1609/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060217T1609-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h	22 Sep 2004 21:21:09 -0000	1.1.2.1
 @@ -0,0 +1,5 @@
 +#ifdef IS_IN_ldconfig
 +#include <sysdeps/unix/sysv/linux/i386/dl-procinfo.h>
 +#else
 +#include <sysdeps/generic/dl-procinfo.h>
 +#endif
---- glibc-20060213T0650/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	17 Jan 2002 06:49:28 -0000	1.2
-+++ glibc-20060213T0650-fedora/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	22 Sep 2004 21:21:09 -0000	1.2.2.1
+--- glibc-20060217T1609/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	17 Jan 2002 06:49:28 -0000	1.2
++++ glibc-20060217T1609-fedora/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	22 Sep 2004 21:21:09 -0000	1.2.2.1
 @@ -1 +1 @@
 -s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 \2\3"_
 +s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 /emul/ia32-linux\2\3"_
---- libc/nptl/descr.h	2006-02-13 07:51:37.000000000 +0100
-+++ libc/nptl/descr.h	2006-02-13 10:17:59.000000000 +0100
-@@ -166,7 +166,7 @@ struct pthread
-   do {									      \
-     __pthread_slist_t *runp = THREAD_GETMEM (THREAD_SELF, robust_list.__next);\
-     if (runp == &mutex->__data.__list)					      \
--      THREAD_SETMEM (THREAD_SELF, robust_list, runp->__next);		      \
-+      THREAD_SETMEM (THREAD_SELF, robust_list.__next, runp->__next);	      \
-     else								      \
-       {									      \
- 	while (runp->__next != &mutex->__data.__list)			      \
---- libc/sysdeps/unix/sysv/linux/not-cancel.h	13 Feb 2006 07:30:05 -0000	1.5.2.1
-+++ libc/sysdeps/unix/sysv/linux/not-cancel.h	13 Feb 2006 09:39:09 -0000
-@@ -28,18 +28,26 @@
-    INLINE_SYSCALL (open, 2, (const char *) (name), (flags))
- 
- /* Uncancelable openat.  */
--extern int __openat_not_cancel (int fd, const char *fname, int oflag,
-+#if !defined NOT_IN_libc || defined IS_IN_libpthread || defined IS_IN_librt
-+extern int __openat_nocancel (int fd, const char *fname, int oflag,
-+			      mode_t mode) attribute_hidden;
-+extern int __openat64_nocancel (int fd, const char *fname, int oflag,
- 				mode_t mode) attribute_hidden;
-+#else
-+# define __openat_nocancel(fd, fname, oflag, mode) \
-+  openat (fd, fname, oflag, mode)
-+# define __openat64_nocancel(fd, fname, oflag, mode) \
-+  openat64 (fd, fname, oflag, mode)
-+#endif
-+
- #define openat_not_cancel(fd, fname, oflag, mode) \
--  __openat_not_cancel (fd, fname, oflag, mode)
-+  __openat_nocancel (fd, fname, oflag, mode)
- #define openat_not_cancel_3(fd, fname, oflag) \
--  __openat_not_cancel (fd, fname, oflag, 0)
--extern int __openat64_not_cancel (int fd, const char *fname, int oflag,
--				  mode_t mode) attribute_hidden;
-+  __openat_nocancel (fd, fname, oflag, 0)
- #define openat64_not_cancel(fd, fname, oflag, mode) \
--  __openat64_not_cancel (fd, fname, oflag, mode)
-+  __openat64_nocancel (fd, fname, oflag, mode)
- #define openat64_not_cancel_3(fd, fname, oflag) \
--  __openat64_not_cancel (fd, fname, oflag, 0)
-+  __openat64_nocancel (fd, fname, oflag, 0)
- 
- /* Uncancelable close.  */
- #define close_not_cancel(fd) \
