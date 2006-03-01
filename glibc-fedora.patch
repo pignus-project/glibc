@@ -2210,3 +2210,14 @@
 @@ -1 +1 @@
 -s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 \2\3"_
 +s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 /emul/ia32-linux\2\3"_
+--- libc/sysdeps/unix/sysv/linux/s390/s390-64/sysdep.h.jj	2006-02-28 15:14:07.000000000 +0100
++++ libc/sysdeps/unix/sysv/linux/s390/s390-64/sysdep.h	2006-03-01 13:31:48.000000000 +0100
+@@ -268,7 +268,7 @@
+ 	register unsigned long gpr6 asm ("6") = (unsigned long)(arg5);
+ #define DECLARGS_6(arg1, arg2, arg3, arg4, arg5, arg6) \
+ 	DECLARGS_5(arg1, arg2, arg3, arg4, arg5) \
+-	register unsigned long gpr6 asm ("7") = (unsigned long)(arg6);
++	register unsigned long gpr7 asm ("7") = (unsigned long)(arg6);
+ 
+ #define ASMFMT_0
+ #define ASMFMT_1 , "0" (gpr2)
