@@ -1,9 +1,9 @@
-%define glibcdate 20060301T0647
+%define glibcdate 20060302T0855
 %define glibcname glibc
-%define glibcsrcdir glibc-20060301T0647
+%define glibcsrcdir glibc-20060302T0855
 %define glibc_release_tarballs 0
-%define glibcversion 2.3.90
-%define glibcrelease 39
+%define glibcversion 2.3.91
+%define glibcrelease 1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1337,6 +1337,14 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Mar  2 2006 Jakub Jelinek <jakub@redhat.com> 2.3.91-1
+- update from CVS
+  - fixes for various arches
+- ensure malloc returns pointers aligned to at least
+  MIN (2 * sizeof (size_t), __alignof__ (long double))
+  (only on ppc32 this has not been the case lately with addition
+   of 128-bit long double, #182742)
+
 * Wed Mar  1 2006 Jakub Jelinek <jakub@redhat.com> 2.3.90-39
 - update from CVS
 
