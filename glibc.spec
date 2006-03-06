@@ -1,9 +1,9 @@
-%define glibcdate 20060306T0720
+%define glibcdate 20060306T1239
 %define glibcname glibc
-%define glibcsrcdir glibc-20060306T0720
+%define glibcsrcdir glibc-20060306T1239
 %define glibc_release_tarballs 0
-%define glibcversion 2.3.91
-%define glibcrelease 2
+%define glibcversion 2.4
+%define glibcrelease 1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1340,6 +1340,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Mar  6 2006 Jakub Jelinek <jakub@redhat.com> 2.4-1
+- update from CVS
+  - glibc 2.4 release
+
 * Mon Mar  6 2006 Jakub Jelinek <jakub@redhat.com> 2.3.91-2
 - update from CVS
   - fix sYSMALLOc for MALLOC_ALIGNMENT > 2 * SIZE_SZ (#183895)
