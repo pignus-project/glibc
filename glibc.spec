@@ -1,9 +1,9 @@
-%define glibcdate 20060302T0855
+%define glibcdate 20060306T0720
 %define glibcname glibc
-%define glibcsrcdir glibc-20060302T0855
+%define glibcsrcdir glibc-20060306T0720
 %define glibc_release_tarballs 0
 %define glibcversion 2.3.91
-%define glibcrelease 1
+%define glibcrelease 2
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -699,6 +699,9 @@ BuildFlags="-march=%{_target_cpu}"
 %ifarch i686
 BuildFlags="-march=i686 -mtune=pentium4"
 %endif
+%ifarch x86_64
+BuildFlags="-DUSE_CFA_VAL_EXPRESSION"
+%endif
 %ifarch alphaev6
 BuildFlags="-mcpu=ev6"
 %endif
@@ -1337,6 +1340,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Mar  6 2006 Jakub Jelinek <jakub@redhat.com> 2.3.91-2
+- update from CVS
+  - fix sYSMALLOc for MALLOC_ALIGNMENT > 2 * SIZE_SZ (#183895)
+  - revert ppc32 malloc alignment patch, it breaks malloc_set_state
+    and needs some further thoughts and time (#183894)
+- provide accurate unwind info for lowlevellock.h stubs on x86_64
+
 * Thu Mar  2 2006 Jakub Jelinek <jakub@redhat.com> 2.3.91-1
 - update from CVS
   - fixes for various arches
