@@ -3,7 +3,7 @@
 %define glibcsrcdir glibc-20060306T1239
 %define glibc_release_tarballs 0
 %define glibcversion 2.4
-%define glibcrelease 4
+%define glibcrelease 5
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1348,7 +1348,7 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Tue Mar  7 2006 Roland McGrath <roland@redhat.com> 2.4-4
+* Tue Mar  7 2006 Roland McGrath <roland@redhat.com> 2.4-5
 - back up %%{ix86} gdb conflicts to < 6.3.0.0-1.111
 
 * Tue Mar  7 2006 Jakub Jelinek <jakub@redhat.com> 2.4-3
