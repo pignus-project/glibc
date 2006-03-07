@@ -3,7 +3,7 @@
 %define glibcsrcdir glibc-20060306T1239
 %define glibc_release_tarballs 0
 %define glibcversion 2.4
-%define glibcrelease 3
+%define glibcrelease 4
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -56,14 +56,13 @@ BuildPreReq: gcc >= 3.2
 Conflicts: rpm <= 4.0-0.65
 Conflicts: glibc-devel < 2.2.3
 Conflicts: gcc4 <= 4.0.0-0.6
-%ifarch x86_64
+%ifarch x86_64 %{ix86}
 # Need gdb that understands DW_CFA_val_expression
 Conflicts: gdb < 6.3.0.0-1.111
-%endif
-%ifarch %{ix86}
+# XXX new gdb is broken, >= -1.111 is adequate if not great (no crashes)
 # Need gdb that understands DW_CFA_val_expression and handles two frames
 # with the same entry point and CFA, but different PC
-Conflicts: gdb < 6.3.0.0-1.115
+#Conflicts: gdb < 6.3.0.0-1.115
 %endif
 # Earlier shadow-utils packages had too restrictive permissions on
 # /etc/default
@@ -1349,6 +1348,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Mar  7 2006 Roland McGrath <roland@redhat.com> 2.4-4
+- back up %%{ix86} gdb conflicts to < 6.3.0.0-1.111
+
 * Tue Mar  7 2006 Jakub Jelinek <jakub@redhat.com> 2.4-3
 - really fix rintl on ppc64
 
