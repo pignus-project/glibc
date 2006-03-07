@@ -3,7 +3,7 @@
 %define glibcsrcdir glibc-20060306T1239
 %define glibc_release_tarballs 0
 %define glibcversion 2.4
-%define glibcrelease 2
+%define glibcrelease 3
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1349,6 +1349,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Mar  7 2006 Jakub Jelinek <jakub@redhat.com> 2.4-3
+- really fix rintl on ppc64
+
 * Tue Mar  7 2006 Jakub Jelinek <jakub@redhat.com> 2.4-2
 - accurate unwind info for lowlevellock.h stubs on %%{ix86}
 - fix ppc/ppc64 ceill, floorl, rintl, roundl and truncl (BZ#2423)
