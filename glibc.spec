@@ -1,6 +1,6 @@
-%define glibcdate 20060306T1239
+%define glibcdate 20060328T0900
 %define glibcname glibc
-%define glibcsrcdir glibc-20060306T1239
+%define glibcsrcdir glibc-20060328T0900
 %define glibc_release_tarballs 0
 %define glibcversion 2.4
 %define glibcrelease 5
@@ -59,10 +59,6 @@ Conflicts: gcc4 <= 4.0.0-0.6
 %ifarch x86_64 %{ix86}
 # Need gdb that understands DW_CFA_val_expression
 Conflicts: gdb < 6.3.0.0-1.111
-# XXX new gdb is broken, >= -1.111 is adequate if not great (no crashes)
-# Need gdb that understands DW_CFA_val_expression and handles two frames
-# with the same entry point and CFA, but different PC
-#Conflicts: gdb < 6.3.0.0-1.115
 %endif
 # Earlier shadow-utils packages had too restrictive permissions on
 # /etc/default
@@ -188,10 +184,7 @@ Autoreq: true
 
 %description -n nscd
 Nscd caches name service lookups and can dramatically improve
-performance with NIS+, and may help with DNS as well. Note that you
-can't use nscd with 2.0 kernels because of bugs in the kernel-side
-thread support. Unfortunately, nscd happens to hit these bugs
-particularly hard.
+performance with NIS+, and may help with DNS as well.
 
 %package utils
 Summary: Development utilities from GNU C library
@@ -1348,7 +1341,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Tue Mar  7 2006 Roland McGrath <roland@redhat.com> 2.4-5
+* Tue Mar 28 2006 Jakub Jelinek <jakub@redhat.com> 2.4-5
+- update from CVS
+  - pshared robust mutex support
+  - fix btowc and bwtoc in C++ (#186410)
+  - fix NIS+ (#186592)
+  - don't declare __wcsto*l_internal for non-GCC or if not -O1+ (#185667)
+- don't mention nscd failures on 2.0 kernels (#185335)
+
+* Tue Mar  7 2006 Roland McGrath <roland@redhat.com> 2.4-4
 - back up %%{ix86} gdb conflicts to < 6.3.0.0-1.111
 
 * Tue Mar  7 2006 Jakub Jelinek <jakub@redhat.com> 2.4-3
