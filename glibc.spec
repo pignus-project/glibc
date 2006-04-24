@@ -1,9 +1,9 @@
-%define glibcdate 20060328T0900
+%define glibcdate 20060424T0820
 %define glibcname glibc
-%define glibcsrcdir glibc-20060328T0900
+%define glibcsrcdir glibc-20060424T0820
 %define glibc_release_tarballs 0
 %define glibcversion 2.4
-%define glibcrelease 5
+%define glibcrelease 6
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -300,7 +300,6 @@ cat > override_headers/asm/unistd.h <<EOF
 #define __NR_mknodat		297
 #define __NR_fchownat		298
 #define __NR_futimesat		299
-#define __NR_fstatat64		300
 #define __NR_unlinkat		301
 #define __NR_renameat		302
 #define __NR_linkat		303
@@ -309,12 +308,28 @@ cat > override_headers/asm/unistd.h <<EOF
 #define __NR_fchmodat		306
 #define __NR_faccessat		307
 #endif
+#ifndef __NR_fstatat64
+#define __NR_fstatat64		300
+#endif
 #ifndef __NR_pselect6
 #define __NR_pselect6		308
 #define __NR_ppoll		309
 #endif
 #ifndef __NR_unshare
 #define __NR_unshare		310
+#endif
+#ifndef __NR_set_robust_list
+#define __NR_set_robust_list	311
+#define __NR_get_robust_list	312
+#endif
+#ifndef __NR_splice
+#define __NR_splice		313
+#endif
+#ifndef __NR_sync_file_range
+#define __NR_sync_file_range	314
+#endif
+#ifndef __NR_tee
+#define __NR_tee		315
 #endif
 %endif
 %ifarch ia64
@@ -369,6 +384,19 @@ cat > override_headers/asm/unistd.h <<EOF
 #ifndef __NR_unshare
 #define __NR_unshare		1296
 #endif
+#ifndef __NR_splice
+#define __NR_splice		1297
+#endif
+#ifndef __NR_set_robust_list
+#define __NR_set_robust_list	1298
+#define __NR_get_robust_list	1299
+#endif
+#ifndef __NR_sync_file_range
+#define __NR_sync_file_range	1300
+#endif
+#ifndef __NR_tee
+#define __NR_tee		1301
+#endif
 %endif
 %ifarch ppc
 #ifndef __NR_utimes
@@ -404,6 +432,12 @@ cat > override_headers/asm/unistd.h <<EOF
 #ifndef __NR_unshare
 #define __NR_unshare		282
 #endif
+#ifndef __NR_splice
+#define __NR_splice		283
+#endif
+#ifndef __NR_tee
+#define __NR_tee		284
+#endif
 %endif
 %ifarch ppc64
 #ifndef __NR_utimes
@@ -431,6 +465,12 @@ cat > override_headers/asm/unistd.h <<EOF
 #endif
 #ifndef __NR_unshare
 #define __NR_unshare		282
+#endif
+#ifndef __NR_splice
+#define __NR_splice		283
+#endif
+#ifndef __NR_tee
+#define __NR_tee		284
 #endif
 %endif
 %ifarch s390
@@ -625,6 +665,19 @@ cat > override_headers/asm/unistd.h <<EOF
 #endif
 #ifndef __NR_unshare
 #define __NR_unshare		272
+#endif
+#ifndef __NR_set_robust_list
+#define __NR_set_robust_list	273
+#define __NR_get_robust_list	274
+#endif
+#ifndef __NR_splice
+#define __NR_splice		275
+#endif
+#ifndef __NR_tee
+#define __NR_tee		276
+#endif
+#ifndef __NR_sync_file_range
+#define __NR_sync_file_range	277
 #endif
 %endif
 %ifnarch %{ix86} x86_64
@@ -1341,6 +1394,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Apr 24 2006 Jakub Jelinek <jakub@redhat.com> 2.4-6
+- update from CVS
+  - NIS+ fixes
+  - don't segfault on too large argp key values (#189545)
+  - getaddrinfo fixes for RFC3484 (#188364)
+
 * Tue Mar 28 2006 Jakub Jelinek <jakub@redhat.com> 2.4-5
 - update from CVS
   - pshared robust mutex support
