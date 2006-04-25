@@ -1,9 +1,9 @@
-%define glibcdate 20060424T0820
+%define glibcdate 20060425T0903
 %define glibcname glibc
-%define glibcsrcdir glibc-20060424T0820
+%define glibcsrcdir glibc-20060425T0903
 %define glibc_release_tarballs 0
-%define glibcversion 2.4
-%define glibcrelease 6
+%define glibcversion 2.4.90
+%define glibcrelease 1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1394,6 +1394,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Apr 25 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-1
+- update from CVS
+
 * Mon Apr 24 2006 Jakub Jelinek <jakub@redhat.com> 2.4-6
 - update from CVS
   - NIS+ fixes
