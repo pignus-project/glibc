@@ -1,9 +1,9 @@
-%define glibcdate 20060425T0903
+%define glibcdate 20060426T2000
 %define glibcname glibc
-%define glibcsrcdir glibc-20060425T0903
+%define glibcsrcdir glibc-20060426T2000
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 1
+%define glibcrelease 2
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -46,7 +46,7 @@ Prereq: basesystem, libgcc
 # This is for building auxiliary programs like memusage, nscd
 # For initial glibc bootstraps it can be commented out
 BuildPreReq: gd-devel libpng-devel zlib-devel texinfo, libselinux-devel >= 1.17.10-1
-BuildPreReq: audit-libs-devel >= 1.1.3, sed >= 3.95
+BuildPreReq: audit-libs-devel >= 1.1.3, sed >= 3.95, libcap-devel
 %ifarch %{prelinkarches}
 BuildPreReq: prelink >= 0.2.0-5
 %endif
@@ -1394,6 +1394,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Apr 26 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-2
+- update from CVS
+  - fix getaddrinfo (#190002)
+  - add auto-propagate nscd.conf options (#177154)
+  - fix nscd auditing (#169148)
+
 * Tue Apr 25 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-1
 - update from CVS
 
