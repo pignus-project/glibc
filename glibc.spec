@@ -1,9 +1,9 @@
-%define glibcdate 20060427T2122
+%define glibcdate 20060501T0751
 %define glibcname glibc
-%define glibcsrcdir glibc-20060427T2122
+%define glibcsrcdir glibc-20060501T0751
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 3
+%define glibcrelease 4
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1394,6 +1394,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon May  1 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-4
+- update from CVS
+  - SETENT_BATCH_READ /etc/default/nss option for speeding up
+    some usages of NIS+ (#188246)
+  - move debug state change notification (#179208)
+  - fix ldd script if one of the dynamic linkers is not installed (#190259)
+
 * Thu Apr 27 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-3
 - update from CVS
   - fix a typo in nscd.conf (#190085)
