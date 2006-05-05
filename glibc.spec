@@ -1079,7 +1079,7 @@ cp crypt/README.ufc-crypt documentation/README.ufc-crypt
 cp timezone/README documentation/README.timezone
 cp ChangeLog{,.15,.16} documentation
 bzip2 -9 documentation/ChangeLog*
-cp ../posix/gai.conf documentation/
+cp posix/gai.conf documentation/
 
 %ifarch s390x
 # Compatibility symlink
