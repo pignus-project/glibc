@@ -1,9 +1,9 @@
-%define glibcdate 20060505T1443
+%define glibcdate 20060511T1325
 %define glibcname glibc
-%define glibcsrcdir glibc-20060505T1443
+%define glibcsrcdir glibc-20060511T1325
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 6
+%define glibcrelease 7
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1397,6 +1397,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu May 11 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-7
+- update from CVS
+  - fix tcgetattr (#177965)
+  - fix <sys/queue.h> (#191264)
+
 * Fri May  5 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-6
 - update from CVS
 - rebuilt using fixed rpm
