@@ -1,9 +1,9 @@
-%define glibcdate 20060511T1325
+%define glibcdate 20060519T1550
 %define glibcname glibc
-%define glibcsrcdir glibc-20060511T1325
+%define glibcsrcdir glibc-20060519T1550
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 7
+%define glibcrelease 8
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1397,6 +1397,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri May 19 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-8
+- update from CVS
+  - fix nss_compat when SETENT_BATCH_READ=TRUE is in /etc/default/nss
+  - fix RFC3484 precedence table for site-local and ULA addresses (#188364)
+  - fix a sunrpc memory leak
+
 * Thu May 11 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-7
 - update from CVS
   - fix tcgetattr (#177965)
