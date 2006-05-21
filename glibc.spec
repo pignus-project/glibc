@@ -1,9 +1,9 @@
-%define glibcdate 20060519T1550
+%define glibcdate 20060521T2153
 %define glibcname glibc
-%define glibcsrcdir glibc-20060519T1550
+%define glibcsrcdir glibc-20060521T2153
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 8
+%define glibcrelease 9
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -1397,6 +1397,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun May 21 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-9
+- update from CVS
+  - big NIS+ changes
+
 * Fri May 19 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-8
 - update from CVS
   - fix nss_compat when SETENT_BATCH_READ=TRUE is in /etc/default/nss
