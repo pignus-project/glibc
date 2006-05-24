@@ -1,9 +1,9 @@
-%define glibcdate 20060521T2153
+%define glibcdate 20060524T0721
 %define glibcname glibc
-%define glibcsrcdir glibc-20060521T2153
+%define glibcsrcdir glibc-20060524T0721
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 9
+%define glibcrelease 10
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -844,6 +844,7 @@ cd build-%{nptl_target_cpu}-linuxnptl && \
 %endif
 
 %if %{buildxen}
+%define nosegneg_subdir_base i686
 %define nosegneg_subdir i686/nosegneg
 cd build-%{nptl_target_cpu}-linuxnptl-nosegneg
 SubDir=%{nosegneg_subdir}
@@ -1313,6 +1314,7 @@ rm -f *.filelist*
 %files -f rpm.filelist
 %defattr(-,root,root)
 %if %{buildxen} && !%{xenpackage}
+%dir /%{_lib}/%{nosegneg_subdir_base}
 %dir /%{_lib}/%{nosegneg_subdir}
 %endif
 %ifarch s390x
@@ -1397,6 +1399,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed May 24 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-10
+- on i686 make glibc owner of /lib/i686 directory (#192597)
+- search parent NIS+ domains (#190803)
+
 * Sun May 21 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-9
 - update from CVS
   - big NIS+ changes
