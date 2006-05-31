@@ -1,9 +1,9 @@
-%define glibcdate 20060524T0721
+%define glibcdate 20060531T1322
 %define glibcname glibc
-%define glibcsrcdir glibc-20060524T0721
+%define glibcsrcdir glibc-20060531T1322
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 10
+%define glibcrelease 11
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define prelinkarches noarch
 %define xenarches i686 athlon
@@ -331,6 +331,9 @@ cat > override_headers/asm/unistd.h <<EOF
 #ifndef __NR_tee
 #define __NR_tee		315
 #endif
+#ifndef __NR_vmsplice
+#define __NR_vmsplice		316
+#endif
 %endif
 %ifarch ia64
 #ifndef __NR_timer_create
@@ -397,6 +400,9 @@ cat > override_headers/asm/unistd.h <<EOF
 #ifndef __NR_tee
 #define __NR_tee		1301
 #endif
+#ifndef __NR_vmsplice
+#define __NR_vmsplice		1302
+#endif
 %endif
 %ifarch ppc
 #ifndef __NR_utimes
@@ -438,6 +444,24 @@ cat > override_headers/asm/unistd.h <<EOF
 #ifndef __NR_tee
 #define __NR_tee		284
 #endif
+#ifndef __NR_vmsplice
+#define __NR_vmsplice		285
+#endif
+#ifndef __NR_openat
+#define __NR_openat		286
+#define __NR_mkdirat		287
+#define __NR_mknodat		288
+#define __NR_fchownat		289
+#define __NR_futimesat		290
+#define __NR_fstatat64		291
+#define __NR_unlinkat		292
+#define __NR_renameat		293
+#define __NR_linkat		294
+#define __NR_symlinkat		295
+#define __NR_readlinkat		296
+#define __NR_fchmodat		297
+#define __NR_faccessat		298
+#endif
 %endif
 %ifarch ppc64
 #ifndef __NR_utimes
@@ -471,6 +495,24 @@ cat > override_headers/asm/unistd.h <<EOF
 #endif
 #ifndef __NR_tee
 #define __NR_tee		284
+#endif
+#ifndef __NR_vmsplice
+#define __NR_vmsplice		285
+#endif
+#ifndef __NR_openat
+#define __NR_openat		286
+#define __NR_mkdirat		287
+#define __NR_mknodat		288
+#define __NR_fchownat		289
+#define __NR_futimesat		290
+#define __NR_newfstatat		291
+#define __NR_unlinkat		292
+#define __NR_renameat		293
+#define __NR_linkat		294
+#define __NR_symlinkat		295
+#define __NR_readlinkat		296
+#define __NR_fchmodat		297
+#define __NR_faccessat		298
 #endif
 %endif
 %ifarch s390
@@ -678,6 +720,9 @@ cat > override_headers/asm/unistd.h <<EOF
 #endif
 #ifndef __NR_sync_file_range
 #define __NR_sync_file_range	277
+#endif
+#ifndef __NR_vmsplice
+#define __NR_vmsplice		278
 #endif
 %endif
 %ifnarch %{ix86} x86_64
@@ -1399,6 +1444,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed May 31 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-11
+- don't exit from nscd -i <database> before the database is
+  actually invalidated, add locking to prune_cache (#191464)
+- build glibc-devel.i386 static libraries with
+  -mno-tls-direct-seg-refs -DNO_TLS_DIRECT_SEG_REFS
+- RFC3542 support (advanced API for IPv6; #191001, BZ##2693)
+
 * Wed May 24 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-10
 - on i686 make glibc owner of /lib/i686 directory (#192597)
 - search parent NIS+ domains (#190803)
