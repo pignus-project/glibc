@@ -1,9 +1,9 @@
-%define glibcdate 20060710T2206
+%define glibcdate 20060729T2255
 %define glibcname glibc
-%define glibcsrcdir glibc-20060710T2206
+%define glibcsrcdir glibc-20060729T2255
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 13
+%define glibcrelease 14
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1438,6 +1438,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Jul 29 2006 Roland McGrath <roland@redhat.com> - 2.4.90-14
+- fix missing destructor calls in dlclose (#197932)
+- PI mutex support
+
 * Tue Jul 10 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-13
 - DT_GNU_HASH support
 
