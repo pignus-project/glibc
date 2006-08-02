@@ -1,9 +1,9 @@
-%define glibcdate 20060731T0706
+%define glibcdate 20060802T1650
 %define glibcname glibc
-%define glibcsrcdir glibc-20060731T0706
+%define glibcsrcdir glibc-20060802T1650
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 15
+%define glibcrelease 16
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1438,8 +1438,17 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Aug  2 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-16
+- fix dladdr on binaries/libraries with only DT_GNU_HASH and no
+  DT_HASH (#200635)
+- fix early timeout of initgroups data in nscd (#173019)
+- add am/pm display to es_PE and es_NI locales (#167101)
+- fix nss_compat failures when nis/nis+ unavailable (#192072)
+
 * Mon Jul 31 2006 Roland McGrath <roland@redhat.com> 2.4.90-15
 - fix missing destructor calls in dlclose (#197932)
+- enable transliteration support in all locales (#196713)
+- disallow RTLD_GLOBAL flag for dlmopen in secondary namespaces (#197462)
 - PI mutex support
 
 * Tue Jul 10 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-13
