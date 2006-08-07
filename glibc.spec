@@ -1,9 +1,9 @@
-%define glibcdate 20060802T1808
+%define glibcdate 20060807T1859
 %define glibcname glibc
-%define glibcsrcdir glibc-20060802T1808
+%define glibcsrcdir glibc-20060807T1859
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 17
+%define glibcrelease 18
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1035,8 +1035,8 @@ for i in $RPM_BUILD_ROOT%{_prefix}/bin/{xtrace,memusage}; do
   cp -a $i $i.tmp
   sed -e 's~=/%{_lib}/libpcprofile.so~=%{_prefix}/%{_lib}/libpcprofile.so~' \
       -e 's~=/%{_lib}/libmemusage.so~=%{_prefix}/%{_lib}/libmemusage.so~' \
-      -e 's~=/\$LIB/libpcprofile.so~=%{_prefix}/$LIB/libpcprofile.so~' \
-      -e 's~=/\$LIB/libmemusage.so~=%{_prefix}/$LIB/libmemusage.so~' \
+      -e 's~='\''/\\\$LIB/libpcprofile.so~='\''%{_prefix}/\\$LIB/libpcprofile.so~' \
+      -e 's~='\''/\\\$LIB/libmemusage.so~='\''%{_prefix}/\\$LIB/libmemusage.so~' \
     $i.tmp > $i
   chmod 755 $i; rm -f $i.tmp
 done
@@ -1443,10 +1443,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug  7 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-18
+- NIS+ fixes
+- fix memusage and xtrace scripts (#200736)
+- redirect /sbin/service sshd condrestart std{out,err} to /dev/null
+  when executed from glibc_post_upgrade
+
 * Wed Aug  2 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-17
 - typo fix for the dladdr patch
 - build i?86 glibc with -mno-tls-direct-seg-refs (#200469)
-- fix memusage and xtrace scripts (#200736)
 
 * Wed Aug  2 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-16
 - fix dladdr on binaries/libraries with only DT_GNU_HASH and no
