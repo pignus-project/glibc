@@ -1,9 +1,9 @@
-%define glibcdate 20060807T1859
+%define glibcdate 20060810T0627
 %define glibcname glibc
-%define glibcsrcdir glibc-20060807T1859
+%define glibcsrcdir glibc-20060810T0627
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 18
+%define glibcrelease 19
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1443,6 +1443,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Aug 10 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-19
+- adaptive malloc brk/mmap threshold
+- fix fchownat to use kernel syscall (if available) on many arches (#201870)
+- only define O_DIRECT with -D_GNU_SOURCE on ia64 to match all
+  other arches (#201748)
+
 * Mon Aug  7 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-18
 - NIS+ fixes
 - fix memusage and xtrace scripts (#200736)
