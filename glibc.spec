@@ -3,7 +3,7 @@
 %define glibcsrcdir glibc-20060815T2033
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 21
+%define glibcrelease 22
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1453,6 +1453,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Aug 18 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-22
+- rebuilt with latest binutils to pick up 64K -z commonpagesize
+  on ppc/ppc64 (#203001)
+
 * Tue Aug 15 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-21
 - if some test gets stuck, kill the tee process after make check
   finishes
