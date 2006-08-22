@@ -1,9 +1,9 @@
-%define glibcdate 20060815T2033
+%define glibcdate 20060822T0706
 %define glibcname glibc
-%define glibcsrcdir glibc-20060815T2033
+%define glibcsrcdir glibc-20060822T0706
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 22
+%define glibcrelease 23
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1453,6 +1453,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Aug 22 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-23
+- malloc fixes, especially for 32-bit arches (#202309)
+- further *_IN locale fixes (#200230)
+- fix get{serv,rpc}ent{,_r} if NIS map is empty (#203237)
+- fix /usr/bin/iconv (#203400)
+
 * Fri Aug 18 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-22
 - rebuilt with latest binutils to pick up 64K -z commonpagesize
   on ppc/ppc64 (#203001)
