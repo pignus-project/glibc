@@ -1,9 +1,9 @@
-%define glibcdate 20060822T0706
+%define glibcdate 20060825T0639
 %define glibcname glibc
-%define glibcsrcdir glibc-20060822T0706
+%define glibcsrcdir glibc-20060825T0639
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 23
+%define glibcrelease 24
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1147,7 +1147,7 @@ echo ====================TESTING=========================
 cd build-%{nptl_target_cpu}-linuxnptl
 ( make %{?_smp_mflags} -k check PARALLELMFLAGS=-s 2>&1
   sleep 10s
-  teepid="`ps -eo ppid,pid,command | grep ^${parent}' [0-9]\+ tee' | cut -d' ' -f2`"
+  teepid="`ps -eo ppid,pid,command | grep ^${parent}'[ 	]\+[0-9]\+[ 	]\+tee' | cut -d' ' -f2`"
   [ -n "$teepid" ] && kill $teepid
 ) | tee check.log || :
 cd ..
@@ -1156,7 +1156,7 @@ echo ====================TESTING -mno-tls-direct-seg-refs=============
 cd build-%{nptl_target_cpu}-linuxnptl-nosegneg
 ( make -j$numprocs -k check PARALLELMFLAGS=-s 2>&1
   sleep 10s
-  teepid="`ps -eo ppid,pid,command | grep ^${parent}' [0-9]\+ tee' | cut -d' ' -f2`"
+  teepid="`ps -eo ppid,pid,command | grep ^${parent}'[ 	]\+[0-9]\+[ 	]\+tee' | cut -d' ' -f2`"
   [ -n "$teepid" ] && kill $teepid
 ) | tee check.log || :
 cd ..
@@ -1453,6 +1453,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Aug 25 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-24
+- temporarily back out code to limit number of unsorted block
+  sort iterations (#203735, #204027)
+- handle PLT symbols in dladdr properly (BZ#2683)
+- avoid malloc infinite looping for allocations larger than
+  the system can allocate (#203915)
+
 * Tue Aug 22 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-23
 - malloc fixes, especially for 32-bit arches (#202309)
 - further *_IN locale fixes (#200230)
