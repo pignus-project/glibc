@@ -3385,3 +3385,14 @@
 @@ -1 +1 @@
 -s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 \2\3"_
 +s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 /emul/ia32-linux\2\3"_
+--- libc/locale/programs/ld-ctype.c	25 Aug 2006 00:38:54 -0000	1.109
++++ libc/locale/programs/ld-ctype.c	12 Aug 2006 20:19:14 -0000	1.108
+@@ -2256,8 +2256,6 @@ ctype_read (struct linereader *ldfile, s
+   /* Prepare the data structures.  */
+   ctype_startup (ldfile, result, charmap, copy_locale, ignore_content);
+   ctype = result->categories[LC_CTYPE].ctype;
+-  if (ctype == NULL)
+-    return;
+ 
+   /* Remember the repertoire we use.  */
+   if (!ignore_content)
