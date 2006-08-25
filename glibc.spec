@@ -3,7 +3,7 @@
 %define glibcsrcdir glibc-20060825T0639
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 24
+%define glibcrelease 25
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1453,7 +1453,7 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri Aug 25 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-24
+* Fri Aug 25 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-25
 - temporarily back out code to limit number of unsorted block
   sort iterations (#203735, #204027)
 - handle PLT symbols in dladdr properly (BZ#2683)

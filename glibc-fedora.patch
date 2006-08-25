@@ -3396,3 +3396,17 @@
  
    /* Remember the repertoire we use.  */
    if (!ignore_content)
+--- libc/nptl/sysdeps/unix/sysv/linux/libc_pthread_init.c.jj	2006-08-25 11:01:24.000000000 +0200
++++ libc/nptl/sysdeps/unix/sysv/linux/libc_pthread_init.c	2006-08-25 11:53:28.000000000 +0200
+@@ -58,9 +58,10 @@ __libc_pthread_init (ptr, reclaim, funct
+ #endif
+ }
+ 
+-
++#ifdef SHARED
+ libc_freeres_fn (freeres_libptread)
+ {
+   if (__libc_pthread_functions.ptr_freeres != NULL)
+     __libc_pthread_functions.ptr_freeres ();
+ }
++#endif
