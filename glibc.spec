@@ -1,9 +1,9 @@
-%define glibcdate 20060825T0639
+%define glibcdate 20060828T1903
 %define glibcname glibc
-%define glibcsrcdir glibc-20060825T0639
+%define glibcsrcdir glibc-20060828T1903
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 25
+%define glibcrelease 26
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1453,6 +1453,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug 28 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-26
+- real fix for the doubly linked list corruption problem
+- try harder in realloc to allocate memory (BZ#2684)
+- fix getnameinfo error reporting (#204122)
+- make localedef more robust on invalid input (#203728)
+
 * Fri Aug 25 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-25
 - temporarily back out code to limit number of unsorted block
   sort iterations (#203735, #204027)

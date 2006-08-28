@@ -1,5 +1,5 @@
---- glibc-20060825T0639/ChangeLog.11	10 Nov 2000 03:31:36 -0000	1.1
-+++ glibc-20060825T0639-fedora/ChangeLog.11	22 Sep 2004 21:20:47 -0000	1.1.4.1
+--- glibc-20060828T1903/ChangeLog.11	10 Nov 2000 03:31:36 -0000	1.1
++++ glibc-20060828T1903-fedora/ChangeLog.11	22 Sep 2004 21:20:47 -0000	1.1.4.1
 @@ -1352,6 +1352,11 @@
  	* sysdeps/unix/sysv/linux/mips/sys/tas.h: Add missing .mips0 at the
  	end of inline assembler code.
@@ -49,8 +49,8 @@
  	* sysdeps/arm/bits/huge_val.h (HUGE_VAL, HUGE_VALF): Add
  	__extension__ to hexadecimal floating constant notation.
  	* sysdeps/i386/bits/huge_val.h (HUGE_VAL, HUGE_VALF, HUGE_VALL):
---- glibc-20060825T0639/ChangeLog.12	16 Aug 2001 05:24:54 -0000	1.1
-+++ glibc-20060825T0639-fedora/ChangeLog.12	22 Sep 2004 21:20:47 -0000	1.1.4.1
+--- glibc-20060828T1903/ChangeLog.12	16 Aug 2001 05:24:54 -0000	1.1
++++ glibc-20060828T1903-fedora/ChangeLog.12	22 Sep 2004 21:20:47 -0000	1.1.4.1
 @@ -7729,6 +7729,13 @@
  
  	* Versions.def [ld]: Add GLIBC_2.2.1.
@@ -77,8 +77,8 @@
  2001-01-02  Franz Sirl	<Franz.Sirl-kernel@lauterbach.com>
  
  	* sysdeps/powerpc/dl-machine.c (__process_machine_rela): Fix typo.
---- glibc-20060825T0639/ChangeLog.15	16 Feb 2005 07:34:17 -0000	1.1
-+++ glibc-20060825T0639-fedora/ChangeLog.15	3 Mar 2005 17:29:57 -0000	1.1.6.2
+--- glibc-20060828T1903/ChangeLog.15	16 Feb 2005 07:34:17 -0000	1.1
++++ glibc-20060828T1903-fedora/ChangeLog.15	3 Mar 2005 17:29:57 -0000	1.1.6.2
 @@ -477,6 +477,14 @@
  
  2004-11-26  Jakub Jelinek  <jakub@redhat.com>
@@ -159,8 +159,8 @@
  2004-08-30  Roland McGrath  <roland@frob.com>
  
  	* scripts/extract-abilist.awk: If `lastversion' variable defined, omit
---- glibc-20060825T0639/ChangeLog.16	4 May 2006 16:05:24 -0000	1.1
-+++ glibc-20060825T0639-fedora/ChangeLog.16	5 May 2006 06:11:52 -0000	1.1.2.1
+--- glibc-20060828T1903/ChangeLog.16	4 May 2006 16:05:24 -0000	1.1
++++ glibc-20060828T1903-fedora/ChangeLog.16	5 May 2006 06:11:52 -0000	1.1.2.1
 @@ -171,6 +171,11 @@
  	[BZ #2611]
  	* stdio-common/renameat.c (renameat): Fix typo.
@@ -332,8 +332,8 @@
  2005-02-10  Roland McGrath  <roland@redhat.com>
  
  	[BZ #157]
---- glibc-20060825T0639/csu/elf-init.c	5 Nov 2005 17:41:38 -0000	1.8
-+++ glibc-20060825T0639-fedora/csu/elf-init.c	15 Nov 2005 09:54:10 -0000	1.3.2.6
+--- glibc-20060828T1903/csu/elf-init.c	5 Nov 2005 17:41:38 -0000	1.8
++++ glibc-20060828T1903-fedora/csu/elf-init.c	15 Nov 2005 09:54:10 -0000	1.3.2.6
 @@ -49,6 +49,23 @@ extern void (*__init_array_end []) (int,
  extern void (*__fini_array_start []) (void) attribute_hidden;
  extern void (*__fini_array_end []) (void) attribute_hidden;
@@ -358,8 +358,8 @@
  
  /* These function symbols are provided for the .init/.fini section entry
     points automagically by the linker.  */
---- glibc-20060825T0639/debug/tst-chk1.c	24 Apr 2006 17:00:18 -0000	1.15
-+++ glibc-20060825T0639-fedora/debug/tst-chk1.c	24 Apr 2006 20:31:49 -0000	1.1.2.16
+--- glibc-20060828T1903/debug/tst-chk1.c	24 Apr 2006 17:00:18 -0000	1.15
++++ glibc-20060828T1903-fedora/debug/tst-chk1.c	24 Apr 2006 20:31:49 -0000	1.1.2.16
 @@ -17,6 +17,9 @@
     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
     02111-1307 USA.  */
@@ -388,8 +388,8 @@
  # define O 0
  #else
  # define O 1
---- glibc-20060825T0639/elf/ldconfig.c	7 Apr 2006 06:57:49 -0000	1.54
-+++ glibc-20060825T0639-fedora/elf/ldconfig.c	24 Apr 2006 08:55:38 -0000	1.47.2.9
+--- glibc-20060828T1903/elf/ldconfig.c	7 Apr 2006 06:57:49 -0000	1.54
++++ glibc-20060828T1903-fedora/elf/ldconfig.c	24 Apr 2006 08:55:38 -0000	1.47.2.9
 @@ -964,17 +964,19 @@ search_dirs (void)
  
  
@@ -471,8 +471,8 @@
      }
  
    search_dirs ();
---- glibc-20060825T0639/elf/tst-stackguard1.c	26 Jun 2005 18:08:36 -0000	1.1
-+++ glibc-20060825T0639-fedora/elf/tst-stackguard1.c	8 Aug 2005 21:24:27 -0000	1.1.2.3
+--- glibc-20060828T1903/elf/tst-stackguard1.c	26 Jun 2005 18:08:36 -0000	1.1
++++ glibc-20060828T1903-fedora/elf/tst-stackguard1.c	8 Aug 2005 21:24:27 -0000	1.1.2.3
 @@ -160,17 +160,21 @@ do_test (void)
       the 16 runs, something is very wrong.  */
    int ndifferences = 0;
@@ -497,8 +497,8 @@
      {
        puts ("stack guard canaries are not randomized enough");
        puts ("nor equal to the default canary value");
---- glibc-20060825T0639/iconv/iconvconfig.c	1 Jan 2006 19:15:56 -0000	1.25
-+++ glibc-20060825T0639-fedora/iconv/iconvconfig.c	2 Jan 2006 10:52:50 -0000	1.19.2.6
+--- glibc-20060828T1903/iconv/iconvconfig.c	1 Jan 2006 19:15:56 -0000	1.25
++++ glibc-20060828T1903-fedora/iconv/iconvconfig.c	2 Jan 2006 10:52:50 -0000	1.19.2.6
 @@ -1011,6 +1011,34 @@ next_prime (uint32_t seed)
                                module name offset
                           (following last entry with step count 0)
@@ -575,8 +575,8 @@
    /* Open the output file.  */
    if (output_file == NULL)
      {
---- glibc-20060825T0639/include/features.h	25 Apr 2006 20:34:32 -0000	1.43
-+++ glibc-20060825T0639-fedora/include/features.h	26 Apr 2006 20:18:17 -0000	1.35.2.12
+--- glibc-20060828T1903/include/features.h	25 Apr 2006 20:34:32 -0000	1.43
++++ glibc-20060828T1903-fedora/include/features.h	26 Apr 2006 20:18:17 -0000	1.35.2.12
 @@ -275,7 +275,13 @@
  #endif
  
@@ -592,16 +592,16 @@
  # if _FORTIFY_SOURCE > 1
  #  define __USE_FORTIFY_LEVEL 2
  # else
---- glibc-20060825T0639/include/bits/stdlib-ldbl.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060825T0639-fedora/include/bits/stdlib-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
+--- glibc-20060828T1903/include/bits/stdlib-ldbl.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060828T1903-fedora/include/bits/stdlib-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
 @@ -0,0 +1 @@
 +#include <stdlib/bits/stdlib-ldbl.h>
---- glibc-20060825T0639/include/bits/wchar-ldbl.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060825T0639-fedora/include/bits/wchar-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
+--- glibc-20060828T1903/include/bits/wchar-ldbl.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060828T1903-fedora/include/bits/wchar-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
 @@ -0,0 +1 @@
 +#include <wcsmbs/bits/wchar-ldbl.h>
---- glibc-20060825T0639/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
-+++ glibc-20060825T0639-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
+--- glibc-20060828T1903/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
++++ glibc-20060828T1903-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
 @@ -58,8 +58,6 @@ korean		ko_KR.eucKR
  korean.euc 	ko_KR.eucKR
  ko_KR		ko_KR.eucKR
@@ -611,8 +611,8 @@
  norwegian       nb_NO.ISO-8859-1
  nynorsk		nn_NO.ISO-8859-1
  polish          pl_PL.ISO-8859-2
---- glibc-20060825T0639/libio/stdio.h	16 Jan 2006 20:12:21 -0000	1.86
-+++ glibc-20060825T0639-fedora/libio/stdio.h	30 Jan 2006 09:29:46 -0000	1.78.2.8
+--- glibc-20060828T1903/libio/stdio.h	16 Jan 2006 20:12:21 -0000	1.86
++++ glibc-20060828T1903-fedora/libio/stdio.h	30 Jan 2006 09:29:46 -0000	1.78.2.8
 @@ -142,10 +142,12 @@ typedef _G_fpos64_t fpos64_t;
  extern struct _IO_FILE *stdin;		/* Standard input stream.  */
  extern struct _IO_FILE *stdout;		/* Standard output stream.  */
@@ -626,8 +626,8 @@
  
  __BEGIN_NAMESPACE_STD
  /* Remove file FILENAME.  */
---- glibc-20060825T0639/libio/bits/stdio2.h	19 Mar 2005 00:14:58 -0000	1.4
-+++ glibc-20060825T0639-fedora/libio/bits/stdio2.h	27 Jun 2005 13:04:16 -0000	1.1.2.6
+--- glibc-20060828T1903/libio/bits/stdio2.h	19 Mar 2005 00:14:58 -0000	1.4
++++ glibc-20060828T1903-fedora/libio/bits/stdio2.h	27 Jun 2005 13:04:16 -0000	1.1.2.6
 @@ -61,14 +61,25 @@ extern int __vfprintf_chk (FILE *__restr
  extern int __vprintf_chk (int __flag, __const char *__restrict __format,
  			  _G_va_list __ap);
@@ -658,8 +658,8 @@
  
  #endif
  
---- glibc-20060825T0639/locale/iso-4217.def	26 Apr 2006 07:14:53 -0000	1.19
-+++ glibc-20060825T0639-fedora/locale/iso-4217.def	26 Apr 2006 20:18:17 -0000	1.15.2.4
+--- glibc-20060828T1903/locale/iso-4217.def	26 Apr 2006 07:14:53 -0000	1.19
++++ glibc-20060828T1903-fedora/locale/iso-4217.def	26 Apr 2006 20:18:17 -0000	1.15.2.4
 @@ -8,6 +8,7 @@
   *
   * !!! The list has to be sorted !!!
@@ -751,8 +751,8 @@
  DEFINE_INT_CURR("PYG")		/* Paraguay Guarani  */
  DEFINE_INT_CURR("QAR")		/* Qatar Rial  */
  DEFINE_INT_CURR("ROL")		/* Romanian Leu  */
---- glibc-20060825T0639/locale/programs/3level.h	7 Dec 2005 05:47:27 -0000	1.6
-+++ glibc-20060825T0639-fedora/locale/programs/3level.h	19 Dec 2005 12:11:15 -0000	1.5.2.2
+--- glibc-20060828T1903/locale/programs/3level.h	7 Dec 2005 05:47:27 -0000	1.6
++++ glibc-20060828T1903-fedora/locale/programs/3level.h	19 Dec 2005 12:11:15 -0000	1.5.2.2
 @@ -202,6 +202,42 @@ CONCAT(TABLE,_iterate) (struct TABLE *t,
  	}
      }
@@ -796,8 +796,8 @@
  #endif
  
  #ifndef NO_FINALIZE
---- glibc-20060825T0639/localedata/Makefile	26 Apr 2006 05:14:03 -0000	1.103
-+++ glibc-20060825T0639-fedora/localedata/Makefile	26 Apr 2006 20:18:17 -0000	1.101.2.3
+--- glibc-20060828T1903/localedata/Makefile	26 Apr 2006 05:14:03 -0000	1.103
++++ glibc-20060828T1903-fedora/localedata/Makefile	26 Apr 2006 20:18:17 -0000	1.101.2.3
 @@ -223,6 +223,7 @@ $(INSTALL-SUPPORTED-LOCALES): install-lo
  	echo -n '...'; \
  	input=`echo $$locale | sed 's/\([^.]*\)[^@]*\(.*\)/\1\2/'`; \
@@ -806,8 +806,8 @@
  		     -i locales/$$input -c -f charmaps/$$charset \
  		     $(addprefix --prefix=,$(install_root)) $$locale; \
  	echo ' done'; \
---- glibc-20060825T0639/localedata/SUPPORTED	13 Aug 2006 20:15:25 -0000	1.96
-+++ glibc-20060825T0639-fedora/localedata/SUPPORTED	15 Aug 2006 05:53:48 -0000	1.71.2.13
+--- glibc-20060828T1903/localedata/SUPPORTED	13 Aug 2006 20:15:25 -0000	1.96
++++ glibc-20060828T1903-fedora/localedata/SUPPORTED	15 Aug 2006 05:53:48 -0000	1.71.2.13
 @@ -77,6 +77,7 @@ cy_GB.UTF-8/UTF-8 \
  cy_GB/ISO-8859-14 \
  da_DK.UTF-8/UTF-8 \
@@ -849,8 +849,8 @@
  ta_IN/UTF-8 \
  te_IN/UTF-8 \
  tg_TJ.UTF-8/UTF-8 \
---- glibc-20060825T0639/localedata/locales/cy_GB	28 Sep 2004 04:37:33 -0000	1.4
-+++ glibc-20060825T0639-fedora/localedata/locales/cy_GB	29 Sep 2004 08:48:23 -0000	1.3.2.2
+--- glibc-20060828T1903/localedata/locales/cy_GB	28 Sep 2004 04:37:33 -0000	1.4
++++ glibc-20060828T1903-fedora/localedata/locales/cy_GB	29 Sep 2004 08:48:23 -0000	1.3.2.2
 @@ -248,8 +248,11 @@ mon         "<U0049><U006F><U006E><U0061
  d_t_fmt     "<U0044><U0079><U0064><U0064><U0020><U0025><U0041><U0020><U0025><U0064><U0020><U006d><U0069><U0073><U0020><U0025><U0042><U0020><U0025><U0059><U0020><U0025><U0054><U0020><U0025><U005A>"
  d_fmt       "<U0025><U0064><U002E><U0025><U006D><U002E><U0025><U0079>"
@@ -865,8 +865,8 @@
  END LC_TIME
  
  LC_MESSAGES
---- glibc-20060825T0639/localedata/locales/en_GB	30 Jul 2006 22:19:44 -0000	1.13
-+++ glibc-20060825T0639-fedora/localedata/locales/en_GB	31 Jul 2006 07:16:59 -0000	1.10.2.3
+--- glibc-20060828T1903/localedata/locales/en_GB	30 Jul 2006 22:19:44 -0000	1.13
++++ glibc-20060828T1903-fedora/localedata/locales/en_GB	31 Jul 2006 07:16:59 -0000	1.10.2.3
 @@ -116,8 +116,8 @@ mon         "<U004A><U0061><U006E><U0075
  d_t_fmt     "<U0025><U0061><U0020><U0025><U0064><U0020><U0025><U0062><U0020><U0025><U0059><U0020><U0025><U0054><U0020><U0025><U005A>"
  d_fmt       "<U0025><U0064><U002F><U0025><U006D><U002F><U0025><U0079>"
@@ -878,8 +878,8 @@
  date_fmt	"<U0025><U0061><U0020><U0025><U0062><U0020><U0025><U0065>/
  <U0020><U0025><U0048><U003A><U0025><U004D><U003A><U0025><U0053><U0020>/
  <U0025><U005A><U0020><U0025><U0059>"
---- glibc-20060825T0639/localedata/locales/no_NO 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060825T0639-fedora/localedata/locales/no_NO	22 Sep 2004 21:21:01 -0000	1.11.2.1
+--- glibc-20060828T1903/localedata/locales/no_NO 1 Jan 1970 00:00:00 -0000
++++ glibc-20060828T1903-fedora/localedata/locales/no_NO	22 Sep 2004 21:21:01 -0000	1.11.2.1
 @@ -0,0 +1,69 @@
 +escape_char	/
 +comment_char    %
@@ -950,8 +950,8 @@
 +LC_ADDRESS
 +copy "nb_NO"
 +END LC_ADDRESS
---- glibc-20060825T0639/localedata/locales/zh_TW	31 Oct 2004 23:42:28 -0000	1.7
-+++ glibc-20060825T0639-fedora/localedata/locales/zh_TW	2 Nov 2004 12:25:57 -0000	1.5.2.2
+--- glibc-20060828T1903/localedata/locales/zh_TW	31 Oct 2004 23:42:28 -0000	1.7
++++ glibc-20060828T1903-fedora/localedata/locales/zh_TW	2 Nov 2004 12:25:57 -0000	1.5.2.2
 @@ -1,7 +1,7 @@
  comment_char %
  escape_char /
@@ -979,36 +979,8 @@
  revision   "0.2"
  date       "2000-08-02"
  %
---- glibc-20060825T0639/malloc/malloc.c	24 Aug 2006 17:29:36 -0000	1.164
-+++ glibc-20060825T0639-fedora/malloc/malloc.c	25 Aug 2006 06:54:11 -0000	1.127.2.28
-@@ -4069,9 +4069,10 @@ _int_malloc(mstate av, size_t bytes)
-   */
- 
-   for(;;) {
--
-+#if 0
-     int iters = 0;
-     bool any_larger = false;
-+#endif    
-     while ( (victim = unsorted_chunks(av)->bk) != unsorted_chunks(av)) {
-       bck = victim->bk;
-       if (__builtin_expect (victim->size <= 2 * SIZE_SZ, 0)
-@@ -4168,11 +4169,13 @@ _int_malloc(mstate av, size_t bytes)
-       fwd->bk = victim;
-       bck->fd = victim;
- 
-+#if 0
-       if (size >= nb)
- 	any_larger = true;
- #define MAX_ITERS	10000
-       if (++iters >= MAX_ITERS)
- 	break;
-+#endif
-     }
- 
-     /*
---- glibc-20060825T0639/malloc/mcheck.c	8 Sep 2004 20:36:02 -0000	1.18
-+++ glibc-20060825T0639-fedora/malloc/mcheck.c	20 Dec 2005 10:59:21 -0000	1.18.2.1
+--- glibc-20060828T1903/malloc/mcheck.c	8 Sep 2004 20:36:02 -0000	1.18
++++ glibc-20060828T1903-fedora/malloc/mcheck.c	20 Dec 2005 10:59:21 -0000	1.18.2.1
 @@ -24,9 +24,25 @@
  # include <mcheck.h>
  # include <stdint.h>
@@ -1084,8 +1056,8 @@
  
        old_free_hook = __free_hook;
        __free_hook = freehook;
---- glibc-20060825T0639/malloc/mtrace.c	14 Sep 2004 04:24:46 -0000	1.41
-+++ glibc-20060825T0639-fedora/malloc/mtrace.c	20 Dec 2005 10:59:21 -0000	1.41.2.1
+--- glibc-20060828T1903/malloc/mtrace.c	14 Sep 2004 04:24:46 -0000	1.41
++++ glibc-20060828T1903-fedora/malloc/mtrace.c	20 Dec 2005 10:59:21 -0000	1.41.2.1
 @@ -40,6 +40,18 @@
  # include <libio/iolibio.h>
  # define setvbuf(s, b, f, l) INTUSE(_IO_setvbuf) (s, b, f, l)
@@ -1141,17 +1113,17 @@
    __memalign_hook = tr_memalignhook;
    __malloc_hook = tr_mallochook;
  
---- glibc-20060825T0639/nis/nss	28 Apr 2006 21:02:23 -0000	1.3
-+++ glibc-20060825T0639-fedora/nis/nss	1 May 2006 08:02:53 -0000	1.2.2.2
+--- glibc-20060828T1903/nis/nss	28 Apr 2006 21:02:23 -0000	1.3
++++ glibc-20060828T1903-fedora/nis/nss	1 May 2006 08:02:53 -0000	1.2.2.2
 @@ -25,4 +25,4 @@
  #  memory with every getXXent() call.  Otherwise each getXXent() call
  #  might result into a network communication with the server to get
  #  the next entry.
 -#SETENT_BATCH_READ=TRUE
 +SETENT_BATCH_READ=TRUE
---- glibc-20060825T0639/nptl/ChangeLog	23 Aug 2006 17:47:19 -0000	1.912
-+++ glibc-20060825T0639-fedora/nptl/ChangeLog	25 Aug 2006 06:45:14 -0000	1.706.2.99
-@@ -1040,6 +1040,15 @@
+--- glibc-20060828T1903/nptl/ChangeLog	25 Aug 2006 13:29:19 -0000	1.913
++++ glibc-20060828T1903-fedora/nptl/ChangeLog	28 Aug 2006 19:19:33 -0000	1.706.2.100
+@@ -1045,6 +1045,15 @@
  	Use __sigfillset.  Document that sigfillset does the right thing wrt
  	to SIGSETXID.
  
@@ -1167,7 +1139,7 @@
  2005-07-11  Jakub Jelinek  <jakub@redhat.com>
  
  	[BZ #1102]
-@@ -1776,6 +1785,11 @@
+@@ -1781,6 +1790,11 @@
  	Move definition inside libpthread, libc, librt check.  Provide
  	definition for rtld.
  
@@ -1179,7 +1151,7 @@
  2004-09-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/alpha/jmpbuf-unwind.h: Define __libc_unwind_longjmp.
-@@ -3850,6 +3864,11 @@
+@@ -3855,6 +3869,11 @@
  
  	* Makefile [$(build-shared) = yes] (tests): Depend on $(test-modules).
  
@@ -1191,8 +1163,8 @@
  2003-07-25  Jakub Jelinek  <jakub@redhat.com>
  
  	* tst-cancel17.c (do_test): Check if aio_cancel failed.
---- glibc-20060825T0639/nptl/Makefile	21 Aug 2006 21:02:10 -0000	1.186
-+++ glibc-20060825T0639-fedora/nptl/Makefile	22 Aug 2006 09:05:40 -0000	1.157.2.26
+--- glibc-20060828T1903/nptl/Makefile	21 Aug 2006 21:02:10 -0000	1.186
++++ glibc-20060828T1903-fedora/nptl/Makefile	22 Aug 2006 09:05:40 -0000	1.157.2.26
 @@ -524,15 +524,19 @@ $(addprefix $(objpfx), \
      $(tests) $(xtests) $(test-srcs))): $(objpfx)libpthread.so \
  				       $(objpfx)libpthread_nonshared.a
@@ -1215,8 +1187,8 @@
  else
  $(addprefix $(objpfx),$(tests) $(test-srcs)): $(objpfx)libpthread.a
  endif
---- glibc-20060825T0639/nptl/tst-stackguard1.c	26 Jun 2005 17:44:14 -0000	1.1
-+++ glibc-20060825T0639-fedora/nptl/tst-stackguard1.c	8 Aug 2005 21:24:28 -0000	1.1.2.3
+--- glibc-20060828T1903/nptl/tst-stackguard1.c	26 Jun 2005 17:44:14 -0000	1.1
++++ glibc-20060828T1903-fedora/nptl/tst-stackguard1.c	8 Aug 2005 21:24:28 -0000	1.1.2.3
 @@ -190,17 +190,21 @@ do_test (void)
       the 16 runs, something is very wrong.  */
    int ndifferences = 0;
@@ -1241,8 +1213,8 @@
      {
        puts ("stack guard canaries are not randomized enough");
        puts ("nor equal to the default canary value");
---- glibc-20060825T0639/nptl/sysdeps/unix/sysv/linux/kernel-features.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060825T0639-fedora/nptl/sysdeps/unix/sysv/linux/kernel-features.h	22 Sep 2004 21:21:02 -0000	1.1.2.1
+--- glibc-20060828T1903/nptl/sysdeps/unix/sysv/linux/kernel-features.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060828T1903-fedora/nptl/sysdeps/unix/sysv/linux/kernel-features.h	22 Sep 2004 21:21:02 -0000	1.1.2.1
 @@ -0,0 +1,6 @@
 +#include_next <kernel-features.h>
 +
@@ -1250,8 +1222,8 @@
 +#ifndef __ASSUME_CLONE_THREAD_FLAGS
 +# define __ASSUME_CLONE_THREAD_FLAGS	1
 +#endif
---- glibc-20060825T0639/nptl/sysdeps/unix/sysv/linux/i386/lowlevellock.h	29 Jul 2006 04:35:59 -0000	1.31
-+++ glibc-20060825T0639-fedora/nptl/sysdeps/unix/sysv/linux/i386/lowlevellock.h	29 Jul 2006 23:12:42 -0000	1.25.2.6
+--- glibc-20060828T1903/nptl/sysdeps/unix/sysv/linux/i386/lowlevellock.h	29 Jul 2006 04:35:59 -0000	1.31
++++ glibc-20060828T1903-fedora/nptl/sysdeps/unix/sysv/linux/i386/lowlevellock.h	29 Jul 2006 23:12:42 -0000	1.25.2.6
 @@ -68,6 +68,88 @@
  #define BUSY_WAIT_NOP          asm ("rep; nop")
  
@@ -1587,8 +1559,8 @@
  			      : "=m" (futex), "=&a" (ignore)		      \
  			      : "m" (futex),				      \
  				"i" (offsetof (tcbhead_t, multiple_threads))  \
---- glibc-20060825T0639/nptl/sysdeps/unix/sysv/linux/i386/i486/lowlevellock.S	9 Apr 2006 02:42:29 -0000	1.15
-+++ glibc-20060825T0639-fedora/nptl/sysdeps/unix/sysv/linux/i386/i486/lowlevellock.S	24 Apr 2006 08:55:43 -0000	1.13.2.3
+--- glibc-20060828T1903/nptl/sysdeps/unix/sysv/linux/i386/i486/lowlevellock.S	9 Apr 2006 02:42:29 -0000	1.15
++++ glibc-20060828T1903-fedora/nptl/sysdeps/unix/sysv/linux/i386/i486/lowlevellock.S	24 Apr 2006 08:55:43 -0000	1.13.2.3
 @@ -1,4 +1,4 @@
 -/* Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
 +/* Copyright (C) 2002, 2003, 2004, 2006 Free Software Foundation, Inc.
@@ -1734,8 +1706,8 @@
  	.size	__lll_mutex_unlock_wake,.-__lll_mutex_unlock_wake
  
  
---- glibc-20060825T0639/nptl/sysdeps/unix/sysv/linux/i386/i486/lowlevelrobustlock.S	2 Mar 2006 00:25:56 -0000	1.2
-+++ glibc-20060825T0639-fedora/nptl/sysdeps/unix/sysv/linux/i386/i486/lowlevelrobustlock.S	6 Mar 2006 07:34:44 -0000	1.1.2.3
+--- glibc-20060828T1903/nptl/sysdeps/unix/sysv/linux/i386/i486/lowlevelrobustlock.S	2 Mar 2006 00:25:56 -0000	1.2
++++ glibc-20060828T1903-fedora/nptl/sysdeps/unix/sysv/linux/i386/i486/lowlevelrobustlock.S	6 Mar 2006 07:34:44 -0000	1.1.2.3
 @@ -44,9 +44,16 @@
  	.hidden	__lll_robust_mutex_lock_wait
  	.align	16
@@ -1836,8 +1808,8 @@
 -	ret
 +	cfi_endproc
  	.size	__lll_robust_mutex_timedlock_wait,.-__lll_robust_mutex_timedlock_wait
---- glibc-20060825T0639/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.S	31 Mar 2005 10:00:15 -0000	1.14
-+++ glibc-20060825T0639-fedora/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.S	6 Mar 2006 07:33:30 -0000	1.11.2.4
+--- glibc-20060828T1903/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.S	31 Mar 2005 10:00:15 -0000	1.14
++++ glibc-20060828T1903-fedora/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.S	6 Mar 2006 07:33:30 -0000	1.11.2.4
 @@ -1,4 +1,4 @@
 -/* Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 +/* Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
@@ -1979,8 +1951,8 @@
  	.size	__lll_mutex_unlock_wake,.-__lll_mutex_unlock_wake
  
  
---- glibc-20060825T0639/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.h	29 Jul 2006 04:35:58 -0000	1.27
-+++ glibc-20060825T0639-fedora/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.h	29 Jul 2006 23:12:42 -0000	1.23.2.4
+--- glibc-20060828T1903/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.h	29 Jul 2006 04:35:58 -0000	1.27
++++ glibc-20060828T1903-fedora/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.h	29 Jul 2006 23:12:42 -0000	1.23.2.4
 @@ -49,6 +49,110 @@
  #define BUSY_WAIT_NOP          asm ("rep; nop")
  
@@ -2368,8 +2340,8 @@
  			      : "=m" (futex), "=&D" (ignore)		      \
  			      : "m" (futex)				      \
  			      : "ax", "cx", "r11", "cc", "memory"); })
---- glibc-20060825T0639/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevelrobustlock.S	2 Mar 2006 00:26:55 -0000	1.2
-+++ glibc-20060825T0639-fedora/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevelrobustlock.S	6 Mar 2006 07:33:30 -0000	1.1.2.3
+--- glibc-20060828T1903/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevelrobustlock.S	2 Mar 2006 00:26:55 -0000	1.2
++++ glibc-20060828T1903-fedora/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevelrobustlock.S	6 Mar 2006 07:33:30 -0000	1.1.2.3
 @@ -46,8 +46,13 @@
  	.hidden	__lll_robust_mutex_lock_wait
  	.align	16
@@ -2464,8 +2436,8 @@
 -	retq
 +	cfi_endproc
  	.size	__lll_robust_mutex_timedlock_wait,.-__lll_robust_mutex_timedlock_wait
---- glibc-20060825T0639/nscd/connections.c	30 May 2006 17:31:43 -0000	1.90
-+++ glibc-20060825T0639-fedora/nscd/connections.c	31 May 2006 15:10:34 -0000	1.55.2.25
+--- glibc-20060828T1903/nscd/connections.c	30 May 2006 17:31:43 -0000	1.90
++++ glibc-20060828T1903-fedora/nscd/connections.c	31 May 2006 15:10:34 -0000	1.55.2.25
 @@ -1914,3 +1914,21 @@ finish_drop_privileges (void)
    install_real_capabilities (new_caps);
  #endif
@@ -2488,8 +2460,8 @@
 +    prune_cache (&dbs[hstdb], LONG_MAX, -1);
 +}
 +
---- glibc-20060825T0639/nscd/nscd.c	30 May 2006 17:29:36 -0000	1.53
-+++ glibc-20060825T0639-fedora/nscd/nscd.c	31 May 2006 15:10:34 -0000	1.38.2.13
+--- glibc-20060828T1903/nscd/nscd.c	30 May 2006 17:29:36 -0000	1.53
++++ glibc-20060828T1903-fedora/nscd/nscd.c	31 May 2006 15:10:34 -0000	1.38.2.13
 @@ -119,6 +119,9 @@ static struct argp argp =
    options, parse_opt, NULL, doc,
  };
@@ -2508,8 +2480,8 @@
    signal (SIGPIPE, SIG_IGN);
  
    /* Cleanup files created by a previous 'bind'.  */
---- glibc-20060825T0639/nscd/nscd.conf	27 Apr 2006 14:46:36 -0000	1.13
-+++ glibc-20060825T0639-fedora/nscd/nscd.conf	27 Apr 2006 21:29:54 -0000	1.8.2.5
+--- glibc-20060828T1903/nscd/nscd.conf	27 Apr 2006 14:46:36 -0000	1.13
++++ glibc-20060828T1903-fedora/nscd/nscd.conf	27 Apr 2006 21:29:54 -0000	1.8.2.5
 @@ -33,8 +33,8 @@
  #	logfile			/var/log/nscd.log
  #	threads			6
@@ -2521,8 +2493,8 @@
  	debug-level		0
  #	reload-count		5
  	paranoia		no
---- glibc-20060825T0639/nscd/nscd.init	20 Jun 2005 15:47:52 -0000	1.9
-+++ glibc-20060825T0639-fedora/nscd/nscd.init	12 Sep 2005 12:53:20 -0000	1.6.2.4
+--- glibc-20060828T1903/nscd/nscd.init	20 Jun 2005 15:47:52 -0000	1.9
++++ glibc-20060828T1903-fedora/nscd/nscd.init	12 Sep 2005 12:53:20 -0000	1.6.2.4
 @@ -9,6 +9,7 @@
  #		slow naming services like NIS, NIS+, LDAP, or hesiod.
  # processname: /usr/sbin/nscd
@@ -2563,8 +2535,8 @@
      RETVAL=$?
      echo
      [ $RETVAL -eq 0 ] && touch /var/lock/subsys/nscd
---- glibc-20060825T0639/posix/Makefile	2 Aug 2006 16:43:46 -0000	1.192
-+++ glibc-20060825T0639-fedora/posix/Makefile	2 Aug 2006 16:57:42 -0000	1.171.2.20
+--- glibc-20060828T1903/posix/Makefile	2 Aug 2006 16:43:46 -0000	1.192
++++ glibc-20060828T1903-fedora/posix/Makefile	2 Aug 2006 16:57:42 -0000	1.171.2.20
 @@ -108,7 +108,8 @@ generated := $(addprefix wordexp-test-re
  	     bug-regex21-mem bug-regex21.mtrace \
  	     tst-rxspencer-mem tst-rxspencer.mtrace tst-getconf.out \
@@ -2598,8 +2570,8 @@
 +	  | sed -n -e '/START_OF_STRINGS/,$${/POSIX_V6_/{s/^[^"]*"//;s/".*$$//;p}}' \
 +	  > $@.new
 +	mv -f $@.new $@
---- glibc-20060825T0639/posix/getconf.speclist.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060825T0639-fedora/posix/getconf.speclist.h	13 Dec 2004 23:32:37 -0000	1.1.2.2
+--- glibc-20060828T1903/posix/getconf.speclist.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060828T1903-fedora/posix/getconf.speclist.h	13 Dec 2004 23:32:37 -0000	1.1.2.2
 @@ -0,0 +1,15 @@
 +#include <unistd.h>
 +const char *START_OF_STRINGS =
@@ -2616,8 +2588,8 @@
 +"POSIX_V6_LPBIG_OFFBIG"
 +#endif
 +"";
---- glibc-20060825T0639/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
-+++ glibc-20060825T0639-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
+--- glibc-20060828T1903/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
++++ glibc-20060828T1903-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
 @@ -36,6 +36,14 @@
  # define add_system_dir(dir) add_dir (dir)
  #endif
@@ -2633,8 +2605,8 @@
  #define CACHEMAGIC "ld.so-1.7.0"
  
  /* libc5 and glibc 2.0/2.1 use the same format.  For glibc 2.2 another
---- glibc-20060825T0639/sysdeps/i386/Makefile	6 Mar 2005 00:18:16 -0000	1.20
-+++ glibc-20060825T0639-fedora/sysdeps/i386/Makefile	30 Jun 2006 09:16:34 -0000	1.16.2.4
+--- glibc-20060828T1903/sysdeps/i386/Makefile	6 Mar 2005 00:18:16 -0000	1.20
++++ glibc-20060828T1903-fedora/sysdeps/i386/Makefile	30 Jun 2006 09:16:34 -0000	1.16.2.4
 @@ -64,4 +64,12 @@ endif
  
  ifneq (,$(filter -mno-tls-direct-seg-refs,$(CFLAGS)))
@@ -2648,8 +2620,8 @@
 +CPPFLAGS-.oS += -DNO_TLS_DIRECT_SEG_REFS
 +CFLAGS-.oS += -mno-tls-direct-seg-refs
  endif
---- glibc-20060825T0639/sysdeps/ia64/Makefile	16 Aug 2004 06:46:14 -0000	1.10
-+++ glibc-20060825T0639-fedora/sysdeps/ia64/Makefile	22 Sep 2004 21:21:07 -0000	1.10.2.1
+--- glibc-20060828T1903/sysdeps/ia64/Makefile	16 Aug 2004 06:46:14 -0000	1.10
++++ glibc-20060828T1903-fedora/sysdeps/ia64/Makefile	22 Sep 2004 21:21:07 -0000	1.10.2.1
 @@ -12,8 +12,8 @@ elide-routines.os += hp-timing
  
  ifeq (yes,$(build-shared))
@@ -2661,8 +2633,8 @@
  endif
  endif
  
---- glibc-20060825T0639/sysdeps/ia64/ia64libgcc.S	11 May 2002 05:12:35 -0000	1.2
-+++ glibc-20060825T0639-fedora/sysdeps/ia64/ia64libgcc.S	22 Sep 2004 21:21:07 -0000	1.2.2.1
+--- glibc-20060828T1903/sysdeps/ia64/ia64libgcc.S	11 May 2002 05:12:35 -0000	1.2
++++ glibc-20060828T1903-fedora/sysdeps/ia64/ia64libgcc.S	22 Sep 2004 21:21:07 -0000	1.2.2.1
 @@ -1,350 +0,0 @@
 -/* From the Intel IA-64 Optimization Guide, choose the minimum latency
 -   alternative.  */
@@ -3014,8 +2986,8 @@
 -	.symver	___multi3, __multi3@GLIBC_2.2
 -
 -#endif
---- glibc-20060825T0639/sysdeps/ia64/libgcc-compat.c 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060825T0639-fedora/sysdeps/ia64/libgcc-compat.c	22 Sep 2004 21:21:08 -0000	1.1.2.1
+--- glibc-20060828T1903/sysdeps/ia64/libgcc-compat.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20060828T1903-fedora/sysdeps/ia64/libgcc-compat.c	22 Sep 2004 21:21:08 -0000	1.1.2.1
 @@ -0,0 +1,84 @@
 +/* pre-.hidden libgcc compatibility
 +   Copyright (C) 2002 Free Software Foundation, Inc.
@@ -3101,8 +3073,8 @@
 +symbol_version (INTUSE (__multi3), __multi3, GLIBC_2.2);
 +
 +#endif
---- glibc-20060825T0639/sysdeps/unix/nice.c	15 Aug 2006 05:24:45 -0000	1.7
-+++ glibc-20060825T0639-fedora/sysdeps/unix/nice.c	15 Aug 2006 05:53:50 -0000	1.6.2.2
+--- glibc-20060828T1903/sysdeps/unix/nice.c	15 Aug 2006 05:24:45 -0000	1.7
++++ glibc-20060828T1903-fedora/sysdeps/unix/nice.c	15 Aug 2006 05:53:50 -0000	1.6.2.2
 @@ -42,7 +42,12 @@ nice (int incr)
  	__set_errno (save);
      }
@@ -3117,8 +3089,8 @@
    if (result == -1)
      {
        if (errno == EACCES)
---- glibc-20060825T0639/sysdeps/unix/sysv/linux/dl-osinfo.h	1 Aug 2006 06:55:27 -0000	1.23
-+++ glibc-20060825T0639-fedora/sysdeps/unix/sysv/linux/dl-osinfo.h	2 Aug 2006 16:57:42 -0000	1.14.2.9
+--- glibc-20060828T1903/sysdeps/unix/sysv/linux/dl-osinfo.h	1 Aug 2006 06:55:27 -0000	1.23
++++ glibc-20060828T1903-fedora/sysdeps/unix/sysv/linux/dl-osinfo.h	2 Aug 2006 16:57:42 -0000	1.14.2.9
 @@ -18,11 +18,14 @@
     02111-1307 USA.  */
  
@@ -3166,8 +3138,8 @@
 +  ret ^= stk;
    return ret;
  }
---- glibc-20060825T0639/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 05:26:34 -0000	1.6
-+++ glibc-20060825T0639-fedora/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 09:43:55 -0000	1.1.2.7
+--- glibc-20060828T1903/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 05:26:34 -0000	1.6
++++ glibc-20060828T1903-fedora/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 09:43:55 -0000	1.1.2.7
 @@ -37,14 +37,14 @@ futimesat (fd, file, tvp)
  {
    int result;
@@ -3210,8 +3182,8 @@
      {
        size_t filelen = strlen (file);
        static const char procfd[] = "/proc/self/fd/%d/%s";
---- glibc-20060825T0639/sysdeps/unix/sysv/linux/paths.h	15 Nov 2000 23:06:47 -0000	1.11
-+++ glibc-20060825T0639-fedora/sysdeps/unix/sysv/linux/paths.h	22 Sep 2004 21:21:08 -0000	1.11.4.1
+--- glibc-20060828T1903/sysdeps/unix/sysv/linux/paths.h	15 Nov 2000 23:06:47 -0000	1.11
++++ glibc-20060828T1903-fedora/sysdeps/unix/sysv/linux/paths.h	22 Sep 2004 21:21:08 -0000	1.11.4.1
 @@ -61,7 +61,7 @@
  #define	_PATH_TTY	"/dev/tty"
  #define	_PATH_UNIX	"/boot/vmlinux"
@@ -3221,8 +3193,8 @@
  #define _PATH_WTMP	"/var/log/wtmp"
  
  /* Provide trailing slash, since mostly used for building pathnames. */
---- glibc-20060825T0639/sysdeps/unix/sysv/linux/tcsetattr.c	10 Sep 2003 19:16:07 -0000	1.16
-+++ glibc-20060825T0639-fedora/sysdeps/unix/sysv/linux/tcsetattr.c	22 Sep 2004 21:21:08 -0000	1.16.2.1
+--- glibc-20060828T1903/sysdeps/unix/sysv/linux/tcsetattr.c	10 Sep 2003 19:16:07 -0000	1.16
++++ glibc-20060828T1903-fedora/sysdeps/unix/sysv/linux/tcsetattr.c	22 Sep 2004 21:21:08 -0000	1.16.2.1
 @@ -49,6 +49,7 @@ tcsetattr (fd, optional_actions, termios
  {
    struct __kernel_termios k_termios;
@@ -3268,8 +3240,8 @@
 +  return retval;
  }
  libc_hidden_def (tcsetattr)
---- glibc-20060825T0639/sysdeps/unix/sysv/linux/i386/dl-cache.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060825T0639-fedora/sysdeps/unix/sysv/linux/i386/dl-cache.h	22 Sep 2004 21:21:08 -0000	1.1.2.1
+--- glibc-20060828T1903/sysdeps/unix/sysv/linux/i386/dl-cache.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060828T1903-fedora/sysdeps/unix/sysv/linux/i386/dl-cache.h	22 Sep 2004 21:21:08 -0000	1.1.2.1
 @@ -0,0 +1,59 @@
 +/* Support for reading /etc/ld.so.cache files written by Linux ldconfig.
 +   Copyright (C) 2004 Free Software Foundation, Inc.
@@ -3330,8 +3302,8 @@
 +  } while (0)
 +
 +#include_next <dl-cache.h>
---- glibc-20060825T0639/sysdeps/unix/sysv/linux/ia64/dl-cache.h	6 Jul 2001 04:56:17 -0000	1.2
-+++ glibc-20060825T0639-fedora/sysdeps/unix/sysv/linux/ia64/dl-cache.h	22 Sep 2004 21:21:09 -0000	1.2.4.1
+--- glibc-20060828T1903/sysdeps/unix/sysv/linux/ia64/dl-cache.h	6 Jul 2001 04:56:17 -0000	1.2
++++ glibc-20060828T1903-fedora/sysdeps/unix/sysv/linux/ia64/dl-cache.h	22 Sep 2004 21:21:09 -0000	1.2.4.1
 @@ -22,4 +22,31 @@
  #define _dl_cache_check_flags(flags) \
    ((flags) == _DL_CACHE_DEFAULT_ID)
@@ -3364,49 +3336,24 @@
 +  } while (0)
 +
  #include_next <dl-cache.h>
---- glibc-20060825T0639/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060825T0639-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c	22 Sep 2004 21:21:09 -0000	1.1.2.1
+--- glibc-20060828T1903/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20060828T1903-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c	22 Sep 2004 21:21:09 -0000	1.1.2.1
 @@ -0,0 +1,5 @@
 +#ifdef IS_IN_ldconfig
 +#include <sysdeps/i386/dl-procinfo.c>
 +#else
 +#include <sysdeps/generic/dl-procinfo.c>
 +#endif
---- glibc-20060825T0639/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060825T0639-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h	22 Sep 2004 21:21:09 -0000	1.1.2.1
+--- glibc-20060828T1903/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060828T1903-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h	22 Sep 2004 21:21:09 -0000	1.1.2.1
 @@ -0,0 +1,5 @@
 +#ifdef IS_IN_ldconfig
 +#include <sysdeps/unix/sysv/linux/i386/dl-procinfo.h>
 +#else
 +#include <sysdeps/generic/dl-procinfo.h>
 +#endif
---- glibc-20060825T0639/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	17 Jan 2002 06:49:28 -0000	1.2
-+++ glibc-20060825T0639-fedora/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	22 Sep 2004 21:21:09 -0000	1.2.2.1
+--- glibc-20060828T1903/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	17 Jan 2002 06:49:28 -0000	1.2
++++ glibc-20060828T1903-fedora/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	22 Sep 2004 21:21:09 -0000	1.2.2.1
 @@ -1 +1 @@
 -s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 \2\3"_
 +s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 /emul/ia32-linux\2\3"_
---- libc/locale/programs/ld-ctype.c	25 Aug 2006 00:38:54 -0000	1.109
-+++ libc/locale/programs/ld-ctype.c	12 Aug 2006 20:19:14 -0000	1.108
-@@ -2256,8 +2256,6 @@ ctype_read (struct linereader *ldfile, s
-   /* Prepare the data structures.  */
-   ctype_startup (ldfile, result, charmap, copy_locale, ignore_content);
-   ctype = result->categories[LC_CTYPE].ctype;
--  if (ctype == NULL)
--    return;
- 
-   /* Remember the repertoire we use.  */
-   if (!ignore_content)
---- libc/nptl/sysdeps/unix/sysv/linux/libc_pthread_init.c.jj	2006-08-25 11:01:24.000000000 +0200
-+++ libc/nptl/sysdeps/unix/sysv/linux/libc_pthread_init.c	2006-08-25 11:53:28.000000000 +0200
-@@ -58,9 +58,10 @@ __libc_pthread_init (ptr, reclaim, funct
- #endif
- }
- 
--
-+#ifdef SHARED
- libc_freeres_fn (freeres_libptread)
- {
-   if (__libc_pthread_functions.ptr_freeres != NULL)
-     __libc_pthread_functions.ptr_freeres ();
- }
-+#endif
