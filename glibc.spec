@@ -1,9 +1,9 @@
-%define glibcdate 20060831T0640
+%define glibcdate 20060831T1812
 %define glibcname glibc
-%define glibcsrcdir glibc-20060831T0640
+%define glibcsrcdir glibc-20060831T1812
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 27
+%define glibcrelease 28
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1453,6 +1453,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Aug 31 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-28
+- another malloc doubly linked list corruption problem fix (#204653)
+
 * Thu Aug 31 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-27
 - allow $LIB and $PLATFORM in dlopen parameters even in suid/sgid (#204399)
 - fix splice prototype (#204530)
