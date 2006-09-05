@@ -1,9 +1,9 @@
-%define glibcdate 20060831T1812
+%define glibcdate 20060905T0633
 %define glibcname glibc
-%define glibcsrcdir glibc-20060831T1812
+%define glibcsrcdir glibc-20060905T0633
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 28
+%define glibcrelease 29
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -48,7 +48,7 @@ Prereq: basesystem, libgcc
 # For initial glibc bootstraps it can be commented out
 BuildPreReq: gd-devel libpng-devel zlib-devel texinfo, libselinux-devel >= 1.17.10-1
 BuildPreReq: audit-libs-devel >= 1.1.3, sed >= 3.95, libcap-devel, gettext
-BuildPreReq: /bin/ps, /bin/kill
+BuildPreReq: /bin/ps, /bin/kill, /bin/awk
 # This is to ensure that __frame_state_for is exported by glibc
 # will be compatible with egcs 1.x.y
 BuildPreReq: gcc >= 3.2
@@ -1147,7 +1147,7 @@ echo ====================TESTING=========================
 cd build-%{nptl_target_cpu}-linuxnptl
 ( make %{?_smp_mflags} -k check PARALLELMFLAGS=-s 2>&1
   sleep 10s
-  teepid="`ps -eo ppid,pid,command | grep ^${parent}'[ 	]\+[0-9]\+[ 	]\+tee' | cut -d' ' -f2`"
+  teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
 ) | tee check.log || :
 cd ..
@@ -1156,7 +1156,7 @@ echo ====================TESTING -mno-tls-direct-seg-refs=============
 cd build-%{nptl_target_cpu}-linuxnptl-nosegneg
 ( make -j$numprocs -k check PARALLELMFLAGS=-s 2>&1
   sleep 10s
-  teepid="`ps -eo ppid,pid,command | grep ^${parent}'[ 	]\+[0-9]\+[ 	]\+tee' | cut -d' ' -f2`"
+  teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
 ) | tee check.log || :
 cd ..
@@ -1453,14 +1453,19 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Sep  5 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-29
+- randomize resolver query ids before use instead after use (#205113)
+- fix resolver symver checking with DT_GNU_HASH (#204909)
+- put .hash section in glibc libraries at the end of RO segment
+  when .gnu.hash is present
+
 * Thu Aug 31 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-28
 - another malloc doubly linked list corruption problem fix (#204653)
 
 * Thu Aug 31 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-27
 - allow $LIB and $PLATFORM in dlopen parameters even in suid/sgid (#204399)
+- handle $LIB/$PLATFORM in LD_LIBRARY_PATH
 - fix splice prototype (#204530)
-- fix pthread_rwlock_{,try,timed}wrlock to honor reader preference
-  if requested
 
 * Mon Aug 28 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-26
 - real fix for the doubly linked list corruption problem
