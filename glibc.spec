@@ -1,9 +1,9 @@
-%define glibcdate 20060905T0633
+%define glibcdate 20060907T0853
 %define glibcname glibc
-%define glibcsrcdir glibc-20060905T0633
+%define glibcsrcdir glibc-20060907T0853
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 29
+%define glibcrelease 30
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -13,7 +13,7 @@
 %define buildxen 0
 %define xenpackage 0
 %endif
-%define rtkaioarches noarch
+%define rtkaioarches %{ix86} x86_64 ia64 ppc ppc64 s390 s390x
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
 %define _unpackaged_files_terminate_build 0
 Summary: The GNU libc libraries.
@@ -788,16 +788,16 @@ touch locale/programs/*-kw.h
 GCC=gcc
 GXX=g++
 %ifarch %{ix86}
-BuildFlags="-march=%{_target_cpu} -DUSE_CFA_VAL_EXPRESSION"
+BuildFlags="-march=%{_target_cpu}"
 %endif
 %ifarch i686
-BuildFlags="-march=i686 -mtune=generic -DUSE_CFA_VAL_EXPRESSION"
+BuildFlags="-march=i686 -mtune=generic"
 %endif
 %ifarch i386
 BuildFlags="$BuildFlags -mno-tls-direct-seg-refs"
 %endif
 %ifarch x86_64
-BuildFlags="-mtune=generic -DUSE_CFA_VAL_EXPRESSION"
+BuildFlags="-mtune=generic"
 %endif
 %ifarch alphaev6
 BuildFlags="-mcpu=ev6"
@@ -824,17 +824,12 @@ GXX="g++ -m64"
 %endif
 
 BuildFlags="$BuildFlags -DNDEBUG=1"
-if gcc -v 2>&1 | grep -q 'gcc version 3.[0123]'; then
-  BuildFlags="$BuildFlags -finline-limit=2000"
-fi
 EnableKernel="--enable-kernel=%{enablekernel}"
-echo "$BuildFlags" > BuildFlags
 echo "$GCC" > Gcc
 AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(linuxthreads\|nptl\|rtkaio\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
 %ifarch %{rtkaioarches}
 AddOns=,rtkaio$AddOns
 %endif
-echo "$AddOns" > AddOns
 
 build_nptl()
 {
@@ -873,9 +868,7 @@ $GCC -static -L. -Os ../fedora/glibc_post_upgrade.c -o glibc_post_upgrade.%{_tar
 cd ..
 
 %install
-BuildFlags=`cat BuildFlags`
 GCC=`cat Gcc`
-AddOns=`cat AddOns`
 
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT
@@ -884,6 +877,12 @@ make -j1 install_root=$RPM_BUILD_ROOT install -C build-%{nptl_target_cpu}-linuxn
 cd build-%{nptl_target_cpu}-linuxnptl && \
     make %{?_smp_mflags} install_root=$RPM_BUILD_ROOT install-locales -C ../localedata objdir=`pwd` && \
     cd ..
+%endif
+
+%ifarch %{rtkaioarches}
+mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio
+cp -a rtkaio/librtkaio.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/`
+ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/` $RPM_BUILD_ROOT/%{_lib}/rtkaio/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
 %endif
 
 %if %{buildxen}
@@ -900,15 +899,15 @@ cp -a nptl/libpthread.so $RPM_BUILD_ROOT/%{_lib}/$SubDir/libpthread-%{version}.s
 pushd $RPM_BUILD_ROOT/%{_lib}/$SubDir
 ln -sf libpthread-*.so `basename $RPM_BUILD_ROOT/%{_lib}/libpthread.so.*`
 popd
-%ifarch %{rtkaioarches}
-cp -a rtkaio/librtkaio.so $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/` $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
-%else
 cp -a rt/librt.so $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so`
 ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so` $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
-%endif
 cp -a nptl_db/libthread_db.so $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/libthread_db-*.so`
 ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libthread_db-*.so` $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/libthread_db.so.*`
+%ifarch %{rtkaioarches}
+mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir
+cp -a rtkaio/librtkaio.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/`
+ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/` $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
+%endif
 cd ..
 %endif
 
@@ -1367,9 +1366,16 @@ rm -f *.filelist*
 
 %files -f rpm.filelist
 %defattr(-,root,root)
+%ifarch %{rtkaioarches}
+%dir /%{_lib}/rtkaio
+%endif
 %if %{buildxen} && !%{xenpackage}
 %dir /%{_lib}/%{nosegneg_subdir_base}
 %dir /%{_lib}/%{nosegneg_subdir}
+%ifarch %{rtkaioarches}
+%dir /%{_lib}/rtkaio/%{nosegneg_subdir_base}
+%dir /%{_lib}/rtkaio/%{nosegneg_subdir}
+%endif
 %endif
 %ifarch s390x
 %dir /lib
@@ -1453,6 +1459,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Sep  7 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-30
+- add librtkaio, to use it add /%{lib}/rtkaio to your
+  LD_LIBRARY_PATH or /etc/ld.so.conf
+- fix or_IN February name (#204730)
+- fix pthread_create called from cancellation handlers (BZ#3124)
+- fix regex case insensitive searches with characters where upper
+  and lower case multibyte representations have different length
+  (e.g. I and dotless i, #202991)
+
 * Tue Sep  5 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-29
 - randomize resolver query ids before use instead after use (#205113)
 - fix resolver symver checking with DT_GNU_HASH (#204909)

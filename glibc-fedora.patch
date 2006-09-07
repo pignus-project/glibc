@@ -1,5 +1,21 @@
---- glibc-20060905T0633/ChangeLog.11	10 Nov 2000 03:31:36 -0000	1.1
-+++ glibc-20060905T0633-fedora/ChangeLog.11	22 Sep 2004 21:20:47 -0000	1.1.4.1
+--- glibc-20060907T0853/ChangeLog	6 Sep 2006 16:51:47 -0000	1.10329
++++ glibc-20060907T0853-fedora/ChangeLog	7 Sep 2006 10:42:03 -0000	1.8782.2.205
+@@ -1,5 +1,13 @@
+ 2006-09-06  Jakub Jelinek  <jakub@redhat.com>
+ 
++	* posix/regex_internal.c (re_string_reconstruct): Handle
++	offset < pstr->valid_raw_len && pstr->offsets_needed case.
++	Ensure no bytes read before raw_mbs array.  Pass a saved copy of
++	pstr->valid_len - 1 rather than pstr->valid_raw_len - 1 to
++	re_string_context_at.
++	* posix/Makefile: Add rules to build and run bug-regex26 test.
++	* posix/bug-regex26.c: New test.
++
+ 	* locale/programs/ld-collate.c (collate_read): Goto sym_equiv_free
+ 	rather than col_sym_free.  Move seqp declaration earlier.
+ 
+--- glibc-20060907T0853/ChangeLog.11	10 Nov 2000 03:31:36 -0000	1.1
++++ glibc-20060907T0853-fedora/ChangeLog.11	22 Sep 2004 21:20:47 -0000	1.1.4.1
 @@ -1352,6 +1352,11 @@
  	* sysdeps/unix/sysv/linux/mips/sys/tas.h: Add missing .mips0 at the
  	end of inline assembler code.
@@ -49,8 +65,8 @@
  	* sysdeps/arm/bits/huge_val.h (HUGE_VAL, HUGE_VALF): Add
  	__extension__ to hexadecimal floating constant notation.
  	* sysdeps/i386/bits/huge_val.h (HUGE_VAL, HUGE_VALF, HUGE_VALL):
---- glibc-20060905T0633/ChangeLog.12	16 Aug 2001 05:24:54 -0000	1.1
-+++ glibc-20060905T0633-fedora/ChangeLog.12	22 Sep 2004 21:20:47 -0000	1.1.4.1
+--- glibc-20060907T0853/ChangeLog.12	16 Aug 2001 05:24:54 -0000	1.1
++++ glibc-20060907T0853-fedora/ChangeLog.12	22 Sep 2004 21:20:47 -0000	1.1.4.1
 @@ -7729,6 +7729,13 @@
  
  	* Versions.def [ld]: Add GLIBC_2.2.1.
@@ -77,8 +93,8 @@
  2001-01-02  Franz Sirl	<Franz.Sirl-kernel@lauterbach.com>
  
  	* sysdeps/powerpc/dl-machine.c (__process_machine_rela): Fix typo.
---- glibc-20060905T0633/ChangeLog.15	16 Feb 2005 07:34:17 -0000	1.1
-+++ glibc-20060905T0633-fedora/ChangeLog.15	3 Mar 2005 17:29:57 -0000	1.1.6.2
+--- glibc-20060907T0853/ChangeLog.15	16 Feb 2005 07:34:17 -0000	1.1
++++ glibc-20060907T0853-fedora/ChangeLog.15	3 Mar 2005 17:29:57 -0000	1.1.6.2
 @@ -477,6 +477,14 @@
  
  2004-11-26  Jakub Jelinek  <jakub@redhat.com>
@@ -159,8 +175,8 @@
  2004-08-30  Roland McGrath  <roland@frob.com>
  
  	* scripts/extract-abilist.awk: If `lastversion' variable defined, omit
---- glibc-20060905T0633/ChangeLog.16	4 May 2006 16:05:24 -0000	1.1
-+++ glibc-20060905T0633-fedora/ChangeLog.16	5 May 2006 06:11:52 -0000	1.1.2.1
+--- glibc-20060907T0853/ChangeLog.16	4 May 2006 16:05:24 -0000	1.1
++++ glibc-20060907T0853-fedora/ChangeLog.16	5 May 2006 06:11:52 -0000	1.1.2.1
 @@ -171,6 +171,11 @@
  	[BZ #2611]
  	* stdio-common/renameat.c (renameat): Fix typo.
@@ -332,8 +348,8 @@
  2005-02-10  Roland McGrath  <roland@redhat.com>
  
  	[BZ #157]
---- glibc-20060905T0633/csu/elf-init.c	5 Nov 2005 17:41:38 -0000	1.8
-+++ glibc-20060905T0633-fedora/csu/elf-init.c	15 Nov 2005 09:54:10 -0000	1.3.2.6
+--- glibc-20060907T0853/csu/elf-init.c	5 Nov 2005 17:41:38 -0000	1.8
++++ glibc-20060907T0853-fedora/csu/elf-init.c	15 Nov 2005 09:54:10 -0000	1.3.2.6
 @@ -49,6 +49,23 @@ extern void (*__init_array_end []) (int,
  extern void (*__fini_array_start []) (void) attribute_hidden;
  extern void (*__fini_array_end []) (void) attribute_hidden;
@@ -358,8 +374,8 @@
  
  /* These function symbols are provided for the .init/.fini section entry
     points automagically by the linker.  */
---- glibc-20060905T0633/debug/tst-chk1.c	24 Apr 2006 17:00:18 -0000	1.15
-+++ glibc-20060905T0633-fedora/debug/tst-chk1.c	24 Apr 2006 20:31:49 -0000	1.1.2.16
+--- glibc-20060907T0853/debug/tst-chk1.c	24 Apr 2006 17:00:18 -0000	1.15
++++ glibc-20060907T0853-fedora/debug/tst-chk1.c	24 Apr 2006 20:31:49 -0000	1.1.2.16
 @@ -17,6 +17,9 @@
     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
     02111-1307 USA.  */
@@ -388,8 +404,8 @@
  # define O 0
  #else
  # define O 1
---- glibc-20060905T0633/elf/ldconfig.c	7 Apr 2006 06:57:49 -0000	1.54
-+++ glibc-20060905T0633-fedora/elf/ldconfig.c	24 Apr 2006 08:55:38 -0000	1.47.2.9
+--- glibc-20060907T0853/elf/ldconfig.c	7 Apr 2006 06:57:49 -0000	1.54
++++ glibc-20060907T0853-fedora/elf/ldconfig.c	24 Apr 2006 08:55:38 -0000	1.47.2.9
 @@ -964,17 +964,19 @@ search_dirs (void)
  
  
@@ -471,8 +487,8 @@
      }
  
    search_dirs ();
---- glibc-20060905T0633/elf/tst-stackguard1.c	26 Jun 2005 18:08:36 -0000	1.1
-+++ glibc-20060905T0633-fedora/elf/tst-stackguard1.c	8 Aug 2005 21:24:27 -0000	1.1.2.3
+--- glibc-20060907T0853/elf/tst-stackguard1.c	26 Jun 2005 18:08:36 -0000	1.1
++++ glibc-20060907T0853-fedora/elf/tst-stackguard1.c	8 Aug 2005 21:24:27 -0000	1.1.2.3
 @@ -160,17 +160,21 @@ do_test (void)
       the 16 runs, something is very wrong.  */
    int ndifferences = 0;
@@ -497,8 +513,8 @@
      {
        puts ("stack guard canaries are not randomized enough");
        puts ("nor equal to the default canary value");
---- glibc-20060905T0633/iconv/iconvconfig.c	1 Jan 2006 19:15:56 -0000	1.25
-+++ glibc-20060905T0633-fedora/iconv/iconvconfig.c	2 Jan 2006 10:52:50 -0000	1.19.2.6
+--- glibc-20060907T0853/iconv/iconvconfig.c	1 Jan 2006 19:15:56 -0000	1.25
++++ glibc-20060907T0853-fedora/iconv/iconvconfig.c	2 Jan 2006 10:52:50 -0000	1.19.2.6
 @@ -1011,6 +1011,34 @@ next_prime (uint32_t seed)
                                module name offset
                           (following last entry with step count 0)
@@ -575,8 +591,8 @@
    /* Open the output file.  */
    if (output_file == NULL)
      {
---- glibc-20060905T0633/include/features.h	25 Apr 2006 20:34:32 -0000	1.43
-+++ glibc-20060905T0633-fedora/include/features.h	26 Apr 2006 20:18:17 -0000	1.35.2.12
+--- glibc-20060907T0853/include/features.h	25 Apr 2006 20:34:32 -0000	1.43
++++ glibc-20060907T0853-fedora/include/features.h	26 Apr 2006 20:18:17 -0000	1.35.2.12
 @@ -275,7 +275,13 @@
  #endif
  
@@ -592,16 +608,16 @@
  # if _FORTIFY_SOURCE > 1
  #  define __USE_FORTIFY_LEVEL 2
  # else
---- glibc-20060905T0633/include/bits/stdlib-ldbl.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060905T0633-fedora/include/bits/stdlib-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
+--- glibc-20060907T0853/include/bits/stdlib-ldbl.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060907T0853-fedora/include/bits/stdlib-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
 @@ -0,0 +1 @@
 +#include <stdlib/bits/stdlib-ldbl.h>
---- glibc-20060905T0633/include/bits/wchar-ldbl.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060905T0633-fedora/include/bits/wchar-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
+--- glibc-20060907T0853/include/bits/wchar-ldbl.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060907T0853-fedora/include/bits/wchar-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
 @@ -0,0 +1 @@
 +#include <wcsmbs/bits/wchar-ldbl.h>
---- glibc-20060905T0633/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
-+++ glibc-20060905T0633-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
+--- glibc-20060907T0853/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
++++ glibc-20060907T0853-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
 @@ -58,8 +58,6 @@ korean		ko_KR.eucKR
  korean.euc 	ko_KR.eucKR
  ko_KR		ko_KR.eucKR
@@ -611,8 +627,8 @@
  norwegian       nb_NO.ISO-8859-1
  nynorsk		nn_NO.ISO-8859-1
  polish          pl_PL.ISO-8859-2
---- glibc-20060905T0633/libio/stdio.h	16 Jan 2006 20:12:21 -0000	1.86
-+++ glibc-20060905T0633-fedora/libio/stdio.h	30 Jan 2006 09:29:46 -0000	1.78.2.8
+--- glibc-20060907T0853/libio/stdio.h	16 Jan 2006 20:12:21 -0000	1.86
++++ glibc-20060907T0853-fedora/libio/stdio.h	30 Jan 2006 09:29:46 -0000	1.78.2.8
 @@ -142,10 +142,12 @@ typedef _G_fpos64_t fpos64_t;
  extern struct _IO_FILE *stdin;		/* Standard input stream.  */
  extern struct _IO_FILE *stdout;		/* Standard output stream.  */
@@ -626,8 +642,8 @@
  
  __BEGIN_NAMESPACE_STD
  /* Remove file FILENAME.  */
---- glibc-20060905T0633/libio/bits/stdio2.h	19 Mar 2005 00:14:58 -0000	1.4
-+++ glibc-20060905T0633-fedora/libio/bits/stdio2.h	27 Jun 2005 13:04:16 -0000	1.1.2.6
+--- glibc-20060907T0853/libio/bits/stdio2.h	19 Mar 2005 00:14:58 -0000	1.4
++++ glibc-20060907T0853-fedora/libio/bits/stdio2.h	27 Jun 2005 13:04:16 -0000	1.1.2.6
 @@ -61,14 +61,25 @@ extern int __vfprintf_chk (FILE *__restr
  extern int __vprintf_chk (int __flag, __const char *__restrict __format,
  			  _G_va_list __ap);
@@ -658,8 +674,8 @@
  
  #endif
  
---- glibc-20060905T0633/locale/iso-4217.def	26 Apr 2006 07:14:53 -0000	1.19
-+++ glibc-20060905T0633-fedora/locale/iso-4217.def	26 Apr 2006 20:18:17 -0000	1.15.2.4
+--- glibc-20060907T0853/locale/iso-4217.def	26 Apr 2006 07:14:53 -0000	1.19
++++ glibc-20060907T0853-fedora/locale/iso-4217.def	26 Apr 2006 20:18:17 -0000	1.15.2.4
 @@ -8,6 +8,7 @@
   *
   * !!! The list has to be sorted !!!
@@ -751,8 +767,8 @@
  DEFINE_INT_CURR("PYG")		/* Paraguay Guarani  */
  DEFINE_INT_CURR("QAR")		/* Qatar Rial  */
  DEFINE_INT_CURR("ROL")		/* Romanian Leu  */
---- glibc-20060905T0633/locale/programs/3level.h	7 Dec 2005 05:47:27 -0000	1.6
-+++ glibc-20060905T0633-fedora/locale/programs/3level.h	19 Dec 2005 12:11:15 -0000	1.5.2.2
+--- glibc-20060907T0853/locale/programs/3level.h	7 Dec 2005 05:47:27 -0000	1.6
++++ glibc-20060907T0853-fedora/locale/programs/3level.h	19 Dec 2005 12:11:15 -0000	1.5.2.2
 @@ -202,6 +202,42 @@ CONCAT(TABLE,_iterate) (struct TABLE *t,
  	}
      }
@@ -796,8 +812,8 @@
  #endif
  
  #ifndef NO_FINALIZE
---- glibc-20060905T0633/localedata/Makefile	26 Apr 2006 05:14:03 -0000	1.103
-+++ glibc-20060905T0633-fedora/localedata/Makefile	26 Apr 2006 20:18:17 -0000	1.101.2.3
+--- glibc-20060907T0853/localedata/Makefile	26 Apr 2006 05:14:03 -0000	1.103
++++ glibc-20060907T0853-fedora/localedata/Makefile	26 Apr 2006 20:18:17 -0000	1.101.2.3
 @@ -223,6 +223,7 @@ $(INSTALL-SUPPORTED-LOCALES): install-lo
  	echo -n '...'; \
  	input=`echo $$locale | sed 's/\([^.]*\)[^@]*\(.*\)/\1\2/'`; \
@@ -806,8 +822,8 @@
  		     -i locales/$$input -c -f charmaps/$$charset \
  		     $(addprefix --prefix=,$(install_root)) $$locale; \
  	echo ' done'; \
---- glibc-20060905T0633/localedata/SUPPORTED	13 Aug 2006 20:15:25 -0000	1.96
-+++ glibc-20060905T0633-fedora/localedata/SUPPORTED	15 Aug 2006 05:53:48 -0000	1.71.2.13
+--- glibc-20060907T0853/localedata/SUPPORTED	13 Aug 2006 20:15:25 -0000	1.96
++++ glibc-20060907T0853-fedora/localedata/SUPPORTED	15 Aug 2006 05:53:48 -0000	1.71.2.13
 @@ -77,6 +77,7 @@ cy_GB.UTF-8/UTF-8 \
  cy_GB/ISO-8859-14 \
  da_DK.UTF-8/UTF-8 \
@@ -849,8 +865,8 @@
  ta_IN/UTF-8 \
  te_IN/UTF-8 \
  tg_TJ.UTF-8/UTF-8 \
---- glibc-20060905T0633/localedata/locales/cy_GB	28 Sep 2004 04:37:33 -0000	1.4
-+++ glibc-20060905T0633-fedora/localedata/locales/cy_GB	29 Sep 2004 08:48:23 -0000	1.3.2.2
+--- glibc-20060907T0853/localedata/locales/cy_GB	28 Sep 2004 04:37:33 -0000	1.4
++++ glibc-20060907T0853-fedora/localedata/locales/cy_GB	29 Sep 2004 08:48:23 -0000	1.3.2.2
 @@ -248,8 +248,11 @@ mon         "<U0049><U006F><U006E><U0061
  d_t_fmt     "<U0044><U0079><U0064><U0064><U0020><U0025><U0041><U0020><U0025><U0064><U0020><U006d><U0069><U0073><U0020><U0025><U0042><U0020><U0025><U0059><U0020><U0025><U0054><U0020><U0025><U005A>"
  d_fmt       "<U0025><U0064><U002E><U0025><U006D><U002E><U0025><U0079>"
@@ -865,8 +881,8 @@
  END LC_TIME
  
  LC_MESSAGES
---- glibc-20060905T0633/localedata/locales/en_GB	30 Jul 2006 22:19:44 -0000	1.13
-+++ glibc-20060905T0633-fedora/localedata/locales/en_GB	31 Jul 2006 07:16:59 -0000	1.10.2.3
+--- glibc-20060907T0853/localedata/locales/en_GB	30 Jul 2006 22:19:44 -0000	1.13
++++ glibc-20060907T0853-fedora/localedata/locales/en_GB	31 Jul 2006 07:16:59 -0000	1.10.2.3
 @@ -116,8 +116,8 @@ mon         "<U004A><U0061><U006E><U0075
  d_t_fmt     "<U0025><U0061><U0020><U0025><U0064><U0020><U0025><U0062><U0020><U0025><U0059><U0020><U0025><U0054><U0020><U0025><U005A>"
  d_fmt       "<U0025><U0064><U002F><U0025><U006D><U002F><U0025><U0079>"
@@ -878,8 +894,8 @@
  date_fmt	"<U0025><U0061><U0020><U0025><U0062><U0020><U0025><U0065>/
  <U0020><U0025><U0048><U003A><U0025><U004D><U003A><U0025><U0053><U0020>/
  <U0025><U005A><U0020><U0025><U0059>"
---- glibc-20060905T0633/localedata/locales/no_NO 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060905T0633-fedora/localedata/locales/no_NO	22 Sep 2004 21:21:01 -0000	1.11.2.1
+--- glibc-20060907T0853/localedata/locales/no_NO 1 Jan 1970 00:00:00 -0000
++++ glibc-20060907T0853-fedora/localedata/locales/no_NO	22 Sep 2004 21:21:01 -0000	1.11.2.1
 @@ -0,0 +1,69 @@
 +escape_char	/
 +comment_char    %
@@ -950,8 +966,8 @@
 +LC_ADDRESS
 +copy "nb_NO"
 +END LC_ADDRESS
---- glibc-20060905T0633/localedata/locales/zh_TW	31 Oct 2004 23:42:28 -0000	1.7
-+++ glibc-20060905T0633-fedora/localedata/locales/zh_TW	2 Nov 2004 12:25:57 -0000	1.5.2.2
+--- glibc-20060907T0853/localedata/locales/zh_TW	31 Oct 2004 23:42:28 -0000	1.7
++++ glibc-20060907T0853-fedora/localedata/locales/zh_TW	2 Nov 2004 12:25:57 -0000	1.5.2.2
 @@ -1,7 +1,7 @@
  comment_char %
  escape_char /
@@ -979,8 +995,8 @@
  revision   "0.2"
  date       "2000-08-02"
  %
---- glibc-20060905T0633/malloc/mcheck.c	8 Sep 2004 20:36:02 -0000	1.18
-+++ glibc-20060905T0633-fedora/malloc/mcheck.c	20 Dec 2005 10:59:21 -0000	1.18.2.1
+--- glibc-20060907T0853/malloc/mcheck.c	8 Sep 2004 20:36:02 -0000	1.18
++++ glibc-20060907T0853-fedora/malloc/mcheck.c	20 Dec 2005 10:59:21 -0000	1.18.2.1
 @@ -24,9 +24,25 @@
  # include <mcheck.h>
  # include <stdint.h>
@@ -1056,8 +1072,8 @@
  
        old_free_hook = __free_hook;
        __free_hook = freehook;
---- glibc-20060905T0633/malloc/mtrace.c	14 Sep 2004 04:24:46 -0000	1.41
-+++ glibc-20060905T0633-fedora/malloc/mtrace.c	20 Dec 2005 10:59:21 -0000	1.41.2.1
+--- glibc-20060907T0853/malloc/mtrace.c	14 Sep 2004 04:24:46 -0000	1.41
++++ glibc-20060907T0853-fedora/malloc/mtrace.c	20 Dec 2005 10:59:21 -0000	1.41.2.1
 @@ -40,6 +40,18 @@
  # include <libio/iolibio.h>
  # define setvbuf(s, b, f, l) INTUSE(_IO_setvbuf) (s, b, f, l)
@@ -1113,17 +1129,17 @@
    __memalign_hook = tr_memalignhook;
    __malloc_hook = tr_mallochook;
  
---- glibc-20060905T0633/nis/nss	28 Apr 2006 21:02:23 -0000	1.3
-+++ glibc-20060905T0633-fedora/nis/nss	1 May 2006 08:02:53 -0000	1.2.2.2
+--- glibc-20060907T0853/nis/nss	28 Apr 2006 21:02:23 -0000	1.3
++++ glibc-20060907T0853-fedora/nis/nss	1 May 2006 08:02:53 -0000	1.2.2.2
 @@ -25,4 +25,4 @@
  #  memory with every getXXent() call.  Otherwise each getXXent() call
  #  might result into a network communication with the server to get
  #  the next entry.
 -#SETENT_BATCH_READ=TRUE
 +SETENT_BATCH_READ=TRUE
---- glibc-20060905T0633/nptl/ChangeLog	31 Aug 2006 17:16:11 -0000	1.915
-+++ glibc-20060905T0633-fedora/nptl/ChangeLog	31 Aug 2006 18:54:54 -0000	1.706.2.102
-@@ -1064,6 +1064,15 @@
+--- glibc-20060907T0853/nptl/ChangeLog	5 Sep 2006 17:18:23 -0000	1.918
++++ glibc-20060907T0853-fedora/nptl/ChangeLog	7 Sep 2006 09:04:05 -0000	1.706.2.103
+@@ -1110,6 +1110,15 @@
  	Use __sigfillset.  Document that sigfillset does the right thing wrt
  	to SIGSETXID.
  
@@ -1139,7 +1155,7 @@
  2005-07-11  Jakub Jelinek  <jakub@redhat.com>
  
  	[BZ #1102]
-@@ -1800,6 +1809,11 @@
+@@ -1846,6 +1855,11 @@
  	Move definition inside libpthread, libc, librt check.  Provide
  	definition for rtld.
  
@@ -1151,7 +1167,7 @@
  2004-09-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/alpha/jmpbuf-unwind.h: Define __libc_unwind_longjmp.
-@@ -3874,6 +3888,11 @@
+@@ -3920,6 +3934,11 @@
  
  	* Makefile [$(build-shared) = yes] (tests): Depend on $(test-modules).
  
@@ -1163,8 +1179,8 @@
  2003-07-25  Jakub Jelinek  <jakub@redhat.com>
  
  	* tst-cancel17.c (do_test): Check if aio_cancel failed.
---- glibc-20060905T0633/nptl/Makefile	21 Aug 2006 21:02:10 -0000	1.186
-+++ glibc-20060905T0633-fedora/nptl/Makefile	22 Aug 2006 09:05:40 -0000	1.157.2.26
+--- glibc-20060907T0853/nptl/Makefile	5 Sep 2006 17:14:52 -0000	1.187
++++ glibc-20060907T0853-fedora/nptl/Makefile	7 Sep 2006 09:04:05 -0000	1.157.2.27
 @@ -524,15 +524,19 @@ $(addprefix $(objpfx), \
      $(tests) $(xtests) $(test-srcs))): $(objpfx)libpthread.so \
  				       $(objpfx)libpthread_nonshared.a
@@ -1187,8 +1203,8 @@
  else
  $(addprefix $(objpfx),$(tests) $(test-srcs)): $(objpfx)libpthread.a
  endif
---- glibc-20060905T0633/nptl/tst-stackguard1.c	26 Jun 2005 17:44:14 -0000	1.1
-+++ glibc-20060905T0633-fedora/nptl/tst-stackguard1.c	8 Aug 2005 21:24:28 -0000	1.1.2.3
+--- glibc-20060907T0853/nptl/tst-stackguard1.c	26 Jun 2005 17:44:14 -0000	1.1
++++ glibc-20060907T0853-fedora/nptl/tst-stackguard1.c	8 Aug 2005 21:24:28 -0000	1.1.2.3
 @@ -190,17 +190,21 @@ do_test (void)
       the 16 runs, something is very wrong.  */
    int ndifferences = 0;
@@ -1213,8 +1229,8 @@
      {
        puts ("stack guard canaries are not randomized enough");
        puts ("nor equal to the default canary value");
---- glibc-20060905T0633/nptl/sysdeps/unix/sysv/linux/kernel-features.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060905T0633-fedora/nptl/sysdeps/unix/sysv/linux/kernel-features.h	22 Sep 2004 21:21:02 -0000	1.1.2.1
+--- glibc-20060907T0853/nptl/sysdeps/unix/sysv/linux/kernel-features.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060907T0853-fedora/nptl/sysdeps/unix/sysv/linux/kernel-features.h	22 Sep 2004 21:21:02 -0000	1.1.2.1
 @@ -0,0 +1,6 @@
 +#include_next <kernel-features.h>
 +
@@ -1222,1222 +1238,8 @@
 +#ifndef __ASSUME_CLONE_THREAD_FLAGS
 +# define __ASSUME_CLONE_THREAD_FLAGS	1
 +#endif
---- glibc-20060905T0633/nptl/sysdeps/unix/sysv/linux/i386/lowlevellock.h	29 Jul 2006 04:35:59 -0000	1.31
-+++ glibc-20060905T0633-fedora/nptl/sysdeps/unix/sysv/linux/i386/lowlevellock.h	29 Jul 2006 23:12:42 -0000	1.25.2.6
-@@ -68,6 +68,88 @@
- #define BUSY_WAIT_NOP          asm ("rep; nop")
- 
- 
-+#ifdef USE_CFA_VAL_EXPRESSION
-+# define LLL_STUB_UNWIND_INFO_START \
-+	".section	.eh_frame,\"a\",@progbits\n"		\
-+"5:\t"	".long	7f-6f	# Length of Common Information Entry\n"	\
-+"6:\t"	".long	0x0	# CIE Identifier Tag\n\t"		\
-+	".byte	0x1	# CIE Version\n\t"			\
-+	".ascii \"zR\\0\"	# CIE Augmentation\n\t"		\
-+	".uleb128 0x1	# CIE Code Alignment Factor\n\t"	\
-+	".sleb128 -4	# CIE Data Alignment Factor\n\t"	\
-+	".byte	0x8	# CIE RA Column\n\t"			\
-+	".uleb128 0x1	# Augmentation size\n\t"		\
-+	".byte	0x1b	# FDE Encoding (pcrel sdata4)\n\t"	\
-+	".byte	0xc	# DW_CFA_def_cfa\n\t"			\
-+	".uleb128 0x4\n\t"					\
-+	".uleb128 0x0\n\t"					\
-+	".align 4\n"						\
-+"7:\t"	".long	17f-8f	# FDE Length\n"				\
-+"8:\t"	".long	8b-5b	# FDE CIE offset\n\t"			\
-+	".long	1b-.	# FDE initial location\n\t"		\
-+	".long	4b-1b	# FDE address range\n\t"		\
-+	".uleb128 0x0	# Augmentation size\n\t"		\
-+	".byte	0x16	# DW_CFA_val_expression\n\t"		\
-+	".uleb128 0x8\n\t"					\
-+	".uleb128 10f-9f\n"					\
-+"9:\t"	".byte	0x78	# DW_OP_breg8\n\t"			\
-+	".sleb128 3b-1b\n"
-+# define LLL_STUB_UNWIND_INFO_END \
-+	".byte	0x16	# DW_CFA_val_expression\n\t"		\
-+	".uleb128 0x8\n\t"					\
-+	".uleb128 12f-11f\n"					\
-+"11:\t"	".byte	0x78	# DW_OP_breg8\n\t"			\
-+	".sleb128 3b-2b\n"					\
-+"12:\t"	".byte	0x40 + (3b-2b-1) # DW_CFA_advance_loc\n\t"	\
-+	".byte	0x16	# DW_CFA_val_expression\n\t"		\
-+	".uleb128 0x8\n\t"					\
-+	".uleb128 16f-13f\n"					\
-+"13:\t"	".byte	0x78	# DW_OP_breg8\n\t"			\
-+	".sleb128 15f-14f\n\t"					\
-+	".byte	0x0d	# DW_OP_const4s\n"			\
-+"14:\t"	".4byte	3b-.\n\t"					\
-+	".byte	0x1c	# DW_OP_minus\n\t"			\
-+	".byte	0x0d	# DW_OP_const4s\n"			\
-+"15:\t"	".4byte	18f-.\n\t"					\
-+	".byte	0x22	# DW_OP_plus\n"				\
-+"16:\t"	".align 4\n"						\
-+"17:\t"	".previous\n"
-+
-+/* Unwind info for
-+   1: lea ..., ...
-+   2: call ...
-+   3: jmp 18f
-+   4:
-+   snippet.  */
-+# define LLL_STUB_UNWIND_INFO_3 \
-+LLL_STUB_UNWIND_INFO_START					\
-+"10:\t"	".byte	0x40 + (2b-1b) # DW_CFA_advance_loc\n\t"	\
-+LLL_STUB_UNWIND_INFO_END
-+
-+/* Unwind info for
-+   1: lea ..., ...
-+   0: movl ..., ...
-+   2: call ...
-+   3: jmp 18f
-+   4:
-+   snippet.  */
-+# define LLL_STUB_UNWIND_INFO_4 \
-+LLL_STUB_UNWIND_INFO_START					\
-+"10:\t"	".byte	0x40 + (0b-1b) # DW_CFA_advance_loc\n\t"	\
-+	".byte	0x16	# DW_CFA_val_expression\n\t"		\
-+	".uleb128 0x8\n\t"					\
-+	".uleb128 20f-19f\n"					\
-+"19:\t"	".byte	0x78	# DW_OP_breg8\n\t"			\
-+	".sleb128 3b-0b\n"					\
-+"20:\t"	".byte	0x40 + (2b-0b) # DW_CFA_advance_loc\n\t"	\
-+LLL_STUB_UNWIND_INFO_END
-+
-+#else
-+# define LLL_STUB_UNWIND_INFO_3
-+# define LLL_STUB_UNWIND_INFO_4
-+#endif
-+
-+
- #define lll_futex_wait(futex, val) \
-   ({									      \
-     int __status;							      \
-@@ -168,13 +250,14 @@ extern int __lll_mutex_unlock_wake (int 
- 			      "jnz _L_mutex_lock_%=\n\t"		      \
- 			      ".subsection 1\n\t"			      \
- 			      ".type _L_mutex_lock_%=,@function\n"	      \
--			      "_L_mutex_lock_%=:\n\t"			      \
--			      "leal %2, %%ecx\n\t"			      \
--			      "call __lll_mutex_lock_wait\n\t"		      \
--			      "jmp 1f\n\t"				      \
--			      ".size _L_mutex_lock_%=,.-_L_mutex_lock_%=\n"   \
-+			      "_L_mutex_lock_%=:\n"			      \
-+			      "1:\tleal %2, %%ecx\n"			      \
-+			      "2:\tcall __lll_mutex_lock_wait\n"	      \
-+			      "3:\tjmp 18f\n"				      \
-+			      "4:\t.size _L_mutex_lock_%=, 4b-1b\n\t"	      \
- 			      ".previous\n"				      \
--			      "1:"					      \
-+			      LLL_STUB_UNWIND_INFO_3			      \
-+			      "18:"					      \
- 			      : "=a" (ignore1), "=c" (ignore2), "=m" (futex)  \
- 			      : "0" (0), "1" (1), "m" (futex)		      \
- 			      : "memory"); })
-@@ -183,16 +266,17 @@ extern int __lll_mutex_unlock_wake (int 
- #define lll_robust_mutex_lock(futex, id) \
-   ({ int result, ignore;						      \
-      __asm __volatile (LOCK_INSTR "cmpxchgl %1, %2\n\t"			      \
--		       "jnz _L_mutex_lock_%=\n\t"			      \
-+		       "jnz _L_robust_mutex_lock_%=\n\t"		      \
- 		       ".subsection 1\n\t"				      \
--		       ".type _L_mutex_lock_%=,@function\n"		      \
--		       "_L_mutex_lock_%=:\n\t"				      \
--		       "leal %2, %%ecx\n\t"				      \
--		       "call __lll_robust_mutex_lock_wait\n\t"		      \
--		       "jmp 1f\n\t"					      \
--		       ".size _L_mutex_lock_%=,.-_L_mutex_lock_%=\n"	      \
-+		       ".type _L_robust_mutex_lock_%=,@function\n"	      \
-+		       "_L_robust_mutex_lock_%=:\n"			      \
-+		       "1:\tleal %2, %%ecx\n"				      \
-+		       "2:\tcall __lll_robust_mutex_lock_wait\n"	      \
-+		       "3:\tjmp 18f\n"					      \
-+		       "4:\t.size _L_robust_mutex_lock_%=, 4b-1b\n\t"	      \
- 		       ".previous\n"					      \
--		       "1:"						      \
-+		       LLL_STUB_UNWIND_INFO_3				      \
-+		       "18:"						      \
- 		       : "=a" (result), "=c" (ignore), "=m" (futex)	      \
- 		       : "0" (0), "1" (id), "m" (futex)			      \
- 		       : "memory");					      \
-@@ -207,13 +291,14 @@ extern int __lll_mutex_unlock_wake (int 
- 			      "jnz _L_mutex_cond_lock_%=\n\t"		      \
- 			      ".subsection 1\n\t"			      \
- 			      ".type _L_mutex_cond_lock_%=,@function\n"	      \
--			      "_L_mutex_cond_lock_%=:\n\t"		      \
--			      "leal %2, %%ecx\n\t"			      \
--			      "call __lll_mutex_lock_wait\n\t"		      \
--			      "jmp 1f\n\t"				      \
--			      ".size _L_mutex_cond_lock_%=,.-_L_mutex_cond_lock_%=\n"   \
-+			      "_L_mutex_cond_lock_%=:\n"		      \
-+			      "1:\tleal %2, %%ecx\n"			      \
-+			      "2:\tcall __lll_mutex_lock_wait\n"	      \
-+			      "3:\tjmp 18f\n"				      \
-+			      "4:\t.size _L_mutex_cond_lock_%=, 4b-1b\n\t"    \
- 			      ".previous\n"				      \
--			      "1:"					      \
-+			      LLL_STUB_UNWIND_INFO_3			      \
-+			      "18:"					      \
- 			      : "=a" (ignore1), "=c" (ignore2), "=m" (futex)  \
- 			      : "0" (0), "1" (2), "m" (futex)		      \
- 			      : "memory"); })
-@@ -222,16 +307,17 @@ extern int __lll_mutex_unlock_wake (int 
- #define lll_robust_mutex_cond_lock(futex, id) \
-   ({ int result, ignore;						      \
-      __asm __volatile (LOCK_INSTR "cmpxchgl %1, %2\n\t"			      \
--		       "jnz _L_mutex_cond_lock_%=\n\t"			      \
-+		       "jnz _L_robust_mutex_cond_lock_%=\n\t"		      \
- 		       ".subsection 1\n\t"				      \
--		       ".type _L_mutex_cond_lock_%=,@function\n"	      \
--		       "_L_mutex_cond_lock_%=:\n\t"			      \
--		       "leal %2, %%ecx\n\t"				      \
--		       "call __lll_robust_mutex_lock_wait\n\t"		      \
--		       "jmp 1f\n\t"					      \
--		       ".size _L_mutex_cond_lock_%=,.-_L_mutex_cond_lock_%=\n"\
-+		       ".type _L_robust_mutex_cond_lock_%=,@function\n"	      \
-+		       "_L_robust_mutex_cond_lock_%=:\n"		      \
-+		       "1:\tleal %2, %%ecx\n"				      \
-+		       "2:\tcall __lll_robust_mutex_lock_wait\n"	      \
-+		       "3:\tjmp 18f\n"					      \
-+		       "4:\t.size _L_robust_mutex_cond_lock_%=, 4b-1b\n\t"    \
- 		       ".previous\n"					      \
--		       "1:"						      \
-+		       LLL_STUB_UNWIND_INFO_3				      \
-+		       "18:"						      \
- 		       : "=a" (result), "=c" (ignore), "=m" (futex)	      \
- 		       : "0" (0), "1" (id | FUTEX_WAITERS), "m" (futex)	      \
- 		       : "memory");					      \
-@@ -244,14 +330,15 @@ extern int __lll_mutex_unlock_wake (int 
- 		       "jnz _L_mutex_timedlock_%=\n\t"			      \
- 		       ".subsection 1\n\t"				      \
- 		       ".type _L_mutex_timedlock_%=,@function\n"	      \
--		       "_L_mutex_timedlock_%=:\n\t"			      \
--		       "leal %3, %%ecx\n\t"				      \
--		       "movl %7, %%edx\n\t"				      \
--		       "call __lll_mutex_timedlock_wait\n\t"		      \
--		       "jmp 1f\n\t"					      \
--		       ".size _L_mutex_timedlock_%=,.-_L_mutex_timedlock_%=\n"\
-+		       "_L_mutex_timedlock_%=:\n"			      \
-+		       "1:\tleal %3, %%ecx\n"				      \
-+		       "0:\tmovl %7, %%edx\n"				      \
-+		       "2:\tcall __lll_mutex_timedlock_wait\n"		      \
-+		       "3:\tjmp 18f\n"					      \
-+		       "4:\t.size _L_mutex_timedlock_%=, 4b-1b\n\t"	      \
- 		       ".previous\n"					      \
--		       "1:"						      \
-+		       LLL_STUB_UNWIND_INFO_4				      \
-+		       "18:"						      \
- 		       : "=a" (result), "=c" (ignore1), "=&d" (ignore2),      \
- 			 "=m" (futex)					      \
- 		       : "0" (0), "1" (1), "m" (futex), "m" (timeout)	      \
-@@ -262,17 +349,18 @@ extern int __lll_mutex_unlock_wake (int 
- #define lll_robust_mutex_timedlock(futex, timeout, id) \
-   ({ int result, ignore1, ignore2;					      \
-      __asm __volatile (LOCK_INSTR "cmpxchgl %1, %3\n\t"			      \
--		       "jnz _L_mutex_timedlock_%=\n\t"			      \
-+		       "jnz _L_robust_mutex_timedlock_%=\n\t"		      \
- 		       ".subsection 1\n\t"				      \
--		       ".type _L_mutex_timedlock_%=,@function\n"	      \
--		       "_L_mutex_timedlock_%=:\n\t"			      \
--		       "leal %3, %%ecx\n\t"				      \
--		       "movl %7, %%edx\n\t"				      \
--		       "call __lll_robust_mutex_timedlock_wait\n\t"	      \
--		       "jmp 1f\n\t"					      \
--		       ".size _L_mutex_timedlock_%=,.-_L_mutex_timedlock_%=\n"\
-+		       ".type _L_robust_mutex_timedlock_%=,@function\n"	      \
-+		       "_L_robust_mutex_timedlock_%=:\n"		      \
-+		       "1:\tleal %3, %%ecx\n"				      \
-+		       "0:\tmovl %7, %%edx\n"				      \
-+		       "2:\tcall __lll_robust_mutex_timedlock_wait\n"	      \
-+		       "3:\tjmp 18f\n"					      \
-+		       "4:\t.size _L_robust_mutex_timedlock_%=, 4b-1b\n\t"    \
- 		       ".previous\n"					      \
--		       "1:"						      \
-+		       LLL_STUB_UNWIND_INFO_4				      \
-+		       "18:"						      \
- 		       : "=a" (result), "=c" (ignore1), "=&d" (ignore2),      \
- 			 "=m" (futex)					      \
- 		       : "0" (0), "1" (id), "m" (futex), "m" (timeout)	      \
-@@ -286,13 +374,14 @@ extern int __lll_mutex_unlock_wake (int 
- 			      "jne _L_mutex_unlock_%=\n\t"		      \
- 			      ".subsection 1\n\t"			      \
- 			      ".type _L_mutex_unlock_%=,@function\n"	      \
--			      "_L_mutex_unlock_%=:\n\t"			      \
--			      "leal %0, %%eax\n\t"			      \
--			      "call __lll_mutex_unlock_wake\n\t"	      \
--			      "jmp 1f\n\t"				      \
--			      ".size _L_mutex_unlock_%=,.-_L_mutex_unlock_%=\n" \
-+			      "_L_mutex_unlock_%=:\n"			      \
-+			      "1:\tleal %0, %%eax\n"			      \
-+			      "2:\tcall __lll_mutex_unlock_wake\n"	      \
-+			      "3:\tjmp 18f\n"				      \
-+			      "4:\t.size _L_mutex_unlock_%=, 4b-1b\n\t"	      \
- 			      ".previous\n"				      \
--			      "1:"					      \
-+			      LLL_STUB_UNWIND_INFO_3			      \
-+			      "18:"					      \
- 			      : "=m" (futex), "=&a" (ignore)		      \
- 			      : "m" (futex)				      \
- 			      : "memory"); })
-@@ -301,16 +390,17 @@ extern int __lll_mutex_unlock_wake (int 
- #define lll_robust_mutex_unlock(futex) \
-   (void) ({ int ignore;							      \
-             __asm __volatile (LOCK_INSTR "andl %2, %0\n\t"		      \
--			      "jne _L_mutex_unlock_%=\n\t"		      \
-+			      "jne _L_robust_mutex_unlock_%=\n\t"	      \
- 			      ".subsection 1\n\t"			      \
--			      ".type _L_mutex_unlock_%=,@function\n"	      \
--			      "_L_mutex_unlock_%=:\n\t"			      \
--			      "leal %0, %%eax\n\t"			      \
--			      "call __lll_mutex_unlock_wake\n\t"	      \
--			      "jmp 1f\n\t"				      \
--			      ".size _L_mutex_unlock_%=,.-_L_mutex_unlock_%=\n" \
-+			      ".type _L_robust_mutex_unlock_%=,@function\n"   \
-+			      "_L_robust_mutex_unlock_%=:\n\t"		      \
-+			      "1:\tleal %0, %%eax\n"			      \
-+			      "2:\tcall __lll_mutex_unlock_wake\n"	      \
-+			      "3:\tjmp 18f\n"				      \
-+			      "4:\t.size _L_robust_mutex_unlock_%=, 4b-1b\n\t"\
- 			      ".previous\n"				      \
--			      "1:"					      \
-+			      LLL_STUB_UNWIND_INFO_3			      \
-+			      "18:"					      \
- 			      : "=m" (futex), "=&a" (ignore)		      \
- 			      : "i" (FUTEX_WAITERS), "m" (futex)	      \
- 			      : "memory"); })
-@@ -404,16 +494,17 @@ extern int lll_unlock_wake_cb (int *__fu
- 			      "je 0f\n\t"				      \
- 			      "lock\n"					      \
- 			      "0:\tcmpxchgl %1, %2\n\t"			      \
--			      "jnz _L_mutex_lock_%=\n\t"		      \
-+			      "jnz _L_lock_%=\n\t"			      \
- 			      ".subsection 1\n\t"			      \
--			      ".type _L_mutex_lock_%=,@function\n"	      \
--			      "_L_mutex_lock_%=:\n\t"			      \
--			      "leal %2, %%ecx\n\t"			      \
--			      "call __lll_mutex_lock_wait\n\t"		      \
--			      "jmp 1f\n\t"				      \
--			      ".size _L_mutex_lock_%=,.-_L_mutex_lock_%=\n"   \
-+			      ".type _L_lock_%=,@function\n"		      \
-+			      "_L_lock_%=:\n"				      \
-+			      "1:\tleal %2, %%ecx\n"			      \
-+			      "2:\tcall __lll_mutex_lock_wait\n"	      \
-+			      "3:\tjmp 18f\n"				      \
-+			      "4:\t.size _L_lock_%=, 4b-1b\n\t"		      \
- 			      ".previous\n"				      \
--			      "1:"					      \
-+			      LLL_STUB_UNWIND_INFO_3			      \
-+			      "18:"					      \
- 			      : "=a" (ignore1), "=c" (ignore2), "=m" (futex)  \
- 			      : "0" (0), "1" (1), "m" (futex),		      \
- 		                "i" (offsetof (tcbhead_t, multiple_threads))  \
-@@ -425,17 +516,18 @@ extern int lll_unlock_wake_cb (int *__fu
-             __asm __volatile ("cmpl $0, %%gs:%P3\n\t"			      \
- 			      "je 0f\n\t"				      \
- 			      "lock\n"					      \
--			      "0:\tsubl $1,%0\n\t"		      \
--			      "jne _L_mutex_unlock_%=\n\t"		      \
-+			      "0:\tsubl $1,%0\n\t"			      \
-+			      "jne _L_unlock_%=\n\t"			      \
- 			      ".subsection 1\n\t"			      \
--			      ".type _L_mutex_unlock_%=,@function\n"	      \
--			      "_L_mutex_unlock_%=:\n\t"			      \
--			      "leal %0, %%eax\n\t"			      \
--			      "call __lll_mutex_unlock_wake\n\t"	      \
--			      "jmp 1f\n\t"				      \
--			      ".size _L_mutex_unlock_%=,.-_L_mutex_unlock_%=\n" \
-+			      ".type _L_unlock_%=,@function\n"		      \
-+			      "_L_unlock_%=:\n"				      \
-+			      "1:\tleal %0, %%eax\n"			      \
-+			      "2:\tcall __lll_mutex_unlock_wake\n"	      \
-+			      "3:\tjmp 18f\n\t"				      \
-+			      "4:\t.size _L_unlock_%=, 4b-1b\n\t"	      \
- 			      ".previous\n"				      \
--			      "1:"					      \
-+			      LLL_STUB_UNWIND_INFO_3			      \
-+			      "18:"					      \
- 			      : "=m" (futex), "=&a" (ignore)		      \
- 			      : "m" (futex),				      \
- 				"i" (offsetof (tcbhead_t, multiple_threads))  \
---- glibc-20060905T0633/nptl/sysdeps/unix/sysv/linux/i386/i486/lowlevellock.S	9 Apr 2006 02:42:29 -0000	1.15
-+++ glibc-20060905T0633-fedora/nptl/sysdeps/unix/sysv/linux/i386/i486/lowlevellock.S	24 Apr 2006 08:55:43 -0000	1.13.2.3
-@@ -1,4 +1,4 @@
--/* Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
-+/* Copyright (C) 2002, 2003, 2004, 2006 Free Software Foundation, Inc.
-    This file is part of the GNU C Library.
-    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
- 
-@@ -41,9 +41,16 @@
- 	.hidden	__lll_mutex_lock_wait
- 	.align	16
- __lll_mutex_lock_wait:
-+	cfi_startproc
- 	pushl	%edx
-+	cfi_adjust_cfa_offset(4)
- 	pushl	%ebx
-+	cfi_adjust_cfa_offset(4)
- 	pushl	%esi
-+	cfi_adjust_cfa_offset(4)
-+	cfi_offset(%edx, -8)
-+	cfi_offset(%ebx, -12)
-+	cfi_offset(%esi, -16)
- 
- 	movl	$2, %edx
- 	movl	%ecx, %ebx
-@@ -63,9 +70,16 @@ __lll_mutex_lock_wait:
- 	jnz	1b
- 
- 	popl	%esi
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%esi)
- 	popl	%ebx
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%ebx)
- 	popl	%edx
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%edx)
- 	ret
-+	cfi_endproc
- 	.size	__lll_mutex_lock_wait,.-__lll_mutex_lock_wait
- 
- 
-@@ -75,17 +89,27 @@ __lll_mutex_lock_wait:
- 	.hidden	__lll_mutex_timedlock_wait
- 	.align	16
- __lll_mutex_timedlock_wait:
-+	cfi_startproc
- 	/* Check for a valid timeout value.  */
- 	cmpl	$1000000000, 4(%edx)
- 	jae	3f
- 
- 	pushl	%edi
-+	cfi_adjust_cfa_offset(4)
- 	pushl	%esi
-+	cfi_adjust_cfa_offset(4)
- 	pushl	%ebx
-+	cfi_adjust_cfa_offset(4)
- 	pushl	%ebp
-+	cfi_adjust_cfa_offset(4)
-+	cfi_offset(%edi, -8)
-+	cfi_offset(%esi, -12)
-+	cfi_offset(%ebx, -16)
-+	cfi_offset(%ebp, -20)
- 
- 	/* Stack frame for the timespec and timeval structs.  */
- 	subl	$8, %esp
-+	cfi_adjust_cfa_offset(8)
- 
- 	movl	%ecx, %ebp
- 	movl	%edx, %edi
-@@ -140,12 +164,29 @@ __lll_mutex_timedlock_wait:
- 	jnz	7f
- 
- 6:	addl	$8, %esp
-+	cfi_adjust_cfa_offset(-8)
- 	popl	%ebp
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%ebp)
- 	popl	%ebx
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%ebx)
- 	popl	%esi
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%esi)
- 	popl	%edi
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%edi)
- 	ret
- 
-+3:	movl	$EINVAL, %eax
-+	ret
-+
-+	cfi_adjust_cfa_offset(24)
-+	cfi_offset(%edi, -8)
-+	cfi_offset(%esi, -12)
-+	cfi_offset(%ebx, -16)
-+	cfi_offset(%ebp, -20)
- 	/* Check whether the time expired.  */
- 7:	cmpl	$-ETIMEDOUT, %ecx
- 	je	5f
-@@ -157,11 +198,9 @@ __lll_mutex_timedlock_wait:
- 	jz	6b
- 	jmp	1b
- 
--3:	movl	$EINVAL, %eax
--	ret
--
- 5:	movl	$ETIMEDOUT, %eax
- 	jmp	6b
-+	cfi_endproc
- 	.size	__lll_mutex_timedlock_wait,.-__lll_mutex_timedlock_wait
- #endif
- 
-@@ -200,9 +239,16 @@ lll_unlock_wake_cb:
- 	.hidden	__lll_mutex_unlock_wake
- 	.align	16
- __lll_mutex_unlock_wake:
-+	cfi_startproc
- 	pushl	%ebx
-+	cfi_adjust_cfa_offset(4)
- 	pushl	%ecx
-+	cfi_adjust_cfa_offset(4)
- 	pushl	%edx
-+	cfi_adjust_cfa_offset(4)
-+	cfi_offset(%ebx, -8)
-+	cfi_offset(%ecx, -12)
-+	cfi_offset(%edx, -16)
- 
- 	movl	%eax, %ebx
- 	movl	$0, (%eax)
-@@ -212,9 +258,16 @@ __lll_mutex_unlock_wake:
- 	ENTER_KERNEL
- 
- 	popl	%edx
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%edx)
- 	popl	%ecx
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%ecx)
- 	popl	%ebx
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%ebx)
- 	ret
-+	cfi_endproc
- 	.size	__lll_mutex_unlock_wake,.-__lll_mutex_unlock_wake
- 
- 
---- glibc-20060905T0633/nptl/sysdeps/unix/sysv/linux/i386/i486/lowlevelrobustlock.S	2 Mar 2006 00:25:56 -0000	1.2
-+++ glibc-20060905T0633-fedora/nptl/sysdeps/unix/sysv/linux/i386/i486/lowlevelrobustlock.S	6 Mar 2006 07:34:44 -0000	1.1.2.3
-@@ -44,9 +44,16 @@
- 	.hidden	__lll_robust_mutex_lock_wait
- 	.align	16
- __lll_robust_mutex_lock_wait:
-+	cfi_startproc
- 	pushl	%edx
-+	cfi_adjust_cfa_offset(4)
- 	pushl	%ebx
-+	cfi_adjust_cfa_offset(4)
- 	pushl	%esi
-+	cfi_adjust_cfa_offset(4)
-+	cfi_offset(%edx, -8)
-+	cfi_offset(%ebx, -12)
-+	cfi_offset(%esi, -16)
- 
- 	movl	%ecx, %ebx
- 	xorl	%esi, %esi	/* No timeout.  */
-@@ -81,9 +88,16 @@ __lll_robust_mutex_lock_wait:
- 	/* NB:	 %eax == 0 */
- 
- 3:	popl	%esi
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%esi)
- 	popl	%ebx
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%ebx)
- 	popl	%edx
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%edx)
- 	ret
-+	cfi_endproc
- 	.size	__lll_robust_mutex_lock_wait,.-__lll_robust_mutex_lock_wait
- 
- 
-@@ -92,17 +106,27 @@ __lll_robust_mutex_lock_wait:
- 	.hidden	__lll_robust_mutex_timedlock_wait
- 	.align	16
- __lll_robust_mutex_timedlock_wait:
-+	cfi_startproc
- 	/* Check for a valid timeout value.  */
- 	cmpl	$1000000000, 4(%edx)
- 	jae	3f
- 
- 	pushl	%edi
-+	cfi_adjust_cfa_offset(4)
- 	pushl	%esi
-+	cfi_adjust_cfa_offset(4)
- 	pushl	%ebx
-+	cfi_adjust_cfa_offset(4)
- 	pushl	%ebp
-+	cfi_adjust_cfa_offset(4)
-+	cfi_offset(%edi, -8)
-+	cfi_offset(%esi, -12)
-+	cfi_offset(%ebx, -16)
-+	cfi_offset(%ebp, -20)
- 
- 	/* Stack frame for the timespec and timeval structs.  */
- 	subl	$12, %esp
-+	cfi_adjust_cfa_offset(12)
- 
- 	movl	%ecx, %ebp
- 	movl	%edx, %edi
-@@ -170,19 +194,34 @@ __lll_robust_mutex_timedlock_wait:
- 	jnz	7f
- 
- 6:	addl	$12, %esp
-+	cfi_adjust_cfa_offset(-12)
- 	popl	%ebp
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%ebp)
- 	popl	%ebx
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%ebx)
- 	popl	%esi
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%esi)
- 	popl	%edi
-+	cfi_adjust_cfa_offset(-4)
-+	cfi_restore(%edi)
- 	ret
- 
-+3:	movl	$EINVAL, %eax
-+	ret
-+
-+	cfi_adjust_cfa_offset(28)
-+	cfi_offset(%edi, -8)
-+	cfi_offset(%esi, -12)
-+	cfi_offset(%ebx, -16)
-+	cfi_offset(%ebp, -20)
- 	/* Check whether the time expired.  */
- 7:	cmpl	$-ETIMEDOUT, %ecx
- 	jne	1b
- 
- 8:	movl	$ETIMEDOUT, %eax
- 	jmp	6b
--
--3:	movl	$EINVAL, %eax
--	ret
-+	cfi_endproc
- 	.size	__lll_robust_mutex_timedlock_wait,.-__lll_robust_mutex_timedlock_wait
---- glibc-20060905T0633/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.S	31 Mar 2005 10:00:15 -0000	1.14
-+++ glibc-20060905T0633-fedora/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.S	6 Mar 2006 07:33:30 -0000	1.11.2.4
-@@ -1,4 +1,4 @@
--/* Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
-+/* Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
-    This file is part of the GNU C Library.
-    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
- 
-@@ -43,9 +43,13 @@
- 	.hidden	__lll_mutex_lock_wait
- 	.align	16
- __lll_mutex_lock_wait:
-+	cfi_startproc
- 	pushq	%r10
-+	cfi_adjust_cfa_offset(8)
- 	pushq	%rdx
--
-+	cfi_adjust_cfa_offset(8)
-+	cfi_offset(%r10, -16)
-+	cfi_offset(%rdx, -24)
- 	xorq	%r10, %r10	/* No timeout.  */
- 	movl	$2, %edx
- #if FUTEX_WAIT == 0
-@@ -67,8 +71,13 @@ __lll_mutex_lock_wait:
- 	jnz	1b
- 
- 	popq	%rdx
-+	cfi_adjust_cfa_offset(-8)
-+	cfi_restore(%rdx)
- 	popq	%r10
-+	cfi_adjust_cfa_offset(-8)
-+	cfi_restore(%r10)
- 	retq
-+	cfi_endproc
- 	.size	__lll_mutex_lock_wait,.-__lll_mutex_lock_wait
- 
- 
-@@ -78,18 +87,30 @@ __lll_mutex_lock_wait:
- 	.hidden	__lll_mutex_timedlock_wait
- 	.align	16
- __lll_mutex_timedlock_wait:
-+	cfi_startproc
- 	/* Check for a valid timeout value.  */
- 	cmpq	$1000000000, 8(%rdx)
- 	jae	3f
- 
- 	pushq	%r8
-+	cfi_adjust_cfa_offset(8)
- 	pushq	%r9
-+	cfi_adjust_cfa_offset(8)
- 	pushq	%r12
-+	cfi_adjust_cfa_offset(8)
- 	pushq	%r13
-+	cfi_adjust_cfa_offset(8)
- 	pushq	%r14
-+	cfi_adjust_cfa_offset(8)
-+	cfi_offset(%r8, -16)
-+	cfi_offset(%r9, -24)
-+	cfi_offset(%r12, -32)
-+	cfi_offset(%r13, -40)
-+	cfi_offset(%r14, -48)
- 
- 	/* Stack frame for the timespec and timeval structs.  */
- 	subq	$16, %rsp
-+	cfi_adjust_cfa_offset(16)
- 
- 	movq	%rdi, %r12
- 	movq	%rdx, %r13
-@@ -147,13 +168,33 @@ __lll_mutex_timedlock_wait:
- 	jnz	7f
- 
- 6:	addq	$16, %rsp
-+	cfi_adjust_cfa_offset(-16)
- 	popq	%r14
-+	cfi_adjust_cfa_offset(-8)
-+	cfi_restore(%r14)
- 	popq	%r13
-+	cfi_adjust_cfa_offset(-8)
-+	cfi_restore(%r13)
- 	popq	%r12
-+	cfi_adjust_cfa_offset(-8)
-+	cfi_restore(%r12)
- 	popq	%r9
-+	cfi_adjust_cfa_offset(-8)
-+	cfi_restore(%r9)
- 	popq	%r8
-+	cfi_adjust_cfa_offset(-8)
-+	cfi_restore(%r8)
-+	retq
-+
-+3:	movl	$EINVAL, %eax
- 	retq
- 
-+	cfi_adjust_cfa_offset(56)
-+	cfi_offset(%r8, -16)
-+	cfi_offset(%r9, -24)
-+	cfi_offset(%r12, -32)
-+	cfi_offset(%r13, -40)
-+	cfi_offset(%r14, -48)
- 	/* Check whether the time expired.  */
- 7:	cmpq	$-ETIMEDOUT, %rcx
- 	je	5f
-@@ -165,11 +206,9 @@ __lll_mutex_timedlock_wait:
- 	jz	6b
- 	jmp	1b
- 
--3:	movl	$EINVAL, %eax
--	retq
--
- 5:	movl	$ETIMEDOUT, %eax
- 	jmp	6b
-+	cfi_endproc
- 	.size	__lll_mutex_timedlock_wait,.-__lll_mutex_timedlock_wait
- #endif
- 
-@@ -199,8 +238,13 @@ lll_unlock_wake_cb:
- 	.hidden	__lll_mutex_unlock_wake
- 	.align	16
- __lll_mutex_unlock_wake:
-+	cfi_startproc
- 	pushq	%rsi
-+	cfi_adjust_cfa_offset(8)
- 	pushq	%rdx
-+	cfi_adjust_cfa_offset(8)
-+	cfi_offset(%rsi, -16)
-+	cfi_offset(%rdx, -24)
- 
- 	movl	$0, (%rdi)
- 	movl	$FUTEX_WAKE, %esi
-@@ -209,8 +253,13 @@ __lll_mutex_unlock_wake:
- 	syscall
- 
- 	popq	%rdx
-+	cfi_adjust_cfa_offset(-8)
-+	cfi_restore(%rdx)
- 	popq	%rsi
-+	cfi_adjust_cfa_offset(-8)
-+	cfi_restore(%rsi)
- 	retq
-+	cfi_endproc
- 	.size	__lll_mutex_unlock_wake,.-__lll_mutex_unlock_wake
- 
- 
---- glibc-20060905T0633/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.h	29 Jul 2006 04:35:58 -0000	1.27
-+++ glibc-20060905T0633-fedora/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.h	29 Jul 2006 23:12:42 -0000	1.23.2.4
-@@ -49,6 +49,110 @@
- #define BUSY_WAIT_NOP          asm ("rep; nop")
- 
- 
-+#ifdef USE_CFA_VAL_EXPRESSION
-+# define LLL_STUB_UNWIND_INFO_START \
-+	".section	.eh_frame,\"a\",@progbits\n" 		\
-+"7:\t"	".long	9f-8f	# Length of Common Information Entry\n" \
-+"8:\t"	".long	0x0	# CIE Identifier Tag\n\t" 		\
-+	".byte	0x1	# CIE Version\n\t" 			\
-+	".ascii \"zR\\0\"	# CIE Augmentation\n\t" 	\
-+	".uleb128 0x1	# CIE Code Alignment Factor\n\t" 	\
-+	".sleb128 -8	# CIE Data Alignment Factor\n\t" 	\
-+	".byte	0x10	# CIE RA Column\n\t" 			\
-+	".uleb128 0x1	# Augmentation size\n\t" 		\
-+	".byte	0x1b	# FDE Encoding (pcrel sdata4)\n\t" 	\
-+	".byte	0x12	# DW_CFA_def_cfa_sf\n\t" 		\
-+	".uleb128 0x7\n\t" 					\
-+	".sleb128 16\n\t" 					\
-+	".align 8\n" 						\
-+"9:\t"	".long	23f-10f	# FDE Length\n" 			\
-+"10:\t"	".long	10b-7b	# FDE CIE offset\n\t" 			\
-+	".long	1b-.	# FDE initial location\n\t" 		\
-+	".long	6b-1b	# FDE address range\n\t" 		\
-+	".uleb128 0x0	# Augmentation size\n\t" 		\
-+	".byte	0x16	# DW_CFA_val_expression\n\t" 		\
-+	".uleb128 0x10\n\t" 					\
-+	".uleb128 12f-11f\n" 					\
-+"11:\t"	".byte	0x80	# DW_OP_breg16\n\t" 			\
-+	".sleb128 4b-1b\n"
-+# define LLL_STUB_UNWIND_INFO_END \
-+	".byte	0x16	# DW_CFA_val_expression\n\t" 		\
-+	".uleb128 0x10\n\t" 					\
-+	".uleb128 14f-13f\n" 					\
-+"13:\t"	".byte	0x80	# DW_OP_breg16\n\t" 			\
-+	".sleb128 4b-2b\n" 					\
-+"14:\t"	".byte	0x40 + (3b-2b) # DW_CFA_advance_loc\n\t" 	\
-+	".byte	0x0e	# DW_CFA_def_cfa_offset\n\t" 		\
-+	".uleb128 0\n\t" 					\
-+	".byte	0x16	# DW_CFA_val_expression\n\t" 		\
-+	".uleb128 0x10\n\t" 					\
-+	".uleb128 16f-15f\n" 					\
-+"15:\t"	".byte	0x80	# DW_OP_breg16\n\t" 			\
-+	".sleb128 4b-3b\n" 					\
-+"16:\t"	".byte	0x40 + (4b-3b-1) # DW_CFA_advance_loc\n\t" 	\
-+	".byte	0x0e	# DW_CFA_def_cfa_offset\n\t" 		\
-+	".uleb128 128\n\t" 					\
-+	".byte	0x16	# DW_CFA_val_expression\n\t" 		\
-+	".uleb128 0x10\n\t" 					\
-+	".uleb128 20f-17f\n" 					\
-+"17:\t"	".byte	0x80	# DW_OP_breg16\n\t" 			\
-+	".sleb128 19f-18f\n\t" 					\
-+	".byte	0x0d	# DW_OP_const4s\n" 			\
-+"18:\t"	".4byte	4b-.\n\t" 					\
-+	".byte	0x1c	# DW_OP_minus\n\t" 			\
-+	".byte	0x0d	# DW_OP_const4s\n" 			\
-+"19:\t"	".4byte	24f-.\n\t" 					\
-+	".byte	0x22	# DW_OP_plus\n" 			\
-+"20:\t"	".byte	0x40 + (5b-4b+1) # DW_CFA_advance_loc\n\t" 	\
-+	".byte	0x13	# DW_CFA_def_cfa_offset_sf\n\t" 	\
-+	".sleb128 16\n\t" 					\
-+	".byte	0x16	# DW_CFA_val_expression\n\t" 		\
-+	".uleb128 0x10\n\t" 					\
-+	".uleb128 22f-21f\n" 					\
-+"21:\t"	".byte	0x80	# DW_OP_breg16\n\t" 			\
-+	".sleb128 4b-5b\n" 					\
-+"22:\t"	".align 8\n" 						\
-+"23:\t"	".previous\n"
-+
-+/* Unwind info for
-+   1: leaq ..., %rdi
-+   2: subq $128, %rsp
-+   3: callq ...
-+   4: addq $128, %rsp
-+   5: jmp 24f
-+   6:
-+   snippet.  */
-+# define LLL_STUB_UNWIND_INFO_5 \
-+LLL_STUB_UNWIND_INFO_START					\
-+"12:\t"	".byte	0x40 + (2b-1b) # DW_CFA_advance_loc\n\t" 	\
-+LLL_STUB_UNWIND_INFO_END
-+
-+/* Unwind info for
-+   1: leaq ..., %rdi
-+   0: movq ..., %rdx
-+   2: subq $128, %rsp
-+   3: callq ...
-+   4: addq $128, %rsp
-+   5: jmp 24f
-+   6:
-+   snippet.  */
-+# define LLL_STUB_UNWIND_INFO_6 \
-+LLL_STUB_UNWIND_INFO_START					\
-+"12:\t"	".byte	0x40 + (0b-1b) # DW_CFA_advance_loc\n\t" 	\
-+	".byte	0x16	# DW_CFA_val_expression\n\t" 		\
-+	".uleb128 0x10\n\t" 					\
-+	".uleb128 26f-25f\n" 					\
-+"25:\t"	".byte	0x80	# DW_OP_breg16\n\t" 			\
-+	".sleb128 4b-0b\n" 					\
-+"26:\t"	".byte	0x40 + (2b-0b) # DW_CFA_advance_loc\n\t" 	\
-+LLL_STUB_UNWIND_INFO_END
-+
-+#else
-+# define LLL_STUB_UNWIND_INFO_5
-+# define LLL_STUB_UNWIND_INFO_6
-+#endif
-+
-+
- #define lll_futex_wait(futex, val) \
-   ({									      \
-     int __status;							      \
-@@ -138,14 +242,18 @@ extern int __lll_mutex_unlock_wait (int 
-   (void) ({ int ignore1, ignore2, ignore3;				      \
- 	    __asm __volatile (LOCK_INSTR "cmpxchgl %0, %2\n\t"		      \
- 			      "jnz 1f\n\t"				      \
--			      ".subsection 1\n"				      \
--			      "1:\tleaq %2, %%rdi\n\t"			      \
--			      "subq $128, %%rsp\n\t"			      \
--			      "callq __lll_mutex_lock_wait\n\t"		      \
--			      "addq $128, %%rsp\n\t"			      \
--			      "jmp 2f\n\t"				      \
-+			      ".subsection 1\n\t"			      \
-+			      ".type  _L_mutex_lock_%=, @function\n"	      \
-+			      "_L_mutex_lock_%=:\n"			      \
-+			      "1:\tleaq %2, %%rdi\n"			      \
-+			      "2:\tsubq $128, %%rsp\n"			      \
-+			      "3:\tcallq __lll_mutex_lock_wait\n"	      \
-+			      "4:\taddq $128, %%rsp\n"			      \
-+			      "5:\tjmp 24f\n"				      \
-+			      "6:\t.size _L_mutex_lock_%=, 6b-1b\n\t"	      \
- 			      ".previous\n"				      \
--			      "2:"					      \
-+			      LLL_STUB_UNWIND_INFO_5			      \
-+			      "24:"					      \
- 			      : "=S" (ignore1), "=&D" (ignore2), "=m" (futex),\
- 				"=a" (ignore3)				      \
- 			      : "0" (1), "m" (futex), "3" (0)		      \
-@@ -153,17 +261,21 @@ extern int __lll_mutex_unlock_wait (int 
- 
- 
- #define lll_robust_mutex_lock(futex, id) \
--  ({ int result, ignore1, ignore2;				      \
-+  ({ int result, ignore1, ignore2;					      \
-     __asm __volatile (LOCK_INSTR "cmpxchgl %0, %2\n\t"			      \
- 		      "jnz 1f\n\t"					      \
--		      ".subsection 1\n"					      \
--		      "1:\tleaq %2, %%rdi\n\t"				      \
--		      "subq $128, %%rsp\n\t"				      \
--		      "callq __lll_robust_mutex_lock_wait\n\t"		      \
--		      "addq $128, %%rsp\n\t"				      \
--		      "jmp 2f\n\t"					      \
-+		      ".subsection 1\n\t"				      \
-+		      ".type  _L_robust_mutex_lock_%=, @function\n"	      \
-+		      "_L_robust_mutex_lock_%=:\n"			      \
-+		      "1:\tleaq %2, %%rdi\n"				      \
-+		      "2:\tsubq $128, %%rsp\n"				      \
-+		      "3:\tcallq __lll_robust_mutex_lock_wait\n"	      \
-+		      "4:\taddq $128, %%rsp\n"				      \
-+		      "5:\tjmp 24f\n"					      \
-+		      "6:\t.size _L_robust_mutex_lock_%=, 6b-1b\n\t"	      \
- 		      ".previous\n"					      \
--		      "2:"						      \
-+		      LLL_STUB_UNWIND_INFO_5				      \
-+		      "24:"						      \
- 		      : "=S" (ignore1), "=&D" (ignore2), "=m" (futex),	      \
- 			"=a" (result)					      \
- 		      : "0" (id), "m" (futex), "3" (0)			      \
-@@ -175,14 +287,18 @@ extern int __lll_mutex_unlock_wait (int 
-   (void) ({ int ignore1, ignore2, ignore3;				      \
- 	    __asm __volatile (LOCK_INSTR "cmpxchgl %0, %2\n\t"		      \
- 			      "jnz 1f\n\t"				      \
--			      ".subsection 1\n"				      \
--			      "1:\tleaq %2, %%rdi\n\t"			      \
--			      "subq $128, %%rsp\n\t"			      \
--			      "callq __lll_mutex_lock_wait\n\t"		      \
--			      "addq $128, %%rsp\n\t"			      \
--			      "jmp 2f\n\t"				      \
-+			      ".subsection 1\n\t"			      \
-+			      ".type  _L_mutex_cond_lock_%=, @function\n"     \
-+			      "_L_mutex_cond_lock_%=:\n"		      \
-+			      "1:\tleaq %2, %%rdi\n"			      \
-+			      "2:\tsubq $128, %%rsp\n"			      \
-+			      "3:\tcallq __lll_mutex_lock_wait\n"	      \
-+			      "4:\taddq $128, %%rsp\n"			      \
-+			      "5:\tjmp 24f\n"				      \
-+			      "6:\t.size _L_mutex_cond_lock_%=, 6b-1b\n\t"    \
- 			      ".previous\n"				      \
--			      "2:"					      \
-+			      LLL_STUB_UNWIND_INFO_5			      \
-+			      "24:"					      \
- 			      : "=S" (ignore1), "=&D" (ignore2), "=m" (futex),\
- 				"=a" (ignore3)				      \
- 			      : "0" (2), "m" (futex), "3" (0)		      \
-@@ -193,14 +309,18 @@ extern int __lll_mutex_unlock_wait (int 
-   ({ int result, ignore1, ignore2;					      \
-     __asm __volatile (LOCK_INSTR "cmpxchgl %0, %2\n\t"			      \
- 		      "jnz 1f\n\t"					      \
--		      ".subsection 1\n"					      \
--		      "1:\tleaq %2, %%rdi\n\t"				      \
--		      "subq $128, %%rsp\n\t"				      \
--		      "callq __lll_robust_mutex_lock_wait\n\t"		      \
--		      "addq $128, %%rsp\n\t"				      \
--		      "jmp 2f\n\t"					      \
-+		      ".subsection 1\n\t"				      \
-+		      ".type  _L_robust_mutex_cond_lock_%=, @function\n"      \
-+		      "_L_robust_mutex_cond_lock_%=:\n"			      \
-+		      "1:\tleaq %2, %%rdi\n"				      \
-+		      "2:\tsubq $128, %%rsp\n"				      \
-+		      "3:\tcallq __lll_robust_mutex_lock_wait\n"	      \
-+		      "4:\taddq $128, %%rsp\n"				      \
-+		      "5:\tjmp 24f\n"					      \
-+		      "6:\t.size _L_robust_mutex_cond_lock_%=, 6b-1b\n\t"     \
- 		      ".previous\n"					      \
--		      "2:"						      \
-+		      LLL_STUB_UNWIND_INFO_5				      \
-+		      "24:"						      \
- 		      : "=S" (ignore1), "=&D" (ignore2), "=m" (futex),	      \
- 			"=a" (result)					      \
- 		      : "0" (id | FUTEX_WAITERS), "m" (futex), "3" (0)	      \
-@@ -212,15 +332,19 @@ extern int __lll_mutex_unlock_wait (int 
-   ({ int result, ignore1, ignore2, ignore3;				      \
-      __asm __volatile (LOCK_INSTR "cmpxchgl %2, %4\n\t"			      \
- 		       "jnz 1f\n\t"					      \
--		       ".subsection 1\n"				      \
--		       "1:\tleaq %4, %%rdi\n\t"				      \
--		       "movq %8, %%rdx\n\t"				      \
--		       "subq $128, %%rsp\n\t"				      \
--		       "callq __lll_mutex_timedlock_wait\n\t"		      \
--		       "addq $128, %%rsp\n\t"				      \
--		       "jmp 2f\n\t"					      \
-+		       ".subsection 1\n\t"				      \
-+		       ".type  _L_mutex_timedlock_%=, @function\n"	      \
-+		       "_L_mutex_timedlock_%=:\n"			      \
-+		       "1:\tleaq %4, %%rdi\n"				      \
-+		       "0:\tmovq %8, %%rdx\n"				      \
-+		       "2:\tsubq $128, %%rsp\n"				      \
-+		       "3:\tcallq __lll_mutex_timedlock_wait\n"		      \
-+		       "4:\taddq $128, %%rsp\n"				      \
-+		       "5:\tjmp 24f\n"					      \
-+		       "6:\t.size _L_mutex_timedlock_%=, 6b-1b\n\t"	      \
- 		       ".previous\n"					      \
--		       "2:"						      \
-+		       LLL_STUB_UNWIND_INFO_6				      \
-+		       "24:"						      \
- 		       : "=a" (result), "=&D" (ignore1), "=S" (ignore2),      \
- 			 "=&d" (ignore3), "=m" (futex)			      \
- 		       : "0" (0), "2" (1), "m" (futex), "m" (timeout)	      \
-@@ -232,15 +356,19 @@ extern int __lll_mutex_unlock_wait (int 
-   ({ int result, ignore1, ignore2, ignore3;				      \
-      __asm __volatile (LOCK_INSTR "cmpxchgl %2, %4\n\t"			      \
- 		       "jnz 1f\n\t"					      \
--		       ".subsection 1\n"				      \
--		       "1:\tleaq %4, %%rdi\n\t"				      \
--		       "movq %8, %%rdx\n\t"				      \
--		       "subq $128, %%rsp\n\t"				      \
--		       "callq __lll_robust_mutex_timedlock_wait\n\t"	      \
--		       "addq $128, %%rsp\n\t"				      \
--		       "jmp 2f\n\t"					      \
-+		       ".subsection 1\n\t"				      \
-+		       ".type  _L_robust_mutex_timedlock_%=, @function\n"     \
-+		       "_L_robust_mutex_timedlock_%=:\n"		      \
-+		       "1:\tleaq %4, %%rdi\n"				      \
-+		       "0:\tmovq %8, %%rdx\n"				      \
-+		       "2:\tsubq $128, %%rsp\n"				      \
-+		       "3:\tcallq __lll_robust_mutex_timedlock_wait\n"	      \
-+		       "4:\taddq $128, %%rsp\n"				      \
-+		       "5:\tjmp 24f\n"					      \
-+		       "6:\t.size _L_robust_mutex_timedlock_%=, 6b-1b\n\t"    \
- 		       ".previous\n"					      \
--		       "2:"						      \
-+		       LLL_STUB_UNWIND_INFO_6				      \
-+		       "24:"						      \
- 		       : "=a" (result), "=&D" (ignore1), "=S" (ignore2),      \
- 			 "=&d" (ignore3), "=m" (futex)			      \
- 		       : "0" (0), "2" (id), "m" (futex), "m" (timeout)	      \
-@@ -252,14 +380,18 @@ extern int __lll_mutex_unlock_wait (int 
-   (void) ({ int ignore;							      \
-             __asm __volatile (LOCK_INSTR "decl %0\n\t"			      \
- 			      "jne 1f\n\t"				      \
--			      ".subsection 1\n"				      \
--			      "1:\tleaq %0, %%rdi\n\t"			      \
--			      "subq $128, %%rsp\n\t"			      \
--			      "callq __lll_mutex_unlock_wake\n\t"	      \
--			      "addq $128, %%rsp\n\t"			      \
--			      "jmp 2f\n\t"				      \
-+			      ".subsection 1\n\t"			      \
-+			      ".type  _L_mutex_unlock_%=, @function\n"	      \
-+			      "_L_mutex_unlock_%=:\n"			      \
-+			      "1:\tleaq %0, %%rdi\n"			      \
-+			      "2:\tsubq $128, %%rsp\n"			      \
-+			      "3:\tcallq __lll_mutex_unlock_wake\n"	      \
-+			      "4:\taddq $128, %%rsp\n"			      \
-+			      "5:\tjmp 24f\n"				      \
-+			      "6:\t.size _L_mutex_unlock_%=, 6b-1b\n\t"	      \
- 			      ".previous\n"				      \
--			      "2:"					      \
-+			      LLL_STUB_UNWIND_INFO_5			      \
-+			      "24:"					      \
- 			      : "=m" (futex), "=&D" (ignore)		      \
- 			      : "m" (futex)				      \
- 			      : "ax", "cx", "r11", "cc", "memory"); })
-@@ -269,14 +401,18 @@ extern int __lll_mutex_unlock_wait (int 
-   (void) ({ int ignore;							      \
- 	    __asm __volatile (LOCK_INSTR "andl %2, %0\n\t"		      \
- 			      "jne 1f\n\t"				      \
--			      ".subsection 1\n"				      \
--			      "1:\tleaq %0, %%rdi\n\t"			      \
--			      "subq $128, %%rsp\n\t"			      \
--			      "callq __lll_mutex_unlock_wake\n\t"	      \
--			      "addq $128, %%rsp\n\t"			      \
--			      "jmp 2f\n\t"				      \
-+			      ".subsection 1\n\t"			      \
-+			      ".type  _L_robust_mutex_unlock_%=, @function\n" \
-+			      "_L_robust_mutex_unlock_%=:\n"		      \
-+			      "1:\tleaq %0, %%rdi\n"			      \
-+			      "2:\tsubq $128, %%rsp\n"			      \
-+			      "3:\tcallq __lll_mutex_unlock_wake\n"	      \
-+			      "4:\taddq $128, %%rsp\n"			      \
-+			      "5:\tjmp 24f\n"				      \
-+			      "6:\t.size _L_robust_mutex_unlock_%=, 6b-1b\n\t"\
- 			      ".previous\n"				      \
--			      "2:"					      \
-+			      LLL_STUB_UNWIND_INFO_5			      \
-+			      "24:"					      \
- 			      : "=m" (futex), "=&D" (ignore)		      \
- 			      : "i" (FUTEX_WAITERS), "m" (futex)	      \
- 			      : "ax", "cx", "r11", "cc", "memory"); })
-@@ -351,17 +487,21 @@ extern int lll_unlock_wake_cb (int *__fu
- 			      "je 0f\n\t"				      \
- 			      "lock; cmpxchgl %0, %2\n\t"		      \
- 			      "jnz 1f\n\t"				      \
--		  	      "jmp 2f\n"				      \
-+		  	      "jmp 24f\n"				      \
- 			      "0:\tcmpxchgl %0, %2\n\t"			      \
- 			      "jnz 1f\n\t"				      \
--			      ".subsection 1\n"				      \
--			      "1:\tleaq %2, %%rdi\n\t"			      \
--			      "subq $128, %%rsp\n\t"			      \
--			      "callq __lll_mutex_lock_wait\n\t"		      \
--			      "addq $128, %%rsp\n\t"			      \
--			      "jmp 2f\n\t"				      \
-+			      ".subsection 1\n\t"			      \
-+			      ".type  _L_lock_%=, @function\n"		      \
-+			      "_L_lock_%=:\n"				      \
-+			      "1:\tleaq %2, %%rdi\n"			      \
-+			      "2:\tsubq $128, %%rsp\n"			      \
-+			      "3:\tcallq __lll_mutex_lock_wait\n"	      \
-+			      "4:\taddq $128, %%rsp\n"			      \
-+			      "5:\tjmp 24f\n"				      \
-+			      "6:\t.size _L_lock_%=, 6b-1b\n\t"		      \
- 			      ".previous\n"				      \
--			      "2:"					      \
-+			      LLL_STUB_UNWIND_INFO_5			      \
-+			      "24:"					      \
- 			      : "=S" (ignore1), "=&D" (ignore2), "=m" (futex),\
- 				"=a" (ignore3)				      \
- 			      : "0" (1), "m" (futex), "3" (0)		      \
-@@ -374,17 +514,21 @@ extern int lll_unlock_wake_cb (int *__fu
- 			      "je 0f\n\t"				      \
- 			      "lock; decl %0\n\t"			      \
- 			      "jne 1f\n\t"				      \
--		  	      "jmp 2f\n"				      \
-+		  	      "jmp 24f\n"				      \
- 			      "0:\tdecl %0\n\t"				      \
- 			      "jne 1f\n\t"				      \
--			      ".subsection 1\n"				      \
--			      "1:\tleaq %0, %%rdi\n\t"			      \
--			      "subq $128, %%rsp\n\t"			      \
--			      "callq __lll_mutex_unlock_wake\n\t"	      \
--			      "addq $128, %%rsp\n\t"			      \
--			      "jmp 2f\n\t"				      \
-+			      ".subsection 1\n\t"			      \
-+			      ".type  _L_unlock_%=, @function\n"	      \
-+			      "_L_unlock_%=:\n"				      \
-+			      "1:\tleaq %0, %%rdi\n"			      \
-+			      "2:\tsubq $128, %%rsp\n"			      \
-+			      "3:\tcallq __lll_mutex_unlock_wake\n"	      \
-+			      "4:\taddq $128, %%rsp\n"			      \
-+			      "5:\tjmp 24f\n"				      \
-+			      "6:\t.size _L_unlock_%=, 6b-1b\n\t"	      \
- 			      ".previous\n"				      \
--			      "2:"					      \
-+			      LLL_STUB_UNWIND_INFO_5			      \
-+			      "24:"					      \
- 			      : "=m" (futex), "=&D" (ignore)		      \
- 			      : "m" (futex)				      \
- 			      : "ax", "cx", "r11", "cc", "memory"); })
---- glibc-20060905T0633/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevelrobustlock.S	2 Mar 2006 00:26:55 -0000	1.2
-+++ glibc-20060905T0633-fedora/nptl/sysdeps/unix/sysv/linux/x86_64/lowlevelrobustlock.S	6 Mar 2006 07:33:30 -0000	1.1.2.3
-@@ -46,8 +46,13 @@
- 	.hidden	__lll_robust_mutex_lock_wait
- 	.align	16
- __lll_robust_mutex_lock_wait:
-+	cfi_startproc
- 	pushq	%r10
-+	cfi_adjust_cfa_offset(8)
- 	pushq	%rdx
-+	cfi_adjust_cfa_offset(8)
-+	cfi_offset(%r10, -16)
-+	cfi_offset(%rdx, -24)
- 
- 	xorq	%r10, %r10	/* No timeout.  */
- #if FUTEX_WAIT == 0
-@@ -85,8 +90,13 @@ __lll_robust_mutex_lock_wait:
- 	/* NB:	 %rax == 0 */
- 
- 3:	popq	%rdx
-+	cfi_adjust_cfa_offset(-8)
-+	cfi_restore(%rdx)
- 	popq	%r10
-+	cfi_adjust_cfa_offset(-8)
-+	cfi_restore(%r10)
- 	retq
-+	cfi_endproc
- 	.size	__lll_robust_mutex_lock_wait,.-__lll_robust_mutex_lock_wait
- 
- 
-@@ -95,17 +105,27 @@ __lll_robust_mutex_lock_wait:
- 	.hidden	__lll_robust_mutex_timedlock_wait
- 	.align	16
- __lll_robust_mutex_timedlock_wait:
-+	cfi_startproc
- 	/* Check for a valid timeout value.  */
- 	cmpq	$1000000000, 8(%rdx)
- 	jae	3f
- 
- 	pushq	%r8
-+	cfi_adjust_cfa_offset(8)
- 	pushq	%r9
-+	cfi_adjust_cfa_offset(8)
- 	pushq	%r12
-+	cfi_adjust_cfa_offset(8)
- 	pushq	%r13
-+	cfi_adjust_cfa_offset(8)
-+	cfi_offset(%r8, -16)
-+	cfi_offset(%r9, -24)
-+	cfi_offset(%r12, -32)
-+	cfi_offset(%r13, -40)
- 
- 	/* Stack frame for the timespec and timeval structs.  */
- 	subq	$24, %rsp
-+	cfi_adjust_cfa_offset(24)
- 
- 	movq	%rdi, %r12
- 	movq	%rdx, %r13
-@@ -176,19 +196,34 @@ __lll_robust_mutex_timedlock_wait:
- 	jnz	7f
- 
- 6:	addq	$24, %rsp
-+	cfi_adjust_cfa_offset(-24)
- 	popq	%r13
-+	cfi_adjust_cfa_offset(-8)
-+	cfi_restore(%r13)
- 	popq	%r12
-+	cfi_adjust_cfa_offset(-8)
-+	cfi_restore(%r12)
- 	popq	%r9
-+	cfi_adjust_cfa_offset(-8)
-+	cfi_restore(%r9)
- 	popq	%r8
-+	cfi_adjust_cfa_offset(-8)
-+	cfi_restore(%r8)
- 	retq
- 
-+3:	movl	$EINVAL, %eax
-+	retq
-+
-+	cfi_adjust_cfa_offset(56)
-+	cfi_offset(%r8, -16)
-+	cfi_offset(%r9, -24)
-+	cfi_offset(%r12, -32)
-+	cfi_offset(%r13, -40)
- 	/* Check whether the time expired.  */
- 7:	cmpq	$-ETIMEDOUT, %rcx
- 	jne	1b
- 
- 8:	movl	$ETIMEDOUT, %eax
- 	jmp	6b
--
--3:	movl	$EINVAL, %eax
--	retq
-+	cfi_endproc
- 	.size	__lll_robust_mutex_timedlock_wait,.-__lll_robust_mutex_timedlock_wait
---- glibc-20060905T0633/nscd/connections.c	30 May 2006 17:31:43 -0000	1.90
-+++ glibc-20060905T0633-fedora/nscd/connections.c	31 May 2006 15:10:34 -0000	1.55.2.25
+--- glibc-20060907T0853/nscd/connections.c	30 May 2006 17:31:43 -0000	1.90
++++ glibc-20060907T0853-fedora/nscd/connections.c	31 May 2006 15:10:34 -0000	1.55.2.25
 @@ -1914,3 +1914,21 @@ finish_drop_privileges (void)
    install_real_capabilities (new_caps);
  #endif
@@ -2460,8 +1262,8 @@
 +    prune_cache (&dbs[hstdb], LONG_MAX, -1);
 +}
 +
---- glibc-20060905T0633/nscd/nscd.c	30 May 2006 17:29:36 -0000	1.53
-+++ glibc-20060905T0633-fedora/nscd/nscd.c	31 May 2006 15:10:34 -0000	1.38.2.13
+--- glibc-20060907T0853/nscd/nscd.c	30 May 2006 17:29:36 -0000	1.53
++++ glibc-20060907T0853-fedora/nscd/nscd.c	31 May 2006 15:10:34 -0000	1.38.2.13
 @@ -119,6 +119,9 @@ static struct argp argp =
    options, parse_opt, NULL, doc,
  };
@@ -2480,8 +1282,8 @@
    signal (SIGPIPE, SIG_IGN);
  
    /* Cleanup files created by a previous 'bind'.  */
---- glibc-20060905T0633/nscd/nscd.conf	27 Apr 2006 14:46:36 -0000	1.13
-+++ glibc-20060905T0633-fedora/nscd/nscd.conf	27 Apr 2006 21:29:54 -0000	1.8.2.5
+--- glibc-20060907T0853/nscd/nscd.conf	27 Apr 2006 14:46:36 -0000	1.13
++++ glibc-20060907T0853-fedora/nscd/nscd.conf	27 Apr 2006 21:29:54 -0000	1.8.2.5
 @@ -33,8 +33,8 @@
  #	logfile			/var/log/nscd.log
  #	threads			6
@@ -2493,8 +1295,8 @@
  	debug-level		0
  #	reload-count		5
  	paranoia		no
---- glibc-20060905T0633/nscd/nscd.init	20 Jun 2005 15:47:52 -0000	1.9
-+++ glibc-20060905T0633-fedora/nscd/nscd.init	12 Sep 2005 12:53:20 -0000	1.6.2.4
+--- glibc-20060907T0853/nscd/nscd.init	20 Jun 2005 15:47:52 -0000	1.9
++++ glibc-20060907T0853-fedora/nscd/nscd.init	12 Sep 2005 12:53:20 -0000	1.6.2.4
 @@ -9,6 +9,7 @@
  #		slow naming services like NIS, NIS+, LDAP, or hesiod.
  # processname: /usr/sbin/nscd
@@ -2535,8 +1337,17 @@
      RETVAL=$?
      echo
      [ $RETVAL -eq 0 ] && touch /var/lock/subsys/nscd
---- glibc-20060905T0633/posix/Makefile	2 Aug 2006 16:43:46 -0000	1.192
-+++ glibc-20060905T0633-fedora/posix/Makefile	2 Aug 2006 16:57:42 -0000	1.171.2.20
+--- glibc-20060907T0853/posix/Makefile	2 Aug 2006 16:43:46 -0000	1.192
++++ glibc-20060907T0853-fedora/posix/Makefile	7 Sep 2006 10:42:04 -0000	1.171.2.21
+@@ -81,7 +81,7 @@ tests		:= tstgetopt testfnm runtests run
+ 		   bug-regex13 bug-regex14 bug-regex15 bug-regex16 \
+ 		   bug-regex17 bug-regex18 bug-regex19 bug-regex20 \
+ 		   bug-regex21 bug-regex22 bug-regex23 bug-regex24 \
+-		   bug-regex25 tst-nice tst-nanosleep tst-regex2 \
++		   bug-regex25 bug-regex26 tst-nice tst-nanosleep tst-regex2 \
+ 		   transbug tst-rxspencer tst-pcre tst-boost \
+ 		   bug-ga1 tst-vfork1 tst-vfork2 tst-waitid \
+ 		   tst-getaddrinfo2 bug-glob1 bug-glob2 tst-sysconf \
 @@ -108,7 +108,8 @@ generated := $(addprefix wordexp-test-re
  	     bug-regex21-mem bug-regex21.mtrace \
  	     tst-rxspencer-mem tst-rxspencer.mtrace tst-getconf.out \
@@ -2547,7 +1358,15 @@
  
  include ../Rules
  
-@@ -282,12 +283,16 @@ bug-glob2-ENV = MALLOC_TRACE=$(objpfx)bu
+@@ -189,6 +190,7 @@ bug-regex20-ENV = LOCPATH=$(common-objpf
+ bug-regex22-ENV = LOCPATH=$(common-objpfx)localedata
+ bug-regex23-ENV = LOCPATH=$(common-objpfx)localedata
+ bug-regex25-ENV = LOCPATH=$(common-objpfx)localedata
++bug-regex26-ENV = LOCPATH=$(common-objpfx)localedata
+ tst-rxspencer-ARGS = --utf8 rxspencer/tests
+ tst-rxspencer-ENV = LOCPATH=$(common-objpfx)localedata
+ tst-pcre-ARGS = PCRE.tests
+@@ -282,12 +284,16 @@ bug-glob2-ENV = MALLOC_TRACE=$(objpfx)bu
  $(objpfx)bug-glob2-mem: $(objpfx)bug-glob2.out
  	$(common-objpfx)malloc/mtrace $(objpfx)bug-glob2.mtrace > $@
  
@@ -2570,8 +1389,49 @@
 +	  | sed -n -e '/START_OF_STRINGS/,$${/POSIX_V6_/{s/^[^"]*"//;s/".*$$//;p}}' \
 +	  > $@.new
 +	mv -f $@.new $@
---- glibc-20060905T0633/posix/getconf.speclist.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060905T0633-fedora/posix/getconf.speclist.h	13 Dec 2004 23:32:37 -0000	1.1.2.2
+--- glibc-20060907T0853/posix/bug-regex26.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20060907T0853-fedora/posix/bug-regex26.c	7 Sep 2006 10:42:04 -0000	1.1.2.1
+@@ -0,0 +1,38 @@
++/* Test re_search with dotless i.
++   Copyright (C) 2006 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++   Contributed by Jakub Jelinek <jakub@redhat.com>, 2006.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++#include <locale.h>
++#include <regex.h>
++#include <string.h>
++
++int
++main (void)
++{
++  struct re_pattern_buffer r;
++  struct re_registers s;
++  setlocale (LC_ALL, "en_US.UTF-8");
++  memset (&r, 0, sizeof (r));
++  memset (&s, 0, sizeof (s));
++  re_set_syntax (RE_SYNTAX_GREP | RE_HAT_LISTS_NOT_NEWLINE | RE_ICASE);
++  re_compile_pattern ("insert into", 11, &r);
++  re_search (&r, "\xFF\0\x12\xA2\xAA\xC4\xB1,K\x12\xC4\xB1*\xACK",
++	     15, 0, 15, &s);
++  return 0;
++}
+--- glibc-20060907T0853/posix/getconf.speclist.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060907T0853-fedora/posix/getconf.speclist.h	13 Dec 2004 23:32:37 -0000	1.1.2.2
 @@ -0,0 +1,15 @@
 +#include <unistd.h>
 +const char *START_OF_STRINGS =
@@ -2588,8 +1448,154 @@
 +"POSIX_V6_LPBIG_OFFBIG"
 +#endif
 +"";
---- glibc-20060905T0633/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
-+++ glibc-20060905T0633-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
+--- glibc-20060907T0853/posix/regex_internal.c	4 Jun 2006 04:57:19 -0000	1.66
++++ glibc-20060907T0853-fedora/posix/regex_internal.c	7 Sep 2006 10:42:04 -0000	1.41.2.14
+@@ -585,34 +585,98 @@ re_string_reconstruct (re_string_t *pstr
+ 
+   if (BE (offset != 0, 1))
+     {
+-      /* Are the characters which are already checked remain?  */
+-      if (BE (offset < pstr->valid_raw_len, 1)
+-#ifdef RE_ENABLE_I18N
+-	  /* Handling this would enlarge the code too much.
+-	     Accept a slowdown in that case.  */
+-	  && pstr->offsets_needed == 0
+-#endif
+-	 )
++      /* Should the already checked characters be kept?  */
++      if (BE (offset < pstr->valid_raw_len, 1))
+ 	{
+ 	  /* Yes, move them to the front of the buffer.  */
+-	  pstr->tip_context = re_string_context_at (pstr, offset - 1, eflags);
+ #ifdef RE_ENABLE_I18N
+-	  if (pstr->mb_cur_max > 1)
+-	    memmove (pstr->wcs, pstr->wcs + offset,
+-		     (pstr->valid_len - offset) * sizeof (wint_t));
++	  if (BE (pstr->offsets_needed, 0))
++	    {
++	      int low = 0, high = pstr->valid_len, mid;
++	      do
++		{
++		  mid = (high + low) / 2;
++		  if (pstr->offsets[mid] > offset)
++		    high = mid;
++		  else if (pstr->offsets[mid] < offset)
++		    low = mid + 1;
++		  else
++		    break;
++		}
++	      while (low < high);
++	      if (pstr->offsets[mid] < offset)
++		++mid;
++	      pstr->tip_context = re_string_context_at (pstr, mid - 1,
++							eflags);
++	      /* This can be quite complicated, so handle specially
++		 only the common and easy case where the character with
++		 different length representation of lower and upper
++		 case is present at or after offset.  */
++	      if (pstr->valid_len > offset
++		  && mid == offset && pstr->offsets[mid] == offset)
++		{
++		  memmove (pstr->wcs, pstr->wcs + offset,
++			   (pstr->valid_len - offset) * sizeof (wint_t));
++		  memmove (pstr->mbs, pstr->mbs + offset, pstr->valid_len - offset);
++		  pstr->valid_len -= offset;
++		  pstr->valid_raw_len -= offset;
++		  for (low = 0; low < pstr->valid_len; low++)
++		    pstr->offsets[low] = pstr->offsets[low + offset] - offset;
++		}
++	      else
++		{
++		  /* Otherwise, just find out how long the partial multibyte
++		     character at offset is and fill it with WEOF/255.  */
++		  pstr->len = pstr->raw_len - idx + offset;
++		  pstr->stop = pstr->raw_stop - idx + offset;
++		  pstr->offsets_needed = 0;
++		  while (mid > 0 && pstr->offsets[mid - 1] == offset)
++		    --mid;
++		  while (mid < pstr->valid_len)
++		    if (pstr->wcs[mid] != WEOF)
++		      break;
++		    else
++		      ++mid;
++		  if (mid == pstr->valid_len)
++		    pstr->valid_len = 0;
++		  else
++		    {
++		      pstr->valid_len = pstr->offsets[mid] - offset;
++		      if (pstr->valid_len)
++			{
++			  for (low = 0; low < pstr->valid_len; ++low)
++			    pstr->wcs[low] = WEOF;
++			  memset (pstr->mbs, 255, pstr->valid_len);
++			}
++		    }
++		  pstr->valid_raw_len = pstr->valid_len;
++		}
++	    }
++	  else
++#endif
++	    {
++	      pstr->tip_context = re_string_context_at (pstr, offset - 1,
++							eflags);
++#ifdef RE_ENABLE_I18N
++	      if (pstr->mb_cur_max > 1)
++		memmove (pstr->wcs, pstr->wcs + offset,
++			 (pstr->valid_len - offset) * sizeof (wint_t));
+ #endif /* RE_ENABLE_I18N */
+-	  if (BE (pstr->mbs_allocated, 0))
+-	    memmove (pstr->mbs, pstr->mbs + offset,
+-		     pstr->valid_len - offset);
+-	  pstr->valid_len -= offset;
+-	  pstr->valid_raw_len -= offset;
++	      if (BE (pstr->mbs_allocated, 0))
++		memmove (pstr->mbs, pstr->mbs + offset,
++			 pstr->valid_len - offset);
++	      pstr->valid_len -= offset;
++	      pstr->valid_raw_len -= offset;
+ #if DEBUG
+-	  assert (pstr->valid_len > 0);
++	      assert (pstr->valid_len > 0);
+ #endif
++	    }
+ 	}
+       else
+ 	{
+ 	  /* No, skip all characters until IDX.  */
++	  int prev_valid_len = pstr->valid_len;
++
+ #ifdef RE_ENABLE_I18N
+ 	  if (BE (pstr->offsets_needed, 0))
+ 	    {
+@@ -636,6 +700,8 @@ re_string_reconstruct (re_string_t *pstr
+ 		     byte other than 0x80 - 0xbf.  */
+ 		  raw = pstr->raw_mbs + pstr->raw_mbs_idx;
+ 		  end = raw + (offset - pstr->mb_cur_max);
++		  if (end < pstr->raw_mbs)
++		    end = pstr->raw_mbs;
+ 		  p = raw + offset - 1;
+ #ifdef _LIBC
+ 		  /* We know the wchar_t encoding is UCS4, so for the simple
+@@ -643,7 +709,7 @@ re_string_reconstruct (re_string_t *pstr
+ 		  if (isascii (*p) && BE (pstr->trans == NULL, 1))
+ 		    {
+ 		      memset (&pstr->cur_state, '\0', sizeof (mbstate_t));
+-		      pstr->valid_len = 0;
++		      /* pstr->valid_len = 0; */
+ 		      wc = (wchar_t) *p;
+ 		    }
+ 		  else
+@@ -686,7 +752,7 @@ re_string_reconstruct (re_string_t *pstr
+ 		pstr->valid_len = re_string_skip_chars (pstr, idx, &wc) - idx;
+ 	      if (wc == WEOF)
+ 		pstr->tip_context
+-		  = re_string_context_at (pstr, pstr->valid_raw_len - 1, eflags);
++		  = re_string_context_at (pstr, prev_valid_len - 1, eflags);
+ 	      else
+ 		pstr->tip_context = ((BE (pstr->word_ops_used != 0, 0)
+ 				      && IS_WIDE_WORD_CHAR (wc))
+--- glibc-20060907T0853/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
++++ glibc-20060907T0853-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
 @@ -36,6 +36,14 @@
  # define add_system_dir(dir) add_dir (dir)
  #endif
@@ -2605,8 +1611,8 @@
  #define CACHEMAGIC "ld.so-1.7.0"
  
  /* libc5 and glibc 2.0/2.1 use the same format.  For glibc 2.2 another
---- glibc-20060905T0633/sysdeps/i386/Makefile	6 Mar 2005 00:18:16 -0000	1.20
-+++ glibc-20060905T0633-fedora/sysdeps/i386/Makefile	30 Jun 2006 09:16:34 -0000	1.16.2.4
+--- glibc-20060907T0853/sysdeps/i386/Makefile	6 Mar 2005 00:18:16 -0000	1.20
++++ glibc-20060907T0853-fedora/sysdeps/i386/Makefile	30 Jun 2006 09:16:34 -0000	1.16.2.4
 @@ -64,4 +64,12 @@ endif
  
  ifneq (,$(filter -mno-tls-direct-seg-refs,$(CFLAGS)))
@@ -2620,8 +1626,8 @@
 +CPPFLAGS-.oS += -DNO_TLS_DIRECT_SEG_REFS
 +CFLAGS-.oS += -mno-tls-direct-seg-refs
  endif
---- glibc-20060905T0633/sysdeps/ia64/Makefile	16 Aug 2004 06:46:14 -0000	1.10
-+++ glibc-20060905T0633-fedora/sysdeps/ia64/Makefile	22 Sep 2004 21:21:07 -0000	1.10.2.1
+--- glibc-20060907T0853/sysdeps/ia64/Makefile	16 Aug 2004 06:46:14 -0000	1.10
++++ glibc-20060907T0853-fedora/sysdeps/ia64/Makefile	22 Sep 2004 21:21:07 -0000	1.10.2.1
 @@ -12,8 +12,8 @@ elide-routines.os += hp-timing
  
  ifeq (yes,$(build-shared))
@@ -2633,8 +1639,8 @@
  endif
  endif
  
---- glibc-20060905T0633/sysdeps/ia64/ia64libgcc.S	11 May 2002 05:12:35 -0000	1.2
-+++ glibc-20060905T0633-fedora/sysdeps/ia64/ia64libgcc.S	22 Sep 2004 21:21:07 -0000	1.2.2.1
+--- glibc-20060907T0853/sysdeps/ia64/ia64libgcc.S	11 May 2002 05:12:35 -0000	1.2
++++ glibc-20060907T0853-fedora/sysdeps/ia64/ia64libgcc.S	22 Sep 2004 21:21:07 -0000	1.2.2.1
 @@ -1,350 +0,0 @@
 -/* From the Intel IA-64 Optimization Guide, choose the minimum latency
 -   alternative.  */
@@ -2986,8 +1992,8 @@
 -	.symver	___multi3, __multi3@GLIBC_2.2
 -
 -#endif
---- glibc-20060905T0633/sysdeps/ia64/libgcc-compat.c 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060905T0633-fedora/sysdeps/ia64/libgcc-compat.c	22 Sep 2004 21:21:08 -0000	1.1.2.1
+--- glibc-20060907T0853/sysdeps/ia64/libgcc-compat.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20060907T0853-fedora/sysdeps/ia64/libgcc-compat.c	22 Sep 2004 21:21:08 -0000	1.1.2.1
 @@ -0,0 +1,84 @@
 +/* pre-.hidden libgcc compatibility
 +   Copyright (C) 2002 Free Software Foundation, Inc.
@@ -3073,8 +2079,8 @@
 +symbol_version (INTUSE (__multi3), __multi3, GLIBC_2.2);
 +
 +#endif
---- glibc-20060905T0633/sysdeps/unix/nice.c	15 Aug 2006 05:24:45 -0000	1.7
-+++ glibc-20060905T0633-fedora/sysdeps/unix/nice.c	15 Aug 2006 05:53:50 -0000	1.6.2.2
+--- glibc-20060907T0853/sysdeps/unix/nice.c	15 Aug 2006 05:24:45 -0000	1.7
++++ glibc-20060907T0853-fedora/sysdeps/unix/nice.c	15 Aug 2006 05:53:50 -0000	1.6.2.2
 @@ -42,7 +42,12 @@ nice (int incr)
  	__set_errno (save);
      }
@@ -3089,8 +2095,8 @@
    if (result == -1)
      {
        if (errno == EACCES)
---- glibc-20060905T0633/sysdeps/unix/sysv/linux/dl-osinfo.h	1 Aug 2006 06:55:27 -0000	1.23
-+++ glibc-20060905T0633-fedora/sysdeps/unix/sysv/linux/dl-osinfo.h	2 Aug 2006 16:57:42 -0000	1.14.2.9
+--- glibc-20060907T0853/sysdeps/unix/sysv/linux/dl-osinfo.h	1 Aug 2006 06:55:27 -0000	1.23
++++ glibc-20060907T0853-fedora/sysdeps/unix/sysv/linux/dl-osinfo.h	2 Aug 2006 16:57:42 -0000	1.14.2.9
 @@ -18,11 +18,14 @@
     02111-1307 USA.  */
  
@@ -3138,8 +2144,8 @@
 +  ret ^= stk;
    return ret;
  }
---- glibc-20060905T0633/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 05:26:34 -0000	1.6
-+++ glibc-20060905T0633-fedora/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 09:43:55 -0000	1.1.2.7
+--- glibc-20060907T0853/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 05:26:34 -0000	1.6
++++ glibc-20060907T0853-fedora/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 09:43:55 -0000	1.1.2.7
 @@ -37,14 +37,14 @@ futimesat (fd, file, tvp)
  {
    int result;
@@ -3182,8 +2188,8 @@
      {
        size_t filelen = strlen (file);
        static const char procfd[] = "/proc/self/fd/%d/%s";
---- glibc-20060905T0633/sysdeps/unix/sysv/linux/paths.h	15 Nov 2000 23:06:47 -0000	1.11
-+++ glibc-20060905T0633-fedora/sysdeps/unix/sysv/linux/paths.h	22 Sep 2004 21:21:08 -0000	1.11.4.1
+--- glibc-20060907T0853/sysdeps/unix/sysv/linux/paths.h	15 Nov 2000 23:06:47 -0000	1.11
++++ glibc-20060907T0853-fedora/sysdeps/unix/sysv/linux/paths.h	22 Sep 2004 21:21:08 -0000	1.11.4.1
 @@ -61,7 +61,7 @@
  #define	_PATH_TTY	"/dev/tty"
  #define	_PATH_UNIX	"/boot/vmlinux"
@@ -3193,8 +2199,8 @@
  #define _PATH_WTMP	"/var/log/wtmp"
  
  /* Provide trailing slash, since mostly used for building pathnames. */
---- glibc-20060905T0633/sysdeps/unix/sysv/linux/tcsetattr.c	10 Sep 2003 19:16:07 -0000	1.16
-+++ glibc-20060905T0633-fedora/sysdeps/unix/sysv/linux/tcsetattr.c	22 Sep 2004 21:21:08 -0000	1.16.2.1
+--- glibc-20060907T0853/sysdeps/unix/sysv/linux/tcsetattr.c	10 Sep 2003 19:16:07 -0000	1.16
++++ glibc-20060907T0853-fedora/sysdeps/unix/sysv/linux/tcsetattr.c	22 Sep 2004 21:21:08 -0000	1.16.2.1
 @@ -49,6 +49,7 @@ tcsetattr (fd, optional_actions, termios
  {
    struct __kernel_termios k_termios;
@@ -3240,8 +2246,8 @@
 +  return retval;
  }
  libc_hidden_def (tcsetattr)
---- glibc-20060905T0633/sysdeps/unix/sysv/linux/i386/dl-cache.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060905T0633-fedora/sysdeps/unix/sysv/linux/i386/dl-cache.h	22 Sep 2004 21:21:08 -0000	1.1.2.1
+--- glibc-20060907T0853/sysdeps/unix/sysv/linux/i386/dl-cache.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060907T0853-fedora/sysdeps/unix/sysv/linux/i386/dl-cache.h	22 Sep 2004 21:21:08 -0000	1.1.2.1
 @@ -0,0 +1,59 @@
 +/* Support for reading /etc/ld.so.cache files written by Linux ldconfig.
 +   Copyright (C) 2004 Free Software Foundation, Inc.
@@ -3302,8 +2308,8 @@
 +  } while (0)
 +
 +#include_next <dl-cache.h>
---- glibc-20060905T0633/sysdeps/unix/sysv/linux/ia64/dl-cache.h	6 Jul 2001 04:56:17 -0000	1.2
-+++ glibc-20060905T0633-fedora/sysdeps/unix/sysv/linux/ia64/dl-cache.h	22 Sep 2004 21:21:09 -0000	1.2.4.1
+--- glibc-20060907T0853/sysdeps/unix/sysv/linux/ia64/dl-cache.h	6 Jul 2001 04:56:17 -0000	1.2
++++ glibc-20060907T0853-fedora/sysdeps/unix/sysv/linux/ia64/dl-cache.h	22 Sep 2004 21:21:09 -0000	1.2.4.1
 @@ -22,4 +22,31 @@
  #define _dl_cache_check_flags(flags) \
    ((flags) == _DL_CACHE_DEFAULT_ID)
@@ -3336,24 +2342,24 @@
 +  } while (0)
 +
  #include_next <dl-cache.h>
---- glibc-20060905T0633/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060905T0633-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c	22 Sep 2004 21:21:09 -0000	1.1.2.1
+--- glibc-20060907T0853/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20060907T0853-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c	22 Sep 2004 21:21:09 -0000	1.1.2.1
 @@ -0,0 +1,5 @@
 +#ifdef IS_IN_ldconfig
 +#include <sysdeps/i386/dl-procinfo.c>
 +#else
 +#include <sysdeps/generic/dl-procinfo.c>
 +#endif
---- glibc-20060905T0633/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20060905T0633-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h	22 Sep 2004 21:21:09 -0000	1.1.2.1
+--- glibc-20060907T0853/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20060907T0853-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h	22 Sep 2004 21:21:09 -0000	1.1.2.1
 @@ -0,0 +1,5 @@
 +#ifdef IS_IN_ldconfig
 +#include <sysdeps/unix/sysv/linux/i386/dl-procinfo.h>
 +#else
 +#include <sysdeps/generic/dl-procinfo.h>
 +#endif
---- glibc-20060905T0633/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	17 Jan 2002 06:49:28 -0000	1.2
-+++ glibc-20060905T0633-fedora/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	22 Sep 2004 21:21:09 -0000	1.2.2.1
+--- glibc-20060907T0853/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	17 Jan 2002 06:49:28 -0000	1.2
++++ glibc-20060907T0853-fedora/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	22 Sep 2004 21:21:09 -0000	1.2.2.1
 @@ -1 +1 @@
 -s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 \2\3"_
 +s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 /emul/ia32-linux\2\3"_
