@@ -880,9 +880,10 @@ cd build-%{nptl_target_cpu}-linuxnptl && \
 %endif
 
 %ifarch %{rtkaioarches}
+rm -f $RPM_BUILD_ROOT{,%{_prefix}}/%{_lib}/librtkaio.so*
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio
-cp -a rtkaio/librtkaio.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/` $RPM_BUILD_ROOT/%{_lib}/rtkaio/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
+mv $RPM_BUILD_ROOT/%{_lib}/librtkaio-*.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/
+ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
 %endif
 
 %if %{buildxen}
@@ -906,7 +907,7 @@ ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libthread_db-*.so` $RPM_BUILD_ROOT/%{_l
 %ifarch %{rtkaioarches}
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir
 cp -a rtkaio/librtkaio.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/` $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
+ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
 %endif
 cd ..
 %endif
