@@ -1,9 +1,9 @@
-%define glibcdate 20060907T0853
+%define glibcdate 20060910T1832
 %define glibcname glibc
-%define glibcsrcdir glibc-20060907T0853
+%define glibcsrcdir glibc-20060910T1832
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 30
+%define glibcrelease 31
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1460,6 +1460,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Sep 10 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-31
+- fix pthread_cond_{,timed}wait cancellation (BZ#3123)
+- fix lrint on ppc32 (BZ#3155)
+- fix malloc allocating more than half of address space (BZ#2775)
+- fix mktime on 32-bit arches a few years after 2038 (BZ#2821)
+
 * Thu Sep  7 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-30
 - add librtkaio, to use it add /%{lib}/rtkaio to your
   LD_LIBRARY_PATH or /etc/ld.so.conf
