@@ -1,9 +1,9 @@
-%define glibcdate 20060910T1832
+%define glibcdate 20060915T0943
 %define glibcname glibc
-%define glibcsrcdir glibc-20060910T1832
+%define glibcsrcdir glibc-20060915T0943
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 31
+%define glibcrelease 32
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -12,6 +12,11 @@
 %else
 %define buildxen 0
 %define xenpackage 0
+%endif
+%ifarch ppc ppc64
+%define buildpower6 1
+%else
+%define buildpower6 0
 %endif
 %define rtkaioarches %{ix86} x86_64 ia64 ppc ppc64 s390 s390x
 %define debuginfocommonarches %{ix86} alpha alphaev6 sparc sparcv9
@@ -826,7 +831,7 @@ GXX="g++ -m64"
 BuildFlags="$BuildFlags -DNDEBUG=1"
 EnableKernel="--enable-kernel=%{enablekernel}"
 echo "$GCC" > Gcc
-AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(linuxthreads\|nptl\|rtkaio\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
+AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(linuxthreads\|nptl\|rtkaio\|powerpc-cpu\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
 %ifarch %{rtkaioarches}
 AddOns=,rtkaio$AddOns
 %endif
@@ -853,6 +858,27 @@ build_nptl linuxnptl
 
 %if %{buildxen}
 build_nptl linuxnptl-nosegneg -mno-tls-direct-seg-refs
+%endif
+
+%if %{buildpower6}
+(
+platform=`LD_SHOW_AUXV=1 /bin/true | sed -n 's/^AT_PLATFORM:[[:blank:]]*//p'`
+if [ "$platform" != power6 ]; then
+  mkdir -p power6emul/{lib,lib64}
+  $GCC -shared -O2 -fpic -o power6emul/%{_lib}/power6emul.so fedora/power6emul.c -Wl,-z,initfirst
+%ifarch ppc
+  echo '' | gcc -shared -nostdlib -O2 -fpic -m64 -o power6emul/lib64/power6emul.so -xc -
+%endif
+%ifarch ppc64
+  echo '' | gcc -shared -nostdlib -O2 -fpic -m32 -o power6emul/lib/power6emul.so -xc -
+%endif
+  export LD_PRELOAD=`pwd`/power6emul/\$LIB/power6emul.so
+fi
+AddOns=",powerpc-cpu$AddOns --with-cpu=power6"
+GCC="$GCC -mcpu=power6"
+GXX="$GXX -mcpu=power6"
+build_nptl linuxnptl-power6
+)
 %endif
 
 cd build-%{nptl_target_cpu}-linuxnptl
@@ -908,6 +934,29 @@ ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libthread_db-*.so` $RPM_BUILD_ROOT/%{_l
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir
 cp -a rtkaio/librtkaio.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/`
 ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
+%endif
+cd ..
+%endif
+
+%if %{buildpower6}
+cd build-%{nptl_target_cpu}-linuxnptl-power6
+mkdir -p $RPM_BUILD_ROOT/%{_lib}/power6/
+cp -a libc.so $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/libc-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libc-*.so` $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/libc.so.*`
+cp -a math/libm.so $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/libm-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libm-*.so` $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/libm.so.*`
+cp -a nptl/libpthread.so $RPM_BUILD_ROOT/%{_lib}/power6/libpthread-%{version}.so
+pushd $RPM_BUILD_ROOT/%{_lib}/power6
+ln -sf libpthread-*.so `basename $RPM_BUILD_ROOT/%{_lib}/libpthread.so.*`
+popd
+cp -a rt/librt.so $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so` $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
+cp -a nptl_db/libthread_db.so $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/libthread_db-*.so`
+ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libthread_db-*.so` $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/libthread_db.so.*`
+%ifarch %{rtkaioarches}
+mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio/power6
+cp -a rtkaio/librtkaio.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/power6/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/`
+ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/power6/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/power6/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
 %endif
 cd ..
 %endif
@@ -1161,6 +1210,19 @@ cd build-%{nptl_target_cpu}-linuxnptl-nosegneg
 ) | tee check.log || :
 cd ..
 %endif
+%if %{buildpower6}
+echo ====================TESTING -mcpu=power6=============
+cd build-%{nptl_target_cpu}-linuxnptl-power6
+( if [ -d ../power6emul ]; then
+    export LD_PRELOAD=`cd ../power6emul; pwd`/\$LIB/power6emul.so
+  fi
+  make -j$numprocs -k check PARALLELMFLAGS=-s 2>&1
+  sleep 10s
+  teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
+  [ -n "$teepid" ] && kill $teepid
+) | tee check.log || :
+cd ..
+%endif
 echo ====================TESTING DETAILS=================
 for i in `sed -n 's|^.*\*\*\* \[\([^]]*\.out\)\].*$|\1|p' build-*-linux*/check.log`; do
   echo =====$i=====
@@ -1378,6 +1440,12 @@ rm -f *.filelist*
 %dir /%{_lib}/rtkaio/%{nosegneg_subdir}
 %endif
 %endif
+%if %{buildpower6}
+%dir /%{_lib}/power6
+%ifarch %{rtkaioarches}
+%dir /%{_lib}/rtkaio/power6
+%endif
+%endif
 %ifarch s390x
 %dir /lib
 /lib/ld64.so.1
@@ -1402,6 +1470,7 @@ rm -f *.filelist*
 %if %{xenpackage}
 %files -f nosegneg.filelist xen
 %defattr(-,root,root)
+%dir /%{_lib}/%{nosegneg_subdir_base}
 %dir /%{_lib}/%{nosegneg_subdir}
 %endif
 
@@ -1460,6 +1529,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Sep 15 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-32
+- on ppc* use just AT_PLATFORM and altivec AT_HWCAP bit for library selection
+- fix lrintl and lroundl on ppc{,64}
+- use hidden visibility on fstatat{,64} and mknodat in libc_nonshared.a
+
 * Sun Sep 10 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-31
 - fix pthread_cond_{,timed}wait cancellation (BZ#3123)
 - fix lrint on ppc32 (BZ#3155)
