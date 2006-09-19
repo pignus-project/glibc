@@ -1,9 +1,9 @@
-%define glibcdate 20060915T0943
+%define glibcdate 20060919T1847
 %define glibcname glibc
-%define glibcsrcdir glibc-20060915T0943
+%define glibcsrcdir glibc-20060919T1847
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 32
+%define glibcrelease 33
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -793,7 +793,7 @@ touch locale/programs/*-kw.h
 GCC=gcc
 GXX=g++
 %ifarch %{ix86}
-BuildFlags="-march=%{_target_cpu}"
+BuildFlags="-march=%{_target_cpu} -mtune=generic"
 %endif
 %ifarch i686
 BuildFlags="-march=i686 -mtune=generic"
@@ -1529,6 +1529,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Sep 15 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-33
+- fix dlclose (#206639)
+- don't load platform optimized libraries if kernel doesn't set
+  AT_PLATFORM
+- fix ppc{32,64} libSegFault.so
+- use -mtune=generic even for glibc-devel.i386 (#206437)
+
 * Fri Sep 15 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-32
 - on ppc* use just AT_PLATFORM and altivec AT_HWCAP bit for library selection
 - fix lrintl and lroundl on ppc{,64}
