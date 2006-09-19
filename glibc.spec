@@ -905,11 +905,15 @@ cd build-%{nptl_target_cpu}-linuxnptl && \
     cd ..
 %endif
 
+librtso=`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
+
 %ifarch %{rtkaioarches}
 rm -f $RPM_BUILD_ROOT{,%{_prefix}}/%{_lib}/librtkaio.so*
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio
 mv $RPM_BUILD_ROOT/%{_lib}/librtkaio-*.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
+rm -f $RPM_BUILD_ROOT/%{_lib}/$librtso
+ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so` $RPM_BUILD_ROOT/%{_lib}/$librtso
+ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/$librtso
 %endif
 
 %if %{buildxen}
@@ -927,13 +931,13 @@ pushd $RPM_BUILD_ROOT/%{_lib}/$SubDir
 ln -sf libpthread-*.so `basename $RPM_BUILD_ROOT/%{_lib}/libpthread.so.*`
 popd
 cp -a rt/librt.so $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so` $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
+ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so` $RPM_BUILD_ROOT/%{_lib}/$SubDir/$librtso
 cp -a nptl_db/libthread_db.so $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/libthread_db-*.so`
 ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libthread_db-*.so` $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/libthread_db.so.*`
 %ifarch %{rtkaioarches}
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir
 cp -a rtkaio/librtkaio.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
+ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/$librtso
 %endif
 cd ..
 %endif
@@ -950,13 +954,13 @@ pushd $RPM_BUILD_ROOT/%{_lib}/power6
 ln -sf libpthread-*.so `basename $RPM_BUILD_ROOT/%{_lib}/libpthread.so.*`
 popd
 cp -a rt/librt.so $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so` $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
+ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so` $RPM_BUILD_ROOT/%{_lib}/power6/$librtso
 cp -a nptl_db/libthread_db.so $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/libthread_db-*.so`
 ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libthread_db-*.so` $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/libthread_db.so.*`
 %ifarch %{rtkaioarches}
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio/power6
 cp -a rtkaio/librtkaio.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/power6/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/power6/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/power6/`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
+ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/power6/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/power6/$librtso
 %endif
 cd ..
 %endif
@@ -1535,6 +1539,7 @@ rm -f *.filelist*
   AT_PLATFORM
 - fix ppc{32,64} libSegFault.so
 - use -mtune=generic even for glibc-devel.i386 (#206437)
+- fix /%{_lib}/librt.so.1 symlink
 
 * Fri Sep 15 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-32
 - on ppc* use just AT_PLATFORM and altivec AT_HWCAP bit for library selection
