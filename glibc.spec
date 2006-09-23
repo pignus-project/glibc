@@ -1,9 +1,9 @@
-%define glibcdate 20060919T1847
+%define glibcdate 20060923T0946
 %define glibcname glibc
-%define glibcsrcdir glibc-20060919T1847
+%define glibcsrcdir glibc-20060923T0946
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 33
+%define glibcrelease 34
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1533,6 +1533,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Sep 23 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-34
+- fix ppc{32,64} longjmp (BZ#3225)
+- fix user visible spelling errors (BZ#3137)
+- fix l{,l}rint{,f,l} around zero (BZ#2592)
+- avoid stack trampoline in s390{,x} makecontext
+
 * Tue Sep 15 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-33
 - fix dlclose (#206639)
 - don't load platform optimized libraries if kernel doesn't set
