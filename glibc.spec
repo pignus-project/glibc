@@ -1,9 +1,9 @@
-%define glibcdate 20060923T0946
+%define glibcdate 20060925T1535
 %define glibcname glibc
-%define glibcsrcdir glibc-20060923T0946
+%define glibcsrcdir glibc-20060925T1535
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 34
+%define glibcrelease 35
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1533,6 +1533,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Sep 25 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-35
+- fix glob with large number of matches (BZ#3253)
+- fix fchownat on kernels that don't support that syscall (BZ#3252)
+- fix lrintl on s390{,64}
+
 * Sat Sep 23 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-34
 - fix ppc{32,64} longjmp (BZ#3225)
 - fix user visible spelling errors (BZ#3137)
