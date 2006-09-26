@@ -3,7 +3,7 @@
 %define glibcsrcdir glibc-20060925T1535
 %define glibc_release_tarballs 0
 %define glibcversion 2.4.90
-%define glibcrelease 35
+%define glibcrelease 36
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1533,6 +1533,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Sep 27 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-36
+- rebuilt with gcc-4.1.1-26 to fix unwind info
+
 * Mon Sep 25 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-35
 - fix glob with large number of matches (BZ#3253)
 - fix fchownat on kernels that don't support that syscall (BZ#3252)
