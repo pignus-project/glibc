@@ -1,9 +1,9 @@
-%define glibcdate 20060925T1535
+%define glibcdate 20060929T2037
 %define glibcname glibc
-%define glibcsrcdir glibc-20060925T1535
+%define glibcsrcdir glibc-20060929T2037
 %define glibc_release_tarballs 0
-%define glibcversion 2.4.90
-%define glibcrelease 36
+%define glibcversion 2.5
+%define glibcrelease 1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1533,6 +1533,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Sep 29 2006 Jakub Jelinek <jakub@redhat.com> 2.5-1
+- glibc 2.5 release
+
 * Wed Sep 27 2006 Jakub Jelinek <jakub@redhat.com> 2.4.90-36
 - rebuilt with gcc-4.1.1-26 to fix unwind info
 
