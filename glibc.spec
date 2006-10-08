@@ -1,9 +1,9 @@
-%define glibcdate 20061002T1858
-%define glibcname glibc
-%define glibcsrcdir glibc-20061002T1858
+%define glibcdate 20061008T1257
+%define glibcname glibc-2.5
+%define glibcsrcdir glibc-2.5-20061008T1257
 %define glibc_release_tarballs 0
 %define glibcversion 2.5
-%define glibcrelease 2
+%define glibcrelease 3
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1533,6 +1533,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Oct  8 2006 Jakub Jelinek <jakub@redhat.com> 2.5-3
+- bump __GLIBC_MINOR__
+- increase PTHREAD_STACK_MIN on ppc{,64} to 128K to allow
+  64K pagesize kernels (#209877)
+- speed up initgroups on NIS+ (#208203)
+
 * Mon Oct  2 2006 Jakub Jelinek <jakub@redhat.com> 2.5-2
 - fix nscd database growing (#207928)
 - bypass prelinking when LD_DYNAMIC_WEAK=1 is in the environment
