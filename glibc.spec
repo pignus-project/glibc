@@ -1,9 +1,9 @@
-%define glibcdate 20061008T1257
-%define glibcname glibc-2.5
-%define glibcsrcdir glibc-2.5-20061008T1257
+%define glibcdate 20061025T1857
+%define glibcname glibc
+%define glibcsrcdir glibc-20061025T1857
 %define glibc_release_tarballs 0
-%define glibcversion 2.5
-%define glibcrelease 3
+%define glibcversion 2.5.90
+%define glibcrelease 1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1533,7 +1533,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Sun Oct  8 2006 Jakub Jelinek <jakub@redhat.com> 2.5-3
+* Wed Oct 25 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-1
+- fix i?86 6 argument syscalls (e.g. splice)
+- fix rtld minimal realloc (BZ#3352)
+- fix RFC3484 getaddrinfo sorting according to rules 4 and 7 (BZ#3369)
+- fix xdrmem_setpos (#211452)
 - bump __GLIBC_MINOR__
 - increase PTHREAD_STACK_MIN on ppc{,64} to 128K to allow
   64K pagesize kernels (#209877)
