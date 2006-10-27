@@ -1,9 +1,9 @@
-%define glibcdate 20061025T1857
+%define glibcdate 20061027T1902
 %define glibcname glibc
-%define glibcsrcdir glibc-20061025T1857
+%define glibcsrcdir glibc-20061027T1902
 %define glibc_release_tarballs 0
 %define glibcversion 2.5.90
-%define glibcrelease 1
+%define glibcrelease 2
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1533,6 +1533,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Oct 27 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-2
+- fix ia64 build
+- don't call _dl_close outside of dl_load_lock critical section
+  if dlopen failed (BZ#3426)
+- add rtld scope locking (#211133)
+
 * Wed Oct 25 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-1
 - fix i?86 6 argument syscalls (e.g. splice)
 - fix rtld minimal realloc (BZ#3352)
