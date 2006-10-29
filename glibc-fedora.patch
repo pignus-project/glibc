@@ -2163,3 +2163,44 @@
 @@ -1 +1 @@
 -s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 \2\3"_
 +s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 /emul/ia32-linux\2\3"_
+--- libc/configure.in	28 Oct 2006 06:40:16 -0000	1.463
++++ libc/configure.in	29 Oct 2006 22:47:02 -0000	1.466
+@@ -1444,9 +1444,16 @@ EOF
+     if AC_TRY_COMMAND([${CC-cc} -Wl,--verbose 2>&1|grep DATA_SEGMENT_RELRO_END 1>&AS_MESSAGE_LOG_FD])
+     then
+       libc_cv_z_relro=yes
++    else
++changequote(,)dnl
++      case "$base_machine" in
++        i[34567]86 | x86_64 | powerpc* | s390* | sparc* | alpha*) ;;
++	*) libc_cv_z_relro="not required" ;;
++      esac
++changequote([,])dnl
+     fi
+   fi])
+-  if test $libc_cv_z_relro != yes; then
++  if test "$libc_cv_z_relro" = no; then
+     AC_MSG_ERROR(linker with -z relro support required)
+   fi
+ 
+--- libc/configure	28 Oct 2006 06:41:30 -0000	1.453
++++ libc/configure	29 Oct 2006 22:48:13 -0000	1.456
+@@ -5650,12 +5650,17 @@ else
+   (exit $ac_status); }; }
+     then
+       libc_cv_z_relro=yes
++    else
++      case "$base_machine" in
++        i[34567]86 | x86_64 | powerpc* | s390* | sparc* | alpha*) ;;
++	*) libc_cv_z_relro="not required" ;;
++      esac
+     fi
+   fi
+ fi
+ echo "$as_me:$LINENO: result: $libc_cv_z_relro" >&5
+ echo "${ECHO_T}$libc_cv_z_relro" >&6
+-  if test $libc_cv_z_relro != yes; then
++  if test "$libc_cv_z_relro" = no; then
+     { { echo "$as_me:$LINENO: error: linker with -z relro support required" >&5
+ echo "$as_me: error: linker with -z relro support required" >&2;}
+    { (exit 1); exit 1; }; }
