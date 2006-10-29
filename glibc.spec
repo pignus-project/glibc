@@ -1,9 +1,9 @@
-%define glibcdate 20061027T1902
+%define glibcdate 20061029T2155
 %define glibcname glibc
-%define glibcsrcdir glibc-20061027T1902
+%define glibcsrcdir glibc-20061029T2155
 %define glibc_release_tarballs 0
 %define glibcversion 2.5.90
-%define glibcrelease 2
+%define glibcrelease 3
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1533,6 +1533,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Oct 29 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-3
+- fix suid/sgid binaries on i?86/x86_64 (#212723)
+
 * Fri Oct 27 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-2
 - fix ia64 build
 - don't call _dl_close outside of dl_load_lock critical section
