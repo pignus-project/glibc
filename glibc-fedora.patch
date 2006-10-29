@@ -2204,3 +2204,19 @@
      { { echo "$as_me:$LINENO: error: linker with -z relro support required" >&5
  echo "$as_me: error: linker with -z relro support required" >&2;}
     { (exit 1); exit 1; }; }
+--- libc/nptl/sysdeps/ia64/pthread_spin_unlock.c	2003-03-18 04:42:45.000000000 +0100
++++ libc/nptl/sysdeps/ia64/pthread_spin_unlock.c	2006-10-30 00:31:16.000000000 +0100
+@@ -1,4 +1,4 @@
+-/* Copyright (C) 2003 Free Software Foundation, Inc.
++/* Copyright (C) 2003, 2006 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+    Contributed by Jakub Jelinek <jakub@redhat.com>, 2003.
+ 
+@@ -23,6 +23,6 @@
+ int
+ pthread_spin_unlock (pthread_spinlock_t *lock)
+ {
+-  __sync_lock_release_si ((int *) lock);
++  __sync_lock_release ((int *) lock);
+   return 0;
+ }
