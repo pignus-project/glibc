@@ -1,9 +1,9 @@
-%define glibcdate 20061103T1610
+%define glibcdate 20061109T2048
 %define glibcname glibc
-%define glibcsrcdir glibc-20061103T1610
+%define glibcsrcdir glibc-20061109T2048
 %define glibc_release_tarballs 0
 %define glibcversion 2.5.90
-%define glibcrelease 4
+%define glibcrelease 5
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1534,6 +1534,16 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Nov  9 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-5
+- fix sysconf (_SC_LEVEL{2,3}_CACHE_SIZE) on Intel Core Duo
+  CPUs
+- fix libthread_db.so on TLS_DTV_AT_TP architectures
+- fix --inhibit-rpath (#214569)
+- fix _r_debug content when prelinked ld.so executes
+  a program as its argument
+- fix strxfrm
+- powerpc-cpu add-on updates
+
 * Fri Nov  3 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-4
 - fix atexit backwards compatibility (#213388)
 - add mai_IN locale (#213415)
