@@ -2195,3 +2195,14 @@
  compat_symbol (libc, __old_sys_siglist, _sys_siglist, GLIBC_2_0);
  compat_symbol (libc, _old_sys_siglist, sys_siglist, GLIBC_2_0);
  compat_symbol (libc, __old_sys_sigabbrev, sys_sigabbrev, GLIBC_2_0);
+--- libc/sysdeps/unix/sysv/linux/i386/sysconf.c	2006-11-09 23:07:15.000000000 +0100
++++ libc/sysdeps/unix/sysv/linux/i386/sysconf.c	2006-11-09 23:07:15.000000000 +0100
+@@ -139,7 +139,7 @@ intel_02_known_compare (const void *p1, 
+ }
+ 
+ 
+-static long int
++static long int  __attribute__ ((noinline))
+ intel_check_word (int name, unsigned int value, bool *has_level_2,
+ 		  bool *no_level_2_or_3)
+ {
