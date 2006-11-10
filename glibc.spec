@@ -1,9 +1,9 @@
-%define glibcdate 20061109T2048
+%define glibcdate 20061110T2049
 %define glibcname glibc
-%define glibcsrcdir glibc-20061109T2048
+%define glibcsrcdir glibc-20061110T2049
 %define glibc_release_tarballs 0
 %define glibcversion 2.5.90
-%define glibcrelease 5
+%define glibcrelease 6
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1534,6 +1534,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Nov 10 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-6
+- fix strxfrm fix
+- fix i?86 floor and ceil inlines (BZ#3451)
+
 * Thu Nov  9 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-5
 - fix sysconf (_SC_LEVEL{2,3}_CACHE_SIZE) on Intel Core Duo
   CPUs
