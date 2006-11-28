@@ -2184,3 +2184,15 @@
 @@ -1 +1 @@
 -s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 \2\3"_
 +s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 /emul/ia32-linux\2\3"_
+--- libc/csu/Makefile	2006-03-02 10:06:17.000000000 +0100
++++ libc/csu/Makefile	2006-11-28 13:48:25.000000000 +0100
+@@ -93,7 +93,8 @@ omit-deps += $(crtstuff)
+ $(crtstuff:%=$(objpfx)%.o): %.o: %.S $(objpfx)defs.h
+ 	$(compile.S) -g0 $(ASFLAGS-.os) -o $@
+ 
+-CFLAGS-initfini.s = -g0 -fPIC -fno-inline-functions $(fno-unit-at-a-time)
++CFLAGS-initfini.s = -g0 -fPIC -fno-inline-functions $(fno-unit-at-a-time) \
++		    -fno-asynchronous-unwind-tables
+ 
+ vpath initfini.c $(sysdirs)
+ 
