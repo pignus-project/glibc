@@ -1,9 +1,9 @@
-%define glibcdate 20061130T1652
+%define glibcdate 20061201T0821
 %define glibcname glibc
-%define glibcsrcdir glibc-20061130T1652
+%define glibcsrcdir glibc-20061201T0821
 %define glibc_release_tarballs 0
 %define glibcversion 2.5.90
-%define glibcrelease 9
+%define glibcrelease 10
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1549,6 +1549,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Dec  1 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-10
+- fix x86-64 restore_rt unwind info
+
 * Thu Nov 30 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-9
 - fix last svc_run change (#217850)
 - on ppc64 build __libc_start_main without unwind info,
