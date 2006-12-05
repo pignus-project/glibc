@@ -1,9 +1,9 @@
-%define glibcdate 20061201T0821
+%define glibcdate 20061205T2141
 %define glibcname glibc
-%define glibcsrcdir glibc-20061201T0821
+%define glibcsrcdir glibc-20061205T2141
 %define glibc_release_tarballs 0
 %define glibcversion 2.5.90
-%define glibcrelease 10
+%define glibcrelease 11
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1549,6 +1549,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Dec  5 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-11
+- allow suid apps to setenv NIS_PATH and incluence through that
+  nis_list and nis_lookup (#209155)
+- fix ttyname and ttyname_r with invalid file descriptor (#218276)
+- cs_CZ LC_TIME fixes (#218438)
+
 * Fri Dec  1 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-10
 - fix x86-64 restore_rt unwind info
 
