@@ -2294,3 +2294,74 @@
  
  # if defined IS_IN_libpthread || !defined NOT_IN_libc
  #  ifndef __ASSEMBLER__
+--- libc/sysdeps/unix/sysv/linux/netlinkaccess.h.jj	2006-01-08 09:21:15.000000000 +0100
++++ libc/sysdeps/unix/sysv/linux/netlinkaccess.h	2006-12-06 13:48:50.000000000 +0100
+@@ -25,6 +25,51 @@
+ 
+ #include <kernel-features.h>
+ 
++/* 2.6.19 kernel headers helpfully removed some macros and
++   moved lots of stuff into new headers, some of which aren't
++   included by linux/rtnetlink.h.  */
++
++#ifndef IFA_MAX
++struct ifaddrmsg
++{
++  uint8_t ifa_family;
++  uint8_t ifa_prefixlen;
++  uint8_t ifa_flags;
++  uint8_t ifa_scope;
++  uint32_t ifa_index;
++};
++
++enum
++{
++  IFA_UNSPEC,
++  IFA_ADDRESS,
++  IFA_LOCAL,
++  IFA_LABEL,
++  IFA_BROADCAST,
++  IFA_ANYCAST,
++  IFA_CACHEINFO,
++  IFA_MULTICAST
++};
++#endif
++
++#ifndef IFA_F_SECONDARY
++# define IFA_F_SECONDARY	0x01
++# define IFA_F_TEMPORARY	IFA_F_SECONDARY
++# define IFA_F_HOMEADDRESS	0x10
++# define IFA_F_DEPRECATED	0x20
++#endif
++
++#ifndef IFA_RTA
++# define IFA_RTA(r) \
++  ((struct rtattr*) ((char*)(r) + NLMSG_ALIGN (sizeof (struct ifaddrmsg))))
++# define IFA_PAYLOAD(n) NLMSG_PAYLOAD (n, sizeof (struct ifaddrmsg))
++#endif
++
++#ifndef IFLA_RTA
++# define IFLA_RTA(r) \
++  ((struct rtattr*) ((char*)(r) + NLMSG_ALIGN (sizeof (struct ifinfomsg))))
++# define IFLA_PAYLOAD(n) NLMSG_PAYLOAD (n, sizeof (struct ifinfomsg))
++#endif
+ 
+ struct netlink_res
+ {
+--- libc/sysdeps/unix/sysv/linux/check_pf.c.jj	2006-09-24 18:50:22.000000000 +0200
++++ libc/sysdeps/unix/sysv/linux/check_pf.c	2006-12-06 13:54:37.000000000 +0100
+@@ -27,13 +27,10 @@
+ #include <unistd.h>
+ #include <sys/socket.h>
+ 
+-#include <asm/types.h>
+-#include <linux/netlink.h>
+-#include <linux/rtnetlink.h>
+-
+ #include <not-cancel.h>
+ #include <kernel-features.h>
+ 
++#include "netlinkaccess.h"
+ 
+ #ifndef IFA_F_TEMPORARY
+ # define IFA_F_TEMPORARY IFA_F_SECONDARY
