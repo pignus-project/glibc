@@ -1,9 +1,9 @@
-%define glibcdate 20061210T1006
+%define glibcdate 20061214T0850
 %define glibcname glibc
-%define glibcsrcdir glibc-20061210T1006
+%define glibcsrcdir glibc-20061214T0850
 %define glibc_release_tarballs 0
 %define glibcversion 2.5.90
-%define glibcrelease 12
+%define glibcrelease 13
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1549,6 +1549,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Dec 14 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-13
+- fix setcontext on ppc32 (#219107)
+- fix wide stdio after setvbuf (#217064, BZ#2337)
+- handle realtime mount option in statvfs
+- revert i?86/x86_64 clone CFI temporarily
+
 * Sun Dec 10 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-12
 - fix hasmntopt (#218802)
 - fix setusershell and getusershell (#218782)
