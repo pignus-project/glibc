@@ -1,9 +1,9 @@
-%define glibcdate 20061214T0850
+%define glibcdate 20061219T1804
 %define glibcname glibc
-%define glibcsrcdir glibc-20061214T0850
+%define glibcsrcdir glibc-20061219T1804
 %define glibc_release_tarballs 0
 %define glibcversion 2.5.90
-%define glibcrelease 13
+%define glibcrelease 14
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1549,10 +1549,16 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Dec 19 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-14
+- fix {j,m}rand48{,_r} on 64-bit arches (BZ#3747)
+- handle power6x AT_PLATFORM (#216970)
+- fix a race condition in getXXbyYY_r (#219145)
+- fix tst-pselect testcase
+
 * Thu Dec 14 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-13
 - fix setcontext on ppc32 (#219107)
 - fix wide stdio after setvbuf (#217064, BZ#2337)
-- handle realtime mount option in statvfs
+- handle relatime mount option in statvfs
 - revert i?86/x86_64 clone CFI temporarily
 
 * Sun Dec 10 2006 Jakub Jelinek <jakub@redhat.com> 2.5.90-12
