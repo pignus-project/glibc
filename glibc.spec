@@ -1,9 +1,9 @@
-%define glibcdate 20070117T1043
+%define glibcdate 20070202T0923
 %define glibcname glibc
-%define glibcsrcdir glibc-20070117T1043
+%define glibcsrcdir glibc-20070202T0923
 %define glibc_release_tarballs 0
 %define glibcversion 2.5.90
-%define glibcrelease 15
+%define glibcrelease 16
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1398,7 +1398,7 @@ touch $RPM_BUILD_ROOT/%{_prefix}/lib/locale/locale-archive
 %triggerin common -p /usr/sbin/tzdata-update -- tzdata
 
 %post devel
-/sbin/install-info %{_infodir}/libc.info.gz %{_infodir}/dir
+/sbin/install-info %{_infodir}/libc.info.gz %{_infodir}/dir || :
 
 %pre headers
 # this used to be a link and it is causing nightmares now
@@ -1408,7 +1408,7 @@ fi
 
 %preun devel
 if [ "$1" = 0 ]; then
-    /sbin/install-info --delete %{_infodir}/libc.info.gz %{_infodir}/dir
+    /sbin/install-info --delete %{_infodir}/libc.info.gz %{_infodir}/dir || :
 fi
 
 %post utils -p /sbin/ldconfig
@@ -1551,6 +1551,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb  2 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-16
+- add strerror_l
+- fix application crashes when doing NSS lookups through nscd
+  mmapped databases and nscd decides to start garbage collection
+  during the lookups (#219145, #225315)
+- fix %0lld printing of 0LL on 32-bit architectures (BZ#3902)
+- ignore errors from install-info in glibc-devel scriptlets
+  (#223691)
+
 * Wed Jan 17 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-15
 - fix NIS getservbyname when proto is NULL
 - fix nss_compat +group handling (#220658)
