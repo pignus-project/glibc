@@ -2193,3 +2193,16 @@
  
  	cfi_startproc;
  PSEUDO_END (BP_SYM (__clone))
+--- libc/powerpc-cpu/sysdeps/powerpc/powerpc32/power4/memset.S	2006-04-06 17:50:35.000000000 +0200
++++ libc/powerpc-cpu/sysdeps/powerpc/powerpc32/power4/memset.S	2007-02-21 14:48:30.000000000 +0100
+@@ -21,6 +21,10 @@
+ #include <bp-sym.h>
+ #include <bp-asm.h>
+ 
++/* Not really needed by memset, but dl-sysdep.c is broken.  */
++	.globl __cache_line_size
++	.lcomm __cache_line_size,4,4
++
+ /* __ptr_t [r3] memset (__ptr_t s [r3], int c [r4], size_t n [r5]));
+    Returns 's'.
+ 
