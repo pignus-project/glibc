@@ -1,9 +1,9 @@
-%define glibcdate 20070221T1011
+%define glibcdate 20070317T2130
 %define glibcname glibc
-%define glibcsrcdir glibc-20070221T1011
+%define glibcsrcdir glibc-20070317T2130
 %define glibc_release_tarballs 0
 %define glibcversion 2.5.90
-%define glibcrelease 18
+%define glibcrelease 19
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1551,6 +1551,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Mar 17 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-19
+- fix power6 libm compat symbols on ppc32 (#232633)
+- fix child refcntr in NPTL fork (#230198)
+- fix ifaddrs with many net devices on > 4KB page size arches (#230151)
+- fix pthread_mutex_timedlock on x86_64 (#228103)
+- various fixes (BZ#3919, BZ#4101, BZ#4130, BZ#4181, BZ#4069, BZ#3458)
+
 * Wed Feb 21 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-18
 - fix nftw with FTW_CHDIR on / (BZ#4076)
 - nscd fixes (BZ#4074)
