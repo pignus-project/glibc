@@ -1,6 +1,6 @@
---- glibc-20070317T2130/ChangeLog	17 Mar 2007 17:09:13 -0000	1.10561
-+++ glibc-20070317T2130-fedora/ChangeLog	17 Mar 2007 21:52:47 -0000	1.8782.2.236
-@@ -917,6 +917,15 @@
+--- glibc-20070331T1609/ChangeLog	26 Mar 2007 20:41:09 -0000	1.10570
++++ glibc-20070331T1609-fedora/ChangeLog	31 Mar 2007 17:23:53 -0000	1.8782.2.237
+@@ -1054,6 +1054,15 @@
  	separators also if no non-zero digits found.
  	* stdlib/Makefile (tests): Add tst-strtod3.
  
@@ -16,8 +16,8 @@
  2006-12-09  Ulrich Drepper  <drepper@redhat.com>
  
  	[BZ #3632]
---- glibc-20070317T2130/ChangeLog.15	16 Feb 2005 07:34:17 -0000	1.1
-+++ glibc-20070317T2130-fedora/ChangeLog.15	19 Dec 2006 19:05:40 -0000	1.1.6.3
+--- glibc-20070331T1609/ChangeLog.15	16 Feb 2005 07:34:17 -0000	1.1
++++ glibc-20070331T1609-fedora/ChangeLog.15	19 Dec 2006 19:05:40 -0000	1.1.6.3
 @@ -477,6 +477,14 @@
  
  2004-11-26  Jakub Jelinek  <jakub@redhat.com>
@@ -83,8 +83,8 @@
  2004-08-30  Roland McGrath  <roland@frob.com>
  
  	* scripts/extract-abilist.awk: If `lastversion' variable defined, omit
---- glibc-20070317T2130/ChangeLog.16	4 May 2006 16:05:24 -0000	1.1
-+++ glibc-20070317T2130-fedora/ChangeLog.16	5 May 2006 06:11:52 -0000	1.1.2.1
+--- glibc-20070331T1609/ChangeLog.16	4 May 2006 16:05:24 -0000	1.1
++++ glibc-20070331T1609-fedora/ChangeLog.16	5 May 2006 06:11:52 -0000	1.1.2.1
 @@ -171,6 +171,11 @@
  	[BZ #2611]
  	* stdio-common/renameat.c (renameat): Fix typo.
@@ -256,8 +256,8 @@
  2005-02-10  Roland McGrath  <roland@redhat.com>
  
  	[BZ #157]
---- glibc-20070317T2130/csu/Makefile	1 Mar 2006 10:35:47 -0000	1.79
-+++ glibc-20070317T2130-fedora/csu/Makefile	30 Nov 2006 17:07:37 -0000	1.74.2.6
+--- glibc-20070331T1609/csu/Makefile	1 Mar 2006 10:35:47 -0000	1.79
++++ glibc-20070331T1609-fedora/csu/Makefile	30 Nov 2006 17:07:37 -0000	1.74.2.6
 @@ -93,7 +93,8 @@ omit-deps += $(crtstuff)
  $(crtstuff:%=$(objpfx)%.o): %.o: %.S $(objpfx)defs.h
  	$(compile.S) -g0 $(ASFLAGS-.os) -o $@
@@ -268,8 +268,8 @@
  
  vpath initfini.c $(sysdirs)
  
---- glibc-20070317T2130/csu/elf-init.c	5 Nov 2005 17:41:38 -0000	1.8
-+++ glibc-20070317T2130-fedora/csu/elf-init.c	15 Nov 2005 09:54:10 -0000	1.3.2.6
+--- glibc-20070331T1609/csu/elf-init.c	5 Nov 2005 17:41:38 -0000	1.8
++++ glibc-20070331T1609-fedora/csu/elf-init.c	15 Nov 2005 09:54:10 -0000	1.3.2.6
 @@ -49,6 +49,23 @@ extern void (*__init_array_end []) (int,
  extern void (*__fini_array_start []) (void) attribute_hidden;
  extern void (*__fini_array_end []) (void) attribute_hidden;
@@ -294,8 +294,8 @@
  
  /* These function symbols are provided for the .init/.fini section entry
     points automagically by the linker.  */
---- glibc-20070317T2130/debug/tst-chk1.c	24 Apr 2006 17:00:18 -0000	1.15
-+++ glibc-20070317T2130-fedora/debug/tst-chk1.c	24 Apr 2006 20:31:49 -0000	1.1.2.16
+--- glibc-20070331T1609/debug/tst-chk1.c	24 Apr 2006 17:00:18 -0000	1.15
++++ glibc-20070331T1609-fedora/debug/tst-chk1.c	24 Apr 2006 20:31:49 -0000	1.1.2.16
 @@ -17,6 +17,9 @@
     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
     02111-1307 USA.  */
@@ -324,8 +324,8 @@
  # define O 0
  #else
  # define O 1
---- glibc-20070317T2130/elf/ldconfig.c	3 Jan 2007 05:44:11 -0000	1.58
-+++ glibc-20070317T2130-fedora/elf/ldconfig.c	17 Jan 2007 10:42:36 -0000	1.47.2.13
+--- glibc-20070331T1609/elf/ldconfig.c	3 Jan 2007 05:44:11 -0000	1.58
++++ glibc-20070331T1609-fedora/elf/ldconfig.c	17 Jan 2007 10:42:36 -0000	1.47.2.13
 @@ -965,17 +965,19 @@ search_dirs (void)
  
  
@@ -407,8 +407,8 @@
      }
  
    search_dirs ();
---- glibc-20070317T2130/elf/tst-stackguard1.c	26 Jun 2005 18:08:36 -0000	1.1
-+++ glibc-20070317T2130-fedora/elf/tst-stackguard1.c	8 Aug 2005 21:24:27 -0000	1.1.2.3
+--- glibc-20070331T1609/elf/tst-stackguard1.c	26 Jun 2005 18:08:36 -0000	1.1
++++ glibc-20070331T1609-fedora/elf/tst-stackguard1.c	8 Aug 2005 21:24:27 -0000	1.1.2.3
 @@ -160,17 +160,21 @@ do_test (void)
       the 16 runs, something is very wrong.  */
    int ndifferences = 0;
@@ -433,8 +433,8 @@
      {
        puts ("stack guard canaries are not randomized enough");
        puts ("nor equal to the default canary value");
---- glibc-20070317T2130/iconv/iconvconfig.c	3 Jan 2007 05:44:11 -0000	1.27
-+++ glibc-20070317T2130-fedora/iconv/iconvconfig.c	17 Jan 2007 10:42:36 -0000	1.19.2.8
+--- glibc-20070331T1609/iconv/iconvconfig.c	3 Jan 2007 05:44:11 -0000	1.27
++++ glibc-20070331T1609-fedora/iconv/iconvconfig.c	17 Jan 2007 10:42:36 -0000	1.19.2.8
 @@ -1011,6 +1011,34 @@ next_prime (uint32_t seed)
                                module name offset
                           (following last entry with step count 0)
@@ -511,8 +511,8 @@
    /* Open the output file.  */
    if (output_file == NULL)
      {
---- glibc-20070317T2130/include/features.h	10 Dec 2006 01:54:13 -0000	1.45
-+++ glibc-20070317T2130-fedora/include/features.h	10 Dec 2006 10:38:54 -0000	1.35.2.14
+--- glibc-20070331T1609/include/features.h	10 Dec 2006 01:54:13 -0000	1.45
++++ glibc-20070331T1609-fedora/include/features.h	10 Dec 2006 10:38:54 -0000	1.35.2.14
 @@ -275,7 +275,13 @@
  #endif
  
@@ -528,16 +528,16 @@
  # if _FORTIFY_SOURCE > 1
  #  define __USE_FORTIFY_LEVEL 2
  # else
---- glibc-20070317T2130/include/bits/stdlib-ldbl.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20070317T2130-fedora/include/bits/stdlib-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
+--- glibc-20070331T1609/include/bits/stdlib-ldbl.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20070331T1609-fedora/include/bits/stdlib-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
 @@ -0,0 +1 @@
 +#include <stdlib/bits/stdlib-ldbl.h>
---- glibc-20070317T2130/include/bits/wchar-ldbl.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20070317T2130-fedora/include/bits/wchar-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
+--- glibc-20070331T1609/include/bits/wchar-ldbl.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20070331T1609-fedora/include/bits/wchar-ldbl.h	1 Feb 2006 09:30:43 -0000	1.1.2.1
 @@ -0,0 +1 @@
 +#include <wcsmbs/bits/wchar-ldbl.h>
---- glibc-20070317T2130/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
-+++ glibc-20070317T2130-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
+--- glibc-20070331T1609/intl/locale.alias	4 Dec 2003 07:57:47 -0000	1.23
++++ glibc-20070331T1609-fedora/intl/locale.alias	22 Sep 2004 21:20:53 -0000	1.23.2.1
 @@ -58,8 +58,6 @@ korean		ko_KR.eucKR
  korean.euc 	ko_KR.eucKR
  ko_KR		ko_KR.eucKR
@@ -547,8 +547,8 @@
  norwegian       nb_NO.ISO-8859-1
  nynorsk		nn_NO.ISO-8859-1
  polish          pl_PL.ISO-8859-2
---- glibc-20070317T2130/libio/stdio.h	17 Feb 2007 18:26:15 -0000	1.89
-+++ glibc-20070317T2130-fedora/libio/stdio.h	21 Feb 2007 11:15:50 -0000	1.78.2.11
+--- glibc-20070331T1609/libio/stdio.h	17 Feb 2007 18:26:15 -0000	1.89
++++ glibc-20070331T1609-fedora/libio/stdio.h	21 Feb 2007 11:15:50 -0000	1.78.2.11
 @@ -145,10 +145,12 @@ typedef _G_fpos64_t fpos64_t;
  extern struct _IO_FILE *stdin;		/* Standard input stream.  */
  extern struct _IO_FILE *stdout;		/* Standard output stream.  */
@@ -562,8 +562,8 @@
  
  __BEGIN_NAMESPACE_STD
  /* Remove file FILENAME.  */
---- glibc-20070317T2130/libio/bits/stdio2.h	17 Mar 2007 17:04:08 -0000	1.5
-+++ glibc-20070317T2130-fedora/libio/bits/stdio2.h	17 Mar 2007 21:52:49 -0000	1.1.2.7
+--- glibc-20070331T1609/libio/bits/stdio2.h	17 Mar 2007 17:04:08 -0000	1.5
++++ glibc-20070331T1609-fedora/libio/bits/stdio2.h	17 Mar 2007 21:52:49 -0000	1.1.2.7
 @@ -61,14 +61,25 @@ extern int __vfprintf_chk (FILE *__restr
  extern int __vprintf_chk (int __flag, __const char *__restrict __format,
  			  _G_va_list __ap);
@@ -594,8 +594,8 @@
  
  #endif
  
---- glibc-20070317T2130/locale/iso-4217.def	17 Feb 2007 07:46:20 -0000	1.20
-+++ glibc-20070317T2130-fedora/locale/iso-4217.def	21 Feb 2007 11:15:50 -0000	1.15.2.5
+--- glibc-20070331T1609/locale/iso-4217.def	17 Feb 2007 07:46:20 -0000	1.20
++++ glibc-20070331T1609-fedora/locale/iso-4217.def	21 Feb 2007 11:15:50 -0000	1.15.2.5
 @@ -8,6 +8,7 @@
   *
   * !!! The list has to be sorted !!!
@@ -687,8 +687,8 @@
  DEFINE_INT_CURR("PYG")		/* Paraguay Guarani  */
  DEFINE_INT_CURR("QAR")		/* Qatar Rial  */
  DEFINE_INT_CURR("ROL")		/* Romanian Leu  */
---- glibc-20070317T2130/locale/programs/3level.h	7 Dec 2005 05:47:27 -0000	1.6
-+++ glibc-20070317T2130-fedora/locale/programs/3level.h	19 Dec 2005 12:11:15 -0000	1.5.2.2
+--- glibc-20070331T1609/locale/programs/3level.h	7 Dec 2005 05:47:27 -0000	1.6
++++ glibc-20070331T1609-fedora/locale/programs/3level.h	19 Dec 2005 12:11:15 -0000	1.5.2.2
 @@ -202,6 +202,42 @@ CONCAT(TABLE,_iterate) (struct TABLE *t,
  	}
      }
@@ -732,8 +732,8 @@
  #endif
  
  #ifndef NO_FINALIZE
---- glibc-20070317T2130/localedata/Makefile	14 Mar 2007 22:32:43 -0000	1.105
-+++ glibc-20070317T2130-fedora/localedata/Makefile	17 Mar 2007 21:52:52 -0000	1.101.2.5
+--- glibc-20070331T1609/localedata/Makefile	14 Mar 2007 22:32:43 -0000	1.105
++++ glibc-20070331T1609-fedora/localedata/Makefile	17 Mar 2007 21:52:52 -0000	1.101.2.5
 @@ -223,6 +223,7 @@ $(INSTALL-SUPPORTED-LOCALES): install-lo
  	echo -n '...'; \
  	input=`echo $$locale | sed 's/\([^.]*\)[^@]*\(.*\)/\1\2/'`; \
@@ -742,8 +742,8 @@
  		     -i locales/$$input -c -f charmaps/$$charset \
  		     $(addprefix --prefix=,$(install_root)) $$locale; \
  	echo ' done'; \
---- glibc-20070317T2130/localedata/SUPPORTED	18 Feb 2007 04:52:09 -0000	1.102
-+++ glibc-20070317T2130-fedora/localedata/SUPPORTED	21 Feb 2007 11:15:50 -0000	1.71.2.16
+--- glibc-20070331T1609/localedata/SUPPORTED	18 Feb 2007 04:52:09 -0000	1.102
++++ glibc-20070331T1609-fedora/localedata/SUPPORTED	21 Feb 2007 11:15:50 -0000	1.71.2.16
 @@ -78,6 +78,7 @@ cy_GB.UTF-8/UTF-8 \
  cy_GB/ISO-8859-14 \
  da_DK.UTF-8/UTF-8 \
@@ -785,8 +785,8 @@
  ta_IN/UTF-8 \
  te_IN/UTF-8 \
  tg_TJ.UTF-8/UTF-8 \
---- glibc-20070317T2130/localedata/locales/cy_GB	28 Sep 2004 04:37:33 -0000	1.4
-+++ glibc-20070317T2130-fedora/localedata/locales/cy_GB	29 Sep 2004 08:48:23 -0000	1.3.2.2
+--- glibc-20070331T1609/localedata/locales/cy_GB	28 Sep 2004 04:37:33 -0000	1.4
++++ glibc-20070331T1609-fedora/localedata/locales/cy_GB	29 Sep 2004 08:48:23 -0000	1.3.2.2
 @@ -248,8 +248,11 @@ mon         "<U0049><U006F><U006E><U0061
  d_t_fmt     "<U0044><U0079><U0064><U0064><U0020><U0025><U0041><U0020><U0025><U0064><U0020><U006d><U0069><U0073><U0020><U0025><U0042><U0020><U0025><U0059><U0020><U0025><U0054><U0020><U0025><U005A>"
  d_fmt       "<U0025><U0064><U002E><U0025><U006D><U002E><U0025><U0079>"
@@ -801,8 +801,8 @@
  END LC_TIME
  
  LC_MESSAGES
---- glibc-20070317T2130/localedata/locales/en_GB	1 Oct 2006 16:18:33 -0000	1.14
-+++ glibc-20070317T2130-fedora/localedata/locales/en_GB	2 Oct 2006 19:02:41 -0000	1.10.2.4
+--- glibc-20070331T1609/localedata/locales/en_GB	1 Oct 2006 16:18:33 -0000	1.14
++++ glibc-20070331T1609-fedora/localedata/locales/en_GB	2 Oct 2006 19:02:41 -0000	1.10.2.4
 @@ -116,8 +116,8 @@ mon         "<U004A><U0061><U006E><U0075
  d_t_fmt     "<U0025><U0061><U0020><U0025><U0064><U0020><U0025><U0062><U0020><U0025><U0059><U0020><U0025><U0054><U0020><U0025><U005A>"
  d_fmt       "<U0025><U0064><U002F><U0025><U006D><U002F><U0025><U0079>"
@@ -814,8 +814,8 @@
  date_fmt	"<U0025><U0061><U0020><U0025><U0062><U0020><U0025><U0065>/
  <U0020><U0025><U0048><U003A><U0025><U004D><U003A><U0025><U0053><U0020>/
  <U0025><U005A><U0020><U0025><U0059>"
---- glibc-20070317T2130/localedata/locales/no_NO 1 Jan 1970 00:00:00 -0000
-+++ glibc-20070317T2130-fedora/localedata/locales/no_NO	22 Sep 2004 21:21:01 -0000	1.11.2.1
+--- glibc-20070331T1609/localedata/locales/no_NO 1 Jan 1970 00:00:00 -0000
++++ glibc-20070331T1609-fedora/localedata/locales/no_NO	22 Sep 2004 21:21:01 -0000	1.11.2.1
 @@ -0,0 +1,69 @@
 +escape_char	/
 +comment_char    %
@@ -886,8 +886,8 @@
 +LC_ADDRESS
 +copy "nb_NO"
 +END LC_ADDRESS
---- glibc-20070317T2130/localedata/locales/zh_TW	31 Oct 2004 23:42:28 -0000	1.7
-+++ glibc-20070317T2130-fedora/localedata/locales/zh_TW	2 Nov 2004 12:25:57 -0000	1.5.2.2
+--- glibc-20070331T1609/localedata/locales/zh_TW	31 Oct 2004 23:42:28 -0000	1.7
++++ glibc-20070331T1609-fedora/localedata/locales/zh_TW	2 Nov 2004 12:25:57 -0000	1.5.2.2
 @@ -1,7 +1,7 @@
  comment_char %
  escape_char /
@@ -915,8 +915,8 @@
  revision   "0.2"
  date       "2000-08-02"
  %
---- glibc-20070317T2130/malloc/mcheck.c	8 Sep 2004 20:36:02 -0000	1.18
-+++ glibc-20070317T2130-fedora/malloc/mcheck.c	20 Dec 2005 10:59:21 -0000	1.18.2.1
+--- glibc-20070331T1609/malloc/mcheck.c	8 Sep 2004 20:36:02 -0000	1.18
++++ glibc-20070331T1609-fedora/malloc/mcheck.c	20 Dec 2005 10:59:21 -0000	1.18.2.1
 @@ -24,9 +24,25 @@
  # include <mcheck.h>
  # include <stdint.h>
@@ -992,8 +992,8 @@
  
        old_free_hook = __free_hook;
        __free_hook = freehook;
---- glibc-20070317T2130/malloc/mtrace.c	25 Jan 2007 00:43:38 -0000	1.43
-+++ glibc-20070317T2130-fedora/malloc/mtrace.c	20 Dec 2005 10:59:21 -0000	1.41.2.1
+--- glibc-20070331T1609/malloc/mtrace.c	25 Jan 2007 00:43:38 -0000	1.43
++++ glibc-20070331T1609-fedora/malloc/mtrace.c	20 Dec 2005 10:59:21 -0000	1.41.2.1
 @@ -40,6 +40,18 @@
  # include <libio/iolibio.h>
  # define setvbuf(s, b, f, l) INTUSE(_IO_setvbuf) (s, b, f, l)
@@ -1049,8 +1049,8 @@
    __memalign_hook = tr_memalignhook;
    __malloc_hook = tr_mallochook;
  
---- glibc-20070317T2130/manual/libc.texinfo	12 Nov 2003 00:37:03 -0000	1.94
-+++ glibc-20070317T2130-fedora/manual/libc.texinfo	3 Nov 2006 16:31:21 -0000	1.94.2.1
+--- glibc-20070331T1609/manual/libc.texinfo	12 Nov 2003 00:37:03 -0000	1.94
++++ glibc-20070331T1609-fedora/manual/libc.texinfo	3 Nov 2006 16:31:21 -0000	1.94.2.1
 @@ -5,7 +5,7 @@
  @setchapternewpage odd
  
@@ -1060,17 +1060,17 @@
  @direntry
  * Libc: (libc).                 C library.
  @end direntry
---- glibc-20070317T2130/nis/nss	28 Apr 2006 21:02:23 -0000	1.3
-+++ glibc-20070317T2130-fedora/nis/nss	1 May 2006 08:02:53 -0000	1.2.2.2
+--- glibc-20070331T1609/nis/nss	28 Apr 2006 21:02:23 -0000	1.3
++++ glibc-20070331T1609-fedora/nis/nss	1 May 2006 08:02:53 -0000	1.2.2.2
 @@ -25,4 +25,4 @@
  #  memory with every getXXent() call.  Otherwise each getXXent() call
  #  might result into a network communication with the server to get
  #  the next entry.
 -#SETENT_BATCH_READ=TRUE
 +SETENT_BATCH_READ=TRUE
---- glibc-20070317T2130/nptl/ChangeLog	17 Mar 2007 17:04:20 -0000	1.955
-+++ glibc-20070317T2130-fedora/nptl/ChangeLog	17 Mar 2007 21:52:53 -0000	1.706.2.118
-@@ -1404,6 +1404,15 @@
+--- glibc-20070331T1609/nptl/ChangeLog	26 Mar 2007 20:12:19 -0000	1.956
++++ glibc-20070331T1609-fedora/nptl/ChangeLog	31 Mar 2007 17:23:55 -0000	1.706.2.119
+@@ -1409,6 +1409,15 @@
  	Use __sigfillset.  Document that sigfillset does the right thing wrt
  	to SIGSETXID.
  
@@ -1086,7 +1086,7 @@
  2005-07-11  Jakub Jelinek  <jakub@redhat.com>
  
  	[BZ #1102]
-@@ -2140,6 +2149,11 @@
+@@ -2145,6 +2154,11 @@
  	Move definition inside libpthread, libc, librt check.  Provide
  	definition for rtld.
  
@@ -1098,7 +1098,7 @@
  2004-09-02  Ulrich Drepper  <drepper@redhat.com>
  
  	* sysdeps/alpha/jmpbuf-unwind.h: Define __libc_unwind_longjmp.
-@@ -4214,6 +4228,11 @@
+@@ -4219,6 +4233,11 @@
  
  	* Makefile [$(build-shared) = yes] (tests): Depend on $(test-modules).
  
@@ -1110,8 +1110,8 @@
  2003-07-25  Jakub Jelinek  <jakub@redhat.com>
  
  	* tst-cancel17.c (do_test): Check if aio_cancel failed.
---- glibc-20070317T2130/nptl/Makefile	8 Sep 2006 10:40:49 -0000	1.188
-+++ glibc-20070317T2130-fedora/nptl/Makefile	28 Nov 2006 11:18:18 -0000	1.157.2.29
+--- glibc-20070331T1609/nptl/Makefile	8 Sep 2006 10:40:49 -0000	1.188
++++ glibc-20070331T1609-fedora/nptl/Makefile	28 Nov 2006 11:18:18 -0000	1.157.2.29
 @@ -340,7 +340,8 @@ endif
  extra-objs += $(crti-objs) $(crtn-objs)
  omit-deps += crti crtn
@@ -1144,8 +1144,8 @@
  else
  $(addprefix $(objpfx),$(tests) $(test-srcs)): $(objpfx)libpthread.a
  endif
---- glibc-20070317T2130/nptl/tst-stackguard1.c	26 Jun 2005 17:44:14 -0000	1.1
-+++ glibc-20070317T2130-fedora/nptl/tst-stackguard1.c	8 Aug 2005 21:24:28 -0000	1.1.2.3
+--- glibc-20070331T1609/nptl/tst-stackguard1.c	26 Jun 2005 17:44:14 -0000	1.1
++++ glibc-20070331T1609-fedora/nptl/tst-stackguard1.c	8 Aug 2005 21:24:28 -0000	1.1.2.3
 @@ -190,17 +190,21 @@ do_test (void)
       the 16 runs, something is very wrong.  */
    int ndifferences = 0;
@@ -1170,8 +1170,8 @@
      {
        puts ("stack guard canaries are not randomized enough");
        puts ("nor equal to the default canary value");
---- glibc-20070317T2130/nptl/sysdeps/unix/sysv/linux/kernel-features.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20070317T2130-fedora/nptl/sysdeps/unix/sysv/linux/kernel-features.h	22 Sep 2004 21:21:02 -0000	1.1.2.1
+--- glibc-20070331T1609/nptl/sysdeps/unix/sysv/linux/kernel-features.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20070331T1609-fedora/nptl/sysdeps/unix/sysv/linux/kernel-features.h	22 Sep 2004 21:21:02 -0000	1.1.2.1
 @@ -0,0 +1,6 @@
 +#include_next <kernel-features.h>
 +
@@ -1179,8 +1179,8 @@
 +#ifndef __ASSUME_CLONE_THREAD_FLAGS
 +# define __ASSUME_CLONE_THREAD_FLAGS	1
 +#endif
---- glibc-20070317T2130/nscd/connections.c	1 Feb 2007 16:05:31 -0000	1.98
-+++ glibc-20070317T2130-fedora/nscd/connections.c	2 Feb 2007 09:48:23 -0000	1.55.2.28
+--- glibc-20070331T1609/nscd/connections.c	1 Feb 2007 16:05:31 -0000	1.98
++++ glibc-20070331T1609-fedora/nscd/connections.c	2 Feb 2007 09:48:23 -0000	1.55.2.28
 @@ -1947,3 +1947,21 @@ finish_drop_privileges (void)
    install_real_capabilities (new_caps);
  #endif
@@ -1203,8 +1203,8 @@
 +    prune_cache (&dbs[hstdb], LONG_MAX, -1);
 +}
 +
---- glibc-20070317T2130/nscd/nscd.c	16 Feb 2007 19:14:58 -0000	1.57
-+++ glibc-20070317T2130-fedora/nscd/nscd.c	21 Feb 2007 11:15:53 -0000	1.38.2.16
+--- glibc-20070331T1609/nscd/nscd.c	16 Feb 2007 19:14:58 -0000	1.57
++++ glibc-20070331T1609-fedora/nscd/nscd.c	21 Feb 2007 11:15:53 -0000	1.38.2.16
 @@ -119,6 +119,9 @@ static struct argp argp =
    options, parse_opt, NULL, doc,
  };
@@ -1223,8 +1223,8 @@
    signal (SIGPIPE, SIG_IGN);
  
    /* Cleanup files created by a previous 'bind'.  */
---- glibc-20070317T2130/nscd/nscd.conf	14 Jan 2007 05:24:04 -0000	1.14
-+++ glibc-20070317T2130-fedora/nscd/nscd.conf	17 Jan 2007 10:42:40 -0000	1.8.2.6
+--- glibc-20070331T1609/nscd/nscd.conf	14 Jan 2007 05:24:04 -0000	1.14
++++ glibc-20070331T1609-fedora/nscd/nscd.conf	17 Jan 2007 10:42:40 -0000	1.8.2.6
 @@ -33,8 +33,8 @@
  #	logfile			/var/log/nscd.log
  #	threads			6
@@ -1236,8 +1236,8 @@
  	debug-level		0
  #	reload-count		5
  	paranoia		no
---- glibc-20070317T2130/nscd/nscd.init	1 Dec 2006 20:12:45 -0000	1.10
-+++ glibc-20070317T2130-fedora/nscd/nscd.init	5 Dec 2006 21:50:20 -0000	1.6.2.5
+--- glibc-20070331T1609/nscd/nscd.init	1 Dec 2006 20:12:45 -0000	1.10
++++ glibc-20070331T1609-fedora/nscd/nscd.init	5 Dec 2006 21:50:20 -0000	1.6.2.5
 @@ -9,6 +9,7 @@
  #		slow naming services like NIS, NIS+, LDAP, or hesiod.
  # processname: /usr/sbin/nscd
@@ -1278,8 +1278,8 @@
      RETVAL=$?
      echo
      [ $RETVAL -eq 0 ] && touch /var/lock/subsys/nscd
---- glibc-20070317T2130/posix/Makefile	5 Feb 2007 15:22:40 -0000	1.195
-+++ glibc-20070317T2130-fedora/posix/Makefile	11 Feb 2007 16:21:43 -0000	1.171.2.23
+--- glibc-20070331T1609/posix/Makefile	5 Feb 2007 15:22:40 -0000	1.195
++++ glibc-20070331T1609-fedora/posix/Makefile	11 Feb 2007 16:21:43 -0000	1.171.2.23
 @@ -110,7 +110,7 @@ generated := $(addprefix wordexp-test-re
  	     tst-rxspencer-mem tst-rxspencer.mtrace tst-getconf.out \
  	     tst-pcre-mem tst-pcre.mtrace tst-boost-mem tst-boost.mtrace \
@@ -1312,8 +1312,8 @@
 +	  | sed -n -e '/START_OF_STRINGS/,$${/POSIX_V6_/{s/^[^"]*"//;s/".*$$//;p}}' \
 +	  > $@.new
 +	mv -f $@.new $@
---- glibc-20070317T2130/posix/getconf.speclist.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20070317T2130-fedora/posix/getconf.speclist.h	13 Dec 2004 23:32:37 -0000	1.1.2.2
+--- glibc-20070331T1609/posix/getconf.speclist.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20070331T1609-fedora/posix/getconf.speclist.h	13 Dec 2004 23:32:37 -0000	1.1.2.2
 @@ -0,0 +1,15 @@
 +#include <unistd.h>
 +const char *START_OF_STRINGS =
@@ -1330,8 +1330,8 @@
 +"POSIX_V6_LPBIG_OFFBIG"
 +#endif
 +"";
---- glibc-20070317T2130/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
-+++ glibc-20070317T2130-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
+--- glibc-20070331T1609/sysdeps/generic/dl-cache.h	25 Jun 2003 08:01:22 -0000	1.13
++++ glibc-20070331T1609-fedora/sysdeps/generic/dl-cache.h	22 Sep 2004 21:21:07 -0000	1.13.2.1
 @@ -36,6 +36,14 @@
  # define add_system_dir(dir) add_dir (dir)
  #endif
@@ -1347,8 +1347,8 @@
  #define CACHEMAGIC "ld.so-1.7.0"
  
  /* libc5 and glibc 2.0/2.1 use the same format.  For glibc 2.2 another
---- glibc-20070317T2130/sysdeps/i386/Makefile	6 Mar 2005 00:18:16 -0000	1.20
-+++ glibc-20070317T2130-fedora/sysdeps/i386/Makefile	30 Jun 2006 09:16:34 -0000	1.16.2.4
+--- glibc-20070331T1609/sysdeps/i386/Makefile	6 Mar 2005 00:18:16 -0000	1.20
++++ glibc-20070331T1609-fedora/sysdeps/i386/Makefile	30 Jun 2006 09:16:34 -0000	1.16.2.4
 @@ -64,4 +64,12 @@ endif
  
  ifneq (,$(filter -mno-tls-direct-seg-refs,$(CFLAGS)))
@@ -1362,8 +1362,8 @@
 +CPPFLAGS-.oS += -DNO_TLS_DIRECT_SEG_REFS
 +CFLAGS-.oS += -mno-tls-direct-seg-refs
  endif
---- glibc-20070317T2130/sysdeps/ia64/Makefile	16 Aug 2004 06:46:14 -0000	1.10
-+++ glibc-20070317T2130-fedora/sysdeps/ia64/Makefile	22 Sep 2004 21:21:07 -0000	1.10.2.1
+--- glibc-20070331T1609/sysdeps/ia64/Makefile	16 Aug 2004 06:46:14 -0000	1.10
++++ glibc-20070331T1609-fedora/sysdeps/ia64/Makefile	22 Sep 2004 21:21:07 -0000	1.10.2.1
 @@ -12,8 +12,8 @@ elide-routines.os += hp-timing
  
  ifeq (yes,$(build-shared))
@@ -1375,8 +1375,8 @@
  endif
  endif
  
---- glibc-20070317T2130/sysdeps/ia64/ia64libgcc.S	11 May 2002 05:12:35 -0000	1.2
-+++ glibc-20070317T2130-fedora/sysdeps/ia64/ia64libgcc.S	22 Sep 2004 21:21:07 -0000	1.2.2.1
+--- glibc-20070331T1609/sysdeps/ia64/ia64libgcc.S	11 May 2002 05:12:35 -0000	1.2
++++ glibc-20070331T1609-fedora/sysdeps/ia64/ia64libgcc.S	22 Sep 2004 21:21:07 -0000	1.2.2.1
 @@ -1,350 +0,0 @@
 -/* From the Intel IA-64 Optimization Guide, choose the minimum latency
 -   alternative.  */
@@ -1728,8 +1728,8 @@
 -	.symver	___multi3, __multi3@GLIBC_2.2
 -
 -#endif
---- glibc-20070317T2130/sysdeps/ia64/libgcc-compat.c 1 Jan 1970 00:00:00 -0000
-+++ glibc-20070317T2130-fedora/sysdeps/ia64/libgcc-compat.c	22 Sep 2004 21:21:08 -0000	1.1.2.1
+--- glibc-20070331T1609/sysdeps/ia64/libgcc-compat.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20070331T1609-fedora/sysdeps/ia64/libgcc-compat.c	22 Sep 2004 21:21:08 -0000	1.1.2.1
 @@ -0,0 +1,84 @@
 +/* pre-.hidden libgcc compatibility
 +   Copyright (C) 2002 Free Software Foundation, Inc.
@@ -1815,8 +1815,8 @@
 +symbol_version (INTUSE (__multi3), __multi3, GLIBC_2.2);
 +
 +#endif
---- glibc-20070317T2130/sysdeps/powerpc/powerpc64/Makefile	2 Feb 2006 08:23:44 -0000	1.8
-+++ glibc-20070317T2130-fedora/sysdeps/powerpc/powerpc64/Makefile	30 Nov 2006 17:07:38 -0000	1.4.2.5
+--- glibc-20070331T1609/sysdeps/powerpc/powerpc64/Makefile	2 Feb 2006 08:23:44 -0000	1.8
++++ glibc-20070331T1609-fedora/sysdeps/powerpc/powerpc64/Makefile	30 Nov 2006 17:07:38 -0000	1.4.2.5
 @@ -30,6 +30,7 @@ ifneq ($(elf),no)
  # we use -fpic instead which is much better.
  CFLAGS-initfini.s += -fpic -O1
@@ -1825,8 +1825,8 @@
  endif
  
  ifeq ($(subdir),elf)
---- glibc-20070317T2130/sysdeps/unix/nice.c	15 Aug 2006 05:24:45 -0000	1.7
-+++ glibc-20070317T2130-fedora/sysdeps/unix/nice.c	15 Aug 2006 05:53:50 -0000	1.6.2.2
+--- glibc-20070331T1609/sysdeps/unix/nice.c	15 Aug 2006 05:24:45 -0000	1.7
++++ glibc-20070331T1609-fedora/sysdeps/unix/nice.c	15 Aug 2006 05:53:50 -0000	1.6.2.2
 @@ -42,7 +42,12 @@ nice (int incr)
  	__set_errno (save);
      }
@@ -1841,8 +1841,8 @@
    if (result == -1)
      {
        if (errno == EACCES)
---- glibc-20070317T2130/sysdeps/unix/sysv/linux/check_pf.c	15 Mar 2007 20:02:24 -0000	1.9
-+++ glibc-20070317T2130-fedora/sysdeps/unix/sysv/linux/check_pf.c	17 Mar 2007 21:53:00 -0000	1.3.2.6
+--- glibc-20070331T1609/sysdeps/unix/sysv/linux/check_pf.c	15 Mar 2007 20:02:24 -0000	1.9
++++ glibc-20070331T1609-fedora/sysdeps/unix/sysv/linux/check_pf.c	17 Mar 2007 21:53:00 -0000	1.3.2.6
 @@ -27,13 +27,10 @@
  #include <unistd.h>
  #include <sys/socket.h>
@@ -1858,8 +1858,8 @@
  
  #ifndef IFA_F_TEMPORARY
  # define IFA_F_TEMPORARY IFA_F_SECONDARY
---- glibc-20070317T2130/sysdeps/unix/sysv/linux/dl-osinfo.h	1 Aug 2006 06:55:27 -0000	1.23
-+++ glibc-20070317T2130-fedora/sysdeps/unix/sysv/linux/dl-osinfo.h	2 Aug 2006 16:57:42 -0000	1.14.2.9
+--- glibc-20070331T1609/sysdeps/unix/sysv/linux/dl-osinfo.h	1 Aug 2006 06:55:27 -0000	1.23
++++ glibc-20070331T1609-fedora/sysdeps/unix/sysv/linux/dl-osinfo.h	2 Aug 2006 16:57:42 -0000	1.14.2.9
 @@ -18,11 +18,14 @@
     02111-1307 USA.  */
  
@@ -1907,8 +1907,8 @@
 +  ret ^= stk;
    return ret;
  }
---- glibc-20070317T2130/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 05:26:34 -0000	1.6
-+++ glibc-20070317T2130-fedora/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 09:43:55 -0000	1.1.2.7
+--- glibc-20070331T1609/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 05:26:34 -0000	1.6
++++ glibc-20070331T1609-fedora/sysdeps/unix/sysv/linux/futimesat.c	3 Feb 2006 09:43:55 -0000	1.1.2.7
 @@ -37,14 +37,14 @@ futimesat (fd, file, tvp)
  {
    int result;
@@ -1951,8 +1951,8 @@
      {
        size_t filelen = strlen (file);
        static const char procfd[] = "/proc/self/fd/%d/%s";
---- glibc-20070317T2130/sysdeps/unix/sysv/linux/netlinkaccess.h	8 Jan 2006 08:21:15 -0000	1.3
-+++ glibc-20070317T2130-fedora/sysdeps/unix/sysv/linux/netlinkaccess.h	10 Dec 2006 10:51:12 -0000	1.1.2.3
+--- glibc-20070331T1609/sysdeps/unix/sysv/linux/netlinkaccess.h	8 Jan 2006 08:21:15 -0000	1.3
++++ glibc-20070331T1609-fedora/sysdeps/unix/sysv/linux/netlinkaccess.h	10 Dec 2006 10:51:12 -0000	1.1.2.3
 @@ -25,6 +25,24 @@
  
  #include <kernel-features.h>
@@ -1978,8 +1978,8 @@
  
  struct netlink_res
  {
---- glibc-20070317T2130/sysdeps/unix/sysv/linux/paths.h	15 Nov 2000 23:06:47 -0000	1.11
-+++ glibc-20070317T2130-fedora/sysdeps/unix/sysv/linux/paths.h	22 Sep 2004 21:21:08 -0000	1.11.4.1
+--- glibc-20070331T1609/sysdeps/unix/sysv/linux/paths.h	15 Nov 2000 23:06:47 -0000	1.11
++++ glibc-20070331T1609-fedora/sysdeps/unix/sysv/linux/paths.h	22 Sep 2004 21:21:08 -0000	1.11.4.1
 @@ -61,7 +61,7 @@
  #define	_PATH_TTY	"/dev/tty"
  #define	_PATH_UNIX	"/boot/vmlinux"
@@ -1989,8 +1989,8 @@
  #define _PATH_WTMP	"/var/log/wtmp"
  
  /* Provide trailing slash, since mostly used for building pathnames. */
---- glibc-20070317T2130/sysdeps/unix/sysv/linux/tcsetattr.c	10 Sep 2003 19:16:07 -0000	1.16
-+++ glibc-20070317T2130-fedora/sysdeps/unix/sysv/linux/tcsetattr.c	22 Sep 2004 21:21:08 -0000	1.16.2.1
+--- glibc-20070331T1609/sysdeps/unix/sysv/linux/tcsetattr.c	10 Sep 2003 19:16:07 -0000	1.16
++++ glibc-20070331T1609-fedora/sysdeps/unix/sysv/linux/tcsetattr.c	22 Sep 2004 21:21:08 -0000	1.16.2.1
 @@ -49,6 +49,7 @@ tcsetattr (fd, optional_actions, termios
  {
    struct __kernel_termios k_termios;
@@ -2036,8 +2036,8 @@
 +  return retval;
  }
  libc_hidden_def (tcsetattr)
---- glibc-20070317T2130/sysdeps/unix/sysv/linux/i386/clone.S	3 Dec 2006 23:12:36 -0000	1.27
-+++ glibc-20070317T2130-fedora/sysdeps/unix/sysv/linux/i386/clone.S	14 Dec 2006 09:06:34 -0000	1.22.2.6
+--- glibc-20070331T1609/sysdeps/unix/sysv/linux/i386/clone.S	3 Dec 2006 23:12:36 -0000	1.27
++++ glibc-20070331T1609-fedora/sysdeps/unix/sysv/linux/i386/clone.S	14 Dec 2006 09:06:34 -0000	1.22.2.6
 @@ -120,9 +120,6 @@ L(pseudo_end):
  	ret
  
@@ -2056,8 +2056,8 @@
  
  	cfi_startproc
  PSEUDO_END (BP_SYM (__clone))
---- glibc-20070317T2130/sysdeps/unix/sysv/linux/i386/dl-cache.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20070317T2130-fedora/sysdeps/unix/sysv/linux/i386/dl-cache.h	22 Sep 2004 21:21:08 -0000	1.1.2.1
+--- glibc-20070331T1609/sysdeps/unix/sysv/linux/i386/dl-cache.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20070331T1609-fedora/sysdeps/unix/sysv/linux/i386/dl-cache.h	22 Sep 2004 21:21:08 -0000	1.1.2.1
 @@ -0,0 +1,59 @@
 +/* Support for reading /etc/ld.so.cache files written by Linux ldconfig.
 +   Copyright (C) 2004 Free Software Foundation, Inc.
@@ -2118,8 +2118,8 @@
 +  } while (0)
 +
 +#include_next <dl-cache.h>
---- glibc-20070317T2130/sysdeps/unix/sysv/linux/ia64/dl-cache.h	6 Jul 2001 04:56:17 -0000	1.2
-+++ glibc-20070317T2130-fedora/sysdeps/unix/sysv/linux/ia64/dl-cache.h	22 Sep 2004 21:21:09 -0000	1.2.4.1
+--- glibc-20070331T1609/sysdeps/unix/sysv/linux/ia64/dl-cache.h	6 Jul 2001 04:56:17 -0000	1.2
++++ glibc-20070331T1609-fedora/sysdeps/unix/sysv/linux/ia64/dl-cache.h	22 Sep 2004 21:21:09 -0000	1.2.4.1
 @@ -22,4 +22,31 @@
  #define _dl_cache_check_flags(flags) \
    ((flags) == _DL_CACHE_DEFAULT_ID)
@@ -2152,29 +2152,29 @@
 +  } while (0)
 +
  #include_next <dl-cache.h>
---- glibc-20070317T2130/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c 1 Jan 1970 00:00:00 -0000
-+++ glibc-20070317T2130-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c	22 Sep 2004 21:21:09 -0000	1.1.2.1
+--- glibc-20070331T1609/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c 1 Jan 1970 00:00:00 -0000
++++ glibc-20070331T1609-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.c	22 Sep 2004 21:21:09 -0000	1.1.2.1
 @@ -0,0 +1,5 @@
 +#ifdef IS_IN_ldconfig
 +#include <sysdeps/i386/dl-procinfo.c>
 +#else
 +#include <sysdeps/generic/dl-procinfo.c>
 +#endif
---- glibc-20070317T2130/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h 1 Jan 1970 00:00:00 -0000
-+++ glibc-20070317T2130-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h	22 Sep 2004 21:21:09 -0000	1.1.2.1
+--- glibc-20070331T1609/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h 1 Jan 1970 00:00:00 -0000
++++ glibc-20070331T1609-fedora/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h	22 Sep 2004 21:21:09 -0000	1.1.2.1
 @@ -0,0 +1,5 @@
 +#ifdef IS_IN_ldconfig
 +#include <sysdeps/unix/sysv/linux/i386/dl-procinfo.h>
 +#else
 +#include <sysdeps/generic/dl-procinfo.h>
 +#endif
---- glibc-20070317T2130/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	17 Jan 2002 06:49:28 -0000	1.2
-+++ glibc-20070317T2130-fedora/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	22 Sep 2004 21:21:09 -0000	1.2.2.1
+--- glibc-20070331T1609/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	17 Jan 2002 06:49:28 -0000	1.2
++++ glibc-20070331T1609-fedora/sysdeps/unix/sysv/linux/ia64/ldd-rewrite.sed	22 Sep 2004 21:21:09 -0000	1.2.2.1
 @@ -1 +1 @@
 -s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 \2\3"_
 +s_^\(RTLDLIST=\)\([^ 	]*\)-ia64\(\.so\.[0-9.]*\)[ 	]*$_\1"\2-ia64\3 /emul/ia32-linux\2\3"_
---- glibc-20070317T2130/sysdeps/unix/sysv/linux/x86_64/clone.S	3 Dec 2006 23:12:36 -0000	1.7
-+++ glibc-20070317T2130-fedora/sysdeps/unix/sysv/linux/x86_64/clone.S	14 Dec 2006 09:06:34 -0000	1.4.2.4
+--- glibc-20070331T1609/sysdeps/unix/sysv/linux/x86_64/clone.S	3 Dec 2006 23:12:36 -0000	1.7
++++ glibc-20070331T1609-fedora/sysdeps/unix/sysv/linux/x86_64/clone.S	14 Dec 2006 09:06:34 -0000	1.4.2.4
 @@ -89,9 +89,6 @@ L(pseudo_end):
  	ret
  
@@ -2193,35 +2193,3 @@
  
  	cfi_startproc;
  PSEUDO_END (BP_SYM (__clone))
---- libc/powerpc-cpu/sysdeps/powerpc/powerpc32/power4/memset.S	2006-04-06 17:50:35.000000000 +0200
-+++ libc/powerpc-cpu/sysdeps/powerpc/powerpc32/power4/memset.S	2007-02-21 14:48:30.000000000 +0100
-@@ -21,6 +21,10 @@
- #include <bp-sym.h>
- #include <bp-asm.h>
- 
-+/* Not really needed by memset, but dl-sysdep.c is broken.  */
-+	.globl __cache_line_size
-+	.lcomm __cache_line_size,4,4
-+
- /* __ptr_t [r3] memset (__ptr_t s [r3], int c [r4], size_t n [r5]));
-    Returns 's'.
- 
---- libc/nscd/gai.c	2007-01-17 10:00:57.000000000 +0100
-+++ libc/nscd/gai.c	2007-03-18 13:00:25.000000000 +0100
-@@ -15,6 +15,7 @@
-    along with this program; if not, write to the Free Software Foundation,
-    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
- 
-+#include <alloca.h>
- /* This file uses the getaddrinfo code but it compiles it without NSCD
-    support.  We just need a few symbol renames.  */
- #define __inet_aton inet_aton
-@@ -25,6 +26,8 @@
- #define __sendto sendto
- #define __strchrnul strchrnul
- #define __getline getline
-+/* nscd uses 1MB or 2MB thread stacks.  */
-+#define __libc_use_alloca(size) (size <= __MAX_ALLOCA_CUTOFF)
- 
- #include <getaddrinfo.c>
- 

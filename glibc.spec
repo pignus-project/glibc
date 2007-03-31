@@ -1,9 +1,9 @@
-%define glibcdate 20070317T2130
+%define glibcdate 20070331T1609
 %define glibcname glibc
-%define glibcsrcdir glibc-20070317T2130
+%define glibcsrcdir glibc-20070331T1609
 %define glibc_release_tarballs 0
 %define glibcversion 2.5.90
-%define glibcrelease 19
+%define glibcrelease 20
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1067,6 +1067,9 @@ ln -f ${RPM_BUILD_ROOT}%{_sbindir}/iconvconfig{,.%{_target_cpu}}
 
 rm -f $RPM_BUILD_ROOT/etc/gai.conf
 
+# In F7+ this is provided by rpcbind rpm
+rm -f $RPM_BUILD_ROOT%{_sbindir}/rpcinfo
+
 # BUILD THE FILE LIST
 find $RPM_BUILD_ROOT -type f -or -type l |
 	sed -e 's|.*/etc|%config &|' \
@@ -1551,6 +1554,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Mar 31 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-20
+- assorted NIS+ speedups (#223467)
+- fix HAVE_LIBCAP configure detection (#178934)
+- remove %{_prefix}/sbin/rpcinfo from glibc-common (#228894)
+
 * Sat Mar 17 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-19
 - fix power6 libm compat symbols on ppc32 (#232633)
 - fix child refcntr in NPTL fork (#230198)
