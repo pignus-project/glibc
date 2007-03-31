@@ -36,6 +36,10 @@ Source2: %(echo %{glibcsrcdir} | sed s/glibc-/glibc-libidn-/).tar.bz2
 Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
+Patch2: glibc-bz3427.patch
+Patch3: glibc-fnmatch-speedup.patch
+Patch4: glibc-bz3306.patch
+Patch5: glibc-libio-__THROW.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -247,6 +251,10 @@ package or when debugging this package.
 %patch1 -p1
 %endif
 %endif
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir -p override_headers/linux
@@ -1558,6 +1566,9 @@ rm -f *.filelist*
 - assorted NIS+ speedups (#223467)
 - fix HAVE_LIBCAP configure detection (#178934)
 - remove %{_prefix}/sbin/rpcinfo from glibc-common (#228894)
+- nexttoward*/nextafter* fixes (BZ#3306)
+- feholdexcept/feupdateenv fixes (BZ#3427)
+- speed up fnmatch with two or more * in the pattern
 
 * Sat Mar 17 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-19
 - fix power6 libm compat symbols on ppc32 (#232633)
