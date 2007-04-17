@@ -1051,9 +1051,9 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/include/rpcsvc/rquota.[hx]
 # Hardlink identical locale files together
 %ifnarch %{auxarches}
 gcc -O2 -o build-%{nptl_target_cpu}-linuxnptl/hardlink fedora/hardlink.c
-rm ${RPM_BUILD_ROOT}${_prefix}/lib/locale/locale-archive || :
+rm ${RPM_BUILD_ROOT}%{_prefix}/lib/locale/locale-archive || :
 olddir=`pwd`
-pushd ${RPM_BUILD_ROOT}${_prefix}/lib/locale
+pushd ${RPM_BUILD_ROOT}%{_prefix}/lib/locale
 # Intentionally we do not pass --alias-file=, aliases will be added
 # by build-locale-archive.
 $olddir/build-%{nptl_target_cpu}-linuxnptl/elf/ld.so \
