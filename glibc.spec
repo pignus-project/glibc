@@ -1051,9 +1051,9 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/include/rpcsvc/rquota.[hx]
 # Hardlink identical locale files together
 %ifnarch %{auxarches}
 gcc -O2 -o build-%{nptl_target_cpu}-linuxnptl/hardlink fedora/hardlink.c
-rm ${RPM_BUILD_ROOT}%{_prefix}/lib/locale/locale-archive || :
 olddir=`pwd`
 pushd ${RPM_BUILD_ROOT}%{_prefix}/lib/locale
+rm locale-archive || :
 # Intentionally we do not pass --alias-file=, aliases will be added
 # by build-locale-archive.
 $olddir/build-%{nptl_target_cpu}-linuxnptl/elf/ld.so \
@@ -1062,6 +1062,7 @@ $olddir/build-%{nptl_target_cpu}-linuxnptl/elf/ld.so \
     --prefix ${RPM_BUILD_ROOT} --add-to-archive \
     *_*
 rm -rf *_*
+mv locale-archive{,.tmpl}
 popd
 #build-%{nptl_target_cpu}-linuxnptl/hardlink -vc $RPM_BUILD_ROOT%{_prefix}/lib/locale
 %endif
@@ -1095,7 +1096,7 @@ SHARE_LANG='s|.*/share/locale/\([^/_]\+\).*/LC_MESSAGES/.*\.mo|%lang(\1) &|'
 LIB_LANG='s|.*/lib/locale/\([^/_]\+\)|%lang(\1) &|'
 # rpm does not handle %lang() tagged files hardlinked together accross
 # languages very well, temporarily disable
-# LIB_LANG=''
+LIB_LANG=''
 sed -e "s|$RPM_BUILD_ROOT||" -e "$LIB_LANG" -e "$SHARE_LANG" < rpm.filelist.in |
 	grep -v '/etc/\(localtime\|nsswitch.conf\|ld.so.conf\|ld.so.cache\|default\)'  | \
 	grep -v '/%{_lib}/lib\(pcprofile\|memusage\).so' | \
@@ -1137,7 +1138,7 @@ grep -v '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist.full |
 	grep -v 'nscd' > rpm.filelist
 
 grep '%{_prefix}/bin' < rpm.filelist >> common.filelist
-grep '%{_prefix}/lib/locale' < rpm.filelist | grep -v /locale-archive.tmpl >> common.filelist
+#grep '%{_prefix}/lib/locale' < rpm.filelist | grep -v /locale-archive.tmpl >> common.filelist
 grep '%{_prefix}/libexec/pt_chown' < rpm.filelist >> common.filelist
 grep '%{_prefix}/sbin/[^gi]' < rpm.filelist >> common.filelist
 grep '%{_prefix}/share' < rpm.filelist \
@@ -1507,6 +1508,7 @@ rm -f *.filelist*
 %ifnarch %{auxarches}
 %files -f common.filelist common
 %defattr(-,root,root)
+%dir %{_prefix}/lib/locale
 %attr(0644,root,root) %config(missingok) %{_prefix}/lib/locale/locale-archive.tmpl
 %attr(0644,root,root) %verify(not md5 size mtime mode) %ghost %config(missingok,noreplace) %{_prefix}/lib/locale/locale-archive
 %dir %attr(755,root,root) /etc/default
