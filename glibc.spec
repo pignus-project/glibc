@@ -1,9 +1,9 @@
-%define glibcdate 20070331T1609
+%define glibcdate 20070416T2350
 %define glibcname glibc
-%define glibcsrcdir glibc-20070331T1609
+%define glibcsrcdir glibc-20070416T2350
 %define glibc_release_tarballs 0
 %define glibcversion 2.5.90
-%define glibcrelease 20
+%define glibcrelease 21
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -36,10 +36,6 @@ Source2: %(echo %{glibcsrcdir} | sed s/glibc-/glibc-libidn-/).tar.bz2
 Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
-Patch2: glibc-bz3427.patch
-Patch3: glibc-fnmatch-speedup.patch
-Patch4: glibc-bz3306.patch
-Patch5: glibc-libio-__THROW.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -251,10 +247,6 @@ package or when debugging this package.
 %patch1 -p1
 %endif
 %endif
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir -p override_headers/linux
@@ -982,11 +974,6 @@ popd
 cd ..
 %endif
 
-# compatibility hack: this locale has vanished from glibc, but some other
-# programs are still using it. Normally we would handle it in the %pre
-# section but with glibc that is simply not an option
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/locale/ru_RU/LC_MESSAGES
-
 # Remove the files we don't want to distribute
 rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libNoVersion*
 rm -f $RPM_BUILD_ROOT/%{_lib}/libNoVersion*
@@ -1064,7 +1051,19 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/include/rpcsvc/rquota.[hx]
 # Hardlink identical locale files together
 %ifnarch %{auxarches}
 gcc -O2 -o build-%{nptl_target_cpu}-linuxnptl/hardlink fedora/hardlink.c
-build-%{nptl_target_cpu}-linuxnptl/hardlink -vc $RPM_BUILD_ROOT%{_prefix}/lib/locale
+rm ${RPM_BUILD_ROOT}${_prefix}/lib/locale/locale-archive || :
+olddir=`pwd`
+pushd ${RPM_BUILD_ROOT}${_prefix}/lib/locale
+# Intentionally we do not pass --alias-file=, aliases will be added
+# by build-locale-archive.
+$olddir/build-%{nptl_target_cpu}-linuxnptl/elf/ld.so \
+  --library-path $olddir/build-%{nptl_target_cpu}-linuxnptl/ \
+  $olddir/build-%{nptl_target_cpu}-linuxnptl/locale/localedef \
+    --prefix ${RPM_BUILD_ROOT} --add-to-archive \
+    *_*
+rm -rf *_*
+popd
+#build-%{nptl_target_cpu}-linuxnptl/hardlink -vc $RPM_BUILD_ROOT%{_prefix}/lib/locale
 %endif
 
 rm -f ${RPM_BUILD_ROOT}/%{_lib}/libnss1-*
@@ -1138,7 +1137,7 @@ grep -v '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist.full |
 	grep -v 'nscd' > rpm.filelist
 
 grep '%{_prefix}/bin' < rpm.filelist >> common.filelist
-grep '%{_prefix}/lib/locale' < rpm.filelist >> common.filelist
+grep '%{_prefix}/lib/locale' < rpm.filelist | grep -v /locale-archive.tmpl >> common.filelist
 grep '%{_prefix}/libexec/pt_chown' < rpm.filelist >> common.filelist
 grep '%{_prefix}/sbin/[^gi]' < rpm.filelist >> common.filelist
 grep '%{_prefix}/share' < rpm.filelist \
@@ -1508,6 +1507,7 @@ rm -f *.filelist*
 %ifnarch %{auxarches}
 %files -f common.filelist common
 %defattr(-,root,root)
+%attr(0644,root,root) %config(missingok) %{_prefix}/lib/locale/locale-archive.tmpl
 %attr(0644,root,root) %verify(not md5 size mtime mode) %ghost %config(missingok,noreplace) %{_prefix}/lib/locale/locale-archive
 %dir %attr(755,root,root) /etc/default
 %verify(not md5 size mtime) %config(noreplace) /etc/default/nss
@@ -1562,6 +1562,18 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Apr 16 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-21
+- don't include individual locale files in glibc-common,
+  rather include prepared locale-archive template and let
+  build-locale-archive create locale-archive from the template
+  and any user supplied /usr/lib/locale/*_* directories,
+  then unlink the locale-archive template - this should save
+  > 80MB of glibc-common occupied disk space
+- fix _XOPEN_VERSION (BZ#4364)
+- fix printf with %g and values tiny bit smaller than 1.e-4 (#235864,
+  BZ#4362)
+- fix NIS+ __nisfind_server (#235229)
+
 * Sat Mar 31 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-20
 - assorted NIS+ speedups (#223467)
 - fix HAVE_LIBCAP configure detection (#178934)
