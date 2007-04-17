@@ -1398,7 +1398,9 @@ touch $RPM_BUILD_ROOT/var/{db,run}/nscd/{passwd,group,hosts,services}
 touch $RPM_BUILD_ROOT/var/run/nscd/{socket,nscd.pid}
 %endif
 
+%ifnarch %{auxarches}
 touch $RPM_BUILD_ROOT/%{_prefix}/lib/locale/locale-archive
+%endif
 
 %post -p /usr/sbin/glibc_post_upgrade.%{_target_cpu}
 
