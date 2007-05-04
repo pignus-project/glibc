@@ -1,9 +1,9 @@
-%define glibcdate 20070416T2350
+%define glibcdate 20070504T0917
 %define glibcname glibc
-%define glibcsrcdir glibc-20070416T2350
+%define glibcsrcdir glibc-20070504T0917
 %define glibc_release_tarballs 0
 %define glibcversion 2.5.90
-%define glibcrelease 21
+%define glibcrelease 22
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1566,6 +1566,16 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri May  4 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-22
+- add transliteration for <U2044> (BZ#3213)                                                                                    
+- fix *scanf with %f on hexadecimal floats without exponent (BZ#4342)                                                          
+- fix *printf with very large precisions for %s (#238406, BZ#4438)                                                             
+- fix inet_ntop size checking for AF_INET (BZ#4439)                                                                            
+- for *printf %e avoid 1.000e-00, for exponent 0 always use + sign (#238431)                                                   
+- fix a regression introduced in #223467 changes
+- gethostby*_r alignment fixes (BZ#4381)
+- fix ifaddrs error handling
+
 * Mon Apr 16 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-21
 - don't include individual locale files in glibc-common,
   rather include prepared locale-archive template and let
