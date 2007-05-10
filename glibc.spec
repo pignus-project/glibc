@@ -1,9 +1,9 @@
-%define glibcdate 20070504T0917
+%define glibcdate 20070510T2308
 %define glibcname glibc
-%define glibcsrcdir glibc-20070504T0917
+%define glibcsrcdir glibc-20070510T2308
 %define glibc_release_tarballs 0
 %define glibcversion 2.5.90
-%define glibcrelease 22
+%define glibcrelease 24
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1566,6 +1566,19 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri May 11 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-24
+- utimensat, futimens and lutimes support
+
+* Thu May 10 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-23
+- use madvise MADV_DONTNEED in malloc
+- fix ia64 feraiseexcept
+- fix s390{,x} feholdexcept (BZ#3427)
+- ppc fenv fixes
+- make fdatasync a cancellation point (BZ#4465)
+- fix *printf for huge precisions with wide char code and multi-byte
+  strings
+- fix dladdr (#232224, BZ#4131)
+
 * Fri May  4 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-22
 - add transliteration for <U2044> (BZ#3213)
 - fix *scanf with %f on hexadecimal floats without exponent (BZ#4342)
