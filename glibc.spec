@@ -1,9 +1,9 @@
-%define glibcdate 20070510T2308
+%define glibcdate 20070515T2025
 %define glibcname glibc
-%define glibcsrcdir glibc-20070510T2308
+%define glibcsrcdir glibc-20070515T2025
 %define glibc_release_tarballs 0
-%define glibcversion 2.5.90
-%define glibcrelease 24
+%define glibcversion 2.6
+%define glibcrelease 1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -1566,6 +1566,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue May 15 2007 Roland McGrath <roland@redhat.com> - 2.6-1
+- glibc 2.6 release
+
 * Fri May 11 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-24
 - utimensat, futimens and lutimes support
 
