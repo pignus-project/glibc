@@ -40,6 +40,7 @@ Patch2: glibc-warning-patrol.patch
 Patch3: glibc-i386-rwlock.patch
 Patch4: glibc-ldconfig-speedup.patch
 Patch5: glibc-private-futex.patch
+Patch6: glibc-fallocate.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -255,6 +256,7 @@ package or when debugging this package.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir -p override_headers/linux
