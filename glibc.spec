@@ -1,8 +1,8 @@
-%define glibcdate 20070515T2025
+%define glibcdate 20070731T1624
 %define glibcname glibc
-%define glibcsrcdir glibc-20070515T2025
+%define glibcsrcdir glibc-20070731T1624
 %define glibc_release_tarballs 0
-%define glibcversion 2.6
+%define glibcversion 2.6.90
 %define glibcrelease 1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
@@ -874,7 +874,7 @@ if [ "$platform" != power6 ]; then
 %endif
   export LD_PRELOAD=`pwd`/power6emul/\$LIB/power6emul.so
 fi
-AddOns=",powerpc-cpu$AddOns --with-cpu=power6"
+AddOns="$AddOns --with-cpu=power6"
 GCC="$GCC -mcpu=power6"
 GXX="$GXX -mcpu=power6"
 build_nptl linuxnptl-power6
@@ -1334,8 +1334,8 @@ for f in `find $RPM_BUILD_ROOT/%{_lib} -type l`; do
 done
 
 echo Sorting source file lists. Might take a while...
-xargs -0 -n 1 echo < $sf | LC_ALL=C grep -v '/<internal>$\|\.gperf$' | LC_ALL=C sort -u > $sf.sorted
-xargs -0 -n 1 echo < $csf | LC_ALL=C grep -v '/<internal>$\|\.gperf$' | LC_ALL=C sort -u > $csf.sorted
+xargs -0 -n 1 echo < $sf | LC_ALL=C grep -v '/<internal>$\|<built-in>$\|\.gperf$' | LC_ALL=C sort -u > $sf.sorted
+xargs -0 -n 1 echo < $csf | LC_ALL=C grep -v '/<internal>$\|<built-in>$\|\.gperf$' | LC_ALL=C sort -u > $csf.sorted
 mkdir -p $RPM_BUILD_ROOT/usr/src/debug
 cat $sf.sorted $csf.sorted \
   | (cd $RPM_BUILD_DIR; LC_ALL=C sort -u | cpio -pdm ${RPM_BUILD_ROOT}/usr/src/debug)
@@ -1401,6 +1401,9 @@ touch $RPM_BUILD_ROOT/var/run/nscd/{socket,nscd.pid}
 %ifnarch %{auxarches}
 touch $RPM_BUILD_ROOT/%{_prefix}/lib/locale/locale-archive
 %endif
+
+mkdir -p $RPM_BUILD_ROOT/var/cache/ldconfig
+> $RPM_BUILD_ROOT/var/cache/ldconfig/aux-cache
 
 %post -p /usr/sbin/glibc_post_upgrade.%{_target_cpu}
 
@@ -1495,6 +1498,8 @@ rm -f *.filelist*
 %dir /etc/ld.so.conf.d
 %dir %{_prefix}/libexec/getconf
 %dir %{_prefix}/%{_lib}/gconv
+%dir %attr(0700,root,root) /var/cache/ldconfig
+%attr(0600,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/cache/ldconfig/aux-cache
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/ld.so.cache
 %doc README NEWS INSTALL FAQ BUGS NOTES PROJECTS CONFORMANCE
 %doc COPYING COPYING.LIB README.libm LICENSES
@@ -1511,7 +1516,7 @@ rm -f *.filelist*
 %files -f common.filelist common
 %defattr(-,root,root)
 %dir %{_prefix}/lib/locale
-%attr(0644,root,root) %config(missingok) %{_prefix}/lib/locale/locale-archive.tmpl
+%attr(0644,root,root) %verify(not md5 size mtime) %{_prefix}/lib/locale/locale-archive.tmpl
 %attr(0644,root,root) %verify(not md5 size mtime mode) %ghost %config(missingok,noreplace) %{_prefix}/lib/locale/locale-archive
 %dir %attr(755,root,root) /etc/default
 %verify(not md5 size mtime) %config(noreplace) /etc/default/nss
@@ -1566,7 +1571,45 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Tue May 15 2007 Roland McGrath <roland@redhat.com> - 2.6-1
+* Tue Jul 31 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-1
+- update to trunk
+  - private futex optimizations
+  - open{,at}{,64} argument checking
+- ldconfig speedups
+
+* Sun Jul  8 2007 Jakub Jelinek <jakub@redhat.com> 2.6-4
+- filter <built-in> pseudo-files from debuginfo source lists (#245714)
+- fix sscanf when errno is EINTR before the call (BZ#4745)
+- save/restore errno around reading /etc/default/nss (BZ#4702)
+- fix LD_HWCAP_MASK handling
+- disable workaround for #210748, instead backport
+  ld.so locking fixes from the trunk (#235026)
+- new x86_64 memcpy
+- don't write uninitialized padding bytes to nscd socket
+- fix dl{,v}sym, dl_iterate_phdr and dlopen if some library is
+  mapped into ld.so's inter-segment hole on x86_64 (#245035, #244545)
+- fix LD_AUDIT=a:b program (#180432)
+- don't crash on pseudo-zero long double values passed to
+  *printf on i?86/x86_64/ia64 (BZ#4586)
+- fix *printf %La and strtold with some hexadecimal floating point
+  constants on ppc/ppc64
+- fix nextafterl on ppc/ppc64
+- fix sem_timedwait on i?86 and x86_64
+
+* Thu May 24 2007 Jakub Jelinek <jakub@redhat.com> 2.6-3
+- don't use %%config(missingok) for locale-archive.tmpl,
+  instead of removing it altogether truncate it to zero
+  size (#240697)
+- add a workaround for #210748
+
+* Mon May 21 2007 Jakub Jelinek <jakub@redhat.com> 2.6-2
+- restore malloc_set_state backwards compatibility (#239344)
+- fix epoll_pwait (BZ#4525)
+- fix printf with unknown format spec or positional arguments
+  and large width and/or precision (BZ#4514)
+- robust mutexes fix (BZ#4512)
+
+* Tue May 15 2007 Roland McGrath <roland@redhat.com> 2.6-1
 - glibc 2.6 release
 
 * Fri May 11 2007 Jakub Jelinek <jakub@redhat.com> 2.5.90-24
