@@ -36,6 +36,10 @@ Source2: %(echo %{glibcsrcdir} | sed s/glibc-/glibc-libidn-/).tar.bz2
 Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
+Patch2: glibc-warning-patrol.patch
+Patch3: glibc-i386-rwlock.patch
+Patch4: glibc-ldconfig-speedup.patch
+Patch5: glibc-private-futex.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -247,6 +251,10 @@ package or when debugging this package.
 %patch1 -p1
 %endif
 %endif
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
 # Hack till glibc-kernheaders get updated, argh
 mkdir -p override_headers/linux
