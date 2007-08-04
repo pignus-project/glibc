@@ -1,9 +1,9 @@
-%define glibcdate 20070801T1703
+%define glibcdate 20070804T2027
 %define glibcname glibc
-%define glibcsrcdir glibc-20070801T1703
+%define glibcsrcdir glibc-20070804T2027
 %define glibc_release_tarballs 0
 %define glibcversion 2.6.90
-%define glibcrelease 2
+%define glibcrelease 3
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -25,7 +25,12 @@ Summary: The GNU libc libraries.
 Name: glibc
 Version: %{glibcversion}
 Release: %{glibcrelease}
-License: LGPL
+# GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
+# Things that are linked directly into dynamically linked programs
+# and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
+# exception which allows linking it into any kind of programs or shared
+# libraries without restrictions.
+License: LGPLv2+ and LGPLv2+ with exceptions and GPLv2+
 Group: System Environment/Libraries
 Source0: %{glibcsrcdir}.tar.bz2
 %if %{glibc_release_tarballs}
@@ -36,7 +41,6 @@ Source2: %(echo %{glibcsrcdir} | sed s/glibc-/glibc-libidn-/).tar.bz2
 Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
-Patch2: glibc-ldconfig-speedup.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -249,7 +253,6 @@ package or when debugging this package.
 %patch1 -p1
 %endif
 %endif
-%patch2 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1048,6 +1051,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Aug  4 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-3
+- fix open{,at}{,64} macro for -pedantic (#250897)
+- add transliteration for l with stroke (#250492)
+- fix strtod ("-0", NULL)
+- update License tag
+
 * Wed Aug  1 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-2
 - make aux-cache purely optional performance optimization in ldconfig,
   don't issue any errors if it can't be created (#250430)
