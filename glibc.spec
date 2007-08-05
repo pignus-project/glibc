@@ -3,7 +3,7 @@
 %define glibcsrcdir glibc-20070804T2027
 %define glibc_release_tarballs 0
 %define glibcversion 2.6.90
-%define glibcrelease 3
+%define glibcrelease 4
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -42,6 +42,7 @@ Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
 Patch2: glibc-ldconfig-speedup.patch
+Patch3: glibc-ppc-rt.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -255,6 +256,7 @@ package or when debugging this package.
 %endif
 %endif
 %patch2 -p1
+%patch3 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1053,6 +1055,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Aug  5 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-4
+- fix librt.so and librtkaio.so on ppc32, so that it is not using
+  bss PLT
+
 * Sat Aug  4 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-3
 - fix open{,at}{,64} macro for -pedantic (#250897)
 - add transliteration for l with stroke (#250492)
