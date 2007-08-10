@@ -1,9 +1,10 @@
-%define glibcdate 20070804T2027
+%define glibcdate 20070809T0939
 %define glibcname glibc
-%define glibcsrcdir glibc-20070804T2027
+%define glibcsrcdir glibc-20070809T0939
 %define glibc_release_tarballs 0
 %define glibcversion 2.6.90
-%define glibcrelease 4
+%define glibcrelease 5
+%define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -41,8 +42,6 @@ Source2: %(echo %{glibcsrcdir} | sed s/glibc-/glibc-libidn-/).tar.bz2
 Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
-Patch2: glibc-ldconfig-speedup.patch
-Patch3: glibc-ppc-rt.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -217,6 +216,7 @@ If unsure if you need this, don't install this package.
 %package debuginfo
 Summary: Debug information for package %{name}
 Group: Development/Debug
+AutoReqProv: no
 %ifarch %{debuginfocommonarches}
 Requires: glibc-debuginfo-common = %{version}-%{release}
 %endif
@@ -238,6 +238,7 @@ with -static -L%{_prefix}/lib/debug%{_prefix}/%{_lib} compiler options.
 %package debuginfo-common
 Summary: Debug information for package %{name}
 Group: Development/Debug
+AutoReqProv: no
 
 %description debuginfo-common
 This package provides debug information for package %{name}.
@@ -255,8 +256,6 @@ package or when debugging this package.
 %patch1 -p1
 %endif
 %endif
-%patch2 -p1
-%patch3 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -497,11 +496,11 @@ rm -f $RPM_BUILD_ROOT/etc/ld.so.cache
 
 # Include ld.so.conf
 echo 'include ld.so.conf.d/*.conf' > $RPM_BUILD_ROOT/etc/ld.so.conf
-touch $RPM_BUILD_ROOT/etc/ld.so.cache
+> $RPM_BUILD_ROOT/etc/ld.so.cache
 chmod 644 $RPM_BUILD_ROOT/etc/ld.so.conf
 mkdir -p $RPM_BUILD_ROOT/etc/ld.so.conf.d
 mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
-touch $RPM_BUILD_ROOT/etc/sysconfig/nscd
+> $RPM_BUILD_ROOT/etc/sysconfig/nscd
 
 # Include %{_prefix}/%{_lib}/gconv/gconv-modules.cache
 > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
@@ -702,6 +701,8 @@ ln -sf /%{_lib}/ld-linux-ia64.so.2 $RPM_BUILD_ROOT/lib/ld-linux-ia64.so.2
 %endif
 %endif
 
+%if %{run_glibc_tests}
+
 # Increase timeouts
 export TIMEOUTFACTOR=16
 parent=$$
@@ -750,84 +751,37 @@ echo ====================PLT RELOCS LIBC.SO==============
 readelf -Wr $RPM_BUILD_ROOT/%{_lib}/libc-*.so | sed -n -e "$PLTCMD"
 echo ====================PLT RELOCS END==================
 
+%endif
+
 %if "%{_enable_debug_packages}" == "1"
 
-case "$-" in *x*) save_trace=yes;; esac
-set +x
-echo Building debuginfo subpackage...
+# The #line directives gperf generates do not give the proper
+# file name relative to the build directory.
+(cd locale; ln -s programs/*.gperf .)
+(cd iconv; ln -s ../locale/programs/charmap-kw.gperf .)
 
-blf=debugfiles.list
-sf=debugsources.list
-cblf=debugcommonfiles.list
-csf=debugcommonsources.list
+ls -l $RPM_BUILD_ROOT/usr/bin/getconf
+ls -l $RPM_BUILD_ROOT/usr/libexec/getconf
+eu-readelf -hS $RPM_BUILD_ROOT/usr/bin/getconf $RPM_BUILD_ROOT/usr/libexec/getconf/*
 
-echo -n > $sf
-echo -n > $csf
+find_debuginfo_args='--strict-build-id -g'
+%ifarch %{debuginfocommonarches}
+find_debuginfo_args="$find_debuginfo_args \
+  -l common.filelist -l utils.filelist -l nscd.filelist \
+  -o debuginfocommon.filelist \
+  -l rpm.filelist -l nosegneg.filelist \
+"
+%endif
+/usr/lib/rpm/find-debuginfo.sh $find_debuginfo_args -o debuginfo.filelist
 
-strip $RPM_BUILD_ROOT/{sbin/ldconfig,usr/sbin/glibc_post_upgrade.%{_target_cpu},usr/sbin/build-locale-archive}
-
-# Strip ELF binaries
-for f in `cat rpm.filelist nosegneg.filelist \
-	  | grep -v '%%\(dir\|lang\|config\|verify\)'`; do
-  bf=$RPM_BUILD_ROOT$f
-  if [ -f $bf -a -x $bf -a ! -h $bf ]; then
-    if `file $bf 2>/dev/null | grep 'ELF.*, not stripped' | grep -vq 'statically linked'`; then
-      bd=`dirname $f`
-      outd=$RPM_BUILD_ROOT/usr/lib/debug$bd
-      mkdir -p $outd
-      echo extracting debug info from $f
-      /usr/lib/rpm/debugedit -b $RPM_BUILD_DIR -d /usr/src/debug -l $sf $bf
-      bn=`basename $f`
-      case $f in
-        /%{_lib}/*) eu-strip -g -f $outd/$bn.debug $bf || :;;
-        *) eu-strip -f $outd/$bn.debug $bf || :;;
-      esac
-      if [ -f $outd/$bn.debug ]; then echo /usr/lib/debug$bd/$bn.debug >> $blf; fi
-    fi
-  fi
-done
-
-for f in `cat common.filelist utils.filelist nscd.filelist \
-          | grep -v '%%\(dir\|lang\|config\|verify\)'`; do
-  bf=$RPM_BUILD_ROOT$f
-  if [ -f $bf -a -x $bf -a ! -h $bf ]; then
-    if `file $bf 2>/dev/null | grep 'ELF.*, not stripped' | grep -vq 'statically linked'`; then
-      bd=`dirname $f`
-      outd=$RPM_BUILD_ROOT/usr/lib/debug$bd
-      mkdir -p $outd
-      echo extracting debug info from $f
-      /usr/lib/rpm/debugedit -b $RPM_BUILD_DIR -d /usr/src/debug -l $csf $bf
-      bn=`basename $f`
-      eu-strip -f $outd/$bn.debug $bf || :
-      if [ -f $outd/$bn.debug ]; then echo /usr/lib/debug$bd/$bn.debug >> $cblf; fi
-    fi
-  fi
-done
-
-for f in `find $RPM_BUILD_ROOT/%{_lib} -type l`; do
-  l=`ls -l $f`
-  l=${l#* -> }
-  t=/usr/lib/debug`dirname ${f#$RPM_BUILD_ROOT}`
-  if grep -q "^$t/$l.debug\$" $blf; then
-    ln -sf $l.debug $RPM_BUILD_ROOT$t/`basename $f`.debug
-    echo $t/`basename $f`.debug >> $blf
-  elif grep -q "^$t.debug/$l\$" $cblf; then
-    ln -sf $l.debug $RPM_BUILD_ROOT$t/`basename $f`.debug
-    echo $t/`basename $f`.debug >> $cblf
-  fi
-done
-
-echo Sorting source file lists. Might take a while...
-xargs -0 -n 1 echo < $sf | LC_ALL=C grep -v '/<internal>$\|<built-in>$\|\.gperf$' | LC_ALL=C sort -u > $sf.sorted
-xargs -0 -n 1 echo < $csf | LC_ALL=C grep -v '/<internal>$\|<built-in>$\|\.gperf$' | LC_ALL=C sort -u > $csf.sorted
-mkdir -p $RPM_BUILD_ROOT/usr/src/debug
-cat $sf.sorted $csf.sorted \
-  | (cd $RPM_BUILD_DIR; LC_ALL=C sort -u | cpio -pdm ${RPM_BUILD_ROOT}/usr/src/debug)
-# stupid cpio creates new directories in mode 0700, fixup
-find $RPM_BUILD_ROOT/usr/src/debug -type d -print | xargs chmod a+rx
+list_debug_archives()
+{
+  local dir=%{_prefix}/lib/debug%{_prefix}/%{_lib}
+  (cd $RPM_BUILD_ROOT; ls ${dir#/}/*.a) | sed 's,^,/,'
+}
 
 %ifarch %{debuginfocommonarches}
-%ifarch %{auxarches}
+
 %ifarch %{ix86}
 %define basearch i386
 %endif
@@ -837,43 +791,48 @@ find $RPM_BUILD_ROOT/usr/src/debug -type d -print | xargs chmod a+rx
 %ifarch sparc sparcv9
 %define basearch sparc
 %endif
-cat $blf > debuginfo.filelist
-find $RPM_BUILD_ROOT/usr/src/debug/%{glibcsrcdir} -type d \
-  | sed "s#^$RPM_BUILD_ROOT#%%dir #" >> debuginfo.filelist
-grep '/generic/\|/linux/\|/%{basearch}/\|/nptl\(_db\)\?/\|^%{glibcsrcdir}/build' \
-  $sf.sorted | sed 's|^|/usr/src/debug/|' >> debuginfo.filelist
-touch debuginfocommon.filelist
+
+sed -i '\#^%{_prefix}/src/debug/#d' debuginfocommon.filelist
+(cd $RPM_BUILD_ROOT%{_prefix}/src; find debug -type d) |
+sed 's#^#%dir %{_prefix}/src/#' > debuginfocommon.sources
+(cd $RPM_BUILD_ROOT%{_prefix}/src; find debug ! -type d) |
+sed 's#^#%{_prefix}/src/#' >> debuginfocommon.sources
+
+# auxarches get only these few source files
+auxarches_debugsources=\
+'/(generic|linux|%{basearch}|nptl(_db)?)/|/%{glibcsrcdir}/build|/dl-osinfo\.h'
+
+egrep "$auxarches_debugsources" debuginfocommon.sources >> debuginfo.filelist
+
+egrep -v "$auxarches_debugsources" \
+      debuginfocommon.sources >> debuginfocommon.filelist
+%ifarch %{auxarches}
 %else
-( grep '^%{glibcsrcdir}/build-\|dl-osinfo\.h' $csf.sorted || : ) > $csf.sorted.build
-cat $blf > debuginfo.filelist
-cat $cblf > debuginfocommon.filelist
-grep '^%{glibcsrcdir}/build-\|dl-osinfo\.h' $sf.sorted \
-  | sed 's|^|/usr/src/debug/|' >> debuginfo.filelist
-find $RPM_BUILD_ROOT/usr/src/debug/%{glibcsrcdir} -type d \
-  | sed "s#^$RPM_BUILD_ROOT#%%dir #" >> debuginfocommon.filelist
-( cat $csf.sorted; grep -v -f $csf.sorted.build $sf.sorted ) \
-  | grep -v 'dl-osinfo\.h' | LC_ALL=C sort -u \
-  | sed 's|^|/usr/src/debug/|' >> debuginfocommon.filelist
-%endif
-%else
-cat $blf $cblf | LC_ALL=C sort -u > debuginfo.filelist
-echo '/usr/src/debug/%{glibcsrcdir}' >> debuginfo.filelist
+# non-aux arches when there is a debuginfo-common
+# all the sources go into debuginfo-common
+#cat debuginfocommon.sources >> debuginfocommon.filelist
 %endif
 
-[ "x$save_trace" = xyes ] && set -x
+list_debug_archives >> debuginfocommon.filelist
+
+%else
+
+list_debug_archives >> debuginfo.filelist
 
 %endif
+
+%endif
+
+rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 
 %ifarch %{auxarches}
-case "$-" in *x*) save_trace=yes;; esac
-set +x
+
 echo Cutting down the list of unpackaged files
-for i in `sed '/%%dir/d;/%%config/d;/%%verify/d;s/%%lang([^)]*) //' \
+>> debuginfocommon.filelist
+sed -e '/%%dir/d;/%%config/d;/%%verify/d;s/%%lang([^)]*) //;s#^/*##' \
 	  common.filelist devel.filelist headers.filelist \
-	  utils.filelist nscd.filelist`; do
-  [ -f "$RPM_BUILD_ROOT$i" ] && rm -f "$RPM_BUILD_ROOT$i" || :
-done
-[ "x$save_trace" = xyes ] && set -x
+    utils.filelist nscd.filelist debuginfocommon.filelist |
+(cd $RPM_BUILD_ROOT; xargs --no-run-if-empty rm -f 2> /dev/null || :)
 
 %else
 
@@ -883,7 +842,7 @@ touch $RPM_BUILD_ROOT/var/run/nscd/{socket,nscd.pid}
 %endif
 
 %ifnarch %{auxarches}
-touch $RPM_BUILD_ROOT/%{_prefix}/lib/locale/locale-archive
+> $RPM_BUILD_ROOT/%{_prefix}/lib/locale/locale-archive
 %endif
 
 mkdir -p $RPM_BUILD_ROOT/var/cache/ldconfig
@@ -1041,20 +1000,16 @@ rm -f *.filelist*
 %ifnarch %{auxarches}
 %files debuginfo-common -f debuginfocommon.filelist
 %defattr(-,root,root)
-%dir %{_prefix}/lib/debug
-%dir %{_prefix}/lib/debug/%{_prefix}
-%dir %{_prefix}/lib/debug/%{_prefix}/%{_lib}
-%{_prefix}/lib/debug/%{_prefix}/%{_lib}/*.a
 %endif
-%else
-%dir %{_prefix}/lib/debug
-%dir %{_prefix}/lib/debug/%{_prefix}
-%dir %{_prefix}/lib/debug/%{_prefix}/%{_lib}
-%{_prefix}/lib/debug/%{_prefix}/%{_lib}/*.a
 %endif
 %endif
 
 %changelog
+* Thu Aug  9 2007 Roland McGrath <roland@redhat.com> 2.6.90-5
+- update to trunk
+  - fix local PLT regressions
+- spec file revamp for new find-debuginfo.sh
+
 * Sun Aug  5 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-4
 - fix librt.so and librtkaio.so on ppc32, so that it is not using
   bss PLT
