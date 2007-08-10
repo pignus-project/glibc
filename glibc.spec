@@ -3,7 +3,7 @@
 %define glibcsrcdir glibc-20070809T0939
 %define glibc_release_tarballs 0
 %define glibcversion 2.6.90
-%define glibcrelease 5
+%define glibcrelease 6
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9 alphaev6
 %define xenarches i686 athlon
@@ -42,6 +42,7 @@ Source2: %(echo %{glibcsrcdir} | sed s/glibc-/glibc-libidn-/).tar.bz2
 Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
+Patch2: glibc-ldconfig-speedup.patch
 Buildroot: %{_tmppath}/glibc-%{PACKAGE_VERSION}-root
 Obsoletes: zoneinfo, libc-static, libc-devel, libc-profile, libc-headers,
 Obsoletes: gencat, locale, ldconfig, locale-ja, glibc-profile
@@ -256,6 +257,7 @@ package or when debugging this package.
 %patch1 -p1
 %endif
 %endif
+%patch2 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1005,7 +1007,7 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Thu Aug  9 2007 Roland McGrath <roland@redhat.com> 2.6.90-5
+* Thu Aug  9 2007 Roland McGrath <roland@redhat.com> 2.6.90-6
 - update to trunk
   - fix local PLT regressions
 - spec file revamp for new find-debuginfo.sh
