@@ -2151,3 +2151,69 @@
  
  	cfi_startproc;
  PSEUDO_END (BP_SYM (__clone))
+--- libc/sysdeps/unix/sysv/linux/i386/posix_fallocate64.c.jj	2007-08-01 17:50:38.000000000 +0200
++++ libc/sysdeps/unix/sysv/linux/i386/posix_fallocate64.c	2007-08-26 00:01:12.000000000 +0200
+@@ -30,7 +30,7 @@ extern int __posix_fallocate64_l64 (int 
+ extern int __have_fallocate attribute_hidden;
+ #endif
+ 
+-extern int __fallocate64 (int fd, int mode, __off64_t offset, __off64_t len)
++extern int __call_fallocate (int fd, int mode, __off64_t offset, __off64_t len)
+      attribute_hidden;
+ 
+ /* Reserve storage for the data of the file associated with FD.  */
+@@ -42,7 +42,7 @@ __posix_fallocate64_l64 (int fd, __off64
+   if (__builtin_expect (__have_fallocate >= 0, 1))
+ # endif
+     {
+-      int res = __fallocate64 (fd, 0, offset, len);
++      int res = __call_fallocate (fd, 0, offset, len);
+ 
+       if (! res)
+ 	return 0;
+--- libc/sysdeps/unix/sysv/linux/i386/posix_fallocate.c.jj	2007-08-01 17:50:52.000000000 +0200
++++ libc/sysdeps/unix/sysv/linux/i386/posix_fallocate.c	2007-08-26 00:00:57.000000000 +0200
+@@ -28,7 +28,7 @@
+ int __have_fallocate attribute_hidden;
+ #endif
+ 
+-extern int __fallocate64 (int fd, int mode, __off64_t offset, __off64_t len)
++extern int __call_fallocate (int fd, int mode, __off64_t offset, __off64_t len)
+      attribute_hidden;
+ 
+ /* Reserve storage for the data of the file associated with FD.  */
+@@ -40,7 +40,7 @@ posix_fallocate (int fd, __off_t offset,
+   if (__builtin_expect (__have_fallocate >= 0, 1))
+ # endif
+     {
+-      int res = __fallocate64 (fd, 0, offset, len);
++      int res = __call_fallocate (fd, 0, offset, len);
+       if (! res)
+ 	return 0;
+ 
+--- libc/sysdeps/unix/sysv/linux/i386/Makefile.jj	2006-01-21 09:14:17.000000000 +0100
++++ libc/sysdeps/unix/sysv/linux/i386/Makefile	2007-08-26 00:01:52.000000000 +0200
+@@ -1,5 +1,5 @@
+ ifeq ($(subdir),misc)
+-sysdep_routines += ioperm iopl vm86 call_pselect6
++sysdep_routines += ioperm iopl vm86 call_pselect6 call_fallocate
+ sysdep_headers += sys/elf.h sys/perm.h sys/reg.h sys/vm86.h sys/debugreg.h sys/io.h
+ endif
+ 
+--- libc/sysdeps/unix/sysv/linux/i386/call_fallocate.S.jj	2007-08-25 23:59:07.000000000 +0200
++++ libc/sysdeps/unix/sysv/linux/i386/call_fallocate.S	2007-08-26 00:00:29.000000000 +0200
+@@ -0,0 +1,7 @@
++#include <sysdep.h>
++
++#ifdef __NR_fallocate
++PSEUDO_ERRVAL (__call_fallocate, fallocate, 6)
++ ret_ERRVAL
++PSEUDO_END_ERRVAL(__call_fallocate)
++#endif
+--- libc/sysdeps/unix/sysv/linux/i386/syscalls.list.jj	2007-08-25 23:57:09.000000000 +0200
++++ libc/sysdeps/unix/sysv/linux/i386/syscalls.list	2007-08-25 23:57:19.000000000 +0200
+@@ -6,4 +6,3 @@ vm86		-	vm86		i:ip	__vm86		vm86@@GLIBC_2
+ oldgetrlimit	EXTRA	getrlimit	i:ip	__old_getrlimit	getrlimit@GLIBC_2.0
+ oldsetrlimit	EXTRA	setrlimit	i:ip	__old_setrlimit	setrlimit@GLIBC_2.0
+ waitpid		-	waitpid		Ci:ipi	__waitpid	waitpid	__libc_waitpid
+-fallocate64	-	fallocate	Vi:iiiiii	__fallocate64
