@@ -1,9 +1,9 @@
-%define glibcdate 20070816T2121
+%define glibcdate 20070825T1839
 %define glibcname glibc
-%define glibcsrcdir glibc-20070816T2121
+%define glibcsrcdir glibc-20070825T1839
 %define glibc_release_tarballs 0
 %define glibcversion 2.6.90
-%define glibcrelease 11
+%define glibcrelease 12
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -1015,6 +1015,14 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Aug 25 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-12
+- readd x86_64 gettimeofday stuff, initialize it earlier
+- nis_list fix (#254115)
+- workaround for bugs in ia64 silly /emul/ia32-linux hack (#253961)
+- misc fixes (BZ#3924, BZ#4566, BZ#4582, BZ#4588, BZ#4726, BZ#4946,
+  BZ#4905, BZ#4814, BZ#4925, BZ#4936, BZ#4896, BZ#4937, BZ#3842,
+  BZ#4554, BZ#4557, BZ#4938)
+
 * Fri Aug 17 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-11
 - remove __strtold_internal and __wcstold_internal from ppc*/s390*/sparc*
   *-ldbl.h headers
