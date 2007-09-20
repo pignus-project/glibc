@@ -1,9 +1,9 @@
-%define glibcdate 20070918T1931
+%define glibcdate 20070920T0007
 %define glibcname glibc
-%define glibcsrcdir glibc-20070918T1931
+%define glibcsrcdir glibc-20070920T0007
 %define glibc_release_tarballs 0
 %define glibcversion 2.6.90
-%define glibcrelease 14
+%define glibcrelease 15
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -1015,6 +1015,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Sep 20 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-15
+- $5$ (SHA-256) and $6$ (SHA-512) support in crypt
+  (#228697, #249477, #173834)
+
 * Tue Sep 18 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-14
 - -D_FORTIFY_SOURCE{,=2} support for C++
 - fortification of fread{,_unlocked}
