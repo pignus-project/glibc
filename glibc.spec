@@ -1,9 +1,9 @@
-%define glibcdate 20071003T1908
+%define glibcdate 20071010T2047
 %define glibcname glibc
-%define glibcsrcdir glibc-20071003T1908
+%define glibcsrcdir glibc-20071010T2047
 %define glibc_release_tarballs 0
 %define glibcversion 2.6.90
-%define glibcrelease 17
+%define glibcrelease 18
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -1015,6 +1015,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Oct 10 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-18
+- add signalfd, eventfd, eventfd_read, eventfd_write
+- qsort speedups
+- workaround for cpuid bugs (#324081)
+- make sure gettext's conversion_lock is initialized even if
+  program isn't linked against libpthread.so.0, only dlopens it (#321761)
+- misc fixes (BZ#5112, BZ#5113, BZ#5104, BZ#5063, BZ#5010, BZ#4407,
+  BZ#3924, BZ#5103, BZ#2633, BZ#181, BZ#73, #321901)
+
 * Wed Oct  3 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-17
 - fix {,v}swprintf with -D_FORTIFY_SOURCE=1 -mlong-double-64 on ppc*/s390*/sparc*
 - strcoll fixes
