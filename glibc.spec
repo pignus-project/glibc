@@ -1,9 +1,9 @@
-%define glibcdate 20071010T2047
+%define glibcdate 20071011T1636
 %define glibcname glibc
-%define glibcsrcdir glibc-20071010T2047
+%define glibcsrcdir glibc-20071011T1636
 %define glibc_release_tarballs 0
 %define glibcversion 2.6.90
-%define glibcrelease 18
+%define glibcrelease 19
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -1015,6 +1015,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Oct 11 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-19
+- fix <netinet/tcp.h>
+- simple preprocessor in localedef, fix de_DE collation with it
+
 * Wed Oct 10 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-18
 - add signalfd, eventfd, eventfd_read, eventfd_write
 - qsort speedups
