@@ -2168,3 +2168,46 @@
  
  	cfi_startproc;
  PSEUDO_END (BP_SYM (__clone))
+--- libc/locale/programs/ld-collate.c	2007-10-12 00:19:00.000000000 +0200
++++ libc/locale/programs/ld-collate.c	2007-10-12 00:59:35.000000000 +0200
+@@ -2719,25 +2719,24 @@ collate_read (struct linereader *ldfile,
+   while (nowtok == tok_define)
+     {
+       if (ignore_content)
+-	{
+-	  lr_ignore_rest (ldfile, 0);
+-	  continue;
+-	}
+-
+-      arg = lr_token (ldfile, charmap, result, NULL, verbose);
+-      if (arg->tok != tok_ident)
+-	SYNTAX_ERROR (_("%s: syntax error"), "LC_COLLATE");
++	lr_ignore_rest (ldfile, 0);
+       else
+ 	{
+-	  /* Simply add the new symbol.  */
+-	  struct name_list *newsym = xmalloc (sizeof (*newsym)
+-					  + arg->val.str.lenmb + 1);
+-	  memcpy (newsym->str, arg->val.str.startmb, arg->val.str.lenmb);
+-	  newsym->str[arg->val.str.lenmb] = '\0';
+-	  newsym->next = defined;
+-	  defined = newsym;
++	  arg = lr_token (ldfile, charmap, result, NULL, verbose);
++	  if (arg->tok != tok_ident)
++	    SYNTAX_ERROR (_("%s: syntax error"), "LC_COLLATE");
++	  else
++	    {
++	      /* Simply add the new symbol.  */
++	      struct name_list *newsym = xmalloc (sizeof (*newsym)
++						  + arg->val.str.lenmb + 1);
++	      memcpy (newsym->str, arg->val.str.startmb, arg->val.str.lenmb);
++	      newsym->str[arg->val.str.lenmb] = '\0';
++	      newsym->next = defined;
++	      defined = newsym;
+ 
+-	  lr_ignore_rest (ldfile, 1);
++	      lr_ignore_rest (ldfile, 1);
++	    }
+ 	}
+ 
+       do
