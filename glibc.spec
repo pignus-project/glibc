@@ -1,9 +1,9 @@
-%define glibcdate 20071011T1636
+%define glibcdate 20071014T2102
 %define glibcname glibc
-%define glibcsrcdir glibc-20071011T1636
+%define glibcsrcdir glibc-20071014T2102
 %define glibc_release_tarballs 0
 %define glibcversion 2.6.90
-%define glibcrelease 19
+%define glibcrelease 20
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -1015,6 +1015,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Oct 14 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-20
+- install <bits/error.h> (#330031)
+- disable -D_FORTIFY_SOURCE{,=2} support (with a warning) for
+  GCC 3.4.x and earlier(#327641)
+- pl_PL locale changes (BZ#4098, #242296)
+- misc fixes (BZ#1140, BZ#3195, BZ#3242, BZ#4359)
+
 * Thu Oct 11 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-19
 - fix <netinet/tcp.h>
 - simple preprocessor in localedef, fix de_DE collation with it
