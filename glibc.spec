@@ -1,9 +1,9 @@
-%define glibcdate 20071014T2102
+%define glibcdate 20071015T0728
 %define glibcname glibc
-%define glibcsrcdir glibc-20071014T2102
+%define glibcsrcdir glibc-20071015T0728
 %define glibc_release_tarballs 0
 %define glibcversion 2.6.90
-%define glibcrelease 20
+%define glibcrelease 21
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -1015,6 +1015,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Oct 15 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-21
+- fix getgr{name,gid}{,_r} with nscd
+
 * Sun Oct 14 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-20
 - install <bits/error.h> (#330031)
 - disable -D_FORTIFY_SOURCE{,=2} support (with a warning) for
