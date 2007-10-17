@@ -1,9 +1,9 @@
-%define glibcdate 20071015T0728
+%define glibcdate 20071017T2029
 %define glibcname glibc
-%define glibcsrcdir glibc-20071015T0728
+%define glibcsrcdir glibc-20071017T2029
 %define glibc_release_tarballs 0
-%define glibcversion 2.6.90
-%define glibcrelease 21
+%define glibcversion 2.7
+%define glibcrelease 1
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -1015,6 +1015,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Oct 17 2007 Jakub Jelinek <jakub@redhat.com> 2.7-1
+- glibc 2.7 release
+- fix tzfile.c for times after last transition (#333561)
+- fix sem_post@GLIBC_2.0 on i?86
+- appease valgrind in libpthread.so initialization
+- misc fixes (BZ#3425, BZ#5184, BZ#5186)
+
 * Mon Oct 15 2007 Jakub Jelinek <jakub@redhat.com> 2.6.90-21
 - fix getgr{name,gid}{,_r} with nscd
 
