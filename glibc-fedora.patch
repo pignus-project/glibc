@@ -2169,3 +2169,20 @@
  
  	cfi_startproc;
  PSEUDO_END (BP_SYM (__clone))
+--- libc/sysdeps/x86_64/memset.S	17 Oct 2007 15:57:28 -0000	1.10
++++ libc/sysdeps/x86_64/memset.S	18 Oct 2007 00:09:32 -0000	1.11
+@@ -30,11 +30,12 @@
+ 
+         .text
+ #ifndef NOT_IN_libc
+-ENTRY(bzero)
++ENTRY(__bzero)
+ 	mov	%rsi,%rdx	/* Adjust parameter.  */
+ 	xorl	%esi,%esi	/* Fill with 0s.  */
+ 	jmp	L(memset_entry)
+-END(bzero)
++END(__bzero)
++weak_alias (__bzero, bzero)
+ #endif
+ 
+ #if defined PIC && !defined NOT_IN_libc

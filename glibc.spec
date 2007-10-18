@@ -3,7 +3,7 @@
 %define glibcsrcdir glibc-20071017T2029
 %define glibc_release_tarballs 0
 %define glibcversion 2.7
-%define glibcrelease 1
+%define glibcrelease 2
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -1015,7 +1015,7 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Wed Oct 17 2007 Jakub Jelinek <jakub@redhat.com> 2.7-1
+* Thu Oct 18 2007 Jakub Jelinek <jakub@redhat.com> 2.7-2
 - glibc 2.7 release
 - fix tzfile.c for times after last transition (#333561)
 - fix sem_post@GLIBC_2.0 on i?86
