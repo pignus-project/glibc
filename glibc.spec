@@ -1,9 +1,9 @@
-%define glibcdate 20071212T1953
+%define glibcdate 20071227T0908
 %define glibcname glibc
-%define glibcsrcdir glibc-20071212T1953
+%define glibcsrcdir glibc-20071227T0908
 %define glibc_release_tarballs 0
 %define glibcversion 2.7.90
-%define glibcrelease 1
+%define glibcrelease 2
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -321,7 +321,8 @@ GCC="gcc -m64"
 GXX="g++ -m64"
 %endif
 
-BuildFlags="$BuildFlags -DNDEBUG=1 -fasynchronous-unwind-tables"
+#BuildFlags="$BuildFlags -DNDEBUG=1 -fasynchronous-unwind-tables"
+BuildFlags="$BuildFlags -fasynchronous-unwind-tables"
 EnableKernel="--enable-kernel=%{enablekernel}"
 echo "$GCC" > Gcc
 AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(linuxthreads\|nptl\|rtkaio\|powerpc-cpu\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
@@ -1015,6 +1016,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Dec 27 2007 Jakub Jelinek <jakub@redhat.com> 2.7.90-2
+- update to trunk
+  - nsswitch fix (#425768)
+- temporarily enable assert checking
+
 * Wed Dec 12 2007 Jakub Jelinek <jakub@redhat.com> 2.7.90-1
 - update to trunk
   - fix __USE_STRING_INLINES on i?86 (#408731, #371711)
