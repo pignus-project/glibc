@@ -1,9 +1,9 @@
-%define glibcdate 20071227T0908
+%define glibcdate 20080103T1958
 %define glibcname glibc
-%define glibcsrcdir glibc-20071227T0908
+%define glibcsrcdir glibc-20080103T1958
 %define glibc_release_tarballs 0
 %define glibcversion 2.7.90
-%define glibcrelease 2
+%define glibcrelease 3
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -1016,6 +1016,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jan  3 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-3
+- update to trunk
+  - fix recognition of interface family (#425768)
+  - add __THROW to __ctype_{b,tolower,toupper}_loc prototypes
+
 * Thu Dec 27 2007 Jakub Jelinek <jakub@redhat.com> 2.7.90-2
 - update to trunk
   - nsswitch fix (#425768)
