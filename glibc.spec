@@ -1,9 +1,9 @@
-%define glibcdate 20080103T1958
+%define glibcdate 20080111T0737
 %define glibcname glibc
-%define glibcsrcdir glibc-20080103T1958
+%define glibcsrcdir glibc-20080111T0737
 %define glibc_release_tarballs 0
 %define glibcversion 2.7.90
-%define glibcrelease 3
+%define glibcrelease 4
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -1016,6 +1016,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jan 11 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-4
+- update to trunk
+  - misc fixes (BZ#5541, BZ#5545, BZ#5553, BZ#5112, BZ#5520)
+  - getaddrinfo fixes
+  - signalize EOVERFLOW from sem_post instead of overflowing
+    the counter
+  - fix i?86 makecontext
+  - fix iconv for iso-2022-jp//translit (#397021)
+
 * Thu Jan  3 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-3
 - update to trunk
   - fix recognition of interface family (#425768)
