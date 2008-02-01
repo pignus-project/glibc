@@ -1,9 +1,9 @@
-%define glibcdate 20080131T0821
+%define glibcdate 20080201T1017
 %define glibcname glibc
-%define glibcsrcdir glibc-20080131T0821
+%define glibcsrcdir glibc-20080201T1017
 %define glibc_release_tarballs 0
 %define glibcversion 2.7.90
-%define glibcrelease 5
+%define glibcrelease 6
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -1016,6 +1016,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb  1 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-6
+- fix build
+
 * Thu Jan 31 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-5
 - update to trunk
 - rebuild with gcc 4.3
