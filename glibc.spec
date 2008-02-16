@@ -1,9 +1,9 @@
-%define glibcdate 20080201T1017
+%define glibcdate 20080216T1726
 %define glibcname glibc
-%define glibcsrcdir glibc-20080201T1017
+%define glibcsrcdir glibc-20080216T1726
 %define glibc_release_tarballs 0
 %define glibcversion 2.7.90
-%define glibcrelease 6
+%define glibcrelease 7
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
@@ -1016,6 +1016,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Feb 16 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-7
+- update to trunk
+  - make NI_MAXHOST and NI_MAXSERV available even in BSDish
+    namespaces (BZ#5737)
+  - timerfd_* syscalls
+
 * Fri Feb  1 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-6
 - fix build
 
