@@ -1,6 +1,6 @@
-%define glibcdate 20080314T1732
+%define glibcdate 20080314T2159
 %define glibcname glibc
-%define glibcsrcdir glibc-20080314T1732
+%define glibcsrcdir glibc-20080314T2159
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.7.90
-Release: 10
+Release: 11
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -980,8 +980,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri Mar 14 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-10
+* Fri Mar 14 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-11
 - update to trunk
+- remove <stropts.h>, define _XOPEN_STREAMS -1 (#436349)
 
 * Wed Mar  5 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-8
 - update to trunk
