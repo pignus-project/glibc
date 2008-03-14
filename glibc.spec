@@ -1,6 +1,6 @@
-%define glibcdate 20080305T0857
+%define glibcdate 20080314T1732
 %define glibcname glibc
-%define glibcsrcdir glibc-20080305T0857
+%define glibcsrcdir glibc-20080314T1732
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.7.90
-Release: 9
+Release: 10
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -144,7 +144,7 @@ use the standard C libraries.
 
 %package common
 Summary: Common binaries and locale data for glibc
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}=%{version}-%{release}
 Requires: tzdata >= 2003a
 Group: System Environment/Base
 
@@ -980,8 +980,8 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Wed Mar 05 2008 Jesse Keating <jkeating@redhat.com> - 2.7.90-9
-- Correct glibc-common requires.
+* Fri Mar 14 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-10
+- update to trunk
 
 * Wed Mar  5 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-8
 - update to trunk
