@@ -980,7 +980,7 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri Mar 14 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-11
+* Tue Mar 18 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-11
 - update to trunk
 - remove <stropts.h>, define _XOPEN_STREAMS -1 (#436349)
 
