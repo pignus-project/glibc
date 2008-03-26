@@ -1,6 +1,6 @@
-%define glibcdate 20080314T2159
+%define glibcdate 20080326T1041
 %define glibcname glibc
-%define glibcsrcdir glibc-20080314T2159
+%define glibcsrcdir glibc-20080326T1041
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.7.90
-Release: 11
+Release: 12
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -144,7 +144,7 @@ use the standard C libraries.
 
 %package common
 Summary: Common binaries and locale data for glibc
-Requires: %{name}=%{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 Requires: tzdata >= 2003a
 Group: System Environment/Base
 
@@ -980,7 +980,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Tue Mar 18 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-11
+* Wed Mar 26 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-12
+- update to trunk
+  - new CLONE_* flags in <sched.h> (#438542)
+  - nis+ errno clobbering fix (#437945)
+  - fix adjtime (#437974)
+
+* Fri Mar 14 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-11
 - update to trunk
 - remove <stropts.h>, define _XOPEN_STREAMS -1 (#436349)
 
