@@ -1,6 +1,6 @@
-%define glibcdate 20080326T1041
+%define glibcdate 20080328T1347
 %define glibcname glibc
-%define glibcsrcdir glibc-20080326T1041
+%define glibcsrcdir glibc-20080328T1347
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.7.90
-Release: 12
+Release: 13
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -980,6 +980,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Mar 28 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-13
+- update to trunk
+  - don't define ARG_MAX in <limits.h>, as it is no longer
+    constant - use sysconf (_SC_ARG_MAX) to get the current
+    argument size limit
+  - fix build on sparc64
+- only service sshd condrestart if /etc/rc.d/init.d/sshd exists
+  (#428859)
+
 * Wed Mar 26 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-12
 - update to trunk
   - new CLONE_* flags in <sched.h> (#438542)
