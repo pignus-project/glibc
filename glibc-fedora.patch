@@ -2481,3 +2481,20 @@
  
  	cfi_startproc;
  PSEUDO_END (BP_SYM (__clone))
+--- libc/locale/programs/ld-collate.c	19 Mar 2008 06:43:32 -0000	1.127
++++ libc/locale/programs/ld-collate.c	8 Apr 2008 15:03:46 -0000	1.128
+@@ -3195,6 +3195,14 @@ error while adding equivalent collating 
+ 	  break;
+ 
+ 	case tok_script:
++	  /* Ignore the rest of the line if we don't need the input of
++	     this line.  */
++	  if (ignore_content)
++	    {
++	      lr_ignore_rest (ldfile, 0);
++	      break;
++	    }
++
+ 	  /* We get told about the scripts we know.  */
+ 	  arg = lr_token (ldfile, charmap, result, repertoire, verbose);
+ 	  if (arg->tok != tok_bsymbol)
