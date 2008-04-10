@@ -1,6 +1,6 @@
-%define glibcdate 20080408T0706
+%define glibcdate 20080410T1907
 %define glibcname glibc
-%define glibcsrcdir glibc-20080408T0706
+%define glibcsrcdir glibc-20080410T1907
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.7.90
-Release: 14
+Release: 15
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -285,8 +285,8 @@ GCC="gcc -m64"
 GXX="g++ -m64"
 %endif
 
-#BuildFlags="$BuildFlags -DNDEBUG=1 -fasynchronous-unwind-tables"
-BuildFlags="$BuildFlags -fasynchronous-unwind-tables"
+BuildFlags="$BuildFlags -DNDEBUG=1 -fasynchronous-unwind-tables"
+#BuildFlags="$BuildFlags -fasynchronous-unwind-tables"
 EnableKernel="--enable-kernel=%{enablekernel}"
 echo "$GCC" > Gcc
 AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(linuxthreads\|nptl\|rtkaio\|powerpc-cpu\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
@@ -980,6 +980,14 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Apr 10 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-15
+- update to trunk
+  - misc fixes (BZ#4314, BZ#4407, BZ#5209, BZ#5436, BZ#5768, BZ#5998,
+    BZ#6024)
+- restart sshd in %post when upstart is used - it doesn't have
+  /dev/initctl (#441763)
+- disable assert checking again
+
 * Tue Apr  8 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-14
 - update to trunk
   - misc fixes (BZ#5443, BZ#5475, BZ#5478, BZ#5939, BZ#5979, BZ#5995,
