@@ -1,6 +1,6 @@
-%define glibcdate 20080412T0741
+%define glibcdate 20080515T0735
 %define glibcname glibc
-%define glibcsrcdir glibc-20080412T0741
+%define glibcsrcdir glibc-20080515T0735
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
@@ -22,7 +22,7 @@
 %define _unpackaged_files_terminate_build 0
 Summary: The GNU libc libraries
 Name: glibc
-Version: 2.8
+Version: 2.8.90
 Release: 1
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
@@ -692,7 +692,7 @@ cd ..
 %if %{buildxen}
 echo ====================TESTING -mno-tls-direct-seg-refs=============
 cd build-%{nptl_target_cpu}-linuxnptl-nosegneg
-( make -j$numprocs -k check PARALLELMFLAGS=-s 2>&1
+( make %{?_smp_mflags} -k check PARALLELMFLAGS=-s 2>&1
   sleep 10s
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
@@ -705,7 +705,7 @@ cd build-%{nptl_target_cpu}-linuxnptl-power6
 ( if [ -d ../power6emul ]; then
     export LD_PRELOAD=`cd ../power6emul; pwd`/\$LIB/power6emul.so
   fi
-  make -j$numprocs -k check PARALLELMFLAGS=-s 2>&1
+  make %{?_smp_mflags} -k check PARALLELMFLAGS=-s 2>&1
   sleep 10s
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
@@ -980,6 +980,23 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu May 15 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-1
+- update to trunk
+  - O(n) memmem/strstr/strcasestr
+  - i386/x86_64 TLS descriptors support
+  - concurrent IPv4 and IPv6 DNS lookups by getaddrinfo
+
+* Mon May  5 2008 Jakub Jelinek <jakub@redhat.com> 2.8-3
+- don't run telinit u in %post if both /dev/initctl and
+  /sbin/initctl exist (#444978)
+- workaround GCC ppc64 miscompilation of c{log{,10},acosh,atan}l
+  (#444996)
+
+* Wed Apr 30 2008 Jakub Jelinek <jakub@redhat.com> 2.8-2
+- fix nscd races during GC (BZ#5381)
+- rebuilt with fixed GCC to fix regex miscompilation on power6
+- SPARC fixes
+
 * Sat Apr 12 2008 Jakub Jelinek <jakub@redhat.com> 2.8-1
 - 2.8 release
 
