@@ -1,6 +1,6 @@
-%define glibcdate 20080515T0735
+%define glibcdate 20080516T2152
 %define glibcname glibc
-%define glibcsrcdir glibc-20080515T0735
+%define glibcsrcdir glibc-20080516T2152
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.8.90
-Release: 1
+Release: 2
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -980,6 +980,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri May 16 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-2
+- fix getaddrinfo (#446801, #446808)
+
 * Thu May 15 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-1
 - update to trunk
   - O(n) memmem/strstr/strcasestr
