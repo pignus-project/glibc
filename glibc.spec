@@ -1,6 +1,6 @@
-%define glibcdate 20080516T2152
+%define glibcdate 20080518T1017
 %define glibcname glibc
-%define glibcsrcdir glibc-20080516T2152
+%define glibcsrcdir glibc-20080518T1017
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.8.90
-Release: 2
+Release: 3
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -285,8 +285,8 @@ GCC="gcc -m64"
 GXX="g++ -m64"
 %endif
 
-BuildFlags="$BuildFlags -DNDEBUG=1 -fasynchronous-unwind-tables"
-#BuildFlags="$BuildFlags -fasynchronous-unwind-tables"
+#BuildFlags="$BuildFlags -DNDEBUG=1 -fasynchronous-unwind-tables"
+BuildFlags="$BuildFlags -fasynchronous-unwind-tables"
 EnableKernel="--enable-kernel=%{enablekernel}"
 echo "$GCC" > Gcc
 AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(linuxthreads\|nptl\|rtkaio\|powerpc-cpu\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
@@ -980,6 +980,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun May 18 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-3
+- getaddrinfo and nscd fixes
+- reenable assertion checking in rawhide
+
 * Fri May 16 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-2
 - fix getaddrinfo (#446801, #446808)
 
