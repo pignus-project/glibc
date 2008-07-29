@@ -2061,3 +2061,57 @@
  
  	cfi_startproc;
  PSEUDO_END (BP_SYM (__clone))
+--- libc/ChangeLog	28 Jul 2008 22:55:10 -0000	1.11297
++++ libc/ChangeLog	29 Jul 2008 01:18:31 -0000	1.11300
+@@ -1,5 +1,13 @@
++2008-07-28  Roland McGrath  <roland@redhat.com>
++
++	* elf/dl-sysdep.c (_dl_show_auxv): Add AT_EXECFN to the table.
++
+ 2008-07-28  Ulrich Drepper  <drepper@redhat.com>
+ 
++	* io/ftw.c (add_object): Remove inline to avoid warning.
++
++	* sysdeps/unix/sysv/linux/paccept.c: Fix compile problem.
++
+ 	* resolv/res_send.c (__libc_res_nsend): Take additional parameter.
+ 	Use it instead of locally defined resplen2 variable.
+ 	(res_nsend): Adjust for __libc_res_nsend interface change.
+--- libc/elf/dl-sysdep.c	24 Jul 2008 18:24:01 -0000	1.6
++++ libc/elf/dl-sysdep.c	29 Jul 2008 01:18:26 -0000	1.7
+@@ -273,6 +273,7 @@ _dl_show_auxv (void)
+       } auxvars[] =
+ 	{
+ 	  [AT_EXECFD - 2] =		{ "AT_EXECFD:       ", dec },
++	  [AT_EXECFN - 2] =		{ "AT_EXECFN:       ", str },
+ 	  [AT_PHDR - 2] =		{ "AT_PHDR:         0x", hex },
+ 	  [AT_PHENT - 2] =		{ "AT_PHENT:        ", dec },
+ 	  [AT_PHNUM - 2] =		{ "AT_PHNUM:        ", dec },
+--- libc/io/ftw.c	21 Feb 2007 09:36:15 -0000	1.55
++++ libc/io/ftw.c	29 Jul 2008 00:26:46 -0000	1.56
+@@ -243,7 +243,7 @@ object_compare (const void *p1, const vo
+ }
+ 
+ 
+-static inline int
++static int
+ add_object (struct ftw_data *data, struct STAT *st)
+ {
+   struct known_object *newp = malloc (sizeof (struct known_object));
+--- libc/sysdeps/unix/sysv/linux/paccept.c	25 Jul 2008 04:40:10 -0000	1.1
++++ libc/sysdeps/unix/sysv/linux/paccept.c	29 Jul 2008 00:25:05 -0000	1.2
+@@ -30,12 +30,12 @@ paccept (int fd, __SOCKADDR_ARG addr, so
+ 	 const __sigset_t *ss, int flags)
+ {
+   if (SINGLE_THREAD_P)
+-    return INLINE_SYSCALL (paccept, 6, fd, addr, addr_len, ss,
++    return INLINE_SYSCALL (paccept, 6, fd, addr.__sockaddr__, addr_len, ss,
+ 			   _NSIG / 8, flags);
+ 
+   int oldtype = LIBC_CANCEL_ASYNC ();
+ 
+-  int result = INLINE_SYSCALL (paccept, 6, fd, addr, addr_len, ss,
++  int result = INLINE_SYSCALL (paccept, 6, fd, addr.__sockaddr__, addr_len, ss,
+ 			       _NSIG / 8, flags);
+ 
+   LIBC_CANCEL_RESET (oldtype);
