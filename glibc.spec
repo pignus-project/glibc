@@ -1,6 +1,6 @@
-%define glibcdate 20080728T2320
+%define glibcdate 20080802T0809
 %define glibcname glibc
-%define glibcsrcdir glibc-20080728T2320
+%define glibcsrcdir glibc-20080802T0809
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.8.90
-Release: 10
+Release: 11
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -980,6 +980,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Aug  2 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-11
+- update from trunk
+  - fix non-absolute $ORIGIN handling (#457560)
+  - exported some further libresolv APIs (#453325)
+  - misc fixes
+
 * Tue Jul 29 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-10
 - update from trunk
   - resolver fixes
