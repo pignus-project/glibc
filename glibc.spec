@@ -1,6 +1,6 @@
-%define glibcdate 20080802T0809
+%define glibcdate 20080326T1041
 %define glibcname glibc
-%define glibcsrcdir glibc-20080802T0809
+%define glibcsrcdir glibc-20080326T1041
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
@@ -22,8 +22,8 @@
 %define _unpackaged_files_terminate_build 0
 Summary: The GNU libc libraries
 Name: glibc
-Version: 2.8.90
-Release: 11
+Version: 2.7.90
+Release: 12
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -692,7 +692,7 @@ cd ..
 %if %{buildxen}
 echo ====================TESTING -mno-tls-direct-seg-refs=============
 cd build-%{nptl_target_cpu}-linuxnptl-nosegneg
-( make %{?_smp_mflags} -k check PARALLELMFLAGS=-s 2>&1
+( make -j$numprocs -k check PARALLELMFLAGS=-s 2>&1
   sleep 10s
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
@@ -705,7 +705,7 @@ cd build-%{nptl_target_cpu}-linuxnptl-power6
 ( if [ -d ../power6emul ]; then
     export LD_PRELOAD=`cd ../power6emul; pwd`/\$LIB/power6emul.so
   fi
-  make %{?_smp_mflags} -k check PARALLELMFLAGS=-s 2>&1
+  make -j$numprocs -k check PARALLELMFLAGS=-s 2>&1
   sleep 10s
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
@@ -980,114 +980,6 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Sat Aug  2 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-11
-- update from trunk
-  - fix non-absolute $ORIGIN handling (#457560)
-  - exported some further libresolv APIs (#453325)
-  - misc fixes
-
-* Tue Jul 29 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-10
-- update from trunk
-  - resolver fixes
-  - misc fixes (BZ#6771, BZ#6763, BZ#6698, BZ#6712)
-  - s390{,x} utmp/utmpx bi-arch support (BZ#6724)
-  - popen "e" flag
-- fr_FR locale changes reenabled
-
-* Wed Jul 16 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-9
-- update from trunk
-  - fix unbuffered vfprintf if writing to the stream fails (#455360)
-  - remove useless "malloc: using debugging hooks" message (#455355)
-  - nscd fixes
-  - fix resolver alignment issues (#454500)
-  - fix setvbuf (BZ#6719)
-
-* Thu Jul  3 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-8
-- update from trunk
-  - watch even resolv.conf in nscd using inotify
-  - some nscd fixes
-
-* Fri Jun 13 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-7
-- update from trunk
-  - avoid *lround* on ppc* clobbering cr3/cr4 registers (#450790)
-  - further nscd fixes (#450704)
-  - use inotify in nscd to watch files
-
-* Thu Jun 12 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-6
-- update from trunk
-  - nscd fixes (#450704)
-  - fix getservbyport (#449358)
-  - fix regexp.h (#446406)
-  - avoid crashing on T_DNAME in DNS responses (#450766)
-
-* Sun May 25 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-5
-- update from trunk
-
-* Tue May 20 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-4
-- further getaddrinfo and nscd fixes
-
-* Sun May 18 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-3
-- getaddrinfo and nscd fixes
-- reenable assertion checking in rawhide
-
-* Fri May 16 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-2
-- fix getaddrinfo (#446801, #446808)
-
-* Thu May 15 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-1
-- update to trunk
-  - O(n) memmem/strstr/strcasestr
-  - i386/x86_64 TLS descriptors support
-  - concurrent IPv4 and IPv6 DNS lookups by getaddrinfo
-
-* Mon May  5 2008 Jakub Jelinek <jakub@redhat.com> 2.8-3
-- don't run telinit u in %post if both /dev/initctl and
-  /sbin/initctl exist (#444978)
-- workaround GCC ppc64 miscompilation of c{log{,10},acosh,atan}l
-  (#444996)
-
-* Wed Apr 30 2008 Jakub Jelinek <jakub@redhat.com> 2.8-2
-- fix nscd races during GC (BZ#5381)
-- rebuilt with fixed GCC to fix regex miscompilation on power6
-- SPARC fixes
-
-* Sat Apr 12 2008 Jakub Jelinek <jakub@redhat.com> 2.8-1
-- 2.8 release
-
-* Fri Apr 11 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-16
-- update to trunk
-  - misc fixes (BZ#4997, BZ#5741)
-  - make sure all users of __libc_setlocale_lock know it is
-    now a rwlock
-  - fix ppc/ppc64 compatibility _sys_errlist and _sys_siglist
-    symbols
-
-* Thu Apr 10 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-15
-- update to trunk
-  - misc fixes (BZ#4314, BZ#4407, BZ#5209, BZ#5436, BZ#5768, BZ#5998,
-		BZ#6024)
-- restart sshd in %post when upstart is used - it doesn't have
-  /dev/initctl (#441763)
-- disable assert checking again
-
-* Tue Apr  8 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-14
-- update to trunk
-  - misc fixes (BZ#5443, BZ#5475, BZ#5478, BZ#5939, BZ#5979, BZ#5995,
-		BZ#6004, BZ#6007, BZ#6020, BZ#6021, BZ#6042)
-  - change mtrace to keep perl 5.10 quiet (#441082)
-  - don't share conversion state between mbtowc and wctomb (#438687)
-  - if st_blksize is too large and malloc fails, retry with smaller
-    buffer in opendir (#430768)
-  - correct *printf overflow test (#358111)
-
-* Fri Mar 28 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-13
-- update to trunk
-  - don't define ARG_MAX in <limits.h>, as it is no longer
-    constant - use sysconf (_SC_ARG_MAX) to get the current
-    argument size limit
-  - fix build on sparc64
-- only service sshd condrestart if /etc/rc.d/init.d/sshd exists
-  (#428859)
-
 * Wed Mar 26 2008 Jakub Jelinek <jakub@redhat.com> 2.7.90-12
 - update to trunk
   - new CLONE_* flags in <sched.h> (#438542)
