@@ -1,6 +1,6 @@
-%define glibcdate 20080828T1623
+%define glibcdate 20081019T1815
 %define glibcname glibc
-%define glibcsrcdir glibc-20080828T1623
+%define glibcsrcdir glibc-20081019T1815
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.8.90
-Release: 13
+Release: 14
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -41,7 +41,6 @@ Source2: %(echo %{glibcsrcdir} | sed s/glibc-/glibc-libidn-/).tar.bz2
 Source3: %{glibcname}-fedora-%{glibcdate}.tar.bz2
 Patch0: %{glibcname}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
-Patch2: glibc-sparcv9v-memset.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Provides: ldconfig
@@ -221,12 +220,17 @@ package or when debugging this package.
 %patch1 -p1
 %endif
 %endif
-%patch2 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
 # all.
 rm -f sysdeps/alpha/alphaev6/memcpy.S
+%if %{buildpower6}
+# On powerpc32, hp timing is only available in power4/power6
+# libs, not in base, so pre-power4 dynamic linker is incompatible
+# with power6 libs.
+rm -f sysdeps/powerpc/powerpc32/power4/hp-timing.[ch]
+%endif
 
 find . -type f -size 0 -o -name "*.orig" -exec rm -f {} \;
 cat > find_provides.sh <<EOF
@@ -982,6 +986,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Oct 19 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-14
+- update from trunk
+  - fix dynamic TLS handling (#467309)
+  - fix sys/signalfd.h for C++ (#467172)
+  - fix sprof (#458861)
+  - fix _mcount and socket syscalls on s390x (#464146)
+  - try harder to allocate memory in valloc and pvalloc (#461481)
+- fix power6 32-bit libs (#467311)
+
 * Fri Oct 10 2008 Dennis Gilmore <dennis@ausil.us> 2.8.90-13
 - apply sparcv9v memset patch from jakub and davem
 
