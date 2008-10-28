@@ -1,6 +1,6 @@
-%define glibcdate 20081019T1815
+%define glibcdate 20081028T1533
 %define glibcname glibc
-%define glibcsrcdir glibc-20081019T1815
+%define glibcsrcdir glibc-20081028T1533
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.8.90
-Release: 14
+Release: 15
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -176,6 +176,8 @@ If unsure if you need this, don't install this package.
 
 %if "%{_enable_debug_packages}" == "1"
 %define debug_package %{nil}
+%define __debug_install_post %{nil}
+%global __debug_package 1
 
 %package debuginfo
 Summary: Debug information for package %{name}
@@ -986,6 +988,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Oct 28 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-15
+- update from trunk
+  - __libc_res_nquery fixes (#466786)
+- try to workaround recent rpm changes which now strip glibc
+  shared libraries when they shouldn't (#468129)
+
 * Sun Oct 19 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-14
 - update from trunk
   - fix dynamic TLS handling (#467309)
