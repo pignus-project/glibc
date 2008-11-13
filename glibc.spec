@@ -1,6 +1,6 @@
-%define glibcdate 20081112T2008
+%define glibcdate 20081113T2206
 %define glibcname glibc
-%define glibcsrcdir glibc-20081112T2008
+%define glibcsrcdir glibc-20081113T2206
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
@@ -22,8 +22,8 @@
 %define _unpackaged_files_terminate_build 0
 Summary: The GNU libc libraries
 Name: glibc
-Version: 2.8.90
-Release: 17
+Version: 2.9
+Release: 1
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -988,6 +988,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Nov 13 2008 Jakub Jelinek <jakub@redhat.com> 2.9-1
+- glibc 2.9 release
+- fix CPU_ALLOC_SIZE on 32-bit arches (BZ#7029)
+
 * Wed Nov 12 2008 Jakub Jelinek <jakub@redhat.com> 2.8.90-17
 - update from trunk
   - don't abort on broken DNS replies (#469299, BZ#7009)
