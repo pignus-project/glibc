@@ -1,6 +1,6 @@
-%define glibcdate 20090108T1017
+%define glibcdate 20090204T2135
 %define glibcname glibc
-%define glibcsrcdir glibc-20090108T1017
+%define glibcsrcdir glibc-20090204T2135
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.9.90
-Release: 2
+Release: 3
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -988,6 +988,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Feb  4 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-3
+- update from trunk
+  - ISO C++ compliant strchr etc. with GCC 4.4+
+  - AT_RANDOM support
+
 * Thu Jan  8 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-2
 - update from trunk
 
