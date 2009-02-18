@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.9.90
-Release: 4
+Release: 5
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1013,7 +1013,7 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Wed Feb 18 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-4
+* Wed Feb 18 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-5
 - update from trunk
 - adjust for i586 + i686 from i386 + i686 build
 - split static libraries into glibc-static subpackage
