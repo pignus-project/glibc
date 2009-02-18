@@ -1,9 +1,9 @@
-%define glibcdate 20090204T2135
+%define glibcdate 20090218T1534
 %define glibcname glibc
-%define glibcsrcdir glibc-20090204T2135
+%define glibcsrcdir glibc-20090218T1534
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
-%define auxarches i586 i686 athlon sparcv9v sparc64v alphaev6
+%define auxarches i686 athlon sparcv9v sparc64v alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
 %define buildxen 1
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.9.90
-Release: 3
+Release: 4
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -57,7 +57,7 @@ BuildRequires: /bin/ps, /bin/kill, /bin/awk
 # This is to ensure that __frame_state_for is exported by glibc
 # will be compatible with egcs 1.x.y
 BuildRequires: gcc >= 3.2
-%define enablekernel 2.6.9
+%define enablekernel 2.6.18
 %ifarch i386
 %define nptl_target_cpu i486
 %else
@@ -118,14 +118,24 @@ executables.
 Install glibc-devel if you are going to develop programs which will
 use the standard C libraries.
 
+%package static
+Summary: C library static libraries for -static linking.
+Group: Development/Libraries
+Requires: %{name}-devel = %{version}-%{release}
+
+%description static
+The glibc-static package contains the C library static libraries
+for -static linking.  You don't need these, unless you link statically,
+which is highly discouraged.
+
 %package headers
 Summary: Header files for development using standard C libraries.
 Group: Development/Libraries
 Provides: %{name}-headers(%{_target_cpu})
 %ifarch x86_64
 # If both -m32 and -m64 is to be supported on AMD64, x86_64 glibc-headers
-# have to be installed, not i386 ones.
-Obsoletes: %{name}-headers(i386)
+# have to be installed, not i586 ones.
+Obsoletes: %{name}-headers(i586)
 %endif
 Requires(pre): kernel-headers
 Requires: kernel-headers >= 2.2.1, %{name} = %{version}-%{release}
@@ -253,7 +263,7 @@ BuildFlags="-march=%{nptl_target_cpu} -mtune=generic"
 %ifarch i686
 BuildFlags="-march=i686 -mtune=generic"
 %endif
-%ifarch i386
+%ifarch i386 i486 i586
 BuildFlags="$BuildFlags -mno-tls-direct-seg-refs"
 %endif
 %ifarch x86_64
@@ -350,7 +360,7 @@ build_nptl linuxnptl-power6
 cd build-%{nptl_target_cpu}-linuxnptl
 $GCC -static -L. -Os ../fedora/glibc_post_upgrade.c -o glibc_post_upgrade.%{_target_cpu} \
   -DNO_SIZE_OPTIMIZATION \
-%ifarch i386
+%ifarch i386 i486 i586
   -DARCH_386 \
 %endif
   '-DLIBTLS="/%{_lib}/tls/"' \
@@ -592,7 +602,12 @@ mv rpm.filelist rpm.filelist.full
 grep -v '%{_prefix}/%{_lib}/lib.*_p.a' rpm.filelist.full |
   egrep -v "(%{_prefix}/include)|(%{_infodir})" > rpm.filelist
 
-grep '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist >> devel.filelist
+grep '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist \
+  | grep '/lib\(\(c\|pthread\)_nonshared\|bsd\(\|-compat\)\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
+  >> devel.filelist
+grep '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist \
+  | grep -v '/lib\(\(c\|pthread\)_nonshared\|bsd\(\|-compat\)\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
+  > static.filelist
 grep '%{_prefix}/%{_lib}/.*\.o' < rpm.filelist >> devel.filelist
 grep '%{_prefix}/%{_lib}/lib.*\.so' < rpm.filelist >> devel.filelist
 
@@ -736,6 +751,13 @@ echo ====================PLT RELOCS END==================
 
 %endif
 
+pushd $RPM_BUILD_ROOT/usr/%{_lib}/
+$GCC -Wl,-r -o libpthread.o -Wl,--whole-archive ./libpthread.a
+rm libpthread.a
+ar rcs libpthread.a libpthread.o
+rm libpthread.o
+popd
+
 %if "%{_enable_debug_packages}" == "1"
 
 # The #line directives gperf generates do not give the proper
@@ -766,7 +788,7 @@ list_debug_archives()
 %ifarch %{debuginfocommonarches}
 
 %ifarch %{ix86}
-%define basearch i386
+%define basearch i586
 %endif
 %ifarch alpha alphaev6
 %define basearch alpha
@@ -813,7 +835,7 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 echo Cutting down the list of unpackaged files
 >> debuginfocommon.filelist
 sed -e '/%%dir/d;/%%config/d;/%%verify/d;s/%%lang([^)]*) //;s#^/*##' \
-    common.filelist devel.filelist headers.filelist \
+    common.filelist devel.filelist static.filelist headers.filelist \
     utils.filelist nscd.filelist debuginfocommon.filelist |
 (cd $RPM_BUILD_ROOT; xargs --no-run-if-empty rm -f 2> /dev/null || :)
 
@@ -951,6 +973,9 @@ rm -f *.filelist*
 %files -f devel.filelist devel
 %defattr(-,root,root)
 
+%files -f static.filelist static
+%defattr(-,root,root)
+
 %files -f headers.filelist headers
 %defattr(-,root,root)
 
@@ -988,6 +1013,14 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Feb 18 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-4
+- update from trunk
+- adjust for i586 + i686 from i386 + i686 build
+- split static libraries into glibc-static subpackage
+- ld -r the whole libpthread.a together to avoid endless issues with
+  -static ... -lpthread
+- require 2.6.18 and later kernel
+
 * Wed Feb  4 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-3
 - update from trunk
   - ISO C++ compliant strchr etc. with GCC 4.4+
