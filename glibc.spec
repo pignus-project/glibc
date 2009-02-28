@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.9.90
-Release: 8
+Release: 8.1
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -76,6 +76,8 @@ BuildRequires: rpm >= 4.2-0.56
 %endif
 %define __find_provides %{_builddir}/%{glibcsrcdir}/find_provides.sh
 %define _filter_GLIBC_PRIVATE 1
+
+Patch2: thread_db.patch
 
 %description
 The glibc package contains standard libraries which are used by
@@ -232,6 +234,8 @@ package or when debugging this package.
 %patch1 -p1
 %endif
 %endif
+
+%patch2 -p0
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1013,6 +1017,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb 27 2009 Roland McGrath <roland@redhat.com> - 2.9.90-8.1
+- fix libthread_db (#487212)
+
 * Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.9.90-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
