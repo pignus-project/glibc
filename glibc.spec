@@ -1,6 +1,6 @@
-%define glibcdate 20090218T1534
+%define glibcdate 20090309T1421
 %define glibcname glibc
-%define glibcsrcdir glibc-20090218T1534
+%define glibcsrcdir glibc-20090309T1421
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.9.90
-Release: 8.1
+Release: 9
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -76,8 +76,6 @@ BuildRequires: rpm >= 4.2-0.56
 %endif
 %define __find_provides %{_builddir}/%{glibcsrcdir}/find_provides.sh
 %define _filter_GLIBC_PRIVATE 1
-
-Patch2: thread_db.patch
 
 %description
 The glibc package contains standard libraries which are used by
@@ -234,8 +232,6 @@ package or when debugging this package.
 %patch1 -p1
 %endif
 %endif
-
-%patch2 -p0
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -607,10 +603,10 @@ grep -v '%{_prefix}/%{_lib}/lib.*_p.a' rpm.filelist.full |
   egrep -v "(%{_prefix}/include)|(%{_infodir})" > rpm.filelist
 
 grep '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist \
-  | grep '/lib\(\(c\|pthread\)_nonshared\|bsd\(\|-compat\)\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
+  | grep '/lib\(\(c\|pthread\|nldbl\)_nonshared\|bsd\(\|-compat\)\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
   >> devel.filelist
 grep '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist \
-  | grep -v '/lib\(\(c\|pthread\)_nonshared\|bsd\(\|-compat\)\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
+  | grep -v '/lib\(\(c\|pthread\|nldbl\)_nonshared\|bsd\(\|-compat\)\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
   > static.filelist
 grep '%{_prefix}/%{_lib}/.*\.o' < rpm.filelist >> devel.filelist
 grep '%{_prefix}/%{_lib}/lib.*\.so' < rpm.filelist >> devel.filelist
@@ -756,7 +752,7 @@ echo ====================PLT RELOCS END==================
 %endif
 
 pushd $RPM_BUILD_ROOT/usr/%{_lib}/
-$GCC -Wl,-r -nostdlib -o libpthread.o -Wl,--whole-archive ./libpthread.a
+$GCC -r -nostdlib -o libpthread.o -Wl,--whole-archive ./libpthread.a
 rm libpthread.a
 ar rcs libpthread.a libpthread.o
 rm libpthread.o
@@ -1017,6 +1013,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Mar  9 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-9
+- update from trunk
+  - POSIX 2008 support: -D_XOPEN_SOURCE=700 and -D_POSIX_C_SOURCE=200809L
+- move libnldbl_nonshared.a on ppc*/s390*/sparc* back to glibc-devel
+
 * Fri Feb 27 2009 Roland McGrath <roland@redhat.com> - 2.9.90-8.1
 - fix libthread_db (#487212)
 
