@@ -1,6 +1,6 @@
-%define glibcdate 20090309T1421
+%define glibcdate 20090310T1925
 %define glibcname glibc
-%define glibcsrcdir glibc-20090309T1421
+%define glibcsrcdir glibc-20090310T1925
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.9.90
-Release: 9
+Release: 10
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1013,6 +1013,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Mar 10 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-10
+- update from trunk
+  - fix atexit/__cxa_atexit
+
 * Mon Mar  9 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-9
 - update from trunk
   - POSIX 2008 support: -D_XOPEN_SOURCE=700 and -D_POSIX_C_SOURCE=200809L
