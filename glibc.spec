@@ -54,6 +54,17 @@ Requires(pre): basesystem, libgcc
 BuildRequires: gd-devel libpng-devel zlib-devel texinfo, libselinux-devel >= 1.33.4-3
 BuildRequires: audit-libs-devel >= 1.1.3, sed >= 3.95, libcap-devel, gettext, nss-devel
 BuildRequires: /bin/ps, /bin/kill, /bin/awk
+%ifarch %{ix86} x86_64 ppc ppc64
+BuildRequires: /usr/bin/setarch
+%ifarch %{ix86}
+%define setarch /usr/bin/setarch i386 -R
+%endif
+%ifarch x86_64 ppc ppc64
+%define setarch /usr/bin/setarch %{_target_cpu} -R
+%endif
+%else
+%define setarch %{nil}
+%endif
 # This is to ensure that __frame_state_for is exported by glibc
 # will be compatible with egcs 1.x.y
 BuildRequires: gcc >= 3.2
@@ -325,7 +336,7 @@ CC="$GCC" CXX="$GXX" CFLAGS="$build_CFLAGS" ../configure --prefix=%{_prefix} \
 	--with-tls --with-__thread --build %{nptl_target_cpu}-redhat-linux \
 	--host %{nptl_target_cpu}-redhat-linux \
 	--disable-profile --enable-experimental-malloc --enable-nss-crypt
-make %{?_smp_mflags} -r CFLAGS="$build_CFLAGS" PARALLELMFLAGS=-s
+%{setarch} make %{?_smp_mflags} -r CFLAGS="$build_CFLAGS" PARALLELMFLAGS=-s
 
 cd ..
 }
@@ -377,7 +388,7 @@ mkdir -p $RPM_BUILD_ROOT
 make -j1 install_root=$RPM_BUILD_ROOT install -C build-%{nptl_target_cpu}-linuxnptl PARALLELMFLAGS=-s
 %ifnarch %{auxarches}
 cd build-%{nptl_target_cpu}-linuxnptl && \
-  make %{?_smp_mflags} install_root=$RPM_BUILD_ROOT install-locales -C ../localedata objdir=`pwd` && \
+  %{setarch} make %{?_smp_mflags} install_root=$RPM_BUILD_ROOT install-locales -C ../localedata objdir=`pwd` && \
   cd ..
 %endif
 
@@ -706,7 +717,7 @@ export TIMEOUTFACTOR=16
 parent=$$
 echo ====================TESTING=========================
 cd build-%{nptl_target_cpu}-linuxnptl
-( make %{?_smp_mflags} -k check PARALLELMFLAGS=-s 2>&1
+( %{setarch} make %{?_smp_mflags} -k check PARALLELMFLAGS=-s 2>&1
   sleep 10s
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
@@ -715,7 +726,7 @@ cd ..
 %if %{buildxen}
 echo ====================TESTING -mno-tls-direct-seg-refs=============
 cd build-%{nptl_target_cpu}-linuxnptl-nosegneg
-( make %{?_smp_mflags} -k check PARALLELMFLAGS=-s 2>&1
+( %{setarch} make %{?_smp_mflags} -k check PARALLELMFLAGS=-s 2>&1
   sleep 10s
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
@@ -728,7 +739,7 @@ cd build-%{nptl_target_cpu}-linuxnptl-power6
 ( if [ -d ../power6emul ]; then
     export LD_PRELOAD=`cd ../power6emul; pwd`/\$LIB/power6emul.so
   fi
-  make %{?_smp_mflags} -k check PARALLELMFLAGS=-s 2>&1
+  %{setarch} make %{?_smp_mflags} -k check PARALLELMFLAGS=-s 2>&1
   sleep 10s
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
@@ -1017,6 +1028,7 @@ rm -f *.filelist*
 - update from trunk
   - fix strverscmp (#494457)
 - configure with --enable-nss-crypt
+- workaround buggy kernels during glibc build process, argh
 
 * Wed Apr  1 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-12
 - update from trunk
