@@ -1,6 +1,6 @@
-%define glibcdate 20090407T0657
+%define glibcdate 20090408T1602
 %define glibcname glibc
-%define glibcsrcdir glibc-20090407T0657
+%define glibcsrcdir glibc-20090408T1602
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.9.90
-Release: 13
+Release: 14
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -244,8 +244,6 @@ rm -f sysdeps/alpha/alphaev6/memcpy.S
 rm -f sysdeps/powerpc/powerpc32/power4/hp-timing.[ch]
 %endif
 
-rm -rf sysdeps/x86_64/memchr.S
-
 find . -type f -size 0 -o -name "*.orig" -exec rm -f {} \;
 cat > find_provides.sh <<EOF
 #!/bin/sh
@@ -326,7 +324,7 @@ CC="$GCC" CXX="$GXX" CFLAGS="$build_CFLAGS" ../configure --prefix=%{_prefix} \
 	--with-headers=%{_prefix}/include --enable-bind-now \
 	--with-tls --with-__thread --build %{nptl_target_cpu}-redhat-linux \
 	--host %{nptl_target_cpu}-redhat-linux \
-	--disable-profile --enable-experimental-malloc --enable-nss-crypt
+	--disable-profile --enable-nss-crypt
 make %{?_smp_mflags} -r CFLAGS="$build_CFLAGS" PARALLELMFLAGS=-s
 
 cd ..
@@ -1015,6 +1013,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Apr  8 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-14
+- update from trunk
+- temporarily disable experimental malloc
+
 * Tue Apr  7 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-13
 - update from trunk
   - fix strverscmp (#494457)
