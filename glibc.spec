@@ -1,6 +1,6 @@
-%define glibcdate 20090408T1602
+%define glibcdate 20090409T1422
 %define glibcname glibc
-%define glibcsrcdir glibc-20090408T1602
+%define glibcsrcdir glibc-20090409T1422
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.9.90
-Release: 14
+Release: 15
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -233,6 +233,31 @@ package or when debugging this package.
 %endif
 %endif
 
+mkdir -p override_headers/asm
+cat > override_headers/asm/unistd.h <<EOF
+#ifndef _HACK_ASM_UNISTD_H
+#include_next <asm/unistd.h>
+%ifarch %{ix86}
+#ifndef __NR_preadv
+#define __NR_preadv	333
+#define __NR_pwritev	334
+#endif
+%endif
+%ifarch x86_64
+#ifndef __NR_preadv
+#define __NR_preadv	295
+#define __NR_pwritev	296
+#endif
+%endif
+%ifarch ppc ppc64
+#ifndef __NR_preadv
+#define __NR_preadv	320
+#define __NR_pwritev	321
+#endif
+%endif
+#endif
+EOF
+
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
 # all.
@@ -321,10 +346,10 @@ mkdir $builddir ; cd $builddir
 build_CFLAGS="$BuildFlags -g -O3 $*"
 CC="$GCC" CXX="$GXX" CFLAGS="$build_CFLAGS" ../configure --prefix=%{_prefix} \
 	--enable-add-ons=nptl$AddOns --without-cvs $EnableKernel \
-	--with-headers=%{_prefix}/include --enable-bind-now \
+	--with-headers=`cd ..; pwd`/override_headers:%{_prefix}/include --enable-bind-now \
 	--with-tls --with-__thread --build %{nptl_target_cpu}-redhat-linux \
 	--host %{nptl_target_cpu}-redhat-linux \
-	--disable-profile --enable-nss-crypt
+	--disable-profile --enable-experimental-malloc --enable-nss-crypt
 make %{?_smp_mflags} -r CFLAGS="$build_CFLAGS" PARALLELMFLAGS=-s
 
 cd ..
@@ -1013,6 +1038,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Apr  9 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-15
+- rebuilt with fixed gcc to avoid miscompilation of i586 memmove
+- reenable experimental malloc again
+
 * Wed Apr  8 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-14
 - update from trunk
 - temporarily disable experimental malloc
