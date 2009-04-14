@@ -1,6 +1,6 @@
-%define glibcdate 20090409T1422
+%define glibcdate 20090414T2104
 %define glibcname glibc
-%define glibcsrcdir glibc-20090409T1422
+%define glibcsrcdir glibc-20090414T2104
 %define glibc_release_tarballs 0
 %define run_glibc_tests 1
 %define auxarches i686 athlon sparcv9v sparc64v alphaev6
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: 2.9.90
-Release: 15
+Release: 16
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1013,6 +1013,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Apr 14 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-16
+- update from trunk
+
 * Thu Apr  9 2009 Jakub Jelinek <jakub@redhat.com> 2.9.90-15
 - rebuilt with fixed gcc to avoid miscompilation of i586 memmove
 - reenable experimental malloc again
