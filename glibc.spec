@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.10-125-g44d20bc
+%define glibcsrcdir glibc-2.10-131-g2fd0cd8
 %define glibcversion 2.10.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 1
+Release: 2
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1024,6 +1024,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jul  2 2009 Andreas Schwab <aschwab@redhat.com> 2.10.90-2
+- Update from master.
+
 * Thu Jun 26 2009 Andreas Schwab <aschwab@redhat.com> 2.10.90-1
 - Update from master.
 - Enable multi-arch support on x86/x86-64.
