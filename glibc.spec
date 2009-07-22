@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.10-181-g42e69bc
+%define glibcsrcdir glibc-2.10-187-gae612b0
 %define glibcversion 2.10.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 4
+Release: 5
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -333,7 +333,8 @@ shift
 rm -rf $builddir
 mkdir $builddir ; cd $builddir
 build_CFLAGS="$BuildFlags -g -O3 $*"
-CC="$GCC" CXX="$GXX" CFLAGS="$build_CFLAGS" ../configure --prefix=%{_prefix} \
+../configure CC="$GCC" CXX="$GXX" CFLAGS="$build_CFLAGS" \
+	--prefix=%{_prefix} \
 	--enable-add-ons=nptl$AddOns --without-cvs $EnableKernel \
 	--with-headers=%{_prefix}/include --enable-bind-now \
 	--with-tls --with-__thread --build %{nptl_target_cpu}-redhat-linux \
@@ -1030,6 +1031,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jul 22 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-5
+- Update from master.
+- Undefine __i686 on x86 to fix build.
+
 * Mon Jul 20 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-4
 - Update from master.
 - Don't build separate i686 package.
