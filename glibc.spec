@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.10-187-gae612b0
+%define glibcsrcdir glibc-2.10-193-g9b6bf8a
 %define glibcversion 2.10.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 6
+Release: 7
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -317,8 +317,14 @@ GCC="gcc -m64"
 GXX="g++ -m64"
 %endif
 
-#BuildFlags="$BuildFlags -DNDEBUG=1 -fasynchronous-unwind-tables"
 BuildFlags="$BuildFlags -fasynchronous-unwind-tables"
+# Add -DNDEBUG unless using a prerelease
+case %{version} in
+  *.*.9[0-9]*) ;;
+  *) 
+     BuildFlags="$BuildFlags -DNDEBUG"
+     ;;
+esac
 EnableKernel="--enable-kernel=%{enablekernel}"
 echo "$GCC" > Gcc
 AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(linuxthreads\|nptl\|rtkaio\|powerpc-cpu\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
@@ -1031,6 +1037,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jul 23 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-7
+- Update from master.
+- Build with -DNDEBUG unless using a prerelease.
+
 * Thu Jul 23 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-6
 - Rebuilt with binutils-2.19.51.0.14-29.fc12 to fix static binaries
 
