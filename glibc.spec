@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 7
+Release: 7.1
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1037,6 +1037,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jul 24 2009 Jakub Jelinek <jakub@redhat.com> - 2.10.90-7.1
+- Fix up pthread_cond_timedwait on x86_64 with old kernels.
+
 * Thu Jul 23 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-7
 - Update from master.
 - Build with -DNDEBUG unless using a prerelease.

@@ -2195,3 +2195,25 @@
  		return;
  	abbrvar = (stdrp == NULL) ? "" : stdrp->r_abbrvar;
  	doabbr(result, zp->z_format, abbrvar, FALSE, TRUE);
+2009-07-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S: Fix error
+	path when not using absolute timeout futex.
+
+--- libc/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S
++++ libc/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S
+@@ -551,12 +551,12 @@ __pthread_cond_timedwait:
+ 	jne	53b
+ 
+ 	cmpq	24(%rsp), %r9
+-	jbe	45b
++	jbe	15f
+ 
+ 	cmpq	%rax, %r9
+ 	ja	39b
+ 
+-	cmpq	$-ETIMEDOUT, %r14
++15:	cmpq	$-ETIMEDOUT, %r14
+ 	jne	8b
+ 
+ 	jmp	99b
