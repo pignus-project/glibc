@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.10-193-g9b6bf8a
+%define glibcsrcdir glibc-2.10-214-g16d2ea4
 %define glibcversion 2.10.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 8.1
+Release: 9
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -321,7 +321,7 @@ BuildFlags="$BuildFlags -fasynchronous-unwind-tables"
 # Add -DNDEBUG unless using a prerelease
 case %{version} in
   *.*.9[0-9]*) ;;
-  *) 
+  *)
      BuildFlags="$BuildFlags -DNDEBUG"
      ;;
 esac
@@ -588,11 +588,11 @@ rm -f $RPM_BUILD_ROOT%{_sbindir}/rpcinfo
 	 -name gconv-modules.cache \
 	 -printf "%%%%verify(not md5 size mtime) " \
 	 , \
-         ! -path "*/lib/debug" -printf "/%%P\n" \)
+	 ! -path "*/lib/debug" -printf "/%%P\n" \)
   find $RPM_BUILD_ROOT -type d \
        \( -path '*%{_prefix}/share/*' ! -path '*%{_infodir}' -o \
-          -path "*%{_prefix}/include/*" -o \
-          -path "*%{_prefix}/lib/locale/*" \
+	  -path "*%{_prefix}/include/*" -o \
+	  -path "*%{_prefix}/lib/locale/*" \
        \) -printf "%%%%dir /%%P\n"
 } | {
 
@@ -1037,6 +1037,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jul 27 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-9
+- Update from master.
+
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.10.90-8.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
