@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.10-221-ge73e694
+%define glibcsrcdir glibc-2.10-229-g78c4ef4
 %define glibcversion 2.10.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 10
+Release: 11
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -580,7 +580,7 @@ rm -f $RPM_BUILD_ROOT%{_sbindir}/rpcinfo
 
 # BUILD THE FILE LIST
 {
-  find $RPM_BUILD_ROOT \( -type f -or -type l \) \
+  find $RPM_BUILD_ROOT \( -type f -o -type l \) \
        \( \
 	 -name etc -printf "%%%%config " -o \
 	 -name gconv-modules \
@@ -588,7 +588,7 @@ rm -f $RPM_BUILD_ROOT%{_sbindir}/rpcinfo
 	 -name gconv-modules.cache \
 	 -printf "%%%%verify(not md5 size mtime) " \
 	 , \
-	 ! -path "*/lib/debug" -printf "/%%P\n" \)
+	 ! -path "*/lib/debug/*" -printf "/%%P\n" \)
   find $RPM_BUILD_ROOT -type d \
        \( -path '*%{_prefix}/share/*' ! -path '*%{_infodir}' -o \
 	  -path "*%{_prefix}/include/*" -o \
@@ -1037,6 +1037,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jul 30 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-11
+- Update from master.
+- Don't package debuginfo files in glibc-devel.
+
 * Tue Jul 28 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-10
 - Update from master.
   * fix memory ordering in pthread_mutex_unlock (BZ#10418)
