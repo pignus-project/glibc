@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.10-229-g78c4ef4
+%define glibcsrcdir glibc-2.10-249-g4a13776
 %define glibcversion 2.10.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 11
+Release: 12
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1037,6 +1037,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug  3 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-12
+- Update from master.
+  - fix fortify failure with longjmp from alternate stack (#512103)
+
 * Thu Jul 30 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-11
 - Update from master.
 - Don't package debuginfo files in glibc-devel.
