@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.10-249-g4a13776
+%define glibcsrcdir glibc-2.10-271-gefa0569
 %define glibcversion 2.10.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 12
+Release: 13
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -533,17 +533,6 @@ mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}
 cp -a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.a \
   $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/
 rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/*_p.a
-# Now strip debugging info from static libraries
-pushd $RPM_BUILD_ROOT%{_prefix}/%{_lib}/
-for i in *.a; do
-  if [ -f $i ]; then
-    case "$i" in
-    *_p.a) ;;
-    *) strip -g -R .comment $i ;;
-    esac
-  fi
-done
-popd
 
 # rquota.x and rquota.h are now provided by quota
 rm -f $RPM_BUILD_ROOT%{_prefix}/include/rpcsvc/rquota.[hx]
@@ -885,7 +874,7 @@ mkdir -p $RPM_BUILD_ROOT/var/cache/ldconfig
 %triggerin common -p /usr/sbin/tzdata-update -- tzdata
 
 %post devel
-/sbin/install-info %{_infodir}/libc.info.gz %{_infodir}/dir || :
+/sbin/install-info %{_infodir}/libc.info.gz %{_infodir}/dir > /dev/null 2>&1 || :
 
 %pre headers
 # this used to be a link and it is causing nightmares now
@@ -895,7 +884,7 @@ fi
 
 %preun devel
 if [ "$1" = 0 ]; then
-  /sbin/install-info --delete %{_infodir}/libc.info.gz %{_infodir}/dir || :
+  /sbin/install-info --delete %{_infodir}/libc.info.gz %{_infodir}/dir > /dev/null 2>&1 || :
 fi
 
 %post utils -p /sbin/ldconfig
@@ -1037,6 +1026,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug 10 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-13
+- Update from master.
+  - fix rehashing of unique symbols (#515677)
+- Fix spurious messages with --excludedocs (#515948)
+
 * Mon Aug  3 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-12
 - Update from master.
   - fix fortify failure with longjmp from alternate stack (#512103)
