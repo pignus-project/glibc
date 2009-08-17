@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.10-271-gefa0569
+%define glibcsrcdir glibc-2.10-277-g677760a
 %define glibcversion 2.10.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 13
+Release: 14
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1026,6 +1026,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug 17 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-14
+- Update from master.
+  - fix pthread_cond_signal (#516469)
+
 * Mon Aug 10 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-13
 - Update from master.
   - fix rehashing of unique symbols (#515677)
