@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.10-277-g677760a
+%define glibcsrcdir glibc-2.10-288-ga0e25a8
 %define glibcversion 2.10.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 14
+Release: 15
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -65,12 +65,14 @@ BuildRequires: gcc >= 3.2
 %else
 %define nptl_target_cpu %{_target_cpu}
 %endif
-# Need AS_NEEDED directive
-# Need --hash-style=* support
 %ifarch %{multiarcharches}
 # Need STT_IFUNC support
 BuildRequires: binutils >= 2.19.51.0.10
+# Earlier releases have broken support for IRELATIVE relocations
+Conflicts: prelink < 0.4.2
 %else
+# Need AS_NEEDED directive
+# Need --hash-style=* support
 BuildRequires: binutils >= 2.17.50.0.2-5
 %endif
 BuildRequires: gcc >= 3.2.1-5
@@ -1026,6 +1028,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug 24 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-15
+- Update from master.
+  - fix fortify failure with longjmp from alternate stack (#512103).
+- Add conflict with prelink (#509655).
+
 * Mon Aug 17 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-14
 - Update from master.
   - fix pthread_cond_signal (#516469)
