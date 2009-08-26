@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.10-288-ga0e25a8
+%define glibcsrcdir glibc-2.10-312-g2df4be8
 %define glibcversion 2.10.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 15
+Release: 16
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1028,6 +1028,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Aug 26 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-16
+- Update from master.
+  - handle AVX saving on x86-64 in interrupted symbol lookups (#519081).
+
 * Mon Aug 24 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-15
 - Update from master.
   - fix fortify failure with longjmp from alternate stack (#512103).
