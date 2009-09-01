@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.10-312-g2df4be8
+%define glibcsrcdir glibc-2.10-318-gc2735e9
 %define glibcversion 2.10.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 17
+Release: 18
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -351,6 +351,7 @@ build_CFLAGS="$BuildFlags -g -O3 $*"
 	--enable-multi-arch \
 %endif
 	--disable-profile --enable-experimental-malloc --enable-nss-crypt
+
 make %{?_smp_mflags} -r CFLAGS="$build_CFLAGS" PARALLELMFLAGS=-s
 
 cd ..
@@ -1028,10 +1029,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Sep  1 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-18
+- Update from master.
+  - fix parse error in <bits/mathinline.h> (#520209).
+
 * Thu Aug 27 2009 Roland McGrath <roland@redhat.com> - 2.10.90-17
 - Update from master.
 
 * Wed Aug 26 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-16
+- Update from master.
   - handle AVX saving on x86-64 in interrupted symbol lookups (#519081).
 
 * Mon Aug 24 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-15
