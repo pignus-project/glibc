@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.10-318-gc2735e9
+%define glibcsrcdir glibc-2.10-322-gd840539
 %define glibcversion 2.10.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 18
+Release: 19
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1029,6 +1029,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Sep  2 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-19
+- Update from master.
+  - Fix x86_64 bits/mathinline.h for -m32 compilation.
+
 * Tue Sep  1 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-18
 - Update from master.
   - fix parse error in <bits/mathinline.h> (#520209).
