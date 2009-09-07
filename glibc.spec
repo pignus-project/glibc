@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.10-327-g01034d7
+%define glibcsrcdir glibc-2.10-330-gd76da20
 %define glibcversion 2.10.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 20
+Release: 21
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1029,6 +1029,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Sep  7 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-21
+- Update from master.
+  - Fix strstr/strcasestr on i386 (#519226).
+
 * Thu Sep  3 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-20
 - Update from master.
   - Fix strstr/strcasestr/fma/fmaf on x86_64 (#519226).
