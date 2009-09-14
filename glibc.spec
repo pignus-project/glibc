@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.10-330-gd76da20
+%define glibcsrcdir glibc-2.10-335-g02bf610
 %define glibcversion 2.10.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 21
+Release: 22
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -320,6 +320,8 @@ GXX="g++ -m64"
 %endif
 
 BuildFlags="$BuildFlags -fasynchronous-unwind-tables"
+# gcc is a memory hog without that (#523172).
+BuildFlags="$BuildFlags -fno-var-tracking-assignments"
 # Add -DNDEBUG unless using a prerelease
 case %{version} in
   *.*.9[0-9]*) ;;
@@ -1029,6 +1031,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Sep 14 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-22
+- Update from master.
+  - Fix endless loop in localedef.
+  - Fix __longjmp_chk on s390/s390x.
+- Fix exit codes in nscd start script (#521848).
+- Build with -fno-var-tracking-assignments for now (#523172).
+
 * Mon Sep  7 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-21
 - Update from master.
   - Fix strstr/strcasestr on i386 (#519226).
