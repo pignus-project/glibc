@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.10-335-g02bf610
+%define glibcsrcdir glibc-2.10-340-gae0f0db
 %define glibcversion 2.10.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 22
+Release: 23
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -542,9 +542,8 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/*_p.a
 # rquota.x and rquota.h are now provided by quota
 rm -f $RPM_BUILD_ROOT%{_prefix}/include/rpcsvc/rquota.[hx]
 
-# Hardlink identical locale files together
+# Create archive of locale files
 %ifnarch %{auxarches}
-gcc -O2 -o build-%{nptl_target_cpu}-linuxnptl/hardlink fedora/hardlink.c
 olddir=`pwd`
 pushd ${RPM_BUILD_ROOT}%{_prefix}/lib/locale
 rm locale-archive || :
@@ -558,7 +557,6 @@ $olddir/build-%{nptl_target_cpu}-linuxnptl/elf/ld.so \
 rm -rf *_*
 mv locale-archive{,.tmpl}
 popd
-#build-%{nptl_target_cpu}-linuxnptl/hardlink -vc $RPM_BUILD_ROOT%{_prefix}/lib/locale
 %endif
 
 rm -f ${RPM_BUILD_ROOT}/%{_lib}/libnss1-*
@@ -1031,6 +1029,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Sep 21 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-23
+- Update from master.
+
 * Mon Sep 14 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-22
 - Update from master.
   - Fix endless loop in localedef.
