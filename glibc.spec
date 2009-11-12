@@ -1,5 +1,5 @@
-%define glibcsrcdir glibc-2.10-343-gf450806
-%define glibcversion 2.10.90
+%define glibcsrcdir glibc-2.11-12-g24c0bf7
+%define glibcversion 2.11.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon sparcv9v sparc64v alphaev6
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 24
+Release: 1
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -34,13 +34,7 @@ License: LGPLv2+ and LGPLv2+ with exceptions and GPLv2+
 Group: System Environment/Libraries
 URL: http://sources.redhat.com/glibc/
 Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.bz2
-%if 0%{?glibc_release_url:1}
-%define glibc_libidn_srcdir %(echo %{glibcsrcdir} | sed s/glibc-/glibc-libidn-/)
-Source1: %{glibc_release_url}%{glibc_libidn_srcdir}.tar.bz2
-%define glibc_release_unpack -a1
-%define glibc_release_setup mv %{glibc_libidn_srcdir} libidn
-%endif
-Source2: %{glibcsrcdir}-fedora.tar.bz2
+Source1: %{glibcsrcdir}-fedora.tar.bz2
 Patch0: %{name}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -68,6 +62,7 @@ BuildRequires: gcc >= 3.2
 %ifarch %{multiarcharches}
 # Need STT_IFUNC support
 BuildRequires: binutils >= 2.19.51.0.10
+Conflicts: binutils < 2.19.51.0.10
 # Earlier releases have broken support for IRELATIVE relocations
 Conflicts: prelink < 0.4.2
 %else
@@ -240,8 +235,7 @@ package or when debugging this package.
 %endif
 
 %prep
-%setup -q -n %{glibcsrcdir} %{?glibc_release_unpack} -b2
-%{?glibc_release_setup}
+%setup -q -n %{glibcsrcdir} -b1
 %patch0 -E -p1
 %ifarch ia64
 %if "%{_lib}" == "lib64"
@@ -320,8 +314,6 @@ GXX="g++ -m64"
 %endif
 
 BuildFlags="$BuildFlags -fasynchronous-unwind-tables"
-# gcc is a memory hog without that (#523172).
-BuildFlags="$BuildFlags -fno-var-tracking-assignments"
 # Add -DNDEBUG unless using a prerelease
 case %{version} in
   *.*.9[0-9]*) ;;
@@ -387,7 +379,7 @@ build_nptl linuxnptl-power6
 %endif
 
 cd build-%{nptl_target_cpu}-linuxnptl
-$GCC -static -L. -Os ../fedora/glibc_post_upgrade.c -o glibc_post_upgrade.%{_target_cpu} \
+$GCC -static -L. -Os -g ../fedora/glibc_post_upgrade.c -o glibc_post_upgrade.%{_target_cpu} \
   -DNO_SIZE_OPTIMIZATION \
 %ifarch i386 i486 i586
   -DARCH_386 \
@@ -425,53 +417,60 @@ ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/librtkaio-*.so` $RPM_BUILD_ROOT/
 %if %{buildxen}
 %define nosegneg_subdir_base i686
 %define nosegneg_subdir i686/nosegneg
+%define nosegneg_subdir_up ../..
 cd build-%{nptl_target_cpu}-linuxnptl-nosegneg
-SubDir=%{nosegneg_subdir}
-mkdir -p $RPM_BUILD_ROOT/%{_lib}/$SubDir/
-cp -a libc.so $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/libc-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libc-*.so` $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/libc.so.*`
-cp -a math/libm.so $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/libm-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libm-*.so` $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/libm.so.*`
-cp -a nptl/libpthread.so $RPM_BUILD_ROOT/%{_lib}/$SubDir/libpthread-%{version}.so
-pushd $RPM_BUILD_ROOT/%{_lib}/$SubDir
-ln -sf libpthread-*.so `basename $RPM_BUILD_ROOT/%{_lib}/libpthread.so.*`
-popd
-cp -a rt/librt.so $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so` $RPM_BUILD_ROOT/%{_lib}/$SubDir/$librtso
-cp -a nptl_db/libthread_db.so $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/libthread_db-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libthread_db-*.so` $RPM_BUILD_ROOT/%{_lib}/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/libthread_db.so.*`
+destdir=$RPM_BUILD_ROOT/%{_lib}/%{nosegneg_subdir}
+mkdir -p $destdir
+for lib in libc math/libm nptl/libpthread rt/librt nptl_db/libthread_db
+do
+  libbase=${lib#*/}
+  libbaseso=$(basename $RPM_BUILD_ROOT/%{_lib}/${libbase}-*.so)
+  # Only install if different from base lib
+  if cmp -s ${lib}.so ../build-%{nptl_target_cpu}-linuxnptl/${lib}.so; then
+    ln -sf %{nosegneg_subdir_up}/$libbaseso $destdir/$libbaseso
+  else
+    cp -a ${lib}.so $destdir/$libbaseso
+  fi
+  ln -sf $libbaseso $destdir/$(basename $RPM_BUILD_ROOT/%{_lib}/${libbase}.so.*)
+done
 %ifarch %{rtkaioarches}
-mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir
-cp -a rtkaio/librtkaio.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/$SubDir/$librtso
+destdir=$RPM_BUILD_ROOT/%{_lib}/rtkaio/%{nosegneg_subdir}
+mkdir -p $destdir
+librtkaioso=$(basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/)
+if cmp -s rtkaio/librtkaio.so ../build-%{nptl_target_cpu}-linuxnptl/rtkaio/librtkaio.so; then
+  ln -s %{nosegneg_subdir_up}/$librtkaioso $destdir/$librtkaioso
+else
+  cp -a rtkaio/librtkaio.so $destdir/$librtkaioso
+fi
+ln -sf $librtkaioso $destdir/$librtso
 %endif
 cd ..
 %endif
 
 %if %{buildpower6}
 cd build-%{nptl_target_cpu}-linuxnptl-power6
-mkdir -p $RPM_BUILD_ROOT/%{_lib}/power6{,x}
-cp -a libc.so $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/libc-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libc-*.so` $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/libc.so.*`
-cp -a math/libm.so $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/libm-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libm-*.so` $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/libm.so.*`
-cp -a nptl/libpthread.so $RPM_BUILD_ROOT/%{_lib}/power6/libpthread-%{version}.so
-pushd $RPM_BUILD_ROOT/%{_lib}/power6
-ln -sf libpthread-*.so `basename $RPM_BUILD_ROOT/%{_lib}/libpthread.so.*`
-popd
-cp -a rt/librt.so $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so` $RPM_BUILD_ROOT/%{_lib}/power6/$librtso
-cp -a nptl_db/libthread_db.so $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/libthread_db-*.so`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/libthread_db-*.so` $RPM_BUILD_ROOT/%{_lib}/power6/`basename $RPM_BUILD_ROOT/%{_lib}/libthread_db.so.*`
-pushd $RPM_BUILD_ROOT/%{_lib}/power6x
+destdir=$RPM_BUILD_ROOT/%{_lib}/power6
+mkdir -p ${destdir}
+for lib in libc math/libm nptl/libpthread rt/librt nptl_db/libthread_db
+do
+  libbase=${lib#*/}
+  libbaseso=$(basename $RPM_BUILD_ROOT/%{_lib}/${libbase}-*.so)
+  cp -a ${lib}.so $destdir/$libbaseso
+  ln -sf $libbaseso $destdir/$(basename $RPM_BUILD_ROOT/%{_lib}/${libbase}.so.*)
+done
+mkdir -p ${destdir}x
+pushd ${destdir}x
 ln -sf ../power6/*.so .
 cp -a ../power6/*.so.* .
 popd
 %ifarch %{rtkaioarches}
-mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio/power6{,x}
-cp -a rtkaio/librtkaio.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/power6/`basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/`
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/power6/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/power6/$librtso
-pushd $RPM_BUILD_ROOT/%{_lib}/rtkaio/power6x
+destdir=$RPM_BUILD_ROOT/%{_lib}/rtkaio/power6
+mkdir -p $destdir
+librtkaioso=$(basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/)
+cp -a rtkaio/librtkaio.so $destdir/$librtkaioso
+ln -sf $librtkaioso $destdir/$librtso
+mkdir -p ${destdir}x
+pushd ${destdir}x
 ln -sf ../power6/*.so .
 cp -a ../power6/*.so.* .
 popd
@@ -682,13 +681,13 @@ touch -r timezone/northamerica $RPM_BUILD_ROOT/etc/localtime
 touch -r sunrpc/etc.rpc $RPM_BUILD_ROOT/etc/rpc
 
 cd fedora
-$GCC -Os -static -o build-locale-archive build-locale-archive.c \
+$GCC -Os -g -static -o build-locale-archive build-locale-archive.c \
   ../build-%{nptl_target_cpu}-linuxnptl/locale/locarchive.o \
   ../build-%{nptl_target_cpu}-linuxnptl/locale/md5.o \
   -DDATADIR=\"%{_datadir}\" -DPREFIX=\"%{_prefix}\" \
   -L../build-%{nptl_target_cpu}-linuxnptl
 install -m 700 build-locale-archive $RPM_BUILD_ROOT/usr/sbin/build-locale-archive
-$GCC -Os -static -o tzdata-update tzdata-update.c \
+$GCC -Os -g -static -o tzdata-update tzdata-update.c \
   -L../build-%{nptl_target_cpu}-linuxnptl
 install -m 700 tzdata-update $RPM_BUILD_ROOT/usr/sbin/tzdata-update
 cd ..
@@ -1029,6 +1028,48 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Nov 12 2009 Andreas Schwab <schwab@redhat.com> - 2.11.90-1
+- Update from master.
+
+* Thu Nov  5 2009 Andreas Schwab <schwab@redhat.com> - 2.11-2
+- Fix readahead on powerpc32.
+- Fix R_PPC64_{JMP_IREL,IRELATIVE} handling.
+- Fix preadv, pwritev and fallocate for -D_FILE_OFFSET_BITS=64 (#533063).
+
+* Mon Nov  2 2009 Andreas Schwab <schwab@redhat.com> - 2.11-1
+- Update to 2.11 release.
+- Disable multi-arch support on PowerPC again since binutils is too old.
+- Fix crash in tzdata-update due to use of multi-arch symbol (#532128).
+
+* Fri Oct 30 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-27
+- Update from master.
+  - Fix races in setXid implementation (BZ#3270).
+  - Implement IFUNC for PPC and enable multi-arch support.
+  - Implement mkstemps/mkstemps64 and mkostemps/mkostemps64 (BZ#10349).
+  - Fix IA-64 and S390 sigevent definitions (BZ#10446).
+  - Fix memory leak in NIS grp database handling (BZ#10713).
+  - Print timestamp in nscd debug messages (BZ#10742).
+  - Fix mixing IPv4 and IPv6 name server in resolv.conf.
+  - Fix range checks in coshl.
+  - Implement SSE4.2 optimized strchr and strrchr.
+  - Handle IFUNC symbols in dlsym (#529965).
+  - Misc fixes (BZ#10312, BZ#10315, BZ#10319, BZ#10391, BZ#10425,
+    BZ#10540, BZ#10553, BZ#10564, BZ#10609, BZ#10692, BZ#10780,
+    BZ#10717, BZ#10784, BZ#10789, BZ#10847
+- No longer build with -fno-var-tracking-assignments.
+
+* Mon Oct 19 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-26
+- Update from master.
+  - Add ____longjmp_chk for sparc.
+- Avoid installing the same libraries twice.
+
+* Mon Oct 12 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-25
+- Update from master
+  - Fix descriptor leak when calling dlopen with RTLD_NOLOAD (#527409).
+  - Fix week-1stday in C locale.
+  - Check for integer overflows in formatting functions.
+  - Fix locale program error handling (#525363).
+
 * Mon Sep 28 2009 Andreas Schwab <schwab@redhat.com> - 2.10.90-24
 - Update from master.
   - Fix missing reloc dependency (#517001).
