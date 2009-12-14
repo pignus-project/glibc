@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.11-55-gb55ec98
+%define glibcsrcdir glibc-2.11-73-g2510d01
 %define glibcversion 2.11.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 3
+Release: 4
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1033,6 +1033,16 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Dec 14 2009 Andreas Schwab <schwab@redhat.com> - 2.11.90-4
+- Update from master.
+  - Add Requeue-PI support for x86 arch.
+  - Redefine O_SYNC and O_DSYNC to match 2.6.33+ kernels.
+  - Fix a few error cases in *name4_r lookup handling (BZ#11000).
+  - Fix kernel version check in recent ptsname change (BZ#11046).
+  - Add more warnings to exec functions (BZ#11056).
+  - Add recvmmsg interface.
+  - Define SCHED_IDLE and SCHED_RESET_ON_FORK for Linux.
+
 * Mon Nov 30 2009 Andreas Schwab <schwab@redhat.com> - 2.11.90-3
 - Update from master.
   - Fix infloop in __pthread_disable_asynccancel on x86_64 (#537690).
