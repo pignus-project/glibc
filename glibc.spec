@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.11-73-g2510d01
+%define glibcsrcdir glibc-2.11-88-gc10f886
 %define glibcversion 2.11.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 4
+Release: 5
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1033,6 +1033,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jan  4 2010 Andreas Schwab <schwab@redhat.com> - 2.11.90-5
+- Update from master.
+  - Additional setcontext(), etc. conformance tests (BZ#11115).
+  - Handle AT_FDCWD in futimens (BZ#10992).
+  - Update poll.h header for POSIX 2008 (BZ#11093).
+  - Avoid ELF lookup race.
+
 * Mon Dec 14 2009 Andreas Schwab <schwab@redhat.com> - 2.11.90-4
 - Update from master.
   - Add Requeue-PI support for x86 arch.
