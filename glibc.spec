@@ -1,5 +1,5 @@
-%define glibcsrcdir glibc-2.11-188-g0cbcca8
-%define glibcversion 2.11.90
+%define glibcsrcdir glibc-2.12-17-g4828935
+%define glibcversion 2.12.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon sparcv9v sparc64v alphaev6
@@ -19,12 +19,11 @@
 %define rtkaioarches %{ix86} x86_64 ia64 ppc ppc64 s390 s390x
 %define debuginfocommonarches alpha alphaev6 sparc sparcv9 sparcv9v sparc64 sparc64v
 %define multiarcharches ppc ppc64 %{ix86} x86_64
-%define _unpackaged_files_terminate_build 0
 
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 12
+Release: 1
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -177,7 +176,7 @@ libraries, as well as national language (locale) support.
 Summary: A Name Service Caching Daemon (nscd).
 Group: System Environment/Daemons
 Requires: libselinux >= 1.17.10-1, audit-libs >= 1.1.3
-Requires(pre): /sbin/chkconfig, /usr/sbin/useradd, /usr/sbin/userdel, sh-utils
+Requires(pre): /sbin/chkconfig, /usr/sbin/useradd, /usr/sbin/userdel, coreutils
 
 %description -n nscd
 Nscd caches name service lookups and can dramatically improve
@@ -410,7 +409,7 @@ cd build-%{nptl_target_cpu}-linuxnptl && \
 librtso=`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
 
 %ifarch %{rtkaioarches}
-rm -f $RPM_BUILD_ROOT{,%{_prefix}}/%{_lib}/librtkaio.so*
+rm -f $RPM_BUILD_ROOT{,%{_prefix}}/%{_lib}/librtkaio.*
 rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so.*
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio
 mv $RPM_BUILD_ROOT/%{_lib}/librtkaio-*.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/
@@ -527,6 +526,7 @@ chmod 644 $RPM_BUILD_ROOT/etc/ld.so.conf
 mkdir -p $RPM_BUILD_ROOT/etc/ld.so.conf.d
 mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
 > $RPM_BUILD_ROOT/etc/sysconfig/nscd
+> $RPM_BUILD_ROOT/etc/gai.conf
 
 # Include %{_prefix}/%{_lib}/gconv/gconv-modules.cache
 > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
@@ -569,8 +569,6 @@ rm -f ${RPM_BUILD_ROOT}/%{_lib}/libnss-*.so.1
 # Ugly hack for buggy rpm
 ln -f ${RPM_BUILD_ROOT}%{_sbindir}/iconvconfig{,.%{_target_cpu}}
 
-rm -f $RPM_BUILD_ROOT/etc/gai.conf
-
 # In F7+ this is provided by rpcbind rpm
 rm -f $RPM_BUILD_ROOT%{_sbindir}/rpcinfo
 
@@ -587,8 +585,7 @@ rm -f $RPM_BUILD_ROOT%{_sbindir}/rpcinfo
 	 ! -path "*/lib/debug/*" -printf "/%%P\n" \)
   find $RPM_BUILD_ROOT -type d \
        \( -path '*%{_prefix}/share/*' ! -path '*%{_infodir}' -o \
-	  -path "*%{_prefix}/include/*" -o \
-	  -path "*%{_prefix}/lib/locale/*" \
+	  -path "*%{_prefix}/include/*" \
        \) -printf "%%%%dir /%%P\n"
 } | {
 
@@ -645,7 +642,8 @@ grep '%{_prefix}/bin' < rpm.filelist >> common.filelist
 #grep '%{_prefix}/libexec/pt_chown' < rpm.filelist >> common.filelist
 grep '%{_prefix}/sbin/[^gi]' < rpm.filelist >> common.filelist
 grep '%{_prefix}/share' < rpm.filelist | \
-  grep -v '%{_prefix}/share/zoneinfo' >> common.filelist
+  grep -v -e '%{_prefix}/share/zoneinfo' -e '%%dir %{prefix}/share' \
+       >> common.filelist
 
 sed -i -e '\|%{_prefix}/bin|d' \
        -e '\|%{_prefix}/lib/locale|d' \
@@ -950,12 +948,10 @@ rm -f *.filelist*
 %endif
 %endif
 %ifarch s390x
-%dir /lib
 /lib/ld64.so.1
 %endif
 %ifarch ia64
 %if "%{_lib}" == "lib64"
-%dir /lib
 /lib/ld-linux-ia64.so.2
 %endif
 %endif
@@ -982,12 +978,12 @@ rm -f *.filelist*
 %ifnarch %{auxarches}
 %files -f common.filelist common
 %defattr(-,root,root)
-%dir %{_prefix}/lib/locale
 %attr(0644,root,root) %verify(not md5 size mtime) %{_prefix}/lib/locale/locale-archive.tmpl
 %attr(0644,root,root) %verify(not md5 size mtime mode) %ghost %config(missingok,noreplace) %{_prefix}/lib/locale/locale-archive
 %dir %attr(755,root,root) /etc/default
 %verify(not md5 size mtime) %config(noreplace) /etc/default/nss
 %attr(4711,root,root) %{_prefix}/libexec/pt_chown
+%attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/gai.conf
 %doc documentation/*
 
 %files -f devel.filelist devel
@@ -1033,6 +1029,104 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed May 19 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-1
+- Update from master
+  - POWER7 optimized memset
+  - Fix typo in es_CR locale
+  - Enable IDN support in getent
+  - Fix race in free sanity check
+  - Fix lookup of collation sequence value during regexp matching
+  - Fix name of tt_RU.UTF-8@iqtelif locale (#589138)
+  - Handle too-small buffers in Linux getlogin_r (BZ#11571, #589946)
+
+* Tue May  4 2010 Roland McGrath <roland@redhat.com> - 2.12-1
+- Update to 2.12 release.
+  - Fix ldconfig chroot handling.
+  - Don't deadlock in __dl_iterate_phdr while (un)loading objects.
+  - Fix handling of newline in addmntent.
+  - Fix AIO when thread creation failed.
+
+* Fri Apr 16 2010 Andreas Schwab <schwab@redhat.com> - 2.11.90-20
+- Update from master
+  - Fix bugs in x86-32 strcmp-sse4.S and strcmp-ssse3.S
+  - Add x86-32 FMA support
+  - Don't crash in trace mode when dependencies are missing
+  - x86-64 SSE4 optimized memcmp
+  - Fix makecontext on s390/s390x
+
+* Tue Apr 13 2010 Andreas Schwab <schwab@redhat.com> - 2.11.90-19
+- Avoid multiarch memcmp in tzdata-update (#581677)
+
+* Mon Apr 12 2010 Andreas Schwab <schwab@redhat.com> - 2.11.90-18
+- Update from master
+  - Implement interfaces to set and get names of threads (BZ#11390)
+  - Locale data updates (BZ#10824, BZ#10936, BZ#11470, BZ#11471)
+  - Print reload count in nscd statistics (BZ#10915)
+  - Fix reading loginuid file in getlogin{,_r}
+  - Fix fallocate error return on i386
+  - Fix cproj implmentation (BZ#10401)
+  - Fix getopt handing (BZ#11039, BZ#11040, BZ#11041)
+  - Implement new mode for NIS passwd.adjunct.byname table (BZ#11134)
+  - Obey LD_HWCAP_MASK in ld.so.cache lookups
+
+* Tue Apr  6 2010 Andreas Schwab <schwab@redhat.com> - 2.11.90-17
+- Update from master
+  - Locale data updates (BZ#11007, BZ#11258, BZ#11272, BZ#10554)
+  - Handle DNS timeouts in old-style lookup code (BZ#11010)
+  - Fix aux cache handling in ldconfig with chroot (BZ#11149)
+  - Fix printing error messages in getopt (BZ#11043)
+  - Declare iruserok and iruserok_af (BZ#11070)
+  - Fix option aliasing in argp (BZ#11254)
+  - Handle POSIX-compliant errno value of unlink in remove (BZ#11276)
+  - Fix definition and testing of S_ISSOCK (BZ#11279)
+  - Fix retrieving of kernel header version (BZ#11287)
+  - Fix concurrent handling of __cpu_features (BZ#11292)
+  - Handle unnecessary padding in getdents64 (BZ#11333)
+  - Fix changes to interface list during getifaddrs calls (BZ#11387)
+  - Missing memory barrier in DES initialization (BZ#11449)
+  - Fix spurious UNAVAIL status is getaddrinfo
+  - Add support for new clocks (BZ#11389)
+  - Fix Linux getlogin{_r,} implementation
+  - Fix missing zero-termination in cuserid (BZ#11397)
+  - Fix glob with empty pattern
+  - Fix handling of STB_GNU_UNIQUE in LD_TRACE_PRELINKING
+  - Unify wint_t handling in wchar.h and wctype.h (BZ#11410)
+  - Implement handling of libc ABI in ELF header
+  - Don't underestimate length of DST substitution in rpath
+  - Power7-optimized 64-bit and 32-bit memcpy
+- Assign global scope to RFC 1918 addresses (#577626)
+
+* Thu Mar 18 2010 Andreas Schwab <schwab@redhat.com> - 2.11.90-16
+- Fix SSSE3 memcmp (#574210)
+
+* Tue Mar  9 2010 Andreas Schwab <schwab@redhat.com> - 2.11.90-15
+- Update from master
+  - sparc64: Fix handling of R_SPARC_TLS_LE_* relocations (#571551)
+  - Handle ext4 and logfs in statvfs functions
+  - Fix setxid race with thread creation
+  - Pass -mtune=i686 to assembler when compiling for i686
+  - Fix R_X86_64_PC32 overflow detection
+  - Fix msgrcv on sparc64
+  - Fix unwind info in x86 strcmp-sse4.S (BZ#11332)
+  - sparc: Add multiarch support for memset/bzero/memcpy
+- Remove directories owned by filesystem (#569414)
+- Add %%ghost /etc/gai.conf to glibc-common (#567748)
+
+* Tue Feb 23 2010 Andreas Schwab <schwab@redhat.com> - 2.11.90-14
+- Update from master
+  - Sparc updates
+- Fix SSSE3 memcpy (#556584)
+
+* Mon Feb 22 2010 Andreas Schwab <schwab@redhat.com> - 2.11.90-13
+- Update from master
+  - Use CPUID_OFFSET instead of FEATURE_OFFSET
+  - Add 32bit memcmp/strcmp/strncmp optimized for SSSE3/SSS4.2
+  - Fix file descriotor leak in nftw with FTW_CHDIR (BZ#11271)
+  - Add Sparc STT_GNU_IFUNC support
+  - Add power7-optimized classification functions
+- Reapply "Optimize 32bit memset/memcpy with SSE2/SSSE3."
+- Use unsigned comparison in sse memcpy/memset
+
 * Mon Feb  8 2010 Andreas Schwab <schwab@redhat.com> - 2.11.90-12
 - Update from master
   - Update constants in <sys/mount.h> for current kernels (#11235)
