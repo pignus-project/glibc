@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.12-27-geb5ad2e
+%define glibcsrcdir glibc-2.12-39-g765ade4
 %define glibcversion 2.12.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -23,7 +23,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 2
+Release: 3
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -596,7 +596,7 @@ rm -f $RPM_BUILD_ROOT%{_sbindir}/rpcinfo
   # languages very well, temporarily disable
   LIB_LANG=''
   sed -e "$LIB_LANG" -e "$SHARE_LANG" \
-      -e '\,/etc/\(localtime\|nsswitch.conf\|ld\.so\.conf\|ld\.so\.cache\|default\),d' \
+      -e '\,/etc/\(localtime\|nsswitch.conf\|ld\.so\.conf\|ld\.so\.cache\|default\|rpc\),d' \
       -e '\,/%{_lib}/lib\(pcprofile\|memusage\)\.so,d' \
       -e '\,bin/\(memusage\|mtrace\|xtrace\|pcprofiledump\),d'
 } | sort > rpm.filelist
@@ -960,6 +960,7 @@ rm -f *.filelist*
 %verify(not md5 size mtime) %config(noreplace) /etc/localtime
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/ld.so.conf
+%verify(not md5 size mtime) %config(noreplace) /etc/rpc
 %dir /etc/ld.so.conf.d
 %dir %{_prefix}/libexec/getconf
 %dir %{_prefix}/%{_lib}/gconv
@@ -1031,6 +1032,17 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jun 15 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-3
+- Update from master
+  - Power7 string compare optimizations
+  - Properly resize buffer in NIS initgroups
+  - Define F_SETPIPE_SZ and F_GETPIPE_SZ
+  - Fix more C++ incompatibility problems in headers
+- Properly set __libc_multiple_libcs
+- Don't assume AT_PAGESIZE is always available (#597578)
+- Don't call uname or getrlimit in libpthread init function (#579086)
+- Mark /etc/rpc as %config (#587050)
+
 * Mon May 31 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-2
 - Update from master
   - Small fix to POWER7 32-bit memcpy
