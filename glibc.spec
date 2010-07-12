@@ -1,5 +1,6 @@
-%define glibcsrcdir glibc-2.12-52-g48b42dd
+%define glibcsrcdir glibc-2.12-62-gb08c89d
 %define glibcversion 2.12.90
+%define glibcportsdir glibc-ports-2.12-12-g71feaf7
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon sparcv9v sparc64v alphaev6
@@ -23,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 4
+Release: 5
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -31,9 +32,10 @@ Release: 4
 # libraries without restrictions.
 License: LGPLv2+ and LGPLv2+ with exceptions and GPLv2+
 Group: System Environment/Libraries
-URL: http://sources.redhat.com/glibc/
+URL: http://www.gnu.org/software/glibc/
 Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.bz2
-Source1: %{glibcsrcdir}-fedora.tar.bz2
+Source1: %{?glibc_release_url}%{glibcportsdir}.tar.bz2
+Source2: %{glibcsrcdir}-fedora.tar.bz2
 Patch0: %{name}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -239,7 +241,8 @@ package or when debugging this package.
 %endif
 
 %prep
-%setup -q -n %{glibcsrcdir} -b1
+rm -rf %{glibcportsdir}
+%setup -q -n %{glibcsrcdir} -b1 -b2
 %patch0 -E -p1
 %ifarch ia64
 %if "%{_lib}" == "lib64"
@@ -341,8 +344,8 @@ mkdir $builddir ; cd $builddir
 build_CFLAGS="$BuildFlags -g -O3 $*"
 ../configure CC="$GCC" CXX="$GXX" CFLAGS="$build_CFLAGS" \
 	--prefix=%{_prefix} \
-	--enable-add-ons=nptl$AddOns --without-cvs $EnableKernel \
-	--with-headers=%{_prefix}/include --enable-bind-now \
+	--enable-add-ons=../%{glibcportsdir},nptl$AddOns \
+	--with-headers=%{_prefix}/include $EnableKernel --enable-bind-now \
 	--with-tls --with-__thread --build %{nptl_target_cpu}-redhat-linux \
 	--host %{nptl_target_cpu}-redhat-linux \
 %ifarch %{multiarcharches}
@@ -1032,6 +1035,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jul 12 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-5
+- Update from master
+  - Don't pass NULL occation to dl_signal_cerror
+  - Implement _PC_PIPE_BUF.
+- Add glibc-ports tarball
+
 * Fri Jul  2 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-4
 - Update from master
   - Work around kernel rejecting valid absolute timestamps
