@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 5
+Release: 6
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -54,7 +54,7 @@ BuildRequires: /bin/ps, /bin/kill, /bin/awk
 # This is to ensure that __frame_state_for is exported by glibc
 # will be compatible with egcs 1.x.y
 BuildRequires: gcc >= 3.2
-%define enablekernel 2.6.18
+%define enablekernel 2.6.32
 %ifarch i386
 %define nptl_target_cpu i486
 %else
@@ -1035,6 +1035,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jul 21 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-6
+- Bump minimum kernel version to 2.6.32
+
 * Mon Jul 12 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-5
 - Update from master
   - Don't pass NULL occation to dl_signal_cerror
