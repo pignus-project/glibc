@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.12-62-gb08c89d
+%define glibcsrcdir glibc-2.12-85-g73507d3
 %define glibcversion 2.12.90
 %define glibcportsdir glibc-ports-2.12-12-g71feaf7
 ### glibc.spec.in follows:
@@ -20,11 +20,12 @@
 %define rtkaioarches %{ix86} x86_64 ia64 ppc ppc64 s390 s390x
 %define debuginfocommonarches alpha alphaev6 sparc sparcv9 sparcv9v sparc64 sparc64v
 %define multiarcharches ppc ppc64 %{ix86} x86_64
+%define portsarches alpha armv5tel
 
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 6
+Release: 7
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -33,9 +34,9 @@ Release: 6
 License: LGPLv2+ and LGPLv2+ with exceptions and GPLv2+
 Group: System Environment/Libraries
 URL: http://www.gnu.org/software/glibc/
-Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.bz2
-Source1: %{?glibc_release_url}%{glibcportsdir}.tar.bz2
-Source2: %{glibcsrcdir}-fedora.tar.bz2
+Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.xz
+Source1: %{?glibc_release_url}%{glibcportsdir}.tar.xz
+Source2: %{glibcsrcdir}-fedora.tar.xz
 Patch0: %{name}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -55,6 +56,7 @@ BuildRequires: /bin/ps, /bin/kill, /bin/awk
 # will be compatible with egcs 1.x.y
 BuildRequires: gcc >= 3.2
 %define enablekernel 2.6.32
+Conflicts: kernel < %{enablekernel}
 %ifarch i386
 %define nptl_target_cpu i486
 %else
@@ -333,6 +335,9 @@ echo "$GCC" > Gcc
 AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(linuxthreads\|nptl\|rtkaio\|powerpc-cpu\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
 %ifarch %{rtkaioarches}
 AddOns=,rtkaio$AddOns
+%endif
+%ifarch %{portsarches}
+AddOns=,../%{glibcportsdir}$AddOns
 %endif
 
 build_nptl()
@@ -1035,6 +1040,18 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug  2 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-7
+- Update from master
+  - Add optimized x86-64 implementation of strnlen and strcaecmp
+  - Document M_PERTURB
+  - Fix vDSO synthetic hwcap handling so they are not masked out from
+    ld.so.cache matching
+  - POWER6/7 optimizations for copysign
+- Build with ports addon on alpha and armv5tel
+- Add conflict with kernel < 2.6.32 (#619538)
+- Switch to xz compressed tar files
+- build-locale-archive: process only directories matching *_*
+
 * Wed Jul 21 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-6
 - Bump minimum kernel version to 2.6.32
 
