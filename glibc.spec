@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.12-85-g73507d3
+%define glibcsrcdir glibc-2.12-118-ga7ab6ec
 %define glibcversion 2.12.90
-%define glibcportsdir glibc-ports-2.12-12-g71feaf7
+%define glibcportsdir glibc-ports-2.12-25-g9ed28e4
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon sparcv9v sparc64v alphaev6
@@ -20,12 +20,11 @@
 %define rtkaioarches %{ix86} x86_64 ia64 ppc ppc64 s390 s390x
 %define debuginfocommonarches alpha alphaev6 sparc sparcv9 sparcv9v sparc64 sparc64v
 %define multiarcharches ppc ppc64 %{ix86} x86_64
-%define portsarches alpha armv5tel
 
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 7
+Release: 8
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -336,9 +335,6 @@ AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(linuxthreads\|nptl\|rtkai
 %ifarch %{rtkaioarches}
 AddOns=,rtkaio$AddOns
 %endif
-%ifarch %{portsarches}
-AddOns=,../%{glibcportsdir}$AddOns
-%endif
 
 build_nptl()
 {
@@ -347,7 +343,10 @@ shift
 rm -rf $builddir
 mkdir $builddir ; cd $builddir
 build_CFLAGS="$BuildFlags -g -O3 $*"
-../configure CC="$GCC" CXX="$GXX" CFLAGS="$build_CFLAGS" \
+# Some configure checks can spuriously fail for some architectures if
+# unwind info is present
+configure_CFLAGS="$build_CFLAGS -fno-asynchronous-unwind-tables"
+../configure CC="$GCC" CXX="$GXX" CFLAGS="$configure_CFLAGS" \
 	--prefix=%{_prefix} \
 	--enable-add-ons=../%{glibcportsdir},nptl$AddOns \
 	--with-headers=%{_prefix}/include $EnableKernel --enable-bind-now \
@@ -356,7 +355,8 @@ build_CFLAGS="$BuildFlags -g -O3 $*"
 %ifarch %{multiarcharches}
 	--enable-multi-arch \
 %endif
-	--disable-profile --enable-experimental-malloc --enable-nss-crypt
+	--disable-profile --enable-experimental-malloc --enable-nss-crypt ||
+{ cat config.log; false; }
 
 make %{?_smp_mflags} -r CFLAGS="$build_CFLAGS" PARALLELMFLAGS=-s
 
@@ -1040,6 +1040,22 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug 23 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-8
+- Update from master
+  - Fix static strspn on x86 (#624852)
+  - Various POWER7 optimized string functions
+  - Fix x86 pthread_cond_signal() FUTEX_WAKE_OP fallback
+  - Add optimized strncasecmp versions for x86-64
+  - PowerPC64 ABI fixes
+  - Properly quote output of locale (BZ#11904)
+  - f_flags in statfs implementation
+  - Add support for fanotify_init and fanotify_mask syscalls
+  - Add support for prlimit and prlimit64
+  - Fix IPTOS_CLASS definition (BZ#11903)
+  - Avoid too much stack use in fnmatch (BZ#11883)
+  - x86: Add support for frame pointer less mcount
+- Disable asynchronous-unwind-tables during configure run
+
 * Mon Aug  2 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-7
 - Update from master
   - Add optimized x86-64 implementation of strnlen and strcaecmp
