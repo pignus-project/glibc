@@ -20,11 +20,15 @@
 %define rtkaioarches %{ix86} x86_64 ia64 ppc ppc64 s390 s390x
 %define debuginfocommonarches alpha alphaev6 sparc sparcv9 sparcv9v sparc64 sparc64v
 %define multiarcharches ppc ppc64 %{ix86} x86_64
+%ifarch %{auxarches}
+#disable unpackaged files check on aux arches
+%define %_unpackaged_files_terminate_build 0
+%endif
 
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 8
+Release: 9
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1040,6 +1044,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Sep 04 2010 Dennis Gilmore <dennis@ausil.us> - 2.12.90-9
+- disable unpackaged file check on auxarches
+
 * Mon Aug 23 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-8
 - Update from master
   - Fix static strspn on x86 (#624852)
