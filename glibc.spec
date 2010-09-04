@@ -22,7 +22,7 @@
 %define multiarcharches ppc ppc64 %{ix86} x86_64
 %ifarch %{auxarches}
 #disable unpackaged files check on aux arches
-%define %_unpackaged_files_terminate_build 0
+%define _unpackaged_files_terminate_build 0
 %endif
 
 Summary: The GNU libc libraries
