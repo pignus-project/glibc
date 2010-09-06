@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.12-118-ga7ab6ec
+%define glibcsrcdir glibc-2.12-147-g32cf406
 %define glibcversion 2.12.90
-%define glibcportsdir glibc-ports-2.12-25-g9ed28e4
+%define glibcportsdir glibc-ports-2.12-26-gcf64098
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon sparcv9v sparc64v alphaev6
@@ -20,15 +20,11 @@
 %define rtkaioarches %{ix86} x86_64 ia64 ppc ppc64 s390 s390x
 %define debuginfocommonarches alpha alphaev6 sparc sparcv9 sparcv9v sparc64 sparc64v
 %define multiarcharches ppc ppc64 %{ix86} x86_64
-%ifarch %{auxarches}
-#disable unpackaged files check on aux arches
-%define _unpackaged_files_terminate_build 0
-%endif
 
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 9
+Release: 10
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -397,9 +393,6 @@ build_nptl linuxnptl-power6
 cd build-%{nptl_target_cpu}-linuxnptl
 $GCC -static -L. -Os -g ../fedora/glibc_post_upgrade.c -o glibc_post_upgrade.%{_target_cpu} \
   -DNO_SIZE_OPTIMIZATION \
-%ifarch i386 i486 i586
-  -DARCH_386 \
-%endif
   '-DLIBTLS="/%{_lib}/tls/"' \
   '-DGCONV_MODULES_DIR="%{_prefix}/%{_lib}/gconv"' \
   '-DLD_SO_CONF="/etc/ld.so.conf"' \
@@ -516,17 +509,15 @@ ln -sf libbsd-compat.a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libbsd.a
 
 install -p -m 644 fedora/nsswitch.conf $RPM_BUILD_ROOT/etc/nsswitch.conf
 
+%ifnarch %{auxarches}
 mkdir -p $RPM_BUILD_ROOT/etc/default
 install -p -m 644 nis/nss $RPM_BUILD_ROOT/etc/default/nss
-
-# Take care of setuids
-# -- new security review sez that this shouldn't be needed anymore
-#chmod 755 $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown
 
 # This is for ncsd - in glibc 2.2
 install -m 644 nscd/nscd.conf $RPM_BUILD_ROOT/etc
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -m 755 nscd/nscd.init $RPM_BUILD_ROOT/etc/rc.d/init.d/nscd
+%endif
 
 # Don't include ld.so.cache
 rm -f $RPM_BUILD_ROOT/etc/ld.so.cache
@@ -536,9 +527,11 @@ echo 'include ld.so.conf.d/*.conf' > $RPM_BUILD_ROOT/etc/ld.so.conf
 > $RPM_BUILD_ROOT/etc/ld.so.cache
 chmod 644 $RPM_BUILD_ROOT/etc/ld.so.conf
 mkdir -p $RPM_BUILD_ROOT/etc/ld.so.conf.d
+%ifnarch %{auxarches}
 mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
 > $RPM_BUILD_ROOT/etc/sysconfig/nscd
 > $RPM_BUILD_ROOT/etc/gai.conf
+%endif
 
 # Include %{_prefix}/%{_lib}/gconv/gconv-modules.cache
 > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
@@ -650,8 +643,6 @@ sed -i -e '\|%{_prefix}/%{_lib}/lib.*\.a|d' \
        -e '\|nscd|d' rpm.filelist
 
 grep '%{_prefix}/bin' < rpm.filelist >> common.filelist
-#grep '%{_prefix}/lib/locale' < rpm.filelist | grep -v /locale-archive.tmpl >> common.filelist
-#grep '%{_prefix}/libexec/pt_chown' < rpm.filelist >> common.filelist
 grep '%{_prefix}/sbin/[^gi]' < rpm.filelist >> common.filelist
 grep '%{_prefix}/share' < rpm.filelist | \
   grep -v -e '%{_prefix}/share/zoneinfo' -e '%%dir %{prefix}/share' \
@@ -840,18 +831,8 @@ egrep "$auxarches_debugsources" debuginfocommon.sources >> debuginfo.filelist
 
 egrep -v "$auxarches_debugsources" \
   debuginfocommon.sources >> debuginfocommon.filelist
-%ifnarch %{auxarches}
-# non-aux arches when there is a debuginfo-common
-# all the sources go into debuginfo-common
-#cat debuginfocommon.sources >> debuginfocommon.filelist
-%endif
 
 list_debug_archives >> debuginfocommon.filelist
-
-%else
-
-# already found by find-debuginfo
-#list_debug_archives >> debuginfo.filelist
 
 %endif
 
@@ -867,6 +848,7 @@ sed -e '/%%dir/d;/%%config/d;/%%verify/d;s/%%lang([^)]*) //;s#^/*##' \
     common.filelist devel.filelist static.filelist headers.filelist \
     utils.filelist nscd.filelist debuginfocommon.filelist |
 (cd $RPM_BUILD_ROOT; xargs --no-run-if-empty rm -f 2> /dev/null || :)
+rm -f $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown
 
 %else
 
@@ -1044,6 +1026,18 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Sep  6 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-10
+- Update from master
+  - Remove invalid iconv aliases (BZ#11979)
+  - Update x86-64 mpn routines from GMP 5.0.1
+  - Fix array overflow in floating point parser (BZ#7066)
+  - Support fanotify_mark syscall on powerpc32
+  - Unroll x86-64 strlen
+  - Unroll 32bit SSE strlen and handle slow bsf
+  - Missing server address again leads to localhost being used (BZ#10851)
+- Revert last change
+- Remove or don't install unpackaged files for auxarches
+
 * Sat Sep 04 2010 Dennis Gilmore <dennis@ausil.us> - 2.12.90-9
 - disable unpackaged file check on auxarches
 
