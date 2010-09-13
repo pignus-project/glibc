@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.12-147-g32cf406
+%define glibcsrcdir glibc-2.12-149-gc044aa7
 %define glibcversion 2.12.90
 %define glibcportsdir glibc-ports-2.12-26-gcf64098
 ### glibc.spec.in follows:
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 10
+Release: 11
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1026,6 +1026,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Sep 13 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-11
+- Update from master
+  - Fix _FORITY_SOURCE version of longjmp for Linux/x86-64 (BZ#11968)
+- Work around shortest-stem feature in make 3.82+
+
 * Mon Sep  6 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-10
 - Update from master
   - Remove invalid iconv aliases (BZ#11979)
