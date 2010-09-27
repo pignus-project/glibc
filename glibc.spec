@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.12-149-gc044aa7
+%define glibcsrcdir glibc-2.12-163-g315970f
 %define glibcversion 2.12.90
-%define glibcportsdir glibc-ports-2.12-26-gcf64098
+%define glibcportsdir glibc-ports-2.12-31-g6c14d67
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 12
+Release: 13
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1026,6 +1026,24 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Sep 27 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-13
+- Update from master
+  - Add two forgotten licence exceptions
+  - getdents64 fallback d_type support
+  - Move freeres function from ld.so to libc.so
+  - Undo feature selection for ftruncate (BZ#12037)
+  - Fix namespace pollution in pthread_cleanup_push
+  - Fix limit detection in x86-64 SSE2 strncasecmp (#632560)
+  - Add support for fanotify_mark on sparc32 and s390
+  - Fix register conflict in s390 ____longjmp_chk (#629970)
+  - Don't try to free rpath strings allocated during startup (#629976)
+  - Actually make it possible to user the default name server
+- Fix memory leak on init/fini dependency list (#632936)
+- Fix handling of collating symbols in regexps (BZ#11561)
+- Don't parse %s format argument as multibyte string (BZ#6530)
+- Fix overflow in nss files parser
+- Fix spurious nop at start of __strspn_ia32
+
 * Wed Sep 15 2010 Dennis Gilmore <dennis@ausil.us> - 2.12.90-12
 - dont build sparcv9v and sparc64v anymore
 
