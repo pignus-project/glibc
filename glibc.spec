@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.12-163-g315970f
+%define glibcsrcdir glibc-2.12-175-g1c37565
 %define glibcversion 2.12.90
-%define glibcportsdir glibc-ports-2.12-31-g6c14d67
+%define glibcportsdir glibc-ports-2.12-32-gdc54bc1
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 14
+Release: 15
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1026,6 +1026,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Oct  4 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-15
+- Update from master
+  - Handle large requests in debugging hooks for malloc (BZ#12005)
+  - Fix handling of remaining bytes in buffer for strncmp and
+    strncasecmp (BZ#12077)
+  - Handle cgroup and btrfs filesystems in statvfs
+  - S/390: Fix highgprs check in startup code (BZ#12067)
+  - Properly convert f_fsid in statvfs (BZ#11611)
+
 * Tue Sep 28 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-14
 - Don't try to write to _rtld_global_ro after performing relro
   protection (#638091)
