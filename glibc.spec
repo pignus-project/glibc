@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.12-175-g1c37565
+%define glibcsrcdir glibc-2.12-188-g5e90846
 %define glibcversion 2.12.90
-%define glibcportsdir glibc-ports-2.12-32-gdc54bc1
+%define glibcportsdir glibc-ports-2.12-37-g16d6bc0
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 15
+Release: 16
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -178,6 +178,7 @@ libraries, as well as national language (locale) support.
 %package -n nscd
 Summary: A Name Service Caching Daemon (nscd).
 Group: System Environment/Daemons
+Requires: %{name} = %{version}-%{release}
 Requires: libselinux >= 1.17.10-1, audit-libs >= 1.1.3
 Requires(pre): /sbin/chkconfig, /usr/sbin/useradd, /usr/sbin/userdel, coreutils
 
@@ -519,9 +520,6 @@ mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -m 755 nscd/nscd.init $RPM_BUILD_ROOT/etc/rc.d/init.d/nscd
 %endif
 
-# Don't include ld.so.cache
-rm -f $RPM_BUILD_ROOT/etc/ld.so.cache
-
 # Include ld.so.conf
 echo 'include ld.so.conf.d/*.conf' > $RPM_BUILD_ROOT/etc/ld.so.conf
 > $RPM_BUILD_ROOT/etc/ld.so.cache
@@ -601,7 +599,7 @@ rm -f $RPM_BUILD_ROOT%{_sbindir}/rpcinfo
   # languages very well, temporarily disable
   LIB_LANG=''
   sed -e "$LIB_LANG" -e "$SHARE_LANG" \
-      -e '\,/etc/\(localtime\|nsswitch.conf\|ld\.so\.conf\|ld\.so\.cache\|default\|rpc\),d' \
+      -e '\,/etc/\(localtime\|nsswitch.conf\|ld\.so\.conf\|ld\.so\.cache\|default\|rpc\|gai\.conf\),d' \
       -e '\,/%{_lib}/lib\(pcprofile\|memusage\)\.so,d' \
       -e '\,bin/\(memusage\|mtrace\|xtrace\|pcprofiledump\),d'
 } | sort > rpm.filelist
@@ -961,6 +959,7 @@ rm -f *.filelist*
 %dir %attr(0700,root,root) /var/cache/ldconfig
 %attr(0600,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/cache/ldconfig/aux-cache
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/ld.so.cache
+%attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/gai.conf
 %doc README NEWS INSTALL FAQ BUGS NOTES PROJECTS CONFORMANCE
 %doc COPYING COPYING.LIB README.libm LICENSES
 %doc hesiod/README.hesiod
@@ -980,7 +979,6 @@ rm -f *.filelist*
 %dir %attr(755,root,root) /etc/default
 %verify(not md5 size mtime) %config(noreplace) /etc/default/nss
 %attr(4711,root,root) %{_prefix}/libexec/pt_chown
-%attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/gai.conf
 %doc documentation/*
 
 %files -f devel.filelist devel
@@ -1026,6 +1024,18 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Oct 14 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-16
+- Update from master
+  - Implement accurate fma (BZ#3268, #43358)
+  - Fix alignment of AVX save area on x86-64 (BZ#12113)
+  - Fix regex memory leaks (BZ#12078)
+  - Improve output of psiginfo (BZ#12107, BZ#12108)
+  - Don't return NULL address in getifaddrs (BZ#12093)
+  - Fix strstr and memmem algorithm (BZ#12092, #641124)
+- Don't discard result of decoding ACE if AI_CANONIDN (#636642)
+- Remove /etc/gai.conf from glibc-common and mark it %%ghost in glibc
+- Require exact glibc version in nscd
+
 * Mon Oct  4 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-15
 - Update from master
   - Handle large requests in debugging hooks for malloc (BZ#12005)
