@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.12-188-g5e90846
+%define glibcsrcdir glibc-2.12-192-g7c08a05
 %define glibcversion 2.12.90
 %define glibcportsdir glibc-ports-2.12-37-g16d6bc0
 ### glibc.spec.in follows:
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 16
+Release: 17
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1024,6 +1024,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Oct 19 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-17
+- Update from master
+  - Fix some fma issues, implement fmal (BZ#3268, #43358)
+  - Expect PLT call to _Unwind_Find_FDE on s390*-linux
+- Never expand $ORIGIN in privileged programs (#643306, CVE-2010-3847)
+
 * Thu Oct 14 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-16
 - Update from master
   - Implement accurate fma (BZ#3268, #43358)
