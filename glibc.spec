@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.12-192-g7c08a05
+%define glibcsrcdir glibc-2.12-216-g3540d66
 %define glibcversion 2.12.90
-%define glibcportsdir glibc-ports-2.12-37-g16d6bc0
+%define glibcportsdir glibc-ports-2.12-40-g3ef5824
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 18
+Release: 19
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -862,6 +862,26 @@ touch $RPM_BUILD_ROOT/var/run/nscd/{socket,nscd.pid}
 mkdir -p $RPM_BUILD_ROOT/var/cache/ldconfig
 > $RPM_BUILD_ROOT/var/cache/ldconfig/aux-cache
 
+%pre -p <lua>
+-- Check that the running kernel is new enough
+required = '%{enablekernel}'
+f = io.open("/proc/sys/kernel/osrelease")
+if f then
+  rel = {}
+  for v in string.gmatch(f:read(), '%%d+') do
+    table.insert(rel, tonumber(v))
+  end
+  i = 1
+  for r in string.gmatch(required, '%%d+') do
+    if rel[i] == nil or tonumber(r) > rel[i] then
+      print("FATAL: kernel too old")
+      os.exit(1)
+    end
+    if tonumber(r) < rel[i] then break end
+    i = i + 1
+  end
+end
+
 %post -p /usr/sbin/glibc_post_upgrade.%{_target_cpu}
 
 %postun -p /sbin/ldconfig
@@ -1024,6 +1044,26 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Nov 12 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-19
+- Update from master
+  - Fix memory leak in fnmatch
+  - Support Intel processor model 6 and model 0x2
+  - Fix comparison in sqrtl for IBM long double
+  - Fix one exit path in x86-64 SSE4.2 str{,n}casecmp (BZ#12205, #651638)
+  - Fix warnings in __bswap_16 (BZ#12194)
+  - Use IFUNC on x86-64 memset
+  - Power7-optimized mempcpy
+  - Handle uneven cache size in 32bit SSE2 memset (BZ#12191)
+  - Verify in ttyname that the symlink is valid (BZ#12167)
+  - Update Danish translations
+  - Fix concurrency problem between dl_open and dl_iterate_phdr
+  - Fix x86-64 strchr propagation of search byte into all bytes of SSE
+    register (BZ#12159)
+  - Fix perturbing in malloc on free (BZ#12140)
+  - PPC/A2 optimized memcpy function
+  - Add C99 FP_FAST_FMA{,F,L} macros to <math.h>
+- Check that the running kernel is new enough (#649589)
+
 * Fri Oct 22 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-18
 - Require suid bit on audit objects in privileged programs (CVE-2010-3856)
 
