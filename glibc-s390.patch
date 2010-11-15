@@ -1,0 +1,12 @@
+diff -up glibc-2.12-192-g7c08a05/sysdeps/ieee754/ldbl-128/s_fmal.c.orig glibc-2.12-192-g7c08a05/sysdeps/ieee754/ldbl-128/s_fmal.c
+--- glibc-2.12-192-g7c08a05/sysdeps/ieee754/ldbl-128/s_fmal.c.orig	2010-10-27 09:29:29.257597749 -0400
++++ glibc-2.12-192-g7c08a05/sysdeps/ieee754/ldbl-128/s_fmal.c	2010-10-27 09:29:38.897491500 -0400
+@@ -176,7 +176,7 @@ __fmal (long double x, long double y, lo
+ 	u.ieee.mantissa3 |= fetestexcept (FE_INEXACT) != 0;
+       v.d = a1 + u.d;
+       /* Ensure the addition is not scheduled after fetestexcept call.  */
+-      asm volatile ("" : "m" (v));
++      asm volatile ("" : : "m" (v));
+       int j = fetestexcept (FE_INEXACT) != 0;
+       feupdateenv (&env);
+       /* Ensure the following computations are performed in default rounding

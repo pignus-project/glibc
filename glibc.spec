@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 19
+Release: 19.1
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -38,6 +38,8 @@ Source1: %{?glibc_release_url}%{glibcportsdir}.tar.xz
 Source2: %{glibcsrcdir}-fedora.tar.xz
 Patch0: %{name}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=645910
+Patch2: %{name}-s390.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Provides: ldconfig
@@ -251,6 +253,7 @@ rm -rf %{glibcportsdir}
 %patch1 -p1
 %endif
 %endif
+%patch2 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1044,6 +1047,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Nov 15 2010 Dan Horák <dan[at]danny.cz> - 2.12.90-19.1
+- fix build on s390(x) using http://sources.redhat.com/ml/libc-hacker/2010-10/msg00009.html
+
 * Fri Nov 12 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-19
 - Update from master
   - Fix memory leak in fnmatch
