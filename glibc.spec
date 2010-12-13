@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.12-216-g3540d66
+%define glibcsrcdir glibc-2.12-232-gdbb0472
 %define glibcversion 2.12.90
-%define glibcportsdir glibc-ports-2.12-40-g3ef5824
+%define glibcportsdir glibc-ports-2.12-45-g8349564
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 19.1
+Release: 20
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -38,8 +38,6 @@ Source1: %{?glibc_release_url}%{glibcportsdir}.tar.xz
 Source2: %{glibcsrcdir}-fedora.tar.xz
 Patch0: %{name}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=645910
-Patch2: %{name}-s390.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Provides: ldconfig
@@ -253,7 +251,6 @@ rm -rf %{glibcportsdir}
 %patch1 -p1
 %endif
 %endif
-%patch2 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -544,10 +541,12 @@ install -m 700 build-%{nptl_target_cpu}-linuxnptl/glibc_post_upgrade.%{_target_c
 
 strip -g $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.o
 
+%if 0%{?_enable_debug_packages}
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}
 cp -a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.a \
   $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/
 rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/*_p.a
+%endif
 
 # rquota.x and rquota.h are now provided by quota
 rm -f $RPM_BUILD_ROOT%{_prefix}/include/rpcsvc/rquota.[hx]
@@ -868,21 +867,9 @@ mkdir -p $RPM_BUILD_ROOT/var/cache/ldconfig
 %pre -p <lua>
 -- Check that the running kernel is new enough
 required = '%{enablekernel}'
-f = io.open("/proc/sys/kernel/osrelease")
-if f then
-  rel = {}
-  for v in string.gmatch(f:read(), '%%d+') do
-    table.insert(rel, tonumber(v))
-  end
-  i = 1
-  for r in string.gmatch(required, '%%d+') do
-    if rel[i] == nil or tonumber(r) > rel[i] then
-      print("FATAL: kernel too old")
-      os.exit(1)
-    end
-    if tonumber(r) < rel[i] then break end
-    i = i + 1
-  end
+rel = posix.uname("%r")
+if rpm.vercmp(rel, required) < 0 then
+  error("FATAL: kernel too old", 0)
 end
 
 %post -p /usr/sbin/glibc_post_upgrade.%{_target_cpu}
@@ -1047,13 +1034,24 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Mon Nov 15 2010 Dan Horák <dan[at]danny.cz> - 2.12.90-19.1
-- fix build on s390(x) using http://sources.redhat.com/ml/libc-hacker/2010-10/msg00009.html
+* Mon Dec 13 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-20
+- Update from master
+  - Declare wcpcpy and wcpncpy only under _GNU_SOURCE
+  - Fix use of restrict in wchar.h and string.h
+  - Fix race in qsort_r initialization (BZ#11655)
+  - Don't ignore zero TTL in DNS answers
+  - Allow aux_cache_file open()ing to fail silently even in the chroot
+    mode (BZ#11149)
+  - Fix multiple nss_compat initgroups() bugs (BZ#10085)
+  - Define MAP_HUGETLB and SWAP_FLAG_DISCARD
+- Remove .UTF-8 suffix from locale names when it is the only supported
+  codeset (#657556)
+- Don't ignore $ORIGIN in libraries
 
 * Fri Nov 12 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-19
 - Update from master
   - Fix memory leak in fnmatch
-  - Support Intel processor model 6 and model 0x2
+  - Support Intel processor model 6 and model 0x2c
   - Fix comparison in sqrtl for IBM long double
   - Fix one exit path in x86-64 SSE4.2 str{,n}casecmp (BZ#12205, #651638)
   - Fix warnings in __bswap_16 (BZ#12194)
