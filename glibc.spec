@@ -24,7 +24,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 21
+Release: 21%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1034,6 +1034,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Dec 21 2010 Dennis Gilmore <dennis@ausil.us> - 2.12.90-21
+- add disttag and rebuild for rawhide
+
 * Tue Dec 14 2010 Andreas Schwab <schwab@redhat.com> - 2.12.90-21
 - Revert bogus change
 
