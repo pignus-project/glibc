@@ -1,5 +1,5 @@
-%define glibcsrcdir glibc-2.13
-%define glibcversion 2.13
+%define glibcsrcdir glibc-2.13-6-g3321010
+%define glibcversion 2.13.90
 %define glibcportsdir glibc-ports-2.12-54-gbd44238
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -1034,6 +1034,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jan 25 2011 Andreas Schwab <schwab@redhat.com> - 2.13.90-1
+- Update from master
+  - Fix ordering of DSO constructors and destructors (BZ#11724)
+- Remove no longer needed assembler workaround
+
 * Tue Jan 18 2011 Andreas Schwab <schwab@redhat.com> - 2.13-1
 - Update to 2.13 release
   - Define AT_NO_AUTOMOUNT
