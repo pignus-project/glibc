@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.13-6-g3321010
+%define glibcsrcdir glibc-2.13-16-gedf9294
 %define glibcversion 2.13.90
-%define glibcportsdir glibc-ports-2.12-54-gbd44238
+%define glibcportsdir glibc-ports-2.13
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -18,13 +18,14 @@
 %define buildpower6 0
 %endif
 %define rtkaioarches %{ix86} x86_64 ia64 ppc ppc64 s390 s390x
-%define debuginfocommonarches alpha alphaev6
+%define biarcharches %{ix86} x86_64 ppc ppc64
+%define debuginfocommonarches %{biarcharches} alpha alphaev6
 %define multiarcharches ppc ppc64 %{ix86} x86_64 %{sparc}
 
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 3
+Release: 4
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -38,7 +39,6 @@ Source1: %{?glibc_release_url}%{glibcportsdir}.tar.xz
 Source2: %{glibcsrcdir}-fedora.tar.xz
 Patch0: %{name}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
-Patch2: %{name}-nopl.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Provides: ldconfig
@@ -252,7 +252,6 @@ rm -rf %{glibcportsdir}
 %patch1 -p1
 %endif
 %endif
-%patch2 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -795,12 +794,12 @@ eu-readelf -hS $RPM_BUILD_ROOT/usr/bin/getconf $RPM_BUILD_ROOT/usr/libexec/getco
 find_debuginfo_args='--strict-build-id -g'
 %ifarch %{debuginfocommonarches}
 find_debuginfo_args="$find_debuginfo_args \
-  -l common.filelist -l utils.filelist -l nscd.filelist \
+  -l common.filelist -l utils.filelist -l nscd.filelist -p '.*/sbin/.*' \
   -o debuginfocommon.filelist \
   -l rpm.filelist -l nosegneg.filelist \
 "
 %endif
-/usr/lib/rpm/find-debuginfo.sh $find_debuginfo_args -o debuginfo.filelist
+eval /usr/lib/rpm/find-debuginfo.sh "$find_debuginfo_args" -o debuginfo.filelist
 
 list_debug_archives()
 {
@@ -809,6 +808,17 @@ list_debug_archives()
 }
 
 %ifarch %{debuginfocommonarches}
+
+sed -i '\#^%{_prefix}/src/debug/#d' debuginfocommon.filelist
+find $RPM_BUILD_ROOT%{_prefix}/src/debug \
+     \( -type d -printf '%%%%dir ' \) , \
+     -printf '%{_prefix}/src/debug/%%P\n' > debuginfocommon.sources
+
+%ifarch %{biarcharches}
+
+cat debuginfocommon.sources >> debuginfo.filelist
+
+%else
 
 %ifarch %{ix86}
 %define basearch i686
@@ -820,11 +830,6 @@ list_debug_archives()
 %define basearch sparc
 %endif
 
-sed -i '\#^%{_prefix}/src/debug/#d' debuginfocommon.filelist
-find $RPM_BUILD_ROOT%{_prefix}/src/debug \
-     \( -type d -printf '%%%%dir ' \) , \
-     -printf '%{_prefix}/src/debug/%%P\n' > debuginfocommon.sources
-
 # auxarches get only these few source files
 auxarches_debugsources=\
 '/(generic|linux|%{basearch}|nptl(_db)?)/|/%{glibcsrcdir}/build|/dl-osinfo\.h'
@@ -833,6 +838,8 @@ egrep "$auxarches_debugsources" debuginfocommon.sources >> debuginfo.filelist
 
 egrep -v "$auxarches_debugsources" \
   debuginfocommon.sources >> debuginfocommon.filelist
+
+%endif
 
 list_debug_archives >> debuginfocommon.filelist
 
@@ -990,7 +997,7 @@ rm -f *.filelist*
 %attr(0644,root,root) %verify(not md5 size mtime mode) %ghost %config(missingok,noreplace) %{_prefix}/lib/locale/locale-archive
 %dir %attr(755,root,root) /etc/default
 %verify(not md5 size mtime) %config(noreplace) /etc/default/nss
-%attr(4711,root,root) %{_prefix}/libexec/pt_chown
+%attr(755,root,root) %caps(cap_chown,cap_fowner=pe) %{_prefix}/libexec/pt_chown
 %doc documentation/*
 
 %files -f devel.filelist devel
@@ -1036,11 +1043,17 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.13.90-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
-
-* Mon Feb  7 2011 Jan Kratochvil <jan.kratochvil@redhat.com> - 2.13.90-2
-- Put back the assembler "workaround" - to disable the nopl instruction.
+* Mon Feb 14 2011 Andreas Schwab <schwab@redhat.com> - 2.13.90-4
+- Update from master
+  - Update sysdeps/unix/sysv/linux/sparc/bits/socket.h
+  - Synchronize generic bits/sched.h cpu_set_t with Linux implementation
+  - Schedule nscd cache pruning more accurately from re-added values
+  - Fix passing symbol value to pltexit callbacks when ld.so auditing
+  - Fix range error handling in sgetspent
+- Revert "Fix ordering of DSO constructors and destructors" (#673014)
+- Create debuginfo-common on biarch archs
+- Reinstall assembler workaround.
+- Replace setuid by file capabilities (#646469)
 
 * Tue Jan 25 2011 Andreas Schwab <schwab@redhat.com> - 2.13.90-1
 - Update from master
