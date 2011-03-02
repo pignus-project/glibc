@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.13-16-gedf9294
+%define glibcsrcdir glibc-2.13-33-g4bff6e0
 %define glibcversion 2.13.90
-%define glibcportsdir glibc-ports-2.13
+%define glibcportsdir glibc-ports-2.13-6-g57d366b
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -25,7 +25,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 4
+Release: 5
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1043,6 +1043,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Mar  2 2011 Andreas Schwab <schwab@redhat.com> - 2.13.90-5
+- Update from master
+  - Fix memory leak in dlopen with RTLD_NOLOAD (BZ#12509)
+  - Don't crash when dependencies are missing (BZ#12454)
+  - Fix allocation when handling positional parameters in printf
+    (BZ#12445)
+  - Fix two printf handler issues
+- Fix false assertion (BZ#12454, #673014)
+
 * Mon Feb 14 2011 Andreas Schwab <schwab@redhat.com> - 2.13.90-4
 - Update from master
   - Update sysdeps/unix/sysv/linux/sparc/bits/socket.h
