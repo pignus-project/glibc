@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.13-33-g4bff6e0
+%define glibcsrcdir glibc-2.13-39-g6a5ee10
 %define glibcversion 2.13.90
-%define glibcportsdir glibc-ports-2.13-6-g57d366b
+%define glibcportsdir glibc-ports-2.13-8-gfb3ed18
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -25,7 +25,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 5
+Release: 6
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1043,6 +1043,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Mar  7 2011 Andreas Schwab <schwab@redhat.com> - 2.13.90-6
+- Update from master
+  - Fix loading first object along a path when tracing
+  - Enable SSE2 memset for AMD'supcoming Orochi processor
+  - Don't read past end of buffer in fmemopen
+- Revert broken changes (#682307)
+
 * Wed Mar  2 2011 Andreas Schwab <schwab@redhat.com> - 2.13.90-5
 - Update from master
   - Fix memory leak in dlopen with RTLD_NOLOAD (BZ#12509)
