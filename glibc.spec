@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.13-52-gbb24205
+%define glibcsrcdir glibc-2.13-72-g821ae71
 %define glibcversion 2.13.90
-%define glibcportsdir glibc-ports-2.13-13-g8825867
+%define glibcportsdir glibc-ports-2.13-26-g9145616
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -21,11 +21,12 @@
 %define biarcharches %{ix86} x86_64 ppc ppc64
 %define debuginfocommonarches %{biarcharches} alpha alphaev6
 %define multiarcharches ppc ppc64 %{ix86} x86_64 %{sparc}
+%define systemtaparches %{ix86} x86_64
 
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 8
+Release: 9
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -52,6 +53,9 @@ Requires(pre): basesystem, libgcc
 BuildRequires: gd-devel libpng-devel zlib-devel texinfo, libselinux-devel >= 1.33.4-3
 BuildRequires: audit-libs-devel >= 1.1.3, sed >= 3.95, libcap-devel, gettext, nss-devel
 BuildRequires: /bin/ps, /bin/kill, /bin/awk
+%ifarch %{systemtaparches}
+BuildRequires: systemtap-sdt-devel
+%endif
 # This is to ensure that __frame_state_for is exported by glibc
 # will be compatible with egcs 1.x.y
 BuildRequires: gcc >= 3.2
@@ -356,6 +360,9 @@ configure_CFLAGS="$build_CFLAGS -fno-asynchronous-unwind-tables"
 	--host %{nptl_target_cpu}-redhat-linux \
 %ifarch %{multiarcharches}
 	--enable-multi-arch \
+%endif
+%ifarch %{systemtaparches}
+	--enable-systemtap \
 %endif
 	--disable-profile --enable-experimental-malloc --enable-nss-crypt ||
 { cat config.log; false; }
@@ -1043,6 +1050,19 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Apr  7 2011 Andreas Schwab <schwab@redhat.com> - 2.13.90-9
+- Update from master
+  - Fix typo in cache information table for x86-{32,64}
+  - Define CLOCK_BOOTTIME, O_PATH, AT_EMPTY_PATH
+  - Work around old buggy program which cannot cope with memcpy
+    semantics (BZ#12518)
+  - Fix visibility of declarations of wcpcpy and wcpncpy (BZ#12631)
+  - Add clock_adjtime, name_to_handle_at, open_by_handle_at, syncfs
+    syscalls
+  - Really implement fallocate{,64} and sync_file_range as
+    cancellation points
+- Enable systemtap support (#690281)
+
 * Thu Mar 24 2011 Andreas Schwab <schwab@redhat.com> - 2.13.90-8
 - Update from master
   - Fix infinite loop (#690323)
