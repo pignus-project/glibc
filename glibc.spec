@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.13-104-g00ee369
+%define glibcsrcdir glibc-2.13-107-gb9af130
 %define glibcversion 2.13.90
 %define glibcportsdir glibc-ports-2.13-31-ga875971
 ### glibc.spec.in follows:
@@ -26,7 +26,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 10
+Release: 11
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1050,6 +1050,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu May  5 2011 Andreas Schwab <schwab@redhat.com> - 2.13.90-11
+- Update from master
+  - Don't use removed rpc headers
+- Install rpc/netdb.h again
+
 * Wed May  4 2011 Andreas Schwab <schwab@redhat.com> - 2.13.90-10
 - Update from master
   - ldconfig: don't crash on empty path in config file (#699784)
