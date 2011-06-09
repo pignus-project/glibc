@@ -1,0 +1,46 @@
+diff -U0 glibc-2.14/ChangeLog.orig glibc-2.14/ChangeLog
+diff -up glibc-2.14/sysdeps/s390/s390-64/utf16-utf32-z9.c.orig glibc-2.14/sysdeps/s390/s390-64/utf16-utf32-z9.c
+--- glibc-2.14/sysdeps/s390/s390-64/utf16-utf32-z9.c.orig	2011-05-31 06:12:33.000000000 +0200
++++ glibc-2.14/sysdeps/s390/s390-64/utf16-utf32-z9.c	2011-06-09 14:44:52.000000000 +0200
+@@ -169,10 +169,7 @@ gconv_end (struct __gconv_step *data)
+     register unsigned long long outlen asm("11") = outend - outptr;	\
+     uint64_t cc = 0;							\
+ 									\
+-    asm volatile (".machine push       \n\t"				\
+-                  ".machine \"z9-109\" \n\t"				\
+-		  "0: " INSTRUCTION "  \n\t"				\
+-                  ".machine pop        \n\t"				\
++    asm volatile ("0: " INSTRUCTION "  \n\t"				\
+                   "   jo     0b        \n\t"				\
+ 		  "   ipm    %2        \n"			        \
+ 		  : "+a" (pOutput), "+a" (pInput), "+d" (cc),		\
+diff -up glibc-2.14/sysdeps/s390/s390-64/utf8-utf16-z9.c.orig glibc-2.14/sysdeps/s390/s390-64/utf8-utf16-z9.c
+--- glibc-2.14/sysdeps/s390/s390-64/utf8-utf16-z9.c.orig	2011-05-31 06:12:33.000000000 +0200
++++ glibc-2.14/sysdeps/s390/s390-64/utf8-utf16-z9.c	2011-06-09 14:44:55.000000000 +0200
+@@ -151,10 +151,7 @@ gconv_end (struct __gconv_step *data)
+     register unsigned long long outlen asm("11") = outend - outptr;	\
+     uint64_t cc = 0;							\
+ 									\
+-    asm volatile (".machine push       \n\t"				\
+-                  ".machine \"z9-109\" \n\t"				\
+-		  "0: " INSTRUCTION "  \n\t"				\
+-                  ".machine pop        \n\t"				\
++    asm volatile ("0: " INSTRUCTION "  \n\t"				\
+                   "   jo     0b        \n\t"				\
+ 		  "   ipm    %2        \n"			        \
+ 		  : "+a" (pOutput), "+a" (pInput), "+d" (cc),		\
+diff -up glibc-2.14/sysdeps/s390/s390-64/utf8-utf32-z9.c.orig glibc-2.14/sysdeps/s390/s390-64/utf8-utf32-z9.c
+--- glibc-2.14/sysdeps/s390/s390-64/utf8-utf32-z9.c.orig	2011-05-31 06:12:33.000000000 +0200
++++ glibc-2.14/sysdeps/s390/s390-64/utf8-utf32-z9.c	2011-06-09 14:44:55.000000000 +0200
+@@ -155,10 +155,7 @@ gconv_end (struct __gconv_step *data)
+     register unsigned long long outlen asm("11") = outend - outptr;	\
+     uint64_t cc = 0;							\
+ 									\
+-    asm volatile (".machine push       \n\t"				\
+-                  ".machine \"z9-109\" \n\t"				\
+-		  "0: " INSTRUCTION "  \n\t"				\
+-                  ".machine pop        \n\t"				\
++    asm volatile ("0: " INSTRUCTION "  \n\t"				\
+                   "   jo     0b        \n\t"				\
+ 		  "   ipm    %2        \n"				\
+ 		  : "+a" (pOutput), "+a" (pInput), "+d" (cc),		\
