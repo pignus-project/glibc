@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.14
+%define glibcsrcdir glibc-2.14-12-g5babac1
 %define glibcversion 2.14
-%define glibcportsdir glibc-ports-2.13-35-g8969f4d
+%define glibcportsdir glibc-ports-2.14
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -41,8 +41,6 @@ Source1: %{?glibc_release_url}%{glibcportsdir}.tar.xz
 Source2: %{glibcsrcdir}-fedora.tar.xz
 Patch0: %{name}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=711330
-Patch2: %{name}-revert-27390476.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Provides: ldconfig
@@ -259,7 +257,6 @@ rm -rf %{glibcportsdir}
 %patch1 -p1
 %endif
 %endif
-%patch2 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1054,8 +1051,17 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Thu Jun  9 2011 Dan Horák <dan[at]danny.cz> - 2.14-3
-- revert glibc commit 27390476 as it requires binutils >= 2.21.52.0.1 (#711330)
+* Mon Jun 21 2011 Andreas Schwab <schwab@redhat.com> - 2.14-3
+- Update from 2.14 branch
+  - Fix typo in recent resolver change which causes segvs (#710279)
+  - Fix memory leak in getaddrinfo (#712178)
+  - Fix <bits/mqueue2.h> for C++ (BZ#12841)
+  - Assume Intel Core i3/i5/i7 processor if AVX is available
+- Filter results from gethostbyname4_r according to request flags
+  (#711827)
+- Repair GB18030 charmap (#712901)
+- Revert "Use .machine to prevent AS from complaining about z9-109
+  instructions in iconv modules" (#711330)
 
 * Fri Jun  3 2011 Andreas Schwab <schwab@redhat.com> - 2.14-2
 - Revert "Handle DNS server failures in case of AF_UNSPEC lookups
