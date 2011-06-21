@@ -4108,7 +4108,15 @@
  weak_alias (__getrlimit, getrlimit)
 --- glibc-2.14-12-g5babac1/sysdeps/posix/getaddrinfo.c
 +++ glibc-2.14-3/sysdeps/posix/getaddrinfo.c
-@@ -889,7 +889,29 @@ gaih_inet (const char *name, const struct gaih_service *service,
+@@ -881,16 +881,48 @@ gaih_inet (const char *name, const struct gaih_service *service,
+ 			}
+ 		    }
+ 
+-		  no_inet6_data = no_data;
+-
+ 		  if (status == NSS_STATUS_SUCCESS)
+ 		    {
+ 		      if ((req->ai_flags & AI_CANONNAME) != 0 && canon == NULL)
  			canon = (*pat)->name;
  
  		      while (*pat != NULL)
@@ -4133,13 +4141,26 @@
 +				got_ipv6 = true;
 +			      pat = &(*pat)->next;
 +			    }
++			  else if (*pat == at)
++			    {
++			      if ((*pat)->next != NULL)
++				memcpy (*pat, (*pat)->next, sizeof (**pat));
++			      else
++				{
++				  no_data = 1;
++				  break;
++				}
++			    }
 +			  else
 +			    *pat = (*pat)->next;
 +			}
  		    }
++
++		  no_inet6_data = no_data;
  		}
  	      else
-@@ -1335,10 +1357,12 @@ static const struct scopeentry
+ 		{
+@@ -1335,10 +1367,12 @@ static const struct scopeentry
      /* Link-local addresses: scope 2.  */
      { { { 169, 254, 0, 0 } }, htonl_c (0xffff0000), 2 },
      { { { 127, 0, 0, 0 } }, htonl_c (0xff000000), 2 },
