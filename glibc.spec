@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.14-15-g9614794
-%define glibcversion 2.14
-%define glibcportsdir glibc-ports-2.14
+%define glibcsrcdir glibc-2.14-58-g2c0e54f
+%define glibcversion 2.14.90
+%define glibcportsdir glibc-ports-2.14-2-ga437c07
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 4
+Release: 1
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -43,6 +43,7 @@ Patch0: %{name}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
+Obsoletes: nss_db
 Provides: ldconfig
 # The dynamic linker supports DT_GNU_HASH
 Provides: rtld(GNU_HASH)
@@ -365,7 +366,7 @@ configure_CFLAGS="$build_CFLAGS -fno-asynchronous-unwind-tables"
 %ifarch %{systemtaparches}
 	--enable-systemtap \
 %endif
-	--disable-profile --enable-experimental-malloc --enable-nss-crypt ||
+	--disable-profile --enable-nss-crypt ||
 { cat config.log; false; }
 
 make %{?_smp_mflags} -r CFLAGS="$build_CFLAGS" %{silentrules}
@@ -402,7 +403,6 @@ build_nptl linuxnptl-power6
 
 cd build-%{nptl_target_cpu}-linuxnptl
 $GCC -static -L. -Os -g ../fedora/glibc_post_upgrade.c -o glibc_post_upgrade.%{_target_cpu} \
-  -DNO_SIZE_OPTIMIZATION \
   '-DLIBTLS="/%{_lib}/tls/"' \
   '-DGCONV_MODULES_DIR="%{_prefix}/%{_lib}/gconv"' \
   '-DLD_SO_CONF="/etc/ld.so.conf"' \
@@ -696,14 +696,16 @@ touch -r timezone/northamerica $RPM_BUILD_ROOT/etc/localtime
 touch -r sunrpc/etc.rpc $RPM_BUILD_ROOT/etc/rpc
 
 cd fedora
-$GCC -Os -g -static -o build-locale-archive build-locale-archive.c \
+$GCC -Os -g -o build-locale-archive build-locale-archive.c \
   ../build-%{nptl_target_cpu}-linuxnptl/locale/locarchive.o \
   ../build-%{nptl_target_cpu}-linuxnptl/locale/md5.o \
   -DDATADIR=\"%{_datadir}\" -DPREFIX=\"%{_prefix}\" \
-  -L../build-%{nptl_target_cpu}-linuxnptl
+  -L../build-%{nptl_target_cpu}-linuxnptl \
+  -B../build-%{nptl_target_cpu}-linuxnptl/csu/ -lc -lc_nonshared
 install -m 700 build-locale-archive $RPM_BUILD_ROOT/usr/sbin/build-locale-archive
-$GCC -Os -g -static -o tzdata-update tzdata-update.c \
-  -L../build-%{nptl_target_cpu}-linuxnptl
+$GCC -Os -g -o tzdata-update tzdata-update.c \
+  -L../build-%{nptl_target_cpu}-linuxnptl \
+  -B../build-%{nptl_target_cpu}-linuxnptl/csu/ -lc -lc_nonshared
 install -m 700 tzdata-update $RPM_BUILD_ROOT/usr/sbin/tzdata-update
 cd ..
 
@@ -1051,6 +1053,20 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jun 30 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-1
+- Update from master
+  - Fix quoting in some installed shell scripts (BZ#12935)
+  - Fix missing .ctors/.dtors lead word in soinit
+  - Improved st{r,p}{,n}cpy for SSE2 and SSSE3 on x86
+  - Avoid __check_pf calls in getaddrinfo unless really needed
+    (BZ#12907)
+  - Rate limit expensive _SC_NPROCESSORS_ONLN computation
+  - Add initgroups lookup support to getent
+  - Reenable nss_db with a completely new implementation
+  - Rewrite makedb to avoid using db library
+  - Add pldd program
+- Obsolete nss_db
+
 * Tue Jun 28 2011 Andreas Schwab <schwab@redhat.com> - 2.14-4
 - Update from 2.14 branch
   - Fix crash in GB18030 encoder (#712901)
