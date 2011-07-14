@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.14-58-g2c0e54f
+%define glibcsrcdir glibc-2.14-101-gdefe906
 %define glibcversion 2.14.90
-%define glibcportsdir glibc-ports-2.14-2-ga437c07
+%define glibcportsdir glibc-ports-2.14-3-ge5cd24d
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -22,12 +22,13 @@
 %define debuginfocommonarches %{biarcharches} alpha alphaev6
 %define multiarcharches ppc ppc64 %{ix86} x86_64 %{sparc}
 %define systemtaparches %{ix86} x86_64
+# Remove -s to get verbose output.
 %define silentrules PARALLELMFLAGS=-s
 
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 1
+Release: 2
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -527,6 +528,10 @@ install -p -m 644 nis/nss $RPM_BUILD_ROOT/etc/default/nss
 install -m 644 nscd/nscd.conf $RPM_BUILD_ROOT/etc
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -m 755 nscd/nscd.init $RPM_BUILD_ROOT/etc/rc.d/init.d/nscd
+mkdir -p $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/
+install -m 644 fedora/nscd.conf %{buildroot}/usr/lib/tmpfiles.d/
+mkdir -p $RPM_BUILD_ROOT/lib/systemd/system
+install -m 644 fedora/nscd.service fedora/nscd.socket $RPM_BUILD_ROOT/lib/systemd/system
 %endif
 
 # Include ld.so.conf
@@ -895,7 +900,27 @@ end
 
 %postun -p /sbin/ldconfig
 
-%post common -p /usr/sbin/build-locale-archive
+%triggerin common -p <lua> -- glibc
+if posix.stat("%{_prefix}/lib/locale/locale-archive.tmpl", "size") > 0 then
+  pid = posix.fork()
+  if pid == 0 then
+    posix.exec("%{_prefix}/sbin/build-locale-archive")
+  elseif pid > 0 then
+    posix.wait(pid)
+  end
+end
+
+%post common -p <lua>
+if posix.access("/etc/ld.so.cache") then
+  if posix.stat("%{_prefix}/lib/locale/locale-archive.tmpl", "size") > 0 then
+    pid = posix.fork()
+    if pid == 0 then
+      posix.exec("%{_prefix}/sbin/build-locale-archive")
+    elseif pid > 0 then
+      posix.wait(pid)
+    end
+  end
+end
 
 %triggerin common -p /usr/sbin/tzdata-update -- tzdata
 
@@ -1028,6 +1053,9 @@ rm -f *.filelist*
 %config /etc/rc.d/init.d/nscd
 %dir %attr(0755,root,root) /var/run/nscd
 %dir %attr(0755,root,root) /var/db/nscd
+/lib/systemd/system/nscd.service
+/lib/systemd/system/nscd.socket
+/usr/lib/tmpfiles.d/nscd.conf
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/run/nscd/nscd.pid
 %attr(0666,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/run/nscd/socket
 %attr(0600,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/run/nscd/passwd
@@ -1053,6 +1081,22 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jul 14 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-2
+- Update from master
+  - Generalize framework to register monitoring of files in nscd
+  - Handle ext4 in {,f}pathconf
+  - Handle Lustre filesystem (BZ#12868)
+  - Handle W; without long options in getopt (BZ#12922)
+  - Change error code for underflows in strtod (BZ#9696)
+  - Fix handling of chained netgroups
+  - Optimize long-word additions in SHA implementation
+  - Handle nscd negtimeout==0
+  - nss_compat: query NIS domain only when needed
+  - Fix robust mutex handling after fork
+  - Make sure RES_USE_INET6 is always restored
+- Add systemd configuration for nscd
+- Be more careful running build-locale-archive
+
 * Thu Jun 30 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-1
 - Update from master
   - Fix quoting in some installed shell scripts (BZ#12935)
@@ -1066,6 +1110,7 @@ rm -f *.filelist*
   - Rewrite makedb to avoid using db library
   - Add pldd program
 - Obsolete nss_db
+- Don't build tzdata-update and build-locale-archive statically
 
 * Tue Jun 28 2011 Andreas Schwab <schwab@redhat.com> - 2.14-4
 - Update from 2.14 branch
