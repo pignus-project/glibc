@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 3
+Release: 4
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1079,6 +1079,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jul 21 2011 Rex Dieter <rdieter@fedoraproject.org> - 2.14.90-4 
+- rebuild (fix prior broken rpm in buildroot)
+
 * Wed Jul 20 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-3
 - Update from master
   - S/390: Don't use r11 in INTERNAL_VSYSCALL_NCS macro
