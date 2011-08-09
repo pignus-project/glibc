@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.14-121-g5551a7b
+%define glibcsrcdir glibc-2.14-151-g16292ed
 %define glibcversion 2.14.90
-%define glibcportsdir glibc-ports-2.14-3-ge5cd24d
+%define glibcportsdir glibc-ports-2.14-6-g3c6ac5c
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -92,8 +92,9 @@ BuildRequires: gcc >= 4.1.0-0.17
 BuildRequires: elfutils >= 0.72
 BuildRequires: rpm >= 4.2-0.56
 %endif
-%define __find_provides %{_builddir}/%{glibcsrcdir}/find_provides.sh
-%define _filter_GLIBC_PRIVATE 1
+%filter_from_provides /GLIBC_PRIVATE/d
+%filter_from_requires /GLIBC_PRIVATE/d
+%filter_setup
 
 %description
 The glibc package contains standard libraries which are used by
@@ -271,12 +272,6 @@ rm -f sysdeps/powerpc/powerpc32/power4/hp-timing.[ch]
 %endif
 
 find . -type f -size 0 -o -name "*.orig" -exec rm -f {} \;
-cat > find_provides.sh <<EOF
-#!/bin/sh
-/usr/lib/rpm/find-provides | grep -v GLIBC_PRIVATE
-exit 0
-EOF
-chmod +x find_provides.sh
 touch `find . -name configure`
 touch locale/programs/*-kw.h
 
@@ -1079,8 +1074,22 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Thu Jul 21 2011 Rex Dieter <rdieter@fedoraproject.org> - 2.14.90-4 
-- rebuild (fix prior broken rpm in buildroot)
+* Tue Aug  9 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-4
+- Update from master
+  - Properly tokenize nameserver line for servers with IPv6 address
+  - Fix encoding name for IDN in getaddrinfo (#725755)
+  - Fix inline strncat/strncmp on x86
+  - Define SEEK_DATA and SEEK_HOLE
+  - Define AF_NFC and PF_NFC
+  - Update ptrace constants
+  - Add read barriers in cancellation initialization
+  - Add read barrier protecting DES initialization
+  - Fix overflow bug in optimized strncat for x86-64
+  - Check for overflows in expressions (BZ#12852)
+  - Fix check for AVX enablement (BZ#13007)
+  - Force La_x86_64_ymm to be 16-byte aligned
+  - Add const attr to gnu_dev_{major,minor,makedev}
+- Filter out GLIBC_PRIVATE symbols again
 
 * Wed Jul 20 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-3
 - Update from master
