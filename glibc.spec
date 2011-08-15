@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.14-151-g16292ed
+%define glibcsrcdir glibc-2.14-171-g85ae058
 %define glibcversion 2.14.90
 %define glibcportsdir glibc-ports-2.14-6-g3c6ac5c
 ### glibc.spec.in follows:
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 4.1
+Release: 5
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -92,9 +92,7 @@ BuildRequires: gcc >= 4.1.0-0.17
 BuildRequires: elfutils >= 0.72
 BuildRequires: rpm >= 4.2-0.56
 %endif
-%filter_from_provides /GLIBC_PRIVATE/d
-%filter_from_requires /GLIBC_PRIVATE/d
-%filter_setup
+%global __filter_GLIBC_PRIVATE 1
 
 %description
 The glibc package contains standard libraries which are used by
@@ -409,6 +407,7 @@ GCC=`cat Gcc`
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT
 make -j1 install_root=$RPM_BUILD_ROOT install -C build-%{target} %{silentrules}
+chmod +x $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown
 %ifnarch %{auxarches}
 cd build-%{target} && \
   make %{?_smp_mflags} install_root=$RPM_BUILD_ROOT install-locales -C ../localedata objdir=`pwd` && \
@@ -801,8 +800,10 @@ eu-readelf -hS $RPM_BUILD_ROOT/usr/bin/getconf $RPM_BUILD_ROOT/usr/libexec/getco
 
 find_debuginfo_args='--strict-build-id -g'
 %ifarch %{debuginfocommonarches}
+echo %{_prefix}/libexec/pt_chown > workaround.filelist
 find_debuginfo_args="$find_debuginfo_args \
-  -l common.filelist -l utils.filelist -l nscd.filelist -p '.*/sbin/.*' \
+  -l common.filelist -l utils.filelist -l nscd.filelist -l workaround.filelist \
+  -p '.*/(sbin|libexec)/.*' \
   -o debuginfocommon.filelist \
   -l rpm.filelist -l nosegneg.filelist \
 "
@@ -1074,6 +1075,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug 15 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-5
+- Update from master
+  - Implement LD_DEBUG=scopes
+  - Locale-independent parsing in libintl (#726536)
+  - Fix stack alignment on x86_64 (#728762)
+  - Implement scandirat function
+
 * Tue Aug  9 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-4
 - Update from master
   - Properly tokenize nameserver line for servers with IPv6 address
@@ -1086,7 +1094,7 @@ rm -f *.filelist*
   - Add read barrier protecting DES initialization
   - Fix overflow bug in optimized strncat for x86-64
   - Check for overflows in expressions (BZ#12852)
-  - Fix check for AVX enablement (BZ#13007)
+  - Fix check for AVX enablement (#720176, BZ#13007)
   - Force La_x86_64_ymm to be 16-byte aligned
   - Add const attr to gnu_dev_{major,minor,makedev}
 - Filter out GLIBC_PRIVATE symbols again
