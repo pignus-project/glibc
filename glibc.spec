@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.14-171-g85ae058
+%define glibcsrcdir glibc-2.14-209-gad69cc2
 %define glibcversion 2.14.90
-%define glibcportsdir glibc-ports-2.14-6-g3c6ac5c
+%define glibcportsdir glibc-ports-2.14-7-g978f13e
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 5
+Release: 6
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1075,6 +1075,16 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Aug 24 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-6
+- Update from master
+  - Correct cycle detection during dependency sorting
+  - Use ifuncs for time and gettimeofday on x86-64
+  - Fix fopen (non-existing-file, "re") errno
+  - Fix CFI info in x86-64 trampolines for non-AVX code
+  - Build libresolv with SSP flags
+  - Avoid executable stack in makedb (#731063)
+  - Align x86 TCB to 64 bytes (cache line size), important for Atom
+
 * Mon Aug 15 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-5
 - Update from master
   - Implement LD_DEBUG=scopes
