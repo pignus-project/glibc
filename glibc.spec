@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.14-213-g3ba5751
+%define glibcsrcdir glibc-2.14-258-g610f9ab
 %define glibcversion 2.14.90
-%define glibcportsdir glibc-ports-2.14-7-g978f13e
+%define glibcportsdir glibc-ports-2.14-8-gc26e391
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 7
+Release: 8
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1075,6 +1075,21 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Sep  8 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-8
+- Update from master
+  - Use O_CLOEXEC when loading objects and cache in ld.so (BZ#13068)
+  - Fix memory leak in case of failed dlopen (BZ#13123)
+  - Optimizations for POWER
+  - Prefer real syscalls instead of vsyscalls on x86-64 outside libc.so
+  - Add Atom-optimized strchr and strrchr for x86-64
+  - Try shell in posix_spawn* only in compat mode (BZ#13134)
+  - Fix glob.h header by removing gcc 1.x support (BZ#13150)
+  - Optimized strchr and strrchr with SSE2 on x86-32
+  - Add optimized x86 wcscmp
+  - Fixes and optimizations for 32-bit sparc fabs
+  - Fix nptl semaphore cleanup invocation
+  - Sanitize HWCAP_SPARC_* defines/usage, and add new entries
+
 * Thu Sep  1 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-7
 - Update from master
   - Relocate objects in dependency order (#733462)
