@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.14-258-g610f9ab
+%define glibcsrcdir glibc-2.14-309-g88738eb
 %define glibcversion 2.14.90
-%define glibcportsdir glibc-ports-2.14-8-gc26e391
+%define glibcportsdir glibc-ports-2.14-15-g560d4a5
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 8
+Release: 9
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -351,7 +351,7 @@ configure_CFLAGS="$build_CFLAGS -fno-asynchronous-unwind-tables"
 	--prefix=%{_prefix} \
 	--enable-add-ons=../%{glibcportsdir},nptl$AddOns \
 	--with-headers=%{_prefix}/include $EnableKernel --enable-bind-now \
-	--with-tls --with-__thread --build=%{target} \
+	--build=%{target} \
 %ifarch %{multiarcharches}
 	--enable-multi-arch \
 %endif
@@ -670,9 +670,11 @@ echo '%{_prefix}/sbin/build-locale-archive' >> common.filelist
 echo '%{_prefix}/sbin/tzdata-update' >> common.filelist
 echo '%{_prefix}/sbin/nscd' > nscd.filelist
 
-cat > utils.filelist <<EOF
+cat >> rpm.filelist <<EOF
 %{_prefix}/%{_lib}/libmemusage.so
 %{_prefix}/%{_lib}/libpcprofile.so
+EOF
+cat > utils.filelist <<EOF
 %{_prefix}/bin/memusage
 %{_prefix}/bin/memusagestat
 %{_prefix}/bin/mtrace
@@ -1075,6 +1077,24 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Sep 16 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-9
+- Update from master
+  - Define IP_MULTICAST_ALL
+  - Add fmax and fmin inlines for x86-64
+  - Avoid race between {,__de}allocate_stack and __reclaim_stacks
+    during fork (#737387)
+  - Optimized lrint and llrint for x86-64
+  - Also relocate in dependency order when doing symbol dependency
+    testing (#737459)
+  - Optimize logb code for 64-bit machines
+  - Fix jn precision (BZ#11589)
+  - Fix boundary conditions in scanf (BZ#13138)
+  - Don't lock string streams in stream cleanup code (BZ#12847)
+  - Define ELFOSABI_GNU
+  - Fix lround loss of precision
+  - Add range checking for FD_SET, FD_CLR, and FD_ISSET
+- Make sure AVC thread has capabilities
+
 * Thu Sep  8 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-8
 - Update from master
   - Use O_CLOEXEC when loading objects and cache in ld.so (BZ#13068)
