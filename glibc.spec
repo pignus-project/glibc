@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.14-309-g88738eb
+%define glibcsrcdir glibc-2.14-317-g68822d7
 %define glibcversion 2.14.90
 %define glibcportsdir glibc-ports-2.14-15-g560d4a5
 ### glibc.spec.in follows:
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 9
+Release: 10
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -186,7 +186,10 @@ Summary: A Name Service Caching Daemon (nscd).
 Group: System Environment/Daemons
 Requires: %{name} = %{version}-%{release}
 Requires: libselinux >= 1.17.10-1, audit-libs >= 1.1.3
-Requires(pre): /sbin/chkconfig, /usr/sbin/useradd, /usr/sbin/userdel, coreutils
+Requires(pre): /usr/sbin/useradd, coreutils
+Requires(post): systemd-units
+Requires(preun): systemd-units
+Requires(postun): systemd-units, /usr/sbin/userdel
 
 %description -n nscd
 Nscd caches name service lookups and can dramatically improve
@@ -518,8 +521,6 @@ install -p -m 644 nis/nss $RPM_BUILD_ROOT/etc/default/nss
 
 # This is for ncsd - in glibc 2.2
 install -m 644 nscd/nscd.conf $RPM_BUILD_ROOT/etc
-mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
-install -m 755 nscd/nscd.init $RPM_BUILD_ROOT/etc/rc.d/init.d/nscd
 mkdir -p $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/
 install -m 644 fedora/nscd.conf %{buildroot}/usr/lib/tmpfiles.d/
 mkdir -p $RPM_BUILD_ROOT/lib/systemd/system
@@ -945,20 +946,23 @@ getent passwd nscd >/dev/null ||
 		    -c "NSCD Daemon" -u 28 -g nscd nscd
 
 %post -n nscd
-/sbin/chkconfig --add nscd
+if test $1 -eq 1; then
+  /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+fi
 
 %preun -n nscd
-if [ $1 = 0 ] ; then
-  service nscd stop > /dev/null 2>&1
-  /sbin/chkconfig --del nscd
+if test $1 -eq 0; then
+  /bin/systemctl --no-reload disable nscd.service > /dev/null 2>&1 || :
+  /bin/systemctl stop nscd.service > /dev/null 2>&1 || :
 fi
 
 %postun -n nscd
-if [ $1 = 0 ] ; then
+if test $1 = 0; then
   /usr/sbin/userdel nscd > /dev/null 2>&1 || :
 fi
-if [ "$1" -ge "1" ]; then
-  service nscd condrestart > /dev/null 2>&1 || :
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+if test $1 -ge 1; then
+  /bin/systemctl try-restart nscd.service >/dev/null 2>&1 || :
 fi
 
 %if %{xenpackage}
@@ -1046,7 +1050,6 @@ rm -f *.filelist*
 %files -f nscd.filelist -n nscd
 %defattr(-,root,root)
 %config(noreplace) /etc/nscd.conf
-%config /etc/rc.d/init.d/nscd
 %dir %attr(0755,root,root) /var/run/nscd
 %dir %attr(0755,root,root) /var/db/nscd
 /lib/systemd/system/nscd.service
@@ -1077,6 +1080,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Sep 28 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-10
+- Update from master
+  - Correctly reparse group line after enlarging the buffer
+  - Fix parse error in bits/mathinline.h with --std=c99 (#740235)
+- Update nscd service file (#740284)
+- Drop nscd init file (#740196)
+
 * Fri Sep 16 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-9
 - Update from master
   - Define IP_MULTICAST_ALL
