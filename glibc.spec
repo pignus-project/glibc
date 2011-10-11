@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.14-317-g68822d7
+%define glibcsrcdir glibc-2.14-346-ga843a20
 %define glibcversion 2.14.90
-%define glibcportsdir glibc-ports-2.14-15-g560d4a5
+%define glibcportsdir glibc-ports-2.14-23-g74d3667
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 10
+Release: 11
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -668,7 +668,6 @@ sed -i -e '\|/%{_lib}/%{nosegneg_subdir}|d' rpm.filelist
 %endif
 
 echo '%{_prefix}/sbin/build-locale-archive' >> common.filelist
-echo '%{_prefix}/sbin/tzdata-update' >> common.filelist
 echo '%{_prefix}/sbin/nscd' > nscd.filelist
 
 cat >> rpm.filelist <<EOF
@@ -703,10 +702,6 @@ $GCC -Os -g -o build-locale-archive build-locale-archive.c \
   -L../build-%{target} \
   -B../build-%{target}/csu/ -lc -lc_nonshared
 install -m 700 build-locale-archive $RPM_BUILD_ROOT/usr/sbin/build-locale-archive
-$GCC -Os -g -o tzdata-update tzdata-update.c \
-  -L../build-%{target} \
-  -B../build-%{target}/csu/ -lc -lc_nonshared
-install -m 700 tzdata-update $RPM_BUILD_ROOT/usr/sbin/tzdata-update
 cd ..
 
 # the last bit: more documentation
@@ -919,7 +914,44 @@ if posix.access("/etc/ld.so.cache") then
   end
 end
 
-%triggerin common -p /usr/sbin/tzdata-update -- tzdata
+%triggerin common -p <lua> -- tzdata
+function update (filename, new_data)
+  local fd = io.open(filename)
+  if not fd then return end
+  local data = fd:read("*a")
+  fd:close()
+  if not data then return end
+  -- Don't update the file unnecessarily.
+  if data == new_data then return end
+  local tempfilename = filename .. ".tzupdate"
+  fd = io.open(tempfilename, "w")
+  if not fd then return end
+  fd:write(new_data)
+  fd:close()
+  posix.chmod(tempfilename, 0644)
+  if not os.rename(tempfilename, filename) then
+    os.remove(tempfilename)
+  end
+end
+fd = io.open("/etc/sysconfig/clock")
+if not fd then return end
+zonename = nil
+for l in fd:lines() do
+  zone = string.match(l, "^[ \t]*ZONE[ \t]*=[ \t]*\"?([^ \t\n\"]*)");
+  if zone then
+    zonename = "/usr/share/zoneinfo/" .. zone
+    break
+  end
+end
+fd:close()
+if not zonename then return end
+fd = io.open(zonename)
+if not fd then return end
+data = fd:read("*a")
+fd:close()
+if not data then return end
+update("/etc/localtime", data)
+update("/var/spool/postfix/etc/localtime", data)
 
 %post devel
 /sbin/install-info %{_infodir}/libc.info.gz %{_infodir}/dir > /dev/null 2>&1 || :
@@ -1080,16 +1112,30 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Oct 11 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-11
+- Update from master
+  - Clean up locarchive mmap reservation code
+  - Fix netname2host (BZ#13179)
+  - Fix remainder (NaN, 0) (BZ#6779, BZ#6783)
+  - S/390: Fix longlong.h inline asms for zarch
+  - Improve 64 bit memchr, memrchr, rawmemchr with SSE2
+  - Update translations
+  - Implement caching of netgroups in nscd
+  - Handle OOM in NSS
+  - Don't call ifunc functions in trace mode
+- Convert tzdata-update to lua (#729796)
+- Horrible workaround for horribly broken software (#737223)
+
 * Wed Sep 28 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-10
 - Update from master
-  - Correctly reparse group line after enlarging the buffer
+  - Correctly reparse group line after enlarging the buffer (#739360)
   - Fix parse error in bits/mathinline.h with --std=c99 (#740235)
 - Update nscd service file (#740284)
 - Drop nscd init file (#740196)
 
 * Fri Sep 16 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-9
 - Update from master
-  - Define IP_MULTICAST_ALL
+  - Define IP_MULTICAST_ALL (BZ#13192)
   - Add fmax and fmin inlines for x86-64
   - Avoid race between {,__de}allocate_stack and __reclaim_stacks
     during fork (#737387)
