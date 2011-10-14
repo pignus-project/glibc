@@ -1,0 +1,27 @@
+From 81dcc7fb74a766f970800b9975e85b5fe7f6ea38 Mon Sep 17 00:00:00 2001
+From: Andreas Schwab <schwab@redhat.com>
+Date: Thu, 13 Oct 2011 13:33:58 +0200
+Subject: [PATCH] Check for zero size in memrchr for x86_64
+
+---
+ ChangeLog                |    2 ++
+ sysdeps/x86_64/memrchr.S |    3 +++
+ 2 files changed, 5 insertions(+), 0 deletions(-)
+
+diff --git a/sysdeps/x86_64/memrchr.S b/sysdeps/x86_64/memrchr.S
+index 81b7a1c..70adca3 100644
+--- a/sysdeps/x86_64/memrchr.S
++++ b/sysdeps/x86_64/memrchr.S
+@@ -282,6 +282,9 @@ L(return_null):
+ 
+ 	.p2align 4
+ L(length_less16_offset0):
++	test	%edx, %edx
++	jz	L(return_null)
++
+ 	mov	%dl, %cl
+ 	pcmpeqb	(%rdi), %xmm1
+ 
+-- 
+1.7.6
+

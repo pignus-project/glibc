@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 11
+Release: 12
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -42,6 +42,7 @@ Source1: %{?glibc_release_url}%{glibcportsdir}.tar.xz
 Source2: %{glibcsrcdir}-fedora.tar.xz
 Patch0: %{name}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
+Patch2: 0001-Check-for-zero-size-in-memrchr-for-x86_64.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Obsoletes: nss_db
@@ -260,6 +261,7 @@ rm -rf %{glibcportsdir}
 %patch1 -p1
 %endif
 %endif
+%patch2 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1112,6 +1114,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Oct 14 2011 Richard W.M. Jones <rjones@redhat.com> - 2.14.90-12
+- Temporarily add patch2 to fix #745739.
+  Patch is upstream so can be removed at next update from master.
+
 * Tue Oct 11 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-11
 - Update from master
   - Clean up locarchive mmap reservation code
