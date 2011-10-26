@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 13
+Release: 14
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -42,6 +42,7 @@ Source1: %{?glibc_release_url}%{glibcportsdir}.tar.xz
 Source2: %{glibcsrcdir}-fedora.tar.xz
 Patch0: %{name}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
+Patch2: %{name}-no-leaf-attribute.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Obsoletes: nss_db
@@ -260,6 +261,7 @@ rm -rf %{glibcportsdir}
 %patch1 -p1
 %endif
 %endif
+%patch2 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1112,6 +1114,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Oct 19 2011 Jim Meyering <meyering@redhat.com> - 2.14.90-14
+- Revert the upstream patch that added the leaf attribute, since it
+  caused gcc -O2 to move code past thread primitives and sometimes
+  even out of critical sections.  See http://bugzilla.redhat.com/747377
+
 * Wed Oct 19 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-13
 - Update from master
   - Fix linkage conflict with feraiseexcept (#746753)
