@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.14-394-g8f3b1ff
+%define glibcsrcdir glibc-2.14-418-gb2ea1df
 %define glibcversion 2.14.90
-%define glibcportsdir glibc-ports-2.14-25-gd3d9bde
+%define glibcportsdir glibc-ports-2.14-43-gf335e01
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 13
+Release: 14
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1112,6 +1112,22 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Nov  8 2011 Andreas Schwab <schwab@redhat.com> - 2.4.90-14
+- Update from master
+  - Fix locking in _IO_flush_all_lockp
+  - Fix buffer allocation in files initgroups handler
+  - Don't start AVC thread until credentials are installed
+  - Don't fail in makedb if SELinux is disabled
+  - New Linux syscalls process_vm_readv and process_vm_writev
+  - Unify getent output for initgroups database (BZ#13367)
+  - Avoid assertion in processes with VM in bad shape (BZ#13276)
+  - Don't mark memory synchronisation functions as leaf (#747377, BZ#13344)
+  - Add missing register initialization in x86-64
+    pthread_cond_timedwait (BZ#13358)
+  - Correctly NUL-terminate link name in sprof (BZ#13337)
+  - Fix readlink call in ldconfig's chroot handling (BZ#13335)
+  - Preserve link time dependencies over relocation dependencies (BZ#12892)
+
 * Wed Oct 19 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-13
 - Update from master
   - Fix linkage conflict with feraiseexcept (#746753)
