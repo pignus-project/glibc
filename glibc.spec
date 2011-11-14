@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.14-498-g98591e5
+%define glibcsrcdir glibc-2.14-518-ga5fb313
 %define glibcversion 2.14.90
-%define glibcportsdir glibc-ports-2.14-43-gf335e01
+%define glibcportsdir glibc-ports-2.14-44-ga9ff872
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 15.2
+Release: 16
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1112,6 +1112,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Nov 14 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-16
+- Update from master
+  - Don't call reused_arena when _int_new_arena failed (#753601)
+  - Fix grouping and reuse other locales in various locales (BZ#13147)
+
 * Fri Nov 11 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-15
 - Update from master
   - Fix db makefile rule for group.db
