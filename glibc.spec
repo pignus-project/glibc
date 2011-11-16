@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.14-498-g98591e5
+%define glibcsrcdir glibc-2.14-418-gb2ea1df
 %define glibcversion 2.14.90
 %define glibcportsdir glibc-ports-2.14-43-gf335e01
 ### glibc.spec.in follows:
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 15.2
+Release: 15.1
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1112,37 +1112,21 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri Nov 11 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-15
-- Update from master
-  - Fix db makefile rule for group.db
-  - Mark setjmp and ucontext functions as non-leaf (#752905)
-  - Check malloc arana limit atomically
-
-* Tue Nov  8 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-14
+* Tue Nov  8 2011 Andreas Schwab <schwab@redhat.com> - 2.4.90-14
 - Update from master
   - Fix locking in _IO_flush_all_lockp
-  - Fix buffer allocation in files initgroups handler (#750361)
+  - Fix buffer allocation in files initgroups handler
   - Don't start AVC thread until credentials are installed
-  - Don't fail in makedb if SELinux is disabled (#750858)
+  - Don't fail in makedb if SELinux is disabled
   - New Linux syscalls process_vm_readv and process_vm_writev
   - Unify getent output for initgroups database (BZ#13367)
-  - Cache network interface information
   - Avoid assertion in processes with VM in bad shape (BZ#13276)
   - Don't mark memory synchronisation functions as leaf (#747377, BZ#13344)
   - Add missing register initialization in x86-64
     pthread_cond_timedwait (BZ#13358)
-  - Fix accuracy problem in generic sin (BZ#10709)
   - Correctly NUL-terminate link name in sprof (BZ#13337)
   - Fix readlink call in ldconfig's chroot handling (BZ#13335)
-  - Optimize accurate 64-bit routines for FMA4 on x86-64
-  - Optimized remquo for 64-bit platforms
-  - Optimize fmod
-  - Add optimized wcslen and strnlen for x86-32
-  - Optimized strnlen and wcscmp for x86-64
-  - Improve x86-32 SSSE3 memcpy
   - Preserve link time dependencies over relocation dependencies (BZ#12892)
-  - Optimize x86-64 rawmemchr
-  - Add optimized str{,n}casecmp for AVX on x86-64
 
 * Wed Oct 19 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-13
 - Update from master
