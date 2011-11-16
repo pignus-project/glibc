@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.14-418-gb2ea1df
+%define glibcsrcdir glibc-2.14-394-g8f3b1ff
 %define glibcversion 2.14.90
-%define glibcportsdir glibc-ports-2.14-43-gf335e01
+%define glibcportsdir glibc-ports-2.14-25-gd3d9bde
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 15.1
+Release: 15
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -42,6 +42,7 @@ Source1: %{?glibc_release_url}%{glibcportsdir}.tar.xz
 Source2: %{glibcsrcdir}-fedora.tar.xz
 Patch0: %{name}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
+Patch2: %{name}-no-leaf-attribute.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Obsoletes: nss_db
@@ -260,6 +261,7 @@ rm -rf %{glibcportsdir}
 %patch1 -p1
 %endif
 %endif
+%patch2 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1112,21 +1114,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Tue Nov  8 2011 Andreas Schwab <schwab@redhat.com> - 2.4.90-14
-- Update from master
-  - Fix locking in _IO_flush_all_lockp
-  - Fix buffer allocation in files initgroups handler
-  - Don't start AVC thread until credentials are installed
-  - Don't fail in makedb if SELinux is disabled
-  - New Linux syscalls process_vm_readv and process_vm_writev
-  - Unify getent output for initgroups database (BZ#13367)
-  - Avoid assertion in processes with VM in bad shape (BZ#13276)
-  - Don't mark memory synchronisation functions as leaf (#747377, BZ#13344)
-  - Add missing register initialization in x86-64
-    pthread_cond_timedwait (BZ#13358)
-  - Correctly NUL-terminate link name in sprof (BZ#13337)
-  - Fix readlink call in ldconfig's chroot handling (BZ#13335)
-  - Preserve link time dependencies over relocation dependencies (BZ#12892)
+* Wed Oct 26 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.14.90-15
+- Rebuilt for glibc bug#747377
+
+* Wed Oct 19 2011 Jim Meyering <meyering@redhat.com> - 2.14.90-14
+- Revert the upstream patch that added the leaf attribute, since it
+  caused gcc -O2 to move code past thread primitives and sometimes
+  even out of critical sections.  See http://bugzilla.redhat.com/747377
 
 * Wed Oct 19 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-13
 - Update from master
