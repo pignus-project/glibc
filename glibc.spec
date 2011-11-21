@@ -1119,7 +1119,7 @@ rm -f *.filelist*
 
 %changelog
 * Fri Nov 18 2011 Jeff Law <law@redhat.com> - 2.14.90-19
-  - Check malloc areana atomically  (BZ#13071)
+  - Check malloc arena atomically  (BZ#13071)
   - Don't call reused_arena when _int_new_arena failed (#753601)
   
 * Wed Nov 16 2011 Jeff Law <law@redhat.com> - 2.14.90-18
