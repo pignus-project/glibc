@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 18
+Release: 19
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -44,6 +44,7 @@ Patch0: %{name}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
 Patch2: %{name}-no-leaf-attribute.patch
 Patch3: %{name}-localegrouping.patch
+Patch4: %{name}-arenalock.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Obsoletes: nss_db
@@ -264,6 +265,7 @@ rm -rf %{glibcportsdir}
 %endif
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1116,49 +1118,16 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Nov 18 2011 Jeff Law <law@redhat.com> - 2.14.90-19
+  - Check malloc areana atomically 
+  - Don't call reused_arena when _int_new_arena failed (#753601)
+  
 * Wed Nov 16 2011 Jeff Law <law@redhat.com> - 2.14.90-18
-  - Fix grouping and reuse other locales in various locales (#13147)
+  - Fix grouping and reuse other locales in various locales (BZ#13147)
   
 * Tue Nov 15 2011 Jeff Law <law@redhat.com> - 2.14.90-17
   Revert bogus commits/rebasing of Nov 14, Nov 11 and Nov 8.  Sources
   should be equivalent to Fedora 16's initial release.
-
-* Mon Nov 14 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-16
-- Update from master
-  - Don't call reused_arena when _int_new_arena failed (#753601)
-  - Fix grouping and reuse other locales in various locales (BZ#13147)
-
-* Fri Nov 11 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-15
-- Update from master
-  - Fix db makefile rule for group.db
-  - Mark setjmp and ucontext functions as non-leaf (#752905)
-  - Check malloc arana limit atomically
-
-* Tue Nov  8 2011 Andreas Schwab <schwab@redhat.com> - 2.14.90-14
-- Update from master
-  - Fix locking in _IO_flush_all_lockp
-  - Fix buffer allocation in files initgroups handler (#750361)
-  - Don't start AVC thread until credentials are installed
-  - Don't fail in makedb if SELinux is disabled (#750858)
-  - New Linux syscalls process_vm_readv and process_vm_writev
-  - Unify getent output for initgroups database (BZ#13367)
-  - Cache network interface information
-  - Avoid assertion in processes with VM in bad shape (BZ#13276)
-  - Don't mark memory synchronisation functions as leaf (#747377, BZ#13344)
-  - Add missing register initialization in x86-64
-    pthread_cond_timedwait (BZ#13358)
-  - Fix accuracy problem in generic sin (BZ#10709)
-  - Correctly NUL-terminate link name in sprof (BZ#13337)
-  - Fix readlink call in ldconfig's chroot handling (BZ#13335)
-  - Optimize accurate 64-bit routines for FMA4 on x86-64
-  - Optimized remquo for 64-bit platforms
-  - Optimize fmod
-  - Add optimized wcslen and strnlen for x86-32
-  - Optimized strnlen and wcscmp for x86-64
-  - Improve x86-32 SSSE3 memcpy
-  - Preserve link time dependencies over relocation dependencies (BZ#12892)
-  - Optimize x86-64 rawmemchr
-  - Add optimized str{,n}casecmp for AVX on x86-64
 
 * Wed Oct 26 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.14.90-15
 - Rebuilt for glibc bug#747377
