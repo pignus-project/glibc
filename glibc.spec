@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 15
+Release: 19
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -43,6 +43,8 @@ Source2: %{glibcsrcdir}-fedora.tar.xz
 Patch0: %{name}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
 Patch2: %{name}-no-leaf-attribute.patch
+Patch3: %{name}-localegrouping.patch
+Patch4: %{name}-arenalock.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Obsoletes: nss_db
@@ -262,6 +264,8 @@ rm -rf %{glibcportsdir}
 %endif
 %endif
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1114,6 +1118,17 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Nov 18 2011 Jeff Law <law@redhat.com> - 2.14.90-19
+  - Check malloc areana atomically 
+  - Don't call reused_arena when _int_new_arena failed (#753601)
+  
+* Wed Nov 16 2011 Jeff Law <law@redhat.com> - 2.14.90-18
+  - Fix grouping and reuse other locales in various locales (BZ#13147)
+  
+* Tue Nov 15 2011 Jeff Law <law@redhat.com> - 2.14.90-17
+  Revert bogus commits/rebasing of Nov 14, Nov 11 and Nov 8.  Sources
+  should be equivalent to Fedora 16's initial release.
+
 * Wed Oct 26 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.14.90-15
 - Rebuilt for glibc bug#747377
 
