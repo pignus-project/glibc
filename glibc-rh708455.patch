@@ -1,0 +1,13 @@
+diff --git a/manual/resource.texi b/manual/resource.texi
+index 0549572..8e3155c 100644
+--- a/manual/resource.texi
++++ b/manual/resource.texi
+@@ -1607,7 +1607,7 @@ processors and so the call
+ @end smallexample
+ 
+ @noindent
+-returns the number of processors which are currently inline (i.e.,
++returns the number of processors which are currently online (i.e.,
+ available).
+ 
+ For these two pieces of information the GNU C library also provides
