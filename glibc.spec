@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 20%{?dist}
+Release: 21%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -46,6 +46,8 @@ Patch2: %{name}-no-leaf-attribute.patch
 Patch3: %{name}-localegrouping.patch
 Patch4: %{name}-arenalock.patch
 Patch5: %{name}-rh757881.patch
+Patch6: %{name}-rh750858.patch
+Patch7: %{name}-rh757887.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Obsoletes: nss_db
@@ -268,6 +270,8 @@ rm -rf %{glibcportsdir}
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
+%patch7 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1120,6 +1124,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov 30 2011 Jeff Law <law@redhat.com> - 2.14.90-21
+  - Don't fail in makedb if SELinux is disabled (#750858)
+  - Fix access after end of search string in regex matcher (#757887)
+
 * Mon Nov 28 2011 Jeff Law <law@redhat.com> - 2.14.90-20
   - Drop lock before calling malloc_printerr (#757881)
 
