@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 21%{?dist}
+Release: 23%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -48,6 +48,10 @@ Patch4: %{name}-arenalock.patch
 Patch5: %{name}-rh757881.patch
 Patch6: %{name}-rh750858.patch
 Patch7: %{name}-rh757887.patch
+Patch8: %{name}-fdelt.patch
+Patch9: %{name}-rh708455.patch
+Patch10: %{name}-rh750811.patch
+Patch11: %{name}-rh758252.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Obsoletes: nss_db
@@ -272,6 +276,10 @@ rm -rf %{glibcportsdir}
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
+%patch11 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1124,6 +1132,16 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Dec 7 2011 Jeff Law <law@redhat.com> - 2.14.90-23
+  - Fix a wrong constant in powerpc hypot implementation (#750811)
+    #13534 in python bug database
+    #13472 in glibc bug database
+  - Truncate time values in Linux futimes when falling back to utime
+
+* Mon Dec 5 2011 Jeff Law <law@redhat.com> - 2.14.90-22
+  - Mark fortified __FD_ELT as extension
+  - Fix typo in manual (#708455)
+
 * Wed Nov 30 2011 Jeff Law <law@redhat.com> - 2.14.90-21
   - Don't fail in makedb if SELinux is disabled (#750858)
   - Fix access after end of search string in regex matcher (#757887)
