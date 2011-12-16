@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 23%{?dist}
+Release: 24%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -52,6 +52,8 @@ Patch8: %{name}-fdelt.patch
 Patch9: %{name}-rh708455.patch
 Patch10: %{name}-rh750811.patch
 Patch11: %{name}-rh758252.patch
+Patch12: %{name}-rh767746.patch
+Patch13: %{name}-rh552960.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Obsoletes: nss_db
@@ -280,6 +282,8 @@ rm -rf %{glibcportsdir}
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
+%patch12 -p1
+%patch13 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1132,6 +1136,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Dec 15 2011 Jeff Law <law@redhat.com> - 2.14.90-24
+  - Handle EAGAIN from FUTEX_WAIT_REQUEUE_PI (#552960)
+  - Add {dist}
+  - Correct return value from pthread_create when stack alloction fails.
+
 * Wed Dec 7 2011 Jeff Law <law@redhat.com> - 2.14.90-23
   - Fix a wrong constant in powerpc hypot implementation (#750811)
     #13534 in python bug database
