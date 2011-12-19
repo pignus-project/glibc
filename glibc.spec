@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 24%{?dist}.2
+Release: 24%{?dist}.3
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1138,7 +1138,7 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Sun Dec 18 2011 Jeff Law <law@redhat.com> - 2.14.90-24.fc16.2
+* Sun Dec 18 2011 Jeff Law <law@redhat.com> - 2.14.90-24.fc16.3
   - Check values from TZ file header (#767696)
   - Handle EAGAIN from FUTEX_WAIT_REQUEUE_PI (#552960)
   - Add {dist}.#
