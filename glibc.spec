@@ -54,6 +54,7 @@ Patch10: %{name}-rh750811.patch
 Patch11: %{name}-rh758252.patch
 Patch12: %{name}-rh767746.patch
 Patch13: %{name}-rh552960.patch
+Patch14: %{name}-rh767696.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Obsoletes: nss_db
@@ -284,6 +285,7 @@ rm -rf %{glibcportsdir}
 %patch11 -p1
 %patch12 -p1
 %patch13 -p1
+%patch14 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1136,10 +1138,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri Dec 16 2011 Jeff Law <law@redhat.com> - 2.14.90-24.fc16.1
+* Sun Dec 18 2011 Jeff Law <law@redhat.com> - 2.14.90-24.fc16.1
+  - Check values from TZ file header (#767696)
   - Handle EAGAIN from FUTEX_WAIT_REQUEUE_PI (#552960)
   - Add {dist}.#
   - Correct return value from pthread_create when stack alloction fails.
+    (#767746)
 
 * Wed Dec 7 2011 Jeff Law <law@redhat.com> - 2.14.90-23
   - Fix a wrong constant in powerpc hypot implementation (#750811)
@@ -1148,7 +1152,7 @@ rm -f *.filelist*
   - Truncate time values in Linux futimes when falling back to utime
 
 * Mon Dec 5 2011 Jeff Law <law@redhat.com> - 2.14.90-22
-  - Mark fortified __FD_ELT as extension
+  - Mark fortified __FD_ELT as extension (#761021)
   - Fix typo in manual (#708455)
 
 * Wed Nov 30 2011 Jeff Law <law@redhat.com> - 2.14.90-21
