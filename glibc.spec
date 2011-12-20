@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.14-394-g8f3b1ff
+%define glibcsrcdir glibc-2.14-a4647e7
 %define glibcversion 2.14.90
-%define glibcportsdir glibc-ports-2.14-25-gd3d9bde
+%define glibcportsdir glibc-ports-2.14-4a93ed4
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 24%{?dist}.3
+Release: 25%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -37,24 +37,15 @@ Release: 24%{?dist}.3
 License: LGPLv2+ and LGPLv2+ with exceptions and GPLv2+
 Group: System Environment/Libraries
 URL: http://www.gnu.org/software/glibc/
-Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.xz
-Source1: %{?glibc_release_url}%{glibcportsdir}.tar.xz
-Source2: %{glibcsrcdir}-fedora.tar.xz
+Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.gz
+Source1: %{?glibc_release_url}%{glibcportsdir}.tar.gz
+Source2: %{glibcsrcdir}-fedora.tar.gz
 Patch0: %{name}-fedora.patch
 Patch1: %{name}-ia64-lib64.patch
-Patch2: %{name}-no-leaf-attribute.patch
-Patch3: %{name}-localegrouping.patch
-Patch4: %{name}-arenalock.patch
-Patch5: %{name}-rh757881.patch
-Patch6: %{name}-rh750858.patch
-Patch7: %{name}-rh757887.patch
-Patch8: %{name}-fdelt.patch
-Patch9: %{name}-rh708455.patch
-Patch10: %{name}-rh750811.patch
-Patch11: %{name}-rh758252.patch
-Patch12: %{name}-rh767746.patch
-Patch13: %{name}-rh552960.patch
-Patch14: %{name}-rh767696.patch
+# Uli wants to see this undergo more analyis (what happens when thread B calls into malloc when
+# thread A has unlocked on the error path
+# There's an alternate approach using mmap after detecting an error that needs discussion
+Patch2: %{name}-rh757881.patch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Obsoletes: nss_db
@@ -274,18 +265,6 @@ rm -rf %{glibcportsdir}
 %endif
 %endif
 %patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1138,6 +1117,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Dec 19 2011 Jeff Law <law@redhat.com> - 2.14.90-25.fc17
+  - Update from master (a4647e7).
+
 * Sun Dec 18 2011 Jeff Law <law@redhat.com> - 2.14.90-24.fc16.3
   - Check values from TZ file header (#767696)
   - Handle EAGAIN from FUTEX_WAIT_REQUEUE_PI (#552960)
