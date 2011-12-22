@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.14-a4647e7
+%define glibcsrcdir glibc-2.14-16c6f99
 %define glibcversion 2.14.90
-%define glibcportsdir glibc-ports-2.14-4a93ed4
+%define glibcportsdir glibc-ports-2.14-c2aeee1
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 25%{?dist}
+Release: 26%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -46,6 +46,14 @@ Patch1: %{name}-ia64-lib64.patch
 # thread A has unlocked on the error path
 # There's an alternate approach using mmap after detecting an error that needs discussion
 Patch2: %{name}-rh757881.patch
+# Sent upstream, awaiting responses
+Patch3: %{name}-rh740506.patch
+# Not sure of upstream status
+Patch4: %{name}-rh730856.patch
+# Reverting an upstream patch.  I don't think this has been discussed upstream yet.
+# Caused a variety of problems for Fedora & Debian
+Patch5: %{name}-rh769421.patch
+
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Obsoletes: nss_db
@@ -261,10 +269,13 @@ rm -rf %{glibcportsdir}
 %patch0 -E -p1
 %ifarch ia64
 %if "%{_lib}" == "lib64"
-%patch1 -p1
+#%patch1 -p1
 %endif
 %endif
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1117,6 +1128,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Dec 22 2011 Jeff Law <law@redhat.com> - 2.14.90-26.fc17
+  - Update from master (16c6f99)
+  - Fix typo in recent tzfile change (#769476)
+  - Make MALLOC_ARENA_MAX and MALLOC_ARENA_TEST match documentation (#740506)
+  - Revert "fix" to pthread_cond_wait (#769421)
+  - Extract patch for 730856 from fedora-patch into a distinct patchfile
+
 * Mon Dec 19 2011 Jeff Law <law@redhat.com> - 2.14.90-25.fc17
   - Update from master (a4647e7).
 
