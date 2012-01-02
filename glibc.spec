@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.14-16c6f99
-%define glibcversion 2.14.90
-%define glibcportsdir glibc-ports-2.14-c2aeee1
+%define glibcsrcdir glibc-2.15-a316c1f
+%define glibcversion 2.15
+%define glibcportsdir glibc-ports-2.15-8a70b2d
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 26%{?dist}
+Release: 1%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -269,7 +269,7 @@ rm -rf %{glibcportsdir}
 %patch0 -E -p1
 %ifarch ia64
 %if "%{_lib}" == "lib64"
-#%patch1 -p1
+%patch1 -p1
 %endif
 %endif
 %patch2 -p1
@@ -1128,6 +1128,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Jan 1 2012 Jeff Law <law@redhat.com> - 2.15-1.fc17
+  - Update from master (a316c1f)
+
 * Thu Dec 22 2011 Jeff Law <law@redhat.com> - 2.14.90-26.fc17
   - Update from master (16c6f99)
   - Fix typo in recent tzfile change (#769476)

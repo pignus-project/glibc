@@ -1,7 +1,7 @@
-diff -rup a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S
---- a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S	2011-12-22 18:04:12.937212834 +0000
-+++ b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S	2011-12-22 18:04:42.104222278 +0000
-@@ -137,7 +137,6 @@ __pthread_cond_wait:
+diff -rNup a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S
+--- a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S	2012-01-01 05:16:32.000000000 -0700
++++ b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S	2012-01-01 13:11:35.782727180 -0700
+@@ -134,7 +134,6 @@ __pthread_cond_wait:
  	cmpl	$PI_BIT, %eax
  	jne	18f
  
@@ -9,7 +9,7 @@ diff -rup a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S b/nptl/sy
  	movl	$(FUTEX_WAIT_REQUEUE_PI|FUTEX_PRIVATE_FLAG), %ecx
  	movl	%ebp, %edx
  	xorl	%esi, %esi
-@@ -151,9 +150,6 @@ __pthread_cond_wait:
+@@ -148,9 +147,6 @@ __pthread_cond_wait:
  	sete	16(%esp)
  	je	19f
  
@@ -19,7 +19,7 @@ diff -rup a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S b/nptl/sy
  	/* Normal and PI futexes dont mix. Use normal futex functions only
  	   if the kernel does not support the PI futex functions.  */
  	cmpl	$-ENOSYS, %eax
-@@ -398,78 +394,6 @@ __pthread_cond_wait:
+@@ -395,78 +391,6 @@ __pthread_cond_wait:
  #endif
  	call	__lll_unlock_wake
  	jmp	11b
@@ -98,7 +98,7 @@ diff -rup a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S b/nptl/sy
  	.size	__pthread_cond_wait, .-__pthread_cond_wait
  versioned_symbol (libpthread, __pthread_cond_wait, pthread_cond_wait,
  		  GLIBC_2_3_2)
-@@ -642,10 +566,6 @@ __condvar_w_cleanup:
+@@ -639,10 +563,6 @@ __condvar_w_cleanup:
  	.long	.LcleanupEND-.Lsub_cond_futex
  	.long	__condvar_w_cleanup-.LSTARTCODE
  	.uleb128  0
@@ -109,19 +109,18 @@ diff -rup a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S b/nptl/sy
  	.long	.LcallUR-.LSTARTCODE
  	.long	.LENDCODE-.LcallUR
  	.long	0
-Only in b/nptl/sysdeps/unix/sysv/linux/i386/i486: pthread_cond_wait.S.orig
-diff -rup a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
---- a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S	2011-12-22 18:04:12.941212837 +0000
-+++ b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S	2011-12-22 18:05:05.155229737 +0000
-@@ -23,7 +23,6 @@
- #include <lowlevelcond.h>
+diff -rNup a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
+--- a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S	2012-01-01 05:16:32.000000000 -0700
++++ b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S	2012-01-01 13:12:04.609729109 -0700
+@@ -24,6 +24,7 @@
  #include <tcb-offsets.h>
  #include <pthread-pi-defines.h>
--#include <pthread-errnos.h>
- #include <stap-probe.h>
+ #include <pthread-errnos.h>
++#include <stap-probe.h>
  
  #include <kernel-features.h>
-@@ -137,14 +136,11 @@ __pthread_cond_wait:
+ 
+@@ -134,14 +135,11 @@ __pthread_cond_wait:
  	cmpl	$PI_BIT, %eax
  	jne	61f
  
@@ -136,7 +135,7 @@ diff -rup a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/nptl/sysde
  #ifdef __ASSUME_REQUEUE_PI
  	jmp	62f
  #else
-@@ -331,70 +327,6 @@ __pthread_cond_wait:
+@@ -328,70 +326,6 @@ __pthread_cond_wait:
  
  13:	movq	%r10, %rax
  	jmp	14b
@@ -207,7 +206,7 @@ diff -rup a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/nptl/sysde
  	.size	__pthread_cond_wait, .-__pthread_cond_wait
  versioned_symbol (libpthread, __pthread_cond_wait, pthread_cond_wait,
  		  GLIBC_2_3_2)
-@@ -547,15 +479,11 @@ __condvar_cleanup1:
+@@ -544,15 +478,11 @@ __condvar_cleanup1:
  	.uleb128 .LcleanupSTART-.LSTARTCODE
  	.uleb128 .LcleanupEND-.LcleanupSTART
  	.uleb128 __condvar_cleanup1-.LSTARTCODE
@@ -225,5 +224,3 @@ diff -rup a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/nptl/sysde
  .Lcstend:
  
  
-Only in b/nptl/sysdeps/unix/sysv/linux/x86_64: pthread_cond_wait.S.orig
-Only in b/nptl/sysdeps/unix/sysv/linux/x86_64: pthread_cond_wait.S.rej
