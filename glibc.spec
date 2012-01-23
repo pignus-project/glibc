@@ -54,6 +54,8 @@ Patch4: %{name}-rh730856.patch
 # Caused a variety of problems for Fedora & Debian
 Patch5: %{name}-rh769421.patch
 Patch6: %{name}-rh729661.patch
+Patch7: %{name}-rh446078.patch
+Patch8: %{name}-rh454629.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -278,6 +280,8 @@ rm -rf %{glibcportsdir}
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
+%patch8 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1132,6 +1136,8 @@ rm -f *.filelist*
 %changelog
 * Mon Jan 23 2012 Jeff Law <law@redhat.com> - 2.15-3
   - Fix cycle detection (#729661)
+  - Fix first workday/weekday for it_IT (#446078)
+  - Fix first workday/weekday for ca_ES (#454629)
 
 * Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.15-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
