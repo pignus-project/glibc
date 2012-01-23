@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 2%{?dist}
+Release: 3%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -53,6 +53,7 @@ Patch4: %{name}-rh730856.patch
 # Reverting an upstream patch.  I don't think this has been discussed upstream yet.
 # Caused a variety of problems for Fedora & Debian
 Patch5: %{name}-rh769421.patch
+Patch6: %{name}-rh729661.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -276,6 +277,7 @@ rm -rf %{glibcportsdir}
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1128,6 +1130,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jan 23 2012 Jeff Law <law@redhat.com> - 2.15-3
+  - Fix cycle detection (#729661)
+
 * Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.15-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
