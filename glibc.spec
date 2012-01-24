@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.15-a316c1f
 %define glibcversion 2.15
-%define glibcportsdir glibc-ports-2.15-8a70b2d
+%define glibcportsdir glibc-ports-2.15-ad8ae7d
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 3%{?dist}
+Release: 4%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1134,6 +1134,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jan 24 2012 Jeff Law <law@redhat.com> - 2.15-4
+  - Update ports from master.
+
 * Mon Jan 23 2012 Jeff Law <law@redhat.com> - 2.15-3
   - Fix cycle detection (#729661)
   - Fix first workday/weekday for it_IT (#446078)
