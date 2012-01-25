@@ -56,6 +56,8 @@ Patch5: %{name}-rh769421.patch
 Patch6: %{name}-rh729661.patch
 Patch7: %{name}-rh446078.patch
 Patch8: %{name}-rh454629.patch
+Patch9: %{name}-rh784402.patch
+Patch10: %{name}-rh622499.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -282,6 +284,8 @@ rm -rf %{glibcportsdir}
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
+%patch10 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1136,6 +1140,9 @@ rm -f *.filelist*
 %changelog
 * Tue Jan 24 2012 Jeff Law <law@redhat.com> - 2.15-4
   - Update ports from master.
+  - Fix first workday/weekday for it_IT (#622499)
+  - Fix type to uint16_t based on upstream comments (729661)
+  - Do not cache negative results in nscd if these are transient (#784402)
 
 * Mon Jan 23 2012 Jeff Law <law@redhat.com> - 2.15-3
   - Fix cycle detection (#729661)

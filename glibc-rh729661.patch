@@ -6,7 +6,7 @@ diff -rup a/elf/dl-deps.c b/elf/dl-deps.c
  	 of the search list.  */
        i = 1;
 -      char seen[nlist];
-+      unsigned short seen[nlist];
++      uint16_t seen[nlist];
        memset (seen, 0, nlist * sizeof (seen[0]));
        while (1)
  	{
@@ -22,7 +22,7 @@ diff -rup a/elf/dl-deps.c b/elf/dl-deps.c
  			}
  
 -		      char this_seen = seen[i];
-+		      unsigned short this_seen = seen[i];
++		      uint16_t this_seen = seen[i];
  		      memmove (&seen[i], &seen[i + 1],
  			       (k - i) * sizeof (seen[0]));
  		      seen[k] = this_seen;
@@ -34,7 +34,7 @@ diff -rup a/elf/dl-fini.c b/elf/dl-fini.c
       of the search list for the main namespace.  */
    unsigned int i = ns == LM_ID_BASE;
 -  char seen[nmaps];
-+  unsigned short seen[nmaps];
++  uint16_t seen[nmaps];
    memset (seen, 0, nmaps * sizeof (seen[0]));
    while (1)
      {
@@ -50,7 +50,7 @@ diff -rup a/elf/dl-fini.c b/elf/dl-fini.c
  		    }
  
 -		  char this_seen = seen[i];
-+		  unsigned short this_seen = seen[i];
++		  uint16_t this_seen = seen[i];
  		  memmove (&seen[i], &seen[i + 1], (k - i) * sizeof (seen[0]));
  		  seen[k] = this_seen;
  
