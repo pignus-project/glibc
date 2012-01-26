@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 5%{?dist}
+Release: 6%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -61,6 +61,7 @@ Patch10: %{name}-rh784402.patch
 Patch11: %{name}-rh622499.patch
 # Depends on systemtap infrastructure, so can't go upstream
 Patch12: %{name}-rh179072.patch
+Patch13: %{name}-rh697421.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -291,6 +292,7 @@ rm -rf %{glibcportsdir}
 %patch10 -p1
 %patch11 -p1
 %patch12 -p1
+%patch13 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1143,6 +1145,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jan 26 2012 Jeff Law <law@redhat.com> - 2.15-6
+  - Add aliases for ISO-10646-UCS-2 (#697421)
+
 * Tue Jan 24 2012 Jeff Law <law@redhat.com> - 2.15-4
   - Update ports from master.
   - Fix first workday/weekday for it_IT (#622499)
