@@ -41,23 +41,24 @@ Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.gz
 Source1: %{?glibc_release_url}%{glibcportsdir}.tar.gz
 Source2: %{glibcsrcdir}-fedora.tar.gz
 Patch0: %{name}-fedora.patch
-Patch1: %{name}-ia64-lib64.patch
+Patch1: %{name}-stap.patch
+Patch2: %{name}-ia64-lib64.patch
 # Uli wants to see this undergo more analyis (what happens when thread B calls into malloc when
 # thread A has unlocked on the error path
 # There's an alternate approach using mmap after detecting an error that needs discussion
-Patch2: %{name}-rh757881.patch
+Patch3: %{name}-rh757881.patch
 # Sent upstream, awaiting responses
-Patch3: %{name}-rh740506.patch
+Patch4: %{name}-rh740506.patch
 # Not sure of upstream status
-Patch4: %{name}-rh730856.patch
+Patch5: %{name}-rh730856.patch
 # Reverting an upstream patch.  I don't think this has been discussed upstream yet.
 # Caused a variety of problems for Fedora & Debian
-Patch5: %{name}-rh769421.patch
-Patch6: %{name}-rh729661.patch
-Patch7: %{name}-rh446078.patch
-Patch8: %{name}-rh454629.patch
-Patch9: %{name}-rh784402.patch
-Patch10: %{name}-rh622499.patch
+Patch6: %{name}-rh769421.patch
+Patch7: %{name}-rh729661.patch
+Patch8: %{name}-rh446078.patch
+Patch9: %{name}-rh454629.patch
+Patch10: %{name}-rh784402.patch
+Patch11: %{name}-rh622499.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -272,12 +273,12 @@ package or when debugging this package.
 rm -rf %{glibcportsdir}
 %setup -q -n %{glibcsrcdir} -b1 -b2
 %patch0 -E -p1
+%patch1 -E -p1
 %ifarch ia64
 %if "%{_lib}" == "lib64"
-%patch1 -p1
-%endif
-%endif
 %patch2 -p1
+%endif
+%endif
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
@@ -286,6 +287,7 @@ rm -rf %{glibcportsdir}
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
+%patch11 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
