@@ -2,7 +2,7 @@
 %define glibcversion 2.15
 %define glibcportsdir glibc-ports-2.15-ad8ae7d
 ### glibc.spec.in follows:
-%define run_glibc_tests 0
+%define run_glibc_tests 1
 %define auxarches athlon alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -62,6 +62,7 @@ Patch11: %{name}-rh622499.patch
 # Depends on systemtap infrastructure, so can't go upstream
 Patch12: %{name}-rh179072.patch
 Patch13: %{name}-rh697421.patch
+Patch14: %{name}-rh740682.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -293,6 +294,7 @@ rm -rf %{glibcportsdir}
 %patch11 -p1
 %patch12 -p1
 %patch13 -p1
+%patch14 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1146,6 +1148,7 @@ rm -f *.filelist*
 
 %changelog
 * Thu Jan 26 2012 Jeff Law <law@redhat.com> - 2.15-6
+  - First argument to settimeofday can be null (#740682)
   - Add aliases for ISO-10646-UCS-2 (#697421)
 
 * Tue Jan 24 2012 Jeff Law <law@redhat.com> - 2.15-4
