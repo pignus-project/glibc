@@ -2,7 +2,7 @@
 %define glibcversion 2.15
 %define glibcportsdir glibc-ports-2.15-ad8ae7d
 ### glibc.spec.in follows:
-%define run_glibc_tests 1
+%define run_glibc_tests 0
 %define auxarches athlon alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -59,6 +59,8 @@ Patch8: %{name}-rh446078.patch
 Patch9: %{name}-rh454629.patch
 Patch10: %{name}-rh784402.patch
 Patch11: %{name}-rh622499.patch
+# Depends on systemtap infrastructure, so can't go upstream
+Patch12: %{name}-rh179072.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -288,6 +290,7 @@ rm -rf %{glibcportsdir}
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
+%patch12 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
