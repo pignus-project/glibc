@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 7%{?dist}
+Release: 8%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -47,7 +47,7 @@ Patch2: %{name}-ia64-lib64.patch
 # thread A has unlocked on the error path
 # There's an alternate approach using mmap after detecting an error that needs discussion
 Patch3: %{name}-rh757881.patch
-# Sent upstream, awaiting responses
+# From upstream.
 Patch4: %{name}-rh740506.patch
 # Not sure of upstream status
 Patch5: %{name}-rh730856.patch
@@ -1152,6 +1152,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Feb 1 2012 Jeff Law <law@redhat.com> - 2.15-8
+  - Use upstream variant of fix for 740506.
+
 * Sun Jan 29 2012 Jeff Law <law@redhat.com> - 2.15-7
   - Sort objects before relocations (sw#13618)
   - Fix bogus sort code that was copied from dl-deps.c.
