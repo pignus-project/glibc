@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 11%{?dist}
+Release: 12%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -74,6 +74,8 @@ Patch19: %{name}-rh787201.patch
 Patch20: %{name}-rh741105.patch
 # Sent upstream, awaiting feedback
 Patch21: %{name}-rh770869.patch
+# Sent upstream, awaiting feedback
+Patch22: %{name}-rh691912.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -313,6 +315,7 @@ rm -rf %{glibcportsdir}
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
+%patch22 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1165,7 +1168,8 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri Feb 3 2012 Jeff Law <law@redhat.com> - 2.15-11
+* Fri Feb 3 2012 Jeff Law <law@redhat.com> - 2.15-12
+  - Add fedfs to /etc/rpc (#691912)
   - Run nscd in the foreground w/ syslogging, fix systemd config (#770869)
   - Avoid mapping past end of shared object (#741105)
   - Turn off -mno-minimal-toc on PPC (#787201)
