@@ -1,15 +1,3 @@
-diff -rup a/localedata/locales/pt_PT b/localedata/locales/pt_PT
---- a/localedata/locales/pt_PT	2006-07-30 16:19:43.000000000 -0600
-+++ b/localedata/locales/pt_PT	2012-01-30 20:54:30.530231851 -0700
-@@ -65,7 +65,7 @@ END LC_MESSAGES
- LC_MONETARY
- int_curr_symbol           "<U0045><U0055><U0052><U0020>"
- currency_symbol           "<U20AC>"
--mon_decimal_point         "<U0024>"
-+mon_decimal_point         "<U002C>"
- mon_thousands_sep         "<U002E>"
- mon_grouping              3;3
- positive_sign             ""
 diff -rup a/localedata/locales/zh_CN b/localedata/locales/zh_CN
 --- a/localedata/locales/zh_CN	2006-07-30 16:19:43.000000000 -0600
 +++ b/localedata/locales/zh_CN	2012-01-30 21:24:46.905115483 -0700
