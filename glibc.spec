@@ -2,7 +2,7 @@
 %define glibcversion 2.15
 %define glibcportsdir glibc-ports-2.15-ad8ae7d
 ### glibc.spec.in follows:
-%define run_glibc_tests 1
+%define run_glibc_tests 0
 %define auxarches athlon alphaev6
 %define xenarches i686 athlon
 %ifarch %{xenarches}
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 12%{?dist}
+Release: 13%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -76,6 +76,9 @@ Patch20: %{name}-rh741105.patch
 Patch21: %{name}-rh770869.patch
 # Sent upstream, awaiting feedback
 Patch22: %{name}-rh691912.patch
+# Not necessary to send upstream
+Patch23: %{name}-rh688948.patch
+
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -316,6 +319,7 @@ rm -rf %{glibcportsdir}
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
+%patch23 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1168,6 +1172,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Feb 6 2012 Jeff Law <law@redhat.com> - 2.15-13
+  - More accurately detect if we're in a chroot (#688948)
+
 * Fri Feb 3 2012 Jeff Law <law@redhat.com> - 2.15-12
   - Add fedfs to /etc/rpc (#691912)
   - Run nscd in the foreground w/ syslogging, fix systemd config (#770869)
