@@ -1,0 +1,32 @@
+diff -rup a/sunrpc/rpc_main.c b/sunrpc/rpc_main.c
+--- a/sunrpc/rpc_main.c	2012-01-01 05:16:32.000000000 -0700
++++ b/sunrpc/rpc_main.c	2012-02-07 11:06:16.479796121 -0700
+@@ -77,6 +77,7 @@ static const char *cmdname;
+ 
+ #define SVR4_CPP "/usr/ccs/lib/cpp"
+ #define SUNOS_CPP "/lib/cpp"
++#define USR_LIB_CPP "/usr/bin/cpp"
+ 
+ static const char *svcclosetime = "120";
+ static int cppDefined;	/* explicit path for C preprocessor */
+@@ -343,12 +344,16 @@ find_cpp (void)
+ 	  crash ();
+ 	}
+       else
+-	{			/* try the other one */
++	{			/* try the other ones */
+ 	  CPP = SVR4_CPP;
+ 	  if (stat (CPP, &buf) < 0)
+-	    {			/* can't find any cpp */
+-	      fputs (_ ("cannot find any C preprocessor (cpp)\n"), stdout);
+-	      crash ();
++	    {
++	      CPP = USR_LIB_CPP;
++	      if (stat (CPP, &buf) < 0)
++		{			/* can't find any cpp */
++		  fputs (_ ("cannot find any C preprocessor (cpp)\n"), stdout);
++		  crash ();
++		}
+ 	    }
+ 	}
+     }
