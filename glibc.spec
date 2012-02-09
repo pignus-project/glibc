@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 14%{?dist}
+Release: 16%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -78,6 +78,8 @@ Patch21: %{name}-rh770869.patch
 Patch22: %{name}-rh691912.patch
 # Not necessary to send upstream
 Patch23: %{name}-rh688948.patch
+# Rakesh & Pravin will send upstream
+Patch24: %{name}-rh770439.patch
 
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -320,6 +322,7 @@ rm -rf %{glibcportsdir}
 %patch21 -p1
 %patch22 -p1
 %patch23 -p1
+%patch24 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1172,6 +1175,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Feb 7 2012 Jeff Law <law@redhat.com> - 2.15-16
+  - Fix weekday names in Kashmiri locale (#770439)
+
 * Tue Feb 7 2012 Jeff Law <law@redhat.com> - 2.15-15
   - Remove change for 787662, correct fix is in gcc.
 
