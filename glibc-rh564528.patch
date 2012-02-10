@@ -1,0 +1,38 @@
+diff -rup a/localedata/locales/ru_UA b/localedata/locales/ru_UA
+--- a/localedata/locales/ru_UA	2012-01-01 05:16:32.000000000 -0700
++++ b/localedata/locales/ru_UA	2012-02-09 22:57:29.698433625 -0700
+@@ -141,6 +141,8 @@ t_fmt_ampm ""
+ date_fmt       "<U0025><U0061><U0020><U0025><U0062><U0020><U0025><U0065>/
+ <U0020><U0025><U0048><U003A><U0025><U004D><U003A><U0025><U0053><U0020>/
+ <U0025><U005A><U0020><U0025><U0059>"
++first_weekday 2
++first_workday 2
+ END LC_TIME
+ 
+ LC_PAPER
+diff -rup a/localedata/locales/uk_UA b/localedata/locales/uk_UA
+--- a/localedata/locales/uk_UA	2012-01-01 05:16:32.000000000 -0700
++++ b/localedata/locales/uk_UA	2012-02-09 22:32:36.864134146 -0700
+@@ -700,7 +700,7 @@ LC_MONETARY
+ % 200 hrv. - 200 hryven (money)
+ 
+ % the local currency symbol
+-currency_symbol           "<U0433><U0440>" % hr (hryvnya)
++currency_symbol           "<U0433><U0440><U043D><U002E>" % hr (hryvnya)
+ 
+ % This must be a 4-character string containing the international currency
+ % symbol as defined by the ISO 4217 standard (three characters) followed
+Only in b/localedata/locales: uk_UA.orig
+Only in b/localedata/locales: uk_UA.rej
+diff -rup a/manual/stdio.texi b/manual/stdio.texi
+--- a/manual/stdio.texi	2012-01-01 05:16:32.000000000 -0700
++++ b/manual/stdio.texi	2012-02-09 23:46:31.660912211 -0700
+@@ -2324,6 +2324,8 @@ the @var{size} argument specifies the ma
+ produce.  The trailing null character is counted towards this limit, so
+ you should allocate at least @var{size} characters for the string @var{s}.
+ 
++The trailing null byte is added to @var{s}, unless @var{size} is zero.
++
+ The return value is the number of characters which would be generated
+ for the given input, excluding the trailing null.  If this value is
+ greater or equal to @var{size}, not all characters from the result have

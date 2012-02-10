@@ -84,6 +84,8 @@ Patch24: %{name}-rh770439.patch
 Patch25: %{name}-rh789209.patch
 # Was acked in the upstream BZ, but patch never got installed
 Patch26: %{name}-rh624296.patch
+# Needs to be sent upstream
+Patch27: %{name}-rh564528.patch
 
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -329,6 +331,7 @@ rm -rf %{glibcportsdir}
 %patch24 -p1
 %patch25 -p1
 %patch26 -p1
+%patch27 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1182,6 +1185,7 @@ rm -f *.filelist*
 
 %changelog
 * Fri Feb 8 2012 Jeff Law <law@redhat.com> - 2.15-17
+  - Clarify info page for snprintf (#564528)
   - Fix first_weekday and first_workday for ru_UA (#624296)
 
 * Tue Feb 7 2012 Jeff Law <law@redhat.com> - 2.15-16
