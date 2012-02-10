@@ -82,6 +82,8 @@ Patch23: %{name}-rh688948.patch
 Patch24: %{name}-rh770439.patch
 # Sent upstream
 Patch25: %{name}-rh789209.patch
+# Was acked in the upstream BZ, but patch never got installed
+Patch26: %{name}-rh624296.patch
 
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -326,6 +328,7 @@ rm -rf %{glibcportsdir}
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1
+%patch26 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1178,6 +1181,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb 8 2012 Jeff Law <law@redhat.com> - 2.15-17
+  - Fix first_weekday and first_workday for ru_UA (#624296)
+
 * Tue Feb 7 2012 Jeff Law <law@redhat.com> - 2.15-16
   - Fix currency_symbol for uk_UA (#789209)
   - Fix weekday names in Kashmiri locale (#770439)
