@@ -1,0 +1,16 @@
+2012-01-01  Ashish Shah  <ashishks@redhat.com>
+
+	* locales/uk_UA (currency_symbol): Fix.
+
+
+--- glibc-2.5-20061008T1257.orig/localedata/locales/uk_UA	2010-09-30 17:42:09.000000000 +0530
++++ glibc-2.5-20061008T1257.orig/localedata/locales/uk_UA	2010-09-30 17:42:34.000000000 +0530
+@@ -88,7 +88,7 @@ 
+ 
+ LC_MONETARY
+ int_curr_symbol           "<U0055><U0041><U0048><U0020>"
+-currency_symbol           "<U0433><U0440>"
++currency_symbol           "<U0433><U0440><U043D><U002E>"
+ mon_decimal_point         "<U002E>"
+ mon_thousands_sep         "<U0020>"
+ mon_grouping              3;3

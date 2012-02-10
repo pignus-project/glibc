@@ -80,6 +80,8 @@ Patch22: %{name}-rh691912.patch
 Patch23: %{name}-rh688948.patch
 # Rakesh & Pravin will send upstream
 Patch24: %{name}-rh770439.patch
+# Sent upstream
+Patch25: %{name}-rh789209.patch
 
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -323,6 +325,7 @@ rm -rf %{glibcportsdir}
 %patch22 -p1
 %patch23 -p1
 %patch24 -p1
+%patch25 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1176,6 +1179,7 @@ rm -f *.filelist*
 
 %changelog
 * Tue Feb 7 2012 Jeff Law <law@redhat.com> - 2.15-16
+  - Fix currency_symbol for uk_UA (#789209)
   - Fix weekday names in Kashmiri locale (#770439)
 
 * Tue Feb 7 2012 Jeff Law <law@redhat.com> - 2.15-15
