@@ -51,8 +51,9 @@ Patch3: %{name}-rh757881.patch
 Patch4: %{name}-rh740506.patch
 # Not sure of upstream status
 Patch5: %{name}-rh730856.patch
-# Follow-on to 552960's original patch to avoid losing wakeups
-Patch6: %{name}-rh552960-2.patch
+# Reverting an upstream patch.  I don't think this has been discussed upstream yet.
+# Caused a variety of problems for Fedora & Debian
+Patch6: %{name}-rh769421.patch
 Patch7: %{name}-rh729661.patch
 Patch8: %{name}-rh446078.patch
 Patch9: %{name}-rh454629.patch
@@ -1193,7 +1194,6 @@ rm -f *.filelist*
   - Add mni_IN (#790298)
 
 * Fri Feb 8 2012 Jeff Law <law@redhat.com> - 2.15-17
-  - Fix lost wakeups in pthread_cond_*.  (#552960, #769421)
   - Clarify info page for snprintf (#564528)
   - Fix first_weekday and first_workday for ru_UA (#624296)
 
