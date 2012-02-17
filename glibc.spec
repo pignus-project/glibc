@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 18%{?dist}
+Release: 19%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -90,6 +90,8 @@ Patch27: %{name}-rh564528.patch
 Patch28: %{name}-rh790292.patch
 Patch29: %{name}-rh790298.patch
 Patch30: %{name}-rh791161.patch
+# Aurelien submitted upstream, Uli has largely ignored
+Patch31 : %{name}-rh730856.patch
 
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -339,6 +341,7 @@ rm -rf %{glibcportsdir}
 %patch28 -p1
 %patch29 -p1
 %patch30 -p1
+%patch31 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1191,6 +1194,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb 17 2012 Jeff Law <law@redhat.com> - 2.15-19
+  - Fix reply buffer mismanagement in resolver (#730856)
+
 * Thu Feb 16 2012 Jeff Law <law@redhat.com> - 2.15-18
   - Revert 552960/769421 changes again, still causing problems.
   - Add doi_IN (#791161)
