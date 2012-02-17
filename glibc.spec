@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 20%{?dist}
+Release: 21%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -94,6 +94,8 @@ Patch29: %{name}-rh790298.patch
 Patch30: %{name}-rh791161.patch
 # Submitted upstream BZ 12377
 Patch31 : %{name}-rh697149.patch
+# Submitted upstream BZ 9954
+Patch32 : %{name}-rh739743.patch
 
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -344,6 +346,7 @@ rm -rf %{glibcportsdir}
 %patch29 -p1
 %patch30 -p1
 %patch31 -p1
+%patch32 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1196,6 +1199,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb 17 2012 Jeff Law <law@redhat.com> - 2.15-21
+  - Correctly identify all 127.x.y.z addresses (#739743)
+  - Don't assign native result if result has no associated interface (#739743)
+
 * Fri Feb 17 2012 Jeff Law <law@redhat.com> - 2.15-20
   - Ignore link-local IPV6 addresses for AI_ADDRCONFIG (#697149)
 
