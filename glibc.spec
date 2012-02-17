@@ -49,7 +49,7 @@ Patch2: %{name}-ia64-lib64.patch
 Patch3: %{name}-rh757881.patch
 # From upstream.
 Patch4: %{name}-rh740506.patch
-# Not sure of upstream status
+# Aurelien submitted upstream, Uli has largely ignored
 Patch5: %{name}-rh730856.patch
 # Reverting an upstream patch.  I don't think this has been discussed upstream yet.
 # Caused a variety of problems for Fedora & Debian
@@ -92,10 +92,8 @@ Patch28: %{name}-rh790292.patch
 Patch29: %{name}-rh790298.patch
 # Submitted upstream BZ 13698
 Patch30: %{name}-rh791161.patch
-# Aurelien submitted upstream, Uli has largely ignored
-Patch31 : %{name}-rh730856.patch
 # Submitted upstream BZ 12377
-Patch32 : %{name}-rh697149.patch
+Patch31 : %{name}-rh697149.patch
 
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -346,7 +344,6 @@ rm -rf %{glibcportsdir}
 %patch29 -p1
 %patch30 -p1
 %patch31 -p1
-%patch32 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
