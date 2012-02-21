@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 22%{?dist}
+Release: 23%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -98,6 +98,8 @@ Patch31 : %{name}-rh697149.patch
 Patch32 : %{name}-rh739743.patch
 # Discussion started upstream, patch needs to be submitted
 Patch33 : %{name}-rh789238.patch
+# Patch posted upstream, discussion ongoing, Paul E. seems to think it's OK
+Patch34 : %{name}-rh794797.patch
 
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -350,6 +352,7 @@ rm -rf %{glibcportsdir}
 %patch31 -p1
 %patch32 -p1
 %patch33 -p1
+%patch34 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1202,6 +1205,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Feb 20 2012 Jeff Law <law@redhat.com> - 2.15-23
+  - Avoid "nargs" integer overflow which could be used to bypass FORTIFY_SOURCE (#794797)
+
 * Mon Feb 20 2012 Jeff Law <law@redhat.com> - 2.15-22
   - Fix main arena locking in malloc/calloc retry path (#789238)
 
