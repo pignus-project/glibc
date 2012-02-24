@@ -105,7 +105,7 @@ Patch35 : %{name}-rh788989.patch
 # Posted upstream
 Patch36 : %{name}-rh795498.patch
 # Posted upstream (bz 13705)
-Patch37 : %{name}-rh795498.patch
+Patch37 : %{name}-rh760935.patch
 
 
 
