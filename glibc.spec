@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 23%{?dist}
+Release: 24%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -100,6 +100,13 @@ Patch32 : %{name}-rh739743.patch
 Patch33 : %{name}-rh789238.patch
 # Patch posted upstream, discussion ongoing, Paul E. seems to think it's OK
 Patch34 : %{name}-rh794797.patch
+# Posted upstream
+Patch35 : %{name}-rh788989.patch
+# Posted upstream
+Patch36 : %{name}-rh795498.patch
+# Posted upstream (bz 13705)
+Patch37 : %{name}-rh795498.patch
+
 
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -353,6 +360,9 @@ rm -rf %{glibcportsdir}
 %patch32 -p1
 %patch33 -p1
 %patch34 -p1
+%patch35 -p1
+%patch36 -p1
+%patch37 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1205,6 +1215,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb 24 2012 Jeff Law <law@redhat.com> - 2.15-24
+  - Fix bogus underflow (#760935)
+  - Correctly handle dns request where large numbers of A and AAA records
+    are returned (#795498)
+  - Fix nscd crash when group has many members (#788959)
+ 
 * Mon Feb 20 2012 Jeff Law <law@redhat.com> - 2.15-23
   - Avoid "nargs" integer overflow which could be used to bypass FORTIFY_SOURCE (#794797)
 
