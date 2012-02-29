@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 24%{?dist}
+Release: 25%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -106,6 +106,8 @@ Patch35 : %{name}-rh788989.patch
 Patch36 : %{name}-rh795498.patch
 # Posted upstream (bz 13705)
 Patch37 : %{name}-rh760935.patch
+# Approved upstream, waiting for privs to commit
+Patch38 : %{name}-rh798471.patch
 
 
 
@@ -363,6 +365,7 @@ rm -rf %{glibcportsdir}
 %patch35 -p1
 %patch36 -p1
 %patch37 -p1
+%patch38 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1215,6 +1218,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Feb 29 2012 Jeff Law <law@redhat.com> - 2.15-25
+  - Fix out of bounds memory access in resolver (#798471)
+
 * Fri Feb 24 2012 Jeff Law <law@redhat.com> - 2.15-24
   - Fix bogus underflow (#760935)
   - Correctly handle dns request where large numbers of A and AAA records
