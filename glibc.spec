@@ -1220,6 +1220,7 @@ rm -f *.filelist*
 %changelog
 * Wed Feb 29 2012 Jeff Law <law@redhat.com> - 2.15-25
   - Fix out of bounds memory access in resolver (#798471)
+  - Always mark vDSO as used (#758888)
 
 * Fri Feb 24 2012 Jeff Law <law@redhat.com> - 2.15-24
   - Fix bogus underflow (#760935)
