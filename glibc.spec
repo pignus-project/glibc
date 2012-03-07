@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 25%{?dist}
+Release: 26%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -98,18 +98,22 @@ Patch31 : %{name}-rh697149.patch
 Patch32 : %{name}-rh739743.patch
 # Discussion started upstream, patch needs to be submitted
 Patch33 : %{name}-rh789238.patch
-# Patch posted upstream, discussion ongoing, Paul E. seems to think it's OK
+# From upstream 
 Patch34 : %{name}-rh794797.patch
 # Posted upstream
 Patch35 : %{name}-rh788989.patch
 # Posted upstream
 Patch36 : %{name}-rh795498.patch
-# Posted upstream (bz 13705)
+# From upstream
 Patch37 : %{name}-rh760935.patch
-# Approved upstream, waiting for privs to commit
+# From upstream
 Patch38 : %{name}-rh798471.patch
-
-
+# From upstream
+Patch39 : %{name}-rh758888.patch
+# Submitted upstream BZ 13818
+Patch40 : %{name}-rh800224.patch
+# From upstream
+Patch41 : %{name}-rh794797-2.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -366,6 +370,9 @@ rm -rf %{glibcportsdir}
 %patch36 -p1
 %patch37 -p1
 %patch38 -p1
+%patch39 -p1
+%patch40 -p1
+%patch41 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1218,6 +1225,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Feb 29 2012 Jeff Law <law@redhat.com> - 2.15-26
+  - Set errno properly in vfprintf (#794797)
+  - Don't kill application when LD_PROFILE is set. (#800224)
+
 * Wed Feb 29 2012 Jeff Law <law@redhat.com> - 2.15-25
   - Fix out of bounds memory access in resolver (#798471)
   - Always mark vDSO as used (#758888)
@@ -1226,7 +1237,7 @@ rm -f *.filelist*
   - Fix bogus underflow (#760935)
   - Correctly handle dns request where large numbers of A and AAA records
     are returned (#795498)
-  - Fix nscd crash when group has many members (#788959)
+  - Fix nscd crash when group has many members (#788989)
  
 * Mon Feb 20 2012 Jeff Law <law@redhat.com> - 2.15-23
   - Avoid "nargs" integer overflow which could be used to bypass FORTIFY_SOURCE (#794797)
