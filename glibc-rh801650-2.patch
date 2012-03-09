@@ -8,26 +8,19 @@ Date:   Thu Jan 26 09:45:54 2012 -0500
     The math routines might since gcc perhaps generates such code.
     Introduce bit_YMM_USBALE and use it in the math routines.
 
-diff --git a/ChangeLog b/ChangeLog
-index 1e2284f..b413d27 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -2,8 +2,17 @@
- 
  	[BZ #13583]
  	* sysdeps/x86_64/multiarch/init-arch.h: Define bit_OSXSAVE.
-+	Clean up HAS_* macros.
+	Clean up HAS_* macros.
  	* sysdeps/x86_64/multiarch/init-arch.c (__init_cpu_features): If
--	bit_AVX is set also check OSXAVE/XCR0 and reset bit_AVX if necessary.
-+	bit_AVX is set also check OSXAVE/XCR0 and set bit_YMM_Usable if
-+	possible.
-+	* sysdeps/x86_64/fpu/multiarch/e_atan2.c: Use HAS_YMM_USABLE, not
-+	HAS_AVX.
-+	* sysdeps/x86_64/fpu/multiarch/e_exp.c: Likewise.
-+	* sysdeps/x86_64/fpu/multiarch/e_log.c: Likewise.
-+	* sysdeps/x86_64/fpu/multiarch/s_atan.c: Likewise.
-+	* sysdeps/x86_64/fpu/multiarch/s_sin.c: Likewise.
-+	* sysdeps/x86_64/fpu/multiarch/s_tan.c: Likewise.
+	bit_AVX is set also check OSXAVE/XCR0 and set bit_YMM_Usable if
+	possible.
+	* sysdeps/x86_64/fpu/multiarch/e_atan2.c: Use HAS_YMM_USABLE, not
+	HAS_AVX.
+	* sysdeps/x86_64/fpu/multiarch/e_exp.c: Likewise.
+	* sysdeps/x86_64/fpu/multiarch/e_log.c: Likewise.
+	* sysdeps/x86_64/fpu/multiarch/s_atan.c: Likewise.
+	* sysdeps/x86_64/fpu/multiarch/s_sin.c: Likewise.
+	* sysdeps/x86_64/fpu/multiarch/s_tan.c: Likewise.
  
  2012-01-25  Joseph Myers  <joseph@codesourcery.com>
  

@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 26%{?dist}
+Release: 27%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -114,6 +114,9 @@ Patch39 : %{name}-rh758888.patch
 Patch40 : %{name}-rh800224.patch
 # From upstream
 Patch41 : %{name}-rh794797-2.patch
+# From upstream
+Patch42 : %{name}-rh801650-1.patch
+Patch43 : %{name}-rh801650-2.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -373,6 +376,8 @@ rm -rf %{glibcportsdir}
 %patch39 -p1
 %patch40 -p1
 %patch41 -p1
+%patch42 -p1
+%patch43 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1225,6 +1230,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Mar 09 2012 Jeff Law <law@redhat.com> - 2.15-27
+  - Fix AVX checks (#801650)
+
 * Wed Feb 29 2012 Jeff Law <law@redhat.com> - 2.15-26
   - Set errno properly in vfprintf (#794797)
   - Don't kill application when LD_PROFILE is set. (#800224)
