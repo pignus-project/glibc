@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 27%{?dist}
+Release: 28%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -117,6 +117,11 @@ Patch41 : %{name}-rh794797-2.patch
 # From upstream
 Patch42 : %{name}-rh801650-1.patch
 Patch43 : %{name}-rh801650-2.patch
+# stap and thus will never be accepted upstream
+Patch44 : %{name}-stap-libm.patch
+# Waiting on upstream
+Patch45 : %{name}-rh803286.patch
+
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -378,6 +383,8 @@ rm -rf %{glibcportsdir}
 %patch41 -p1
 %patch42 -p1
 %patch43 -p1
+%patch44 -p1
+%patch45 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1230,6 +1237,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Mar 13 2012 Jeff Law <law@redhat.com> - 2.15-28
+  - Add doi_IN, sat_IN and mni_IN to SUPPORTED locals (#803286)
+  - Add stap probes in slowpow and slowexp.
+
 * Fri Mar 09 2012 Jeff Law <law@redhat.com> - 2.15-27
   - Fix AVX checks (#801650)
 
