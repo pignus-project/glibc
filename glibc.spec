@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 29%{?dist}
+Release: 30%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -100,9 +100,9 @@ Patch32 : %{name}-rh739743.patch
 Patch33 : %{name}-rh789238.patch
 # From upstream 
 Patch34 : %{name}-rh794797.patch
-# Posted upstream
+# From upstream
 Patch35 : %{name}-rh788989.patch
-# Posted upstream
+# From upstream (sans comment which was added during review)
 Patch36 : %{name}-rh795498.patch
 # From upstream
 Patch37 : %{name}-rh760935.patch
@@ -123,6 +123,8 @@ Patch44 : %{name}-stap-libm.patch
 Patch45 : %{name}-rh803286.patch
 # Sent upstream, waiting on review
 Patch46 : %{name}-rh806403.patch
+# Submitted upstream, BZ 13594
+Patch47 : %{name}-rh806070.patch
 
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -388,6 +390,7 @@ rm -rf %{glibcportsdir}
 %patch44 -p1
 %patch45 -p1
 %patch46 -p1
+%patch47 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1240,6 +1243,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Mar 27 2012 Jeff Law <law@redhat.com> - 2.15-30
+  - Fix data race in nscd (#806070)
+
 * Fri Mar 23 2012 Jeff Law <law@redhat.com> - 2.15-29
   - Fix typo in __nss_getent (#806403).
 
