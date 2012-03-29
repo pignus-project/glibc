@@ -1,0 +1,217 @@
+2012-03-29  Jeff Law  <law@redhat.com>
+
+	* crypt/md5-crypt.c (__md5_crypt_r): Avoid unbounded alloca uses
+	due to long keys.
+	* crypt/sha256-crypt.c (__sha256_crypt_r): Likewise.
+	* crypt/sha512-crypt.c (__sha512_crypt_r): Likewise.
+
+diff -rup c/crypt/md5-crypt.c d/crypt/md5-crypt.c
+--- c/crypt/md5-crypt.c	2012-01-01 05:16:32.000000000 -0700
++++ d/crypt/md5-crypt.c	2012-03-27 11:37:24.035574503 -0600
+@@ -108,6 +108,7 @@ __md5_crypt_r (key, salt, buffer, buflen
+   char *cp;
+   char *copied_key = NULL;
+   char *copied_salt = NULL;
++  char *free_key = NULL;
+ 
+   /* Find beginning of salt string.  The prefix should normally always
+      be present.  Just in case it is not.  */
+@@ -120,7 +121,17 @@ __md5_crypt_r (key, salt, buffer, buflen
+ 
+   if ((key - (char *) 0) % __alignof__ (md5_uint32) != 0)
+     {
+-      char *tmp = (char *) alloca (key_len + __alignof__ (md5_uint32));
++      char *tmp;
++
++      if (__libc_use_alloca (key_len + __alignof__ (md5_uint32)))
++	tmp = (char *) alloca (key_len + __alignof__ (md5_uint32));
++      else
++	{
++	  free_key = tmp = (char *) malloc (key_len + __alignof__ (md5_uint32));
++	  if (tmp == NULL)
++	    return NULL;
++	}
++	
+       key = copied_key =
+ 	memcpy (tmp + __alignof__ (md5_uint32)
+ 		- (tmp - (char *) 0) % __alignof__ (md5_uint32),
+@@ -142,7 +158,10 @@ __md5_crypt_r (key, salt, buffer, buflen
+   /* Initialize libfreebl3.  */
+   NSSLOWInitContext *nss_ictx = NSSLOW_Init ();
+   if (nss_ictx == NULL)
+-    return NULL;
++    {
++      free (free_key);
++      return NULL;
++    }
+   NSSLOWHASHContext *nss_ctx = NULL;
+   NSSLOWHASHContext *nss_alt_ctx = NULL;
+ #else
+@@ -296,6 +315,7 @@ __md5_crypt_r (key, salt, buffer, buflen
+   if (copied_salt != NULL)
+     memset (copied_salt, '\0', salt_len);
+ 
++  free (free_key);
+   return buffer;
+ }
+ 
+diff -rup c/crypt/sha256-crypt.c d/crypt/sha256-crypt.c
+--- c/crypt/sha256-crypt.c	2012-01-01 05:16:32.000000000 -0700
++++ d/crypt/sha256-crypt.c	2012-03-27 11:58:55.823809542 -0600
+@@ -123,6 +123,9 @@ __sha256_crypt_r (key, salt, buffer, buf
+   /* Default number of rounds.  */
+   size_t rounds = ROUNDS_DEFAULT;
+   bool rounds_custom = false;
++  size_t alloca_used = 0;
++  char *free_key = NULL;
++  char *free_pbytes = NULL;
+ 
+   /* Find beginning of salt string.  The prefix should normally always
+      be present.  Just in case it is not.  */
+@@ -149,7 +152,17 @@ __sha256_crypt_r (key, salt, buffer, buf
+ 
+   if ((key - (char *) 0) % __alignof__ (uint32_t) != 0)
+     {
+-      char *tmp = (char *) alloca (key_len + __alignof__ (uint32_t));
++      char *tmp;
++
++      if (__libc_use_alloca (key_len + __alignof__ (uint32_t)))
++	tmp = alloca_account (key_len + __alignof__ (uint32_t), alloca_used);
++      else
++	{
++	  free_key = tmp = (char *) malloc (key_len + __alignof__ (uint32_t));
++	  if (tmp == NULL)
++	    return NULL;
++	}
++	
+       key = copied_key =
+ 	memcpy (tmp + __alignof__ (uint32_t)
+ 		- (tmp - (char *) 0) % __alignof__ (uint32_t),
+@@ -160,6 +179,7 @@ __sha256_crypt_r (key, salt, buffer, buf
+   if ((salt - (char *) 0) % __alignof__ (uint32_t) != 0)
+     {
+       char *tmp = (char *) alloca (salt_len + __alignof__ (uint32_t));
++      alloca_used += salt_len + __alignof__ (uint32_t);
+       salt = copied_salt =
+ 	memcpy (tmp + __alignof__ (uint32_t)
+ 		- (tmp - (char *) 0) % __alignof__ (uint32_t),
+@@ -171,7 +191,10 @@ __sha256_crypt_r (key, salt, buffer, buf
+   /* Initialize libfreebl3.  */
+   NSSLOWInitContext *nss_ictx = NSSLOW_Init ();
+   if (nss_ictx == NULL)
+-    return NULL;
++    {
++      free (free_key);
++      return NULL;
++    }
+   NSSLOWHASHContext *nss_ctx = NULL;
+   NSSLOWHASHContext *nss_alt_ctx = NULL;
+ #else
+@@ -233,8 +256,19 @@ __sha256_crypt_r (key, salt, buffer, buf
+   /* Finish the digest.  */
+   sha256_finish_ctx (&alt_ctx, nss_alt_ctx, temp_result);
+ 
+-  /* Create byte sequence P.  */
+-  cp = p_bytes = alloca (key_len);
++  /* Create byte sequence P.  */
++  if (__libc_use_alloca (alloca_used + key_len))
++    cp = p_bytes = (char *) alloca (key_len);
++  else
++    {
++      free_pbytes = cp = p_bytes = (char *)malloc (key_len);
++      if (free_pbytes == NULL)
++	{
++	  free (free_key);
++	  return NULL;
++	}
++    }
++	
+   for (cnt = key_len; cnt >= 32; cnt -= 32)
+     cp = mempcpy (cp, temp_result, 32);
+   memcpy (cp, temp_result, cnt);
+@@ -362,6 +401,8 @@ __sha256_crypt_r (key, salt, buffer, buf
+   if (copied_salt != NULL)
+     memset (copied_salt, '\0', salt_len);
+ 
++  free (free_key);
++  free (free_pbytes);
+   return buffer;
+ }
+ 
+diff -rup c/crypt/sha512-crypt.c d/crypt/sha512-crypt.c
+--- c/crypt/sha512-crypt.c	2012-01-01 05:16:32.000000000 -0700
++++ d/crypt/sha512-crypt.c	2012-03-27 12:10:08.895097239 -0600
+@@ -123,6 +123,9 @@ __sha512_crypt_r (key, salt, buffer, buf
+   /* Default number of rounds.  */
+   size_t rounds = ROUNDS_DEFAULT;
+   bool rounds_custom = false;
++  size_t alloca_used = 0;
++  char *free_key = NULL;
++  char *free_pbytes = NULL;
+ 
+   /* Find beginning of salt string.  The prefix should normally always
+      be present.  Just in case it is not.  */
+@@ -149,7 +152,17 @@ __sha512_crypt_r (key, salt, buffer, buf
+ 
+   if ((key - (char *) 0) % __alignof__ (uint64_t) != 0)
+     {
+-      char *tmp = (char *) alloca (key_len + __alignof__ (uint64_t));
++      char *tmp;
++
++      if (__libc_use_alloca (key_len + __alignof__ (uint64_t)))
++	tmp = alloca_account (key_len + __alignof__ (uint64_t), alloca_used);
++      else
++	{
++	  free_key = tmp = (char *) malloc (key_len + __alignof__ (uint64_t));
++	  if (tmp == NULL)
++	    return NULL;
++	}
++	
+       key = copied_key =
+ 	memcpy (tmp + __alignof__ (uint64_t)
+ 		- (tmp - (char *) 0) % __alignof__ (uint64_t),
+@@ -171,7 +190,10 @@ __sha512_crypt_r (key, salt, buffer, buf
+   /* Initialize libfreebl3.  */
+   NSSLOWInitContext *nss_ictx = NSSLOW_Init ();
+   if (nss_ictx == NULL)
+-    return NULL;
++    {
++      free (free_key);
++      return NULL;
++    }
+   NSSLOWHASHContext *nss_ctx = NULL;
+   NSSLOWHASHContext *nss_alt_ctx = NULL;
+ #else
+@@ -233,8 +255,19 @@ __sha512_crypt_r (key, salt, buffer, buf
+   /* Finish the digest.  */
+   sha512_finish_ctx (&alt_ctx, nss_alt_ctx, temp_result);
+ 
+-  /* Create byte sequence P.  */
+-  cp = p_bytes = alloca (key_len);
++  /* Create byte sequence P.  */
++  if (__libc_use_alloca (alloca_used + key_len))
++    cp = p_bytes = (char *) alloca (key_len);
++  else
++    {
++      free_pbytes = cp = p_bytes = (char *)malloc (key_len);
++      if (free_pbytes == NULL)
++	{
++	  free (free_key);
++	  return NULL;
++	}
++    }
++	
+   for (cnt = key_len; cnt >= 64; cnt -= 64)
+     cp = mempcpy (cp, temp_result, 64);
+   memcpy (cp, temp_result, cnt);
+@@ -374,6 +412,8 @@ __sha512_crypt_r (key, salt, buffer, buf
+   if (copied_salt != NULL)
+     memset (copied_salt, '\0', salt_len);
+ 
++  free (free_key);
++  free (free_pbytes);
+   return buffer;
+ }
+ 
+ 
+ 

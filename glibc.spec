@@ -125,6 +125,8 @@ Patch45 : %{name}-rh803286.patch
 Patch46 : %{name}-rh806403.patch
 # Submitted upstream, BZ 13594
 Patch47 : %{name}-rh806070.patch
+# Submitted upstream
+Patch48 : %{name}-rh804792.patch
 
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -391,6 +393,7 @@ rm -rf %{glibcportsdir}
 %patch45 -p1
 %patch46 -p1
 %patch47 -p1
+%patch48 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1244,6 +1247,7 @@ rm -f *.filelist*
 
 %changelog
 * Tue Mar 27 2012 Jeff Law <law@redhat.com> - 2.15-30
+  - Avoid unbound alloca usage in *-crypt routines (#804792)
   - Fix data race in nscd (#806070)
 
 * Fri Mar 23 2012 Jeff Law <law@redhat.com> - 2.15-29
