@@ -1,29 +1,43 @@
-2012-03-29  Jeff Law  <law@redhat.com>
+commit b8dc394ddfd58bc5d0fe9ecfc970fc42b789a9df
+Author: Jeff Law <law@redhat.com>
+Date:   Fri Mar 30 09:45:44 2012 -0600
 
-	* crypt/md5-crypt.c (__md5_crypt_r): Avoid unbounded alloca uses
-	due to long keys.
-	* crypt/sha256-crypt.c (__sha256_crypt_r): Likewise.
-	* crypt/sha512-crypt.c (__sha512_crypt_r): Likewise.
+    2012-03-29  Jeff Law  <law@redhat.com>
+    
+    	* crypt/md5-crypt.c (__md5_crypt_r): Avoid unbounded alloca uses
+    	due to long keys.
+    	* crypt/sha256-crypt.c (__sha256_crypt_r): Likewise.
+    	* crypt/sha512-crypt.c (__sha512_crypt_r): Likewise.
 
-diff -rup c/crypt/md5-crypt.c d/crypt/md5-crypt.c
---- c/crypt/md5-crypt.c	2012-01-01 05:16:32.000000000 -0700
-+++ d/crypt/md5-crypt.c	2012-03-27 11:37:24.035574503 -0600
-@@ -108,6 +108,7 @@ __md5_crypt_r (key, salt, buffer, buflen
+diff --git a/crypt/md5-crypt.c b/crypt/md5-crypt.c
+index ba606bb..db4ea9c 100644
+--- a/crypt/md5-crypt.c
++++ b/crypt/md5-crypt.c
+@@ -1,6 +1,6 @@
+ /* One way encryption based on MD5 sum.
+    Compatible with the behavior of MD5 crypt introduced in FreeBSD 2.0.
+-   Copyright (C) 1996, 1997, 1999, 2000, 2001, 2002, 2004, 2009
++   Copyright (C) 1996, 1997, 1999, 2000, 2001, 2002, 2004, 2009, 2012
+    Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1996.
+@@ -107,6 +107,8 @@ __md5_crypt_r (key, salt, buffer, buflen)
    char *cp;
    char *copied_key = NULL;
    char *copied_salt = NULL;
 +  char *free_key = NULL;
++  size_t alloca_used = 0;
  
    /* Find beginning of salt string.  The prefix should normally always
       be present.  Just in case it is not.  */
-@@ -120,7 +121,17 @@ __md5_crypt_r (key, salt, buffer, buflen
+@@ -119,7 +121,17 @@ __md5_crypt_r (key, salt, buffer, buflen)
  
    if ((key - (char *) 0) % __alignof__ (md5_uint32) != 0)
      {
 -      char *tmp = (char *) alloca (key_len + __alignof__ (md5_uint32));
 +      char *tmp;
 +
-+      if (__libc_use_alloca (key_len + __alignof__ (md5_uint32)))
++      if (__libc_use_alloca (alloca_used + key_len + __alignof__ (md5_uint32)))
 +	tmp = (char *) alloca (key_len + __alignof__ (md5_uint32));
 +      else
 +	{
@@ -31,11 +45,11 @@ diff -rup c/crypt/md5-crypt.c d/crypt/md5-crypt.c
 +	  if (tmp == NULL)
 +	    return NULL;
 +	}
-+	
++
        key = copied_key =
  	memcpy (tmp + __alignof__ (md5_uint32)
  		- (tmp - (char *) 0) % __alignof__ (md5_uint32),
-@@ -142,7 +158,10 @@ __md5_crypt_r (key, salt, buffer, buflen
+@@ -141,7 +153,10 @@ __md5_crypt_r (key, salt, buffer, buflen)
    /* Initialize libfreebl3.  */
    NSSLOWInitContext *nss_ictx = NSSLOW_Init ();
    if (nss_ictx == NULL)
@@ -47,7 +61,7 @@ diff -rup c/crypt/md5-crypt.c d/crypt/md5-crypt.c
    NSSLOWHASHContext *nss_ctx = NULL;
    NSSLOWHASHContext *nss_alt_ctx = NULL;
  #else
-@@ -296,6 +315,7 @@ __md5_crypt_r (key, salt, buffer, buflen
+@@ -295,6 +310,7 @@ __md5_crypt_r (key, salt, buffer, buflen)
    if (copied_salt != NULL)
      memset (copied_salt, '\0', salt_len);
  
@@ -55,10 +69,18 @@ diff -rup c/crypt/md5-crypt.c d/crypt/md5-crypt.c
    return buffer;
  }
  
-diff -rup c/crypt/sha256-crypt.c d/crypt/sha256-crypt.c
---- c/crypt/sha256-crypt.c	2012-01-01 05:16:32.000000000 -0700
-+++ d/crypt/sha256-crypt.c	2012-03-27 11:58:55.823809542 -0600
-@@ -123,6 +123,9 @@ __sha256_crypt_r (key, salt, buffer, buf
+diff --git a/crypt/sha256-crypt.c b/crypt/sha256-crypt.c
+index eb2585b..440933a 100644
+--- a/crypt/sha256-crypt.c
++++ b/crypt/sha256-crypt.c
+@@ -1,5 +1,5 @@
+ /* One way encryption based on SHA256 sum.
+-   Copyright (C) 2007, 2009 Free Software Foundation, Inc.
++   Copyright (C) 2007, 2009, 2012 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+    Contributed by Ulrich Drepper <drepper@redhat.com>, 2007.
+ 
+@@ -122,6 +122,9 @@ __sha256_crypt_r (key, salt, buffer, buflen)
    /* Default number of rounds.  */
    size_t rounds = ROUNDS_DEFAULT;
    bool rounds_custom = false;
@@ -68,14 +90,14 @@ diff -rup c/crypt/sha256-crypt.c d/crypt/sha256-crypt.c
  
    /* Find beginning of salt string.  The prefix should normally always
       be present.  Just in case it is not.  */
-@@ -149,7 +152,17 @@ __sha256_crypt_r (key, salt, buffer, buf
+@@ -148,7 +151,17 @@ __sha256_crypt_r (key, salt, buffer, buflen)
  
    if ((key - (char *) 0) % __alignof__ (uint32_t) != 0)
      {
 -      char *tmp = (char *) alloca (key_len + __alignof__ (uint32_t));
 +      char *tmp;
 +
-+      if (__libc_use_alloca (key_len + __alignof__ (uint32_t)))
++      if (__libc_use_alloca (alloca_used + key_len + __alignof__ (uint32_t)))
 +	tmp = alloca_account (key_len + __alignof__ (uint32_t), alloca_used);
 +      else
 +	{
@@ -83,11 +105,11 @@ diff -rup c/crypt/sha256-crypt.c d/crypt/sha256-crypt.c
 +	  if (tmp == NULL)
 +	    return NULL;
 +	}
-+	
++
        key = copied_key =
  	memcpy (tmp + __alignof__ (uint32_t)
  		- (tmp - (char *) 0) % __alignof__ (uint32_t),
-@@ -160,6 +179,7 @@ __sha256_crypt_r (key, salt, buffer, buf
+@@ -159,6 +172,7 @@ __sha256_crypt_r (key, salt, buffer, buflen)
    if ((salt - (char *) 0) % __alignof__ (uint32_t) != 0)
      {
        char *tmp = (char *) alloca (salt_len + __alignof__ (uint32_t));
@@ -95,7 +117,7 @@ diff -rup c/crypt/sha256-crypt.c d/crypt/sha256-crypt.c
        salt = copied_salt =
  	memcpy (tmp + __alignof__ (uint32_t)
  		- (tmp - (char *) 0) % __alignof__ (uint32_t),
-@@ -171,7 +191,10 @@ __sha256_crypt_r (key, salt, buffer, buf
+@@ -170,7 +184,10 @@ __sha256_crypt_r (key, salt, buffer, buflen)
    /* Initialize libfreebl3.  */
    NSSLOWInitContext *nss_ictx = NSSLOW_Init ();
    if (nss_ictx == NULL)
@@ -107,13 +129,11 @@ diff -rup c/crypt/sha256-crypt.c d/crypt/sha256-crypt.c
    NSSLOWHASHContext *nss_ctx = NULL;
    NSSLOWHASHContext *nss_alt_ctx = NULL;
  #else
-@@ -233,8 +256,19 @@ __sha256_crypt_r (key, salt, buffer, buf
-   /* Finish the digest.  */
+@@ -233,7 +250,18 @@ __sha256_crypt_r (key, salt, buffer, buflen)
    sha256_finish_ctx (&alt_ctx, nss_alt_ctx, temp_result);
  
--  /* Create byte sequence P.  */
+   /* Create byte sequence P.  */
 -  cp = p_bytes = alloca (key_len);
-+  /* Create byte sequence P.  */
 +  if (__libc_use_alloca (alloca_used + key_len))
 +    cp = p_bytes = (char *) alloca (key_len);
 +  else
@@ -125,11 +145,11 @@ diff -rup c/crypt/sha256-crypt.c d/crypt/sha256-crypt.c
 +	  return NULL;
 +	}
 +    }
-+	
++
    for (cnt = key_len; cnt >= 32; cnt -= 32)
      cp = mempcpy (cp, temp_result, 32);
    memcpy (cp, temp_result, cnt);
-@@ -362,6 +401,8 @@ __sha256_crypt_r (key, salt, buffer, buf
+@@ -361,6 +389,8 @@ __sha256_crypt_r (key, salt, buffer, buflen)
    if (copied_salt != NULL)
      memset (copied_salt, '\0', salt_len);
  
@@ -138,10 +158,18 @@ diff -rup c/crypt/sha256-crypt.c d/crypt/sha256-crypt.c
    return buffer;
  }
  
-diff -rup c/crypt/sha512-crypt.c d/crypt/sha512-crypt.c
---- c/crypt/sha512-crypt.c	2012-01-01 05:16:32.000000000 -0700
-+++ d/crypt/sha512-crypt.c	2012-03-27 12:10:08.895097239 -0600
-@@ -123,6 +123,9 @@ __sha512_crypt_r (key, salt, buffer, buf
+diff --git a/crypt/sha512-crypt.c b/crypt/sha512-crypt.c
+index 8f8ed33..e5d9cac 100644
+--- a/crypt/sha512-crypt.c
++++ b/crypt/sha512-crypt.c
+@@ -1,5 +1,5 @@
+ /* One way encryption based on SHA512 sum.
+-   Copyright (C) 2007, 2009 Free Software Foundation, Inc.
++   Copyright (C) 2007, 2009, 2012 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+    Contributed by Ulrich Drepper <drepper@redhat.com>, 2007.
+ 
+@@ -122,6 +122,9 @@ __sha512_crypt_r (key, salt, buffer, buflen)
    /* Default number of rounds.  */
    size_t rounds = ROUNDS_DEFAULT;
    bool rounds_custom = false;
@@ -151,14 +179,14 @@ diff -rup c/crypt/sha512-crypt.c d/crypt/sha512-crypt.c
  
    /* Find beginning of salt string.  The prefix should normally always
       be present.  Just in case it is not.  */
-@@ -149,7 +152,17 @@ __sha512_crypt_r (key, salt, buffer, buf
+@@ -148,7 +151,17 @@ __sha512_crypt_r (key, salt, buffer, buflen)
  
    if ((key - (char *) 0) % __alignof__ (uint64_t) != 0)
      {
 -      char *tmp = (char *) alloca (key_len + __alignof__ (uint64_t));
 +      char *tmp;
 +
-+      if (__libc_use_alloca (key_len + __alignof__ (uint64_t)))
++      if (__libc_use_alloca (alloca_used + key_len + __alignof__ (uint64_t)))
 +	tmp = alloca_account (key_len + __alignof__ (uint64_t), alloca_used);
 +      else
 +	{
@@ -166,11 +194,11 @@ diff -rup c/crypt/sha512-crypt.c d/crypt/sha512-crypt.c
 +	  if (tmp == NULL)
 +	    return NULL;
 +	}
-+	
++
        key = copied_key =
  	memcpy (tmp + __alignof__ (uint64_t)
  		- (tmp - (char *) 0) % __alignof__ (uint64_t),
-@@ -171,7 +190,10 @@ __sha512_crypt_r (key, salt, buffer, buf
+@@ -170,7 +183,10 @@ __sha512_crypt_r (key, salt, buffer, buflen)
    /* Initialize libfreebl3.  */
    NSSLOWInitContext *nss_ictx = NSSLOW_Init ();
    if (nss_ictx == NULL)
@@ -182,13 +210,11 @@ diff -rup c/crypt/sha512-crypt.c d/crypt/sha512-crypt.c
    NSSLOWHASHContext *nss_ctx = NULL;
    NSSLOWHASHContext *nss_alt_ctx = NULL;
  #else
-@@ -233,8 +255,19 @@ __sha512_crypt_r (key, salt, buffer, buf
-   /* Finish the digest.  */
+@@ -233,7 +249,18 @@ __sha512_crypt_r (key, salt, buffer, buflen)
    sha512_finish_ctx (&alt_ctx, nss_alt_ctx, temp_result);
  
--  /* Create byte sequence P.  */
+   /* Create byte sequence P.  */
 -  cp = p_bytes = alloca (key_len);
-+  /* Create byte sequence P.  */
 +  if (__libc_use_alloca (alloca_used + key_len))
 +    cp = p_bytes = (char *) alloca (key_len);
 +  else
@@ -200,11 +226,11 @@ diff -rup c/crypt/sha512-crypt.c d/crypt/sha512-crypt.c
 +	  return NULL;
 +	}
 +    }
-+	
++
    for (cnt = key_len; cnt >= 64; cnt -= 64)
      cp = mempcpy (cp, temp_result, 64);
    memcpy (cp, temp_result, cnt);
-@@ -374,6 +412,8 @@ __sha512_crypt_r (key, salt, buffer, buf
+@@ -373,6 +400,8 @@ __sha512_crypt_r (key, salt, buffer, buflen)
    if (copied_salt != NULL)
      memset (copied_salt, '\0', salt_len);
  
@@ -212,6 +238,4 @@ diff -rup c/crypt/sha512-crypt.c d/crypt/sha512-crypt.c
 +  free (free_pbytes);
    return buffer;
  }
- 
- 
  
