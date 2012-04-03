@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 30%{?dist}
+Release: 31%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -96,7 +96,7 @@ Patch30: %{name}-rh791161.patch
 Patch31 : %{name}-rh697149.patch
 # Submitted upstream BZ 9954
 Patch32 : %{name}-rh739743.patch
-# Discussion started upstream, patch needs to be submitted
+# Submitted upstream, BZ13939
 Patch33 : %{name}-rh789238.patch
 # From upstream 
 Patch34 : %{name}-rh794797.patch
@@ -127,6 +127,8 @@ Patch46 : %{name}-rh806403.patch
 Patch47 : %{name}-rh806070.patch
 # Submitted upstream
 Patch48 : %{name}-rh804792.patch
+# Submitted upstream (BZ 13939)
+Patch49 : %{name}-rh789238-2.patch
 
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -394,6 +396,7 @@ rm -rf %{glibcportsdir}
 %patch46 -p1
 %patch47 -p1
 %patch48 -p1
+%patch49 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1246,6 +1249,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Apr 2 2012 Jeff Law <law@redhat.com> - 2.15-31
+  - When retrying after main arena failure, always retry in a 
+    different arena. (#789238)
+
 * Tue Mar 27 2012 Jeff Law <law@redhat.com> - 2.15-30
   - Avoid unbound alloca usage in *-crypt routines (#804792)
   - Fix data race in nscd (#806070)
