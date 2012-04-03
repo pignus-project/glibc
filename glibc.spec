@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 31%{?dist}
+Release: 32%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -129,6 +129,8 @@ Patch47 : %{name}-rh806070.patch
 Patch48 : %{name}-rh804792.patch
 # Submitted upstream (BZ 13939)
 Patch49 : %{name}-rh789238-2.patch
+# Submitted upstream 
+Patch50 : %{name}-rh682500.patch
 
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -397,6 +399,7 @@ rm -rf %{glibcportsdir}
 %patch47 -p1
 %patch48 -p1
 %patch49 -p1
+%patch50 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1249,6 +1252,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Apr 3 2012 Jeff Law <law@redhat.com> - 2.15-32
+  - Fix first day of week for lv_LV (#682500)
+
 * Mon Apr 2 2012 Jeff Law <law@redhat.com> - 2.15-31
   - When retrying after main arena failure, always retry in a 
     different arena. (#789238)
