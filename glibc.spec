@@ -40,97 +40,147 @@ URL: http://www.gnu.org/software/glibc/
 Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.gz
 Source1: %{?glibc_release_url}%{glibcportsdir}.tar.gz
 Source2: %{glibcsrcdir}-fedora.tar.gz
-Patch0: %{name}-fedora.patch
-Patch1: %{name}-stap.patch
-Patch2: %{name}-ia64-lib64.patch
-# Uli wants to see this undergo more analyis (what happens when thread B calls into malloc when
-# thread A has unlocked on the error path
-# There's an alternate approach using mmap after detecting an error that needs discussion
-Patch3: %{name}-rh757881.patch
-# From upstream.
-Patch4: %{name}-rh740506.patch
-# Aurelien submitted upstream, Uli has largely ignored
-Patch5: %{name}-rh730856.patch
-# Reverting an upstream patch.  I don't think this has been discussed upstream yet.
-# Caused a variety of problems for Fedora & Debian
-Patch6: %{name}-rh769421.patch
-Patch7: %{name}-rh729661.patch
-Patch8: %{name}-rh446078.patch
-Patch9: %{name}-rh454629.patch
-Patch10: %{name}-rh784402.patch
-Patch11: %{name}-rh622499.patch
+
+# 0000-0999 for patches which are unlikely to ever go upstream or which
+# have not been analyzed to see if they ought to go upstream yet.
+# 
+# 1000-2000 for patches that are already upstream. 
+#
+# 2000-3000 for patches that are awaiting upstream approval
+#
+# Yes, I realize this means some gratutious changes as patches to from
+# one bucket to another, but I find this scheme makes it easier to track
+# the upstream divergence and patches needing approval.
+#
+# Note that we can still apply the patches in any order we see fit, so
+# the changes from one bucket to another won't necessarily result in needing
+# to twiddle the patch because of dependencies on prior patches and the like.
+
+
+#
+# Patches that are highly unlikely to ever be accepated upstream.
+#
+# Still needs to be broken down into individual patches
+Patch0000: %{name}-fedora.patch
+
+# Systemtap and thus won't likely be accepted upstream
+Patch0001: %{name}-stap.patch
+
+# Reverting an upstream patch.  I don't think this has been discussed
+# upstream yet.
+Patch0006: %{name}-rh769421.patch
+
 # Depends on systemtap infrastructure, so can't go upstream
-Patch12: %{name}-rh179072.patch
-Patch13: %{name}-rh697421.patch
-Patch14: %{name}-rh740682.patch
-Patch15: %{name}-sw13618.patch
-# Fix bogus sorting code which was copied from dl-deps.
-Patch16: %{name}-sw13618-2.patch
-Patch17: %{name}-rh783979.patch
-# Needs to go upstream
-Patch18: %{name}-rh657588.patch
-Patch19: %{name}-rh787201.patch
-# Sent upstream, awaiting feedback
-Patch20: %{name}-rh741105.patch
-# Sent upstream, awaiting feedback
-Patch21: %{name}-rh770869.patch
-# Sent upstream, awaiting feedback
-Patch22: %{name}-rh691912.patch
-# Not necessary to send upstream
-Patch23: %{name}-rh688948.patch
-# Rakesh & Pravin will send upstream
-Patch24: %{name}-rh770439.patch
-# Sent upstream
-Patch25: %{name}-rh789209.patch
-# Was acked in the upstream BZ, but patch never got installed
-Patch26: %{name}-rh624296.patch
+Patch0012: %{name}-rh179072.patch
+
 # Needs to be sent upstream
-Patch27: %{name}-rh564528.patch
-# Submitted upstream BZ 13604
-Patch28: %{name}-rh790292.patch
-# Submitted upstream BZ 13603
-Patch29: %{name}-rh790298.patch
-# Submitted upstream BZ 13698
-Patch30: %{name}-rh791161.patch
-# Submitted upstream BZ 12377
-Patch31 : %{name}-rh697149.patch
-# Submitted upstream BZ 9954
-Patch32 : %{name}-rh739743.patch
-# Submitted upstream, BZ13939
-Patch33 : %{name}-rh789238.patch
-# From upstream 
-Patch34 : %{name}-rh794797.patch
-# From upstream
-Patch35 : %{name}-rh788989.patch
-# From upstream (sans comment which was added during review)
-Patch36 : %{name}-rh795498.patch
-# From upstream
-Patch37 : %{name}-rh760935.patch
-# From upstream
-Patch38 : %{name}-rh798471.patch
-# From upstream
-Patch39 : %{name}-rh758888.patch
-# Submitted upstream BZ 13818
-Patch40 : %{name}-rh800224.patch
-# From upstream
-Patch41 : %{name}-rh794797-2.patch
-# From upstream
-Patch42 : %{name}-rh801650-1.patch
-Patch43 : %{name}-rh801650-2.patch
+Patch0013: %{name}-rh697421.patch
+
+# Needs to be sent upstream
+Patch0014: %{name}-rh740682.patch
+
+# Needs to be sent upstream
+Patch0018: %{name}-rh657588.patch
+
+# Not likely to be accepted upstream
+Patch0019: %{name}-rh787201.patch
+
+# Not necessary to send upstream, fedora specific
+Patch0023: %{name}-rh688948.patch
+
+# Needs to be sent upstream
+Patch0027: %{name}-rh564528.patch
+
 # stap and thus will never be accepted upstream
-Patch44 : %{name}-stap-libm.patch
-# Waiting on upstream
-Patch45 : %{name}-rh803286.patch
-# Sent upstream, waiting on review
-Patch46 : %{name}-rh806403.patch
-# Submitted upstream, BZ 13594
-Patch47 : %{name}-rh806070.patch
-# Submitted upstream
-Patch48 : %{name}-rh804792.patch
-# Submitted upstream (BZ 13939)
-Patch49 : %{name}-rh789238-2.patch
-# Submitted upstream 
-Patch50 : %{name}-rh682500.patch
+Patch0044: %{name}-stap-libm.patch
+
+#
+# Patches from upstream
+#
+
+Patch1004: %{name}-rh740506.patch
+Patch1010: %{name}-rh784402.patch
+Patch1026: %{name}-rh624296.patch
+Patch1034: %{name}-rh794797.patch
+Patch1035: %{name}-rh788989.patch
+Patch1036: %{name}-rh795498.patch
+Patch1037: %{name}-rh760935.patch
+Patch1038: %{name}-rh798471.patch
+Patch1039: %{name}-rh758888.patch
+Patch1041: %{name}-rh794797-2.patch
+Patch1042: %{name}-rh801650-1.patch
+Patch1043: %{name}-rh801650-2.patch
+Patch1046: %{name}-rh806403.patch
+Patch1048: %{name}-rh804792.patch
+
+#
+# Patches submitted, but not yet approved upstream.
+# Each should be associated with a BZ.
+# Obviously we're not there right now, but that's the goal
+#
+
+# Upstream BZ 13579
+Patch2002: %{name}-sw13579.patch
+
+Patch2003: %{name}-rh757881.patch
+
+# Upstream BZ 13013
+Patch2005: %{name}-rh730856.patch
+
+Patch2007: %{name}-rh729661.patch
+
+# Upstream BZ 13197
+Patch2008: %{name}-rh446078.patch
+
+# Upstream BZ 13905
+Patch2009: %{name}-rh454629.patch
+
+# Upstream BZ 13948
+Patch2011: %{name}-rh622499.patch
+
+# Upstream BZ 13618
+Patch2015: %{name}-sw13618.patch
+Patch2016: %{name}-sw13618-2.patch
+
+Patch2017: %{name}-rh783979.patch
+Patch2020: %{name}-rh741105.patch
+Patch2021: %{name}-rh770869.patch
+Patch2022: %{name}-rh691912.patch
+Patch2024: %{name}-rh770439.patch
+Patch2025: %{name}-rh789209.patch
+
+# Upstream BZ 13604
+Patch2028: %{name}-rh790292.patch
+
+# Upstream BZ 13603
+Patch2029: %{name}-rh790298.patch
+
+# Upstream BZ 13698
+Patch2030: %{name}-rh791161.patch
+
+# Upstream BZ 12377
+Patch2031: %{name}-rh697149.patch
+
+# Upstream BZ 9954
+Patch2032: %{name}-rh739743.patch
+
+# Upstream BZ 13939
+Patch2033: %{name}-rh789238.patch
+
+#Upstream BZ 13818
+Patch2040: %{name}-rh800224.patch
+
+Patch2045: %{name}-rh803286.patch
+
+# Upstream BZ 13594
+Patch2047: %{name}-rh806070.patch
+
+# Upstream BZ 13939
+Patch2049: %{name}-rh789238-2.patch
+
+# Upstream BZ 13946
+Patch2050: %{name}-rh682500.patch
+
 
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -345,61 +395,58 @@ package or when debugging this package.
 %prep
 rm -rf %{glibcportsdir}
 %setup -q -n %{glibcsrcdir} -b1 -b2
-%patch0 -E -p1
-%patch1 -E -p1
-%ifarch ia64
-%if "%{_lib}" == "lib64"
-%patch2 -p1
-%endif
-%endif
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
-%patch19 -p1
-%patch20 -p1
-%patch21 -p1
-%patch22 -p1
-%patch23 -p1
-%patch24 -p1
-%patch25 -p1
-%patch26 -p1
-%patch27 -p1
-%patch28 -p1
-%patch29 -p1
-%patch30 -p1
-%patch31 -p1
-%patch32 -p1
-%patch33 -p1
-%patch34 -p1
-%patch35 -p1
-%patch36 -p1
-%patch37 -p1
-%patch38 -p1
-%patch39 -p1
-%patch40 -p1
-%patch41 -p1
-%patch42 -p1
-%patch43 -p1
-%patch44 -p1
-%patch45 -p1
-%patch46 -p1
-%patch47 -p1
-%patch48 -p1
-%patch49 -p1
-%patch50 -p1
+
+%patch0000 -E -p1
+%patch0001 -E -p1
+%patch2002 -p1
+%patch2003 -p1
+%patch1004 -p1
+%patch2005 -p1
+%patch0006 -p1
+%patch2007 -p1
+%patch2008 -p1
+%patch2009 -p1
+%patch1010 -p1
+%patch2011 -p1
+%patch0012 -p1
+%patch0013 -p1
+%patch0014 -p1
+%patch2015 -p1
+%patch2016 -p1
+%patch2017 -p1
+%patch0018 -p1
+%patch0019 -p1
+%patch2020 -p1
+%patch2021 -p1
+%patch2022 -p1
+%patch0023 -p1
+%patch2024 -p1
+%patch2025 -p1
+%patch1026 -p1
+%patch0027 -p1
+%patch2028 -p1
+%patch2029 -p1
+%patch2030 -p1
+%patch2031 -p1
+%patch2032 -p1
+%patch2033 -p1
+%patch1034 -p1
+%patch1035 -p1
+%patch1036 -p1
+%patch1037 -p1
+%patch1038 -p1
+%patch1039 -p1
+%patch2040 -p1
+%patch1041 -p1
+%patch1042 -p1
+%patch1043 -p1
+%patch0044 -p1
+%patch2045 -p1
+%patch1046 -p1
+%patch2047 -p1
+%patch1048 -p1
+%patch2049 -p1
+%patch2050 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
