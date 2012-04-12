@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 32%{?dist}
+Release: 33%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -181,6 +181,8 @@ Patch2049: %{name}-rh789238-2.patch
 # Upstream BZ 13946
 Patch2050: %{name}-rh682500.patch
 
+# Upstream BZ 13761
+Patch2051: %{name}-rh788989-2.patch
 
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -447,6 +449,7 @@ rm -rf %{glibcportsdir}
 %patch1048 -p1
 %patch2049 -p1
 %patch2050 -p1
+%patch2051 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1299,6 +1302,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Apr 12 2012 Jeff Law <law@redhat.com> - 2.15-33
+  - Fix another unbound alloca in nscd groups (#788989)
+
 * Tue Apr 3 2012 Jeff Law <law@redhat.com> - 2.15-32
   - Fix first day of week for lv_LV (#682500)
 
