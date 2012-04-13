@@ -1,0 +1,20 @@
+2012-03-30  Jeff Law  <law@redhat.com>
+
+	* include/features.h: Warn if user requests FORTIFY_SOURCE checking
+	but the checks are disabled for any reason.
+
+diff --git a/include/features.h b/include/features.h
+index c347555..e3ad8b0 100644
+--- a/include/features.h
++++ b/include/features.h
+@@ -325,6 +325,10 @@
+ # define __USE_FORTIFY_LEVEL 0
+ #endif
+ 
++#if defined _FORTIFY_SOURCE && _FORTIFY_SOURCE > 0 && __USE_FORTIFY_LEVEL == 0
++# warning _FORTIFY_SOURCE requested but disabled
++#endif
++
+ /* We do support the IEC 559 math functionality, real and complex.  */
+ #define __STDC_IEC_559__		1
+ #define __STDC_IEC_559_COMPLEX__	1
