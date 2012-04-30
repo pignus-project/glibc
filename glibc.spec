@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 34%{?dist}
+Release: 35%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -112,6 +112,7 @@ Patch1042: %{name}-rh801650-1.patch
 Patch1043: %{name}-rh801650-2.patch
 Patch1046: %{name}-rh806403.patch
 Patch1048: %{name}-rh804792.patch
+Patch1049: %{name}-rh817276.patch
 
 #
 # Patches submitted, but not yet approved upstream.
@@ -454,6 +455,11 @@ rm -rf %{glibcportsdir}
 %patch2050 -p1
 %patch2051 -p1
 %patch2052 -p1
+
+pushd ../%{glibcportsdir}
+%patch1049 -p1
+popd
+
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1306,6 +1312,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Apr 30 2012 Jeff Law <law@redhat.com> - 2.15-35
+  - Implement context routines for ARM (#817276)
+
 * Fri Apr 13 2012 Jeff Law <law@redhat.com> - 2.15-34
   - Issue a warning if FORTIFY_CHECKING is requested, but disabled.
 
