@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 35%{?dist}
+Release: 36%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -112,7 +112,7 @@ Patch1042: %{name}-rh801650-1.patch
 Patch1043: %{name}-rh801650-2.patch
 Patch1046: %{name}-rh806403.patch
 Patch1048: %{name}-rh804792.patch
-Patch1049: %{name}-rh817276.patch
+Patch1053: %{name}-rh817276.patch
 
 #
 # Patches submitted, but not yet approved upstream.
@@ -188,6 +188,9 @@ Patch2051: %{name}-rh788989-2.patch
 # Upstream BZ 13979
 Patch2052: %{name}-sw13979.patch
 
+# Upstream, see libc-alpha posting from Carlos O'Donell 5/5/2012
+Patch2054: %{name}-arm-hardfloat-1.patch
+Patch2055: %{name}-arm-hardfloat-2.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -455,9 +458,11 @@ rm -rf %{glibcportsdir}
 %patch2050 -p1
 %patch2051 -p1
 %patch2052 -p1
+%patch2054 -p1
 
 pushd ../%{glibcportsdir}
-%patch1049 -p1
+%patch1053 -p1
+%patch2055 -p1
 popd
 
 
@@ -1312,6 +1317,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon May 7 2012 Jeff Law <law@redhat.com> - 2.15-36
+  - Improve fortification disabled warning.
+  - Change location of dynamic linker for armhf.
+
 * Mon Apr 30 2012 Jeff Law <law@redhat.com> - 2.15-35
   - Implement context routines for ARM (#817276)
 

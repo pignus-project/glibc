@@ -12,7 +12,7 @@ index c347555..e3ad8b0 100644
  #endif
  
 +#if defined _FORTIFY_SOURCE && _FORTIFY_SOURCE > 0 && __USE_FORTIFY_LEVEL == 0
-+# warning _FORTIFY_SOURCE requested but disabled
++# warning _FORTIFY_SOURCE requested but disabled, please enable optimizer to restore fortification
 +#endif
 +
  /* We do support the IEC 559 math functionality, real and complex.  */

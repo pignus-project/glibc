@@ -1,0 +1,48 @@
+diff -rup c/sysdeps/arm/configure.in d/sysdeps/arm/configure.in
+--- c/sysdeps/arm/configure.in	2012-01-08 22:47:04.000000000 -0700
++++ d/sysdeps/arm/configure.in	2012-05-07 11:55:26.111096072 -0600
+@@ -18,3 +18,28 @@ EOF
+ if test $libc_cv_asm_cfi_directive_sections != yes; then
+   AC_MSG_ERROR([need .cfi_sections in this configuration])
+ fi
++
++AC_CACHE_CHECK([whether the compiler is using the ARM hard-float ABI],
++  [libc_cv_arm_pcs_vfp],
++  [archcppflag=`echo "" |
++       $CC $CFLAGS $CPPFLAGS -E -dM - |
++       grep __ARM_PCS_VFP |
++       sed -e 's/^#define //' -e 's/ .*//'`
++  # We check to see if the compiler and flags are
++  # selecting the hard-float ABI and if they are then
++  # we set libc_cv_arm_pcs_vfp to yes which causes
++  # HAVE_ARM_PCS_VFP to be defined in config.h and
++  # in include/libc-symbols.h and thus availabile to
++  # shlib-versions to select the appropriate name for
++  # the dynamic linker via %ifdef.
++  case x$archcppflag in
++  x__ARM_PCS_VFP)
++    libc_cv_arm_pcs_vfp=yes
++    ;;
++  *)
++    libc_cv_arm_pcs_vfp=no
++    ;;
++  esac])
++if test $libc_cv_arm_pcs_vfp = yes; then
++  AC_DEFINE(HAVE_ARM_PCS_VFP)
++fi
+Only in d/sysdeps/arm: configure.in.orig
+diff -rup c/sysdeps/arm/shlib-versions d/sysdeps/arm/shlib-versions
+--- c/sysdeps/arm/shlib-versions	2012-01-08 22:47:04.000000000 -0700
++++ d/sysdeps/arm/shlib-versions	2012-05-07 11:57:07.739567660 -0600
+@@ -1,4 +1,10 @@
+ arm.*-.*-linux-gnueabi.*	DEFAULT			GLIBC_2.4
+ 
+-arm.*-.*-linux-gnueabi.*	ld=ld-linux.so.3
++%ifdef HAVE_ARM_PCS_VFP
++# The EABI-derived hard-float ABI uses a new dynamic linker.
++arm.*-.*-linux-gnueabi.*       ld=ld-linux-armhf.so.3
++%else
++# The EABI-derived soft-float ABI continues to use ld-linux.so.3.
++arm.*-.*-linux-gnueabi.*       ld=ld-linux.so.3
++%endif
+ arm.*-.*-linux.*	ld=ld-linux.so.2
