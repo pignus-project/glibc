@@ -3,7 +3,7 @@ index 706add2..f00b798 100644
 --- a/sysdeps/arm/configure.in
 +++ b/sysdeps/arm/configure.in
 @@ -49,3 +49,20 @@ EOF
- if test $libc_cv_asm_cfi_directive_sections !=3D yes; then
+ if test $libc_cv_asm_cfi_directive_sections != yes; then
    AC_MSG_ERROR([need .cfi_sections in this configuration])
  fi
 +
@@ -19,8 +19,8 @@ index 706add2..f00b798 100644
 +  [AC_EGREP_CPP(yes,[#ifdef __ARM_PCS_VFP
 +                      yes
 +                     #endif
-+  ], libc_cv_arm_pcs_vfp=3Dyes, libc_cv_arm_pcs_vfp=3Dno)])
-+if test $libc_cv_arm_pcs_vfp =3D yes; then
++  ], libc_cv_arm_pcs_vfp=yes, libc_cv_arm_pcs_vfp=no)])
++if test $libc_cv_arm_pcs_vfp = yes; then
 +  AC_DEFINE(HAVE_ARM_PCS_VFP)
 +fi
 
