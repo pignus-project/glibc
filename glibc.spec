@@ -112,6 +112,7 @@ Patch1042: %{name}-rh801650-1.patch
 Patch1043: %{name}-rh801650-2.patch
 Patch1046: %{name}-rh806403.patch
 Patch1048: %{name}-rh804792.patch
+Patch1052: %{name}-sw13979.patch
 Patch1053: %{name}-rh817276.patch
 
 #
@@ -184,9 +185,6 @@ Patch2050: %{name}-rh682500.patch
 
 # Upstream BZ 13761
 Patch2051: %{name}-rh788989-2.patch
-
-# Upstream BZ 13979
-Patch2052: %{name}-sw13979.patch
 
 # Upstream, see libc-alpha posting from Carlos O'Donell 5/5/2012
 Patch2054: %{name}-arm-hardfloat-1.patch
@@ -457,7 +455,7 @@ rm -rf %{glibcportsdir}
 %patch2049 -p1
 %patch2050 -p1
 %patch2051 -p1
-%patch2052 -p1
+%patch1052 -p1
 %patch2054 -p1
 
 pushd ../%{glibcportsdir}
