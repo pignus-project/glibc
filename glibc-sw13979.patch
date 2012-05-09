@@ -1,20 +1,30 @@
-2012-03-30  Jeff Law  <law@redhat.com>
-
-	* include/features.h: Warn if user requests FORTIFY_SOURCE checking
-	but the checks are disabled for any reason.
-
-diff --git a/include/features.h b/include/features.h
-index c347555..e3ad8b0 100644
---- a/include/features.h
-+++ b/include/features.h
-@@ -325,6 +325,10 @@
+diff -rup c/include/features.h d/include/features.h
+--- c/include/features.h	2012-05-08 21:26:45.294191922 -0600
++++ d/include/features.h	2012-05-08 21:32:42.889297128 -0600
+@@ -309,19 +309,18 @@
+ # define __USE_REENTRANT	1
+ #endif
+ 
+-#if defined _FORTIFY_SOURCE && _FORTIFY_SOURCE > 0 \
+-    && defined __OPTIMIZE__ && __OPTIMIZE__ > 0
+-# if !__GNUC_PREREQ (4, 1)
+-#  ifdef __GNUC_RH_RELEASE__
+-#   warning _FORTIFY_SOURCE supported only with GCC 4.1 and later
+-#  endif
+-#  define __USE_FORTIFY_LEVEL 0
++#if defined _FORTIFY_SOURCE && _FORTIFY_SOURCE > 0
++# if !defined __OPTIMIZE__ || __OPTIMIZE__ <= 0
++#  warning _FORTIFY_SOURCE requires compiling with optimization (-O)
++# elif !__GNUC_PREREQ (4, 1)
++#  warning _FORTIFY_SOURCE requires GCC 4.1 or later
+ # elif _FORTIFY_SOURCE > 1
+ #  define __USE_FORTIFY_LEVEL 2
+ # else
+ #  define __USE_FORTIFY_LEVEL 1
+ # endif
+-#else
++#endif
++#ifndef __USE_FORTIFY_LEVEL
  # define __USE_FORTIFY_LEVEL 0
  #endif
  
-+#if defined _FORTIFY_SOURCE && _FORTIFY_SOURCE > 0 && __USE_FORTIFY_LEVEL == 0
-+# warning _FORTIFY_SOURCE requested but disabled, please enable optimizer to restore fortification
-+#endif
-+
- /* We do support the IEC 559 math functionality, real and complex.  */
- #define __STDC_IEC_559__		1
- #define __STDC_IEC_559_COMPLEX__	1
