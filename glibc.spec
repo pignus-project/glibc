@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 36%{?dist}
+Release: 37%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -189,6 +189,9 @@ Patch2051: %{name}-rh788989-2.patch
 # Upstream, see libc-alpha posting from Carlos O'Donell 5/5/2012
 Patch2054: %{name}-arm-hardfloat-1.patch
 Patch2055: %{name}-arm-hardfloat-2.patch
+
+# Upstream BZ 13753, probably will be fixed differently
+Patch2056: %{name}-rh801650-3.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -463,6 +466,7 @@ pushd ../%{glibcportsdir}
 %patch2055 -p1
 popd
 
+%patch2056 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1315,6 +1319,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu May 10 2012 Jeff Law <law@redhat.com> - 2.15-37
+  - Try again to fix AVX testing (#801650)
+
 * Mon May 7 2012 Jeff Law <law@redhat.com> - 2.15-36
   - Improve fortification disabled warning.
   - Change location of dynamic linker for armhf.
