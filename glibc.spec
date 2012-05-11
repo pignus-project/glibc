@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 37%{?dist}
+Release: 38%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -108,8 +108,6 @@ Patch1037: %{name}-rh760935.patch
 Patch1038: %{name}-rh798471.patch
 Patch1039: %{name}-rh758888.patch
 Patch1041: %{name}-rh794797-2.patch
-Patch1042: %{name}-rh801650-1.patch
-Patch1043: %{name}-rh801650-2.patch
 Patch1046: %{name}-rh806403.patch
 Patch1048: %{name}-rh804792.patch
 Patch1052: %{name}-sw13979.patch
@@ -190,8 +188,8 @@ Patch2051: %{name}-rh788989-2.patch
 Patch2054: %{name}-arm-hardfloat-1.patch
 Patch2055: %{name}-arm-hardfloat-2.patch
 
-# Upstream BZ 13753, probably will be fixed differently
-Patch2056: %{name}-rh801650-3.patch
+# Upstream BZ 13753/14059
+Patch2056: %{name}-rh801650.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -448,8 +446,6 @@ rm -rf %{glibcportsdir}
 %patch1039 -p1
 %patch2040 -p1
 %patch1041 -p1
-%patch1042 -p1
-%patch1043 -p1
 %patch0044 -p1
 %patch2045 -p1
 %patch1046 -p1
@@ -1319,6 +1315,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri May 11 2012 Jeff Law <law@redhat.com> - 2.15-38
+  - Upstream patch to fix AVX testing (#801650)
+
 * Thu May 10 2012 Jeff Law <law@redhat.com> - 2.15-37
   - Try again to fix AVX testing (#801650)
 
