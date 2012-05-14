@@ -92,12 +92,12 @@ diff -rup c/sysdeps/x86_64/multiarch/init-arch.c d/sysdeps/x86_64/multiarch/init
 +		     : "=a" (xcrlow), "=d" (xcrhigh) : "c" (0));
 +		(xcrlow & (bit_YMM_state | bit_XMM_state)) ==
 +		 (bit_YMM_state | bit_XMM_state); }))
-+	__cpu_features.feature[index_AVX_Usable] = 1;
++	__cpu_features.feature[index_AVX_Usable] |= bit_AVX_Usable;
 +    }
 +
 +  /* FMA4 depends on AVX support.  */
 +  if ((__cpu_features.cpuid[COMMON_CPUID_INDEX_80000001].ecx & bit_FMA4) &&  __cpu_features.feature[index_AVX_Usable])
-+	__cpu_features.feature[index_FMA4_Usable] = 1;
++	__cpu_features.feature[index_FMA4_Usable] |= bit_FMA4_Usable;
 +
    __cpu_features.family = family;
    __cpu_features.model = model;

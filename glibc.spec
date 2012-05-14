@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 38%{?dist}
+Release: 39%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1315,6 +1315,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon May 14 2012 Jeff Law <law@redhat.com> - 2.15-39
+  - Update upstream patch for AVX testing (#801650)
+
 * Fri May 11 2012 Jeff Law <law@redhat.com> - 2.15-38
   - Upstream patch to fix AVX testing (#801650)
 
