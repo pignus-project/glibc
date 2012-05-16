@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 39%{?dist}
+Release: 40%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -109,6 +109,7 @@ Patch1038: %{name}-rh798471.patch
 Patch1039: %{name}-rh758888.patch
 Patch1041: %{name}-rh794797-2.patch
 Patch1046: %{name}-rh806403.patch
+Patch1047: %{name}-rh806070.patch
 Patch1048: %{name}-rh804792.patch
 Patch1052: %{name}-sw13979.patch
 Patch1053: %{name}-rh817276.patch
@@ -172,8 +173,6 @@ Patch2040: %{name}-rh800224.patch
 
 Patch2045: %{name}-rh803286.patch
 
-# Upstream BZ 13594
-Patch2047: %{name}-rh806070.patch
 
 # Upstream BZ 13939
 Patch2049: %{name}-rh789238-2.patch
@@ -449,7 +448,7 @@ rm -rf %{glibcportsdir}
 %patch0044 -p1
 %patch2045 -p1
 %patch1046 -p1
-%patch2047 -p1
+%patch1047 -p1
 %patch1048 -p1
 %patch2049 -p1
 %patch2050 -p1
@@ -1315,6 +1314,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue May 15 2012 Jeff Law <law@redhat.com> - 2.15-40
+  - Update to upstream patch for 806070 (#806070)
+
 * Mon May 14 2012 Jeff Law <law@redhat.com> - 2.15-39
   - Update upstream patch for AVX testing (#801650)
 
