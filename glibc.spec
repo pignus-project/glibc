@@ -893,7 +893,6 @@ rm -rf $RPM_BUILD_ROOT%{_prefix}/share/zoneinfo
 
 # Make sure %config files have the same timestamp
 touch -r fedora/glibc.spec.in $RPM_BUILD_ROOT/etc/ld.so.conf
-touch -r timezone/northamerica $RPM_BUILD_ROOT/etc/localtime
 touch -r sunrpc/etc.rpc $RPM_BUILD_ROOT/etc/rpc
 
 cd fedora
