@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 1%{?dist}
+Release: 2%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -162,6 +162,9 @@ Patch2032: %{name}-rh682500.patch
 
 # Upstream BZ 13761
 Patch2033: %{name}-rh788989-2.patch
+
+# Upstream BZ 13027
+Patch2034: %{name}-rh804630.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -405,11 +408,12 @@ rm -rf %{glibcportsdir}
 %patch2026 -p1
 %patch2027 -p1
 %patch2028 -p1
-#%patch0029 -p1
+%patch0029 -p1
 %patch2030 -p1
 %patch2031 -p1
 %patch2032 -p1
 %patch2033 -p1
+%patch2034 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1267,6 +1271,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed May 23 2012  Jeff Law <law@redhat.com> - 2.15.90-2
+  - Fix option rotate when one IPV6 server is enabled (#804630)
+  - Reenable slow/uberslow path taps slowpow/slowexp.
+
 * Wed May 23 2012  Jeff Law <law@redhat.com> - 2.15.90-1
   - Resync with upstream sources.
 
