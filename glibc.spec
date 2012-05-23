@@ -1151,8 +1151,13 @@ if not fd then return end
 data = fd:read("*a")
 fd:close()
 if not data then return end
-update("/etc/localtime", data)
 update("/var/spool/postfix/etc/localtime", data)
+posix.symlink (zonename, "/etc/localtime.tzupdate")
+posix.chmod("/etc/localtime.tzupdate", 0644)
+if not os.rename("/etc/localtime.tzupdate", "/etc/localtime") then
+  os.remove("/etc/localtime.tzupdate")
+end
+
 
 %post devel
 /sbin/install-info %{_infodir}/libc.info.gz %{_infodir}/dir > /dev/null 2>&1 || :
@@ -1314,7 +1319,8 @@ rm -f *.filelist*
 
 %changelog
 * Tue May 22 2012 Patsy Franklin <pfrankli@redhat.com> - 2.15-41
-  - Make the symlink relative rather than linking into the buildroot.
+  - Fix tzdata trigger (#822200)
+  - Make the symlink relative rather than linking into the buildroot (#822200).
   - Changed /etc/localtime to a symlink. 8222000 (#822200)
 
 * Tue May 15 2012 Jeff Law <law@redhat.com> - 2.15-40
