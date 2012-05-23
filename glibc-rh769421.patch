@@ -1,6 +1,6 @@
-diff -Nrup a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S
---- a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S	2012-01-01 20:52:51.546347249 -0700
-+++ b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S	2012-01-01 20:57:21.880320786 -0700
+diff -Nrup c/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S d/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S
+--- c/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S	2012-05-20 23:58:20.732670548 -0600
++++ d/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S	2012-05-20 23:58:52.667518135 -0600
 @@ -137,7 +137,6 @@ __pthread_cond_wait:
  	cmpl	$PI_BIT, %eax
  	jne	18f
@@ -109,10 +109,10 @@ diff -Nrup a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S b/nptl/s
  	.long	.LcallUR-.LSTARTCODE
  	.long	.LENDCODE-.LcallUR
  	.long	0
-diff -Nrup a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
---- a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S	2012-01-01 20:52:51.550347247 -0700
-+++ b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S	2012-01-01 20:57:21.883320786 -0700
-@@ -137,14 +137,11 @@ __pthread_cond_wait:
+diff -Nrup c/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S d/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
+--- c/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S	2012-05-20 23:58:20.736670528 -0600
++++ d/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S	2012-05-21 00:01:39.870720001 -0600
+@@ -136,14 +136,11 @@ __pthread_cond_wait:
  	cmpl	$PI_BIT, %eax
  	jne	61f
  
@@ -127,11 +127,10 @@ diff -Nrup a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/nptl/sysd
  #ifdef __ASSUME_REQUEUE_PI
  	jmp	62f
  #else
-@@ -331,70 +328,6 @@ __pthread_cond_wait:
- 
+@@ -331,69 +328,6 @@ __pthread_cond_wait:
  13:	movq	%r10, %rax
  	jmp	14b
--
+ 
 -91:
 -.LcleanupSTART2:
 -	/* FUTEX_WAIT_REQUEUE_PI returned EAGAIN.  We need to
@@ -152,7 +151,7 @@ diff -Nrup a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/nptl/sysd
 -#if cond_lock != 0
 -	addq	$cond_lock, %rdi
 -#endif
--	cmpq	$-1, dep_mutex-cond_lock(%rdi)
+-	LP_OP(cmp) $-1, dep_mutex-cond_lock(%rdi)
 -	movl	$LLL_PRIVATE, %eax
 -	movl	$LLL_SHARED, %esi
 -	cmovne	%eax, %esi
@@ -178,7 +177,7 @@ diff -Nrup a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/nptl/sysd
 -#if cond_lock != 0
 -	addq	$cond_lock, %rdi
 -#endif
--	cmpq	$-1, dep_mutex-cond_lock(%rdi)
+-	LP_OP(cmp) $-1, dep_mutex-cond_lock(%rdi)
 -	movl	$LLL_PRIVATE, %eax
 -	movl	$LLL_SHARED, %esi
 -	cmovne	%eax, %esi
@@ -190,7 +189,7 @@ diff -Nrup a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/nptl/sysd
 -93:
 -	/* Set the rest of SYS_futex args for FUTEX_WAIT_REQUEUE_PI. */
 -	xorq	%r10, %r10
--	movq	dep_mutex(%rdi), %r8
+-	mov	dep_mutex(%rdi), %R8_LP
 -	leaq	cond_futex(%rdi), %rdi
 -	jmp	90b
 -.LcleanupEND2:
@@ -198,7 +197,7 @@ diff -Nrup a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/nptl/sysd
  	.size	__pthread_cond_wait, .-__pthread_cond_wait
  versioned_symbol (libpthread, __pthread_cond_wait, pthread_cond_wait,
  		  GLIBC_2_3_2)
-@@ -547,15 +480,11 @@ __condvar_cleanup1:
+@@ -546,15 +480,11 @@ __condvar_cleanup1:
  	.uleb128 .LcleanupSTART-.LSTARTCODE
  	.uleb128 .LcleanupEND-.LcleanupSTART
  	.uleb128 __condvar_cleanup1-.LSTARTCODE

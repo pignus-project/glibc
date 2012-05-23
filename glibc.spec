@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.15-a316c1f
-%define glibcversion 2.15
-%define glibcportsdir glibc-ports-2.15-ad8ae7d
+%define glibcsrcdir glibc-2.15.90-8b728fa3
+%define glibcversion 2.15.90
+%define glibcportsdir glibc-ports-2.15.90-4645e97
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 41%{?dist}
+Release: 1%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -68,51 +68,36 @@ Patch0001: %{name}-stap.patch
 
 # Reverting an upstream patch.  I don't think this has been discussed
 # upstream yet.
-Patch0006: %{name}-rh769421.patch
+Patch0005: %{name}-rh769421.patch
 
 # Depends on systemtap infrastructure, so can't go upstream
-Patch0012: %{name}-rh179072.patch
+Patch0009: %{name}-rh179072.patch
 
 # Needs to be sent upstream
-Patch0013: %{name}-rh697421.patch
+Patch0010: %{name}-rh697421.patch
 
 # Needs to be sent upstream
-Patch0014: %{name}-rh740682.patch
+Patch0011: %{name}-rh740682.patch
 
 # Needs to be sent upstream
-Patch0018: %{name}-rh657588.patch
+Patch0013: %{name}-rh657588.patch
 
 # Not likely to be accepted upstream
-Patch0019: %{name}-rh787201.patch
+Patch0014: %{name}-rh787201.patch
 
 # Not necessary to send upstream, fedora specific
-Patch0023: %{name}-rh688948.patch
+Patch0018: %{name}-rh688948.patch
 
 # Needs to be sent upstream
-Patch0027: %{name}-rh564528.patch
+Patch0021: %{name}-rh564528.patch
 
 # stap and thus will never be accepted upstream
-Patch0044: %{name}-stap-libm.patch
+Patch0029: %{name}-stap-libm.patch
 
 #
 # Patches from upstream
 #
 
-Patch1004: %{name}-rh740506.patch
-Patch1010: %{name}-rh784402.patch
-Patch1026: %{name}-rh624296.patch
-Patch1034: %{name}-rh794797.patch
-Patch1035: %{name}-rh788989.patch
-Patch1036: %{name}-rh795498.patch
-Patch1037: %{name}-rh760935.patch
-Patch1038: %{name}-rh798471.patch
-Patch1039: %{name}-rh758888.patch
-Patch1041: %{name}-rh794797-2.patch
-Patch1046: %{name}-rh806403.patch
-Patch1047: %{name}-rh806070.patch
-Patch1048: %{name}-rh804792.patch
-Patch1052: %{name}-sw13979.patch
-Patch1053: %{name}-rh817276.patch
 
 #
 # Patches submitted, but not yet approved upstream.
@@ -126,69 +111,57 @@ Patch2002: %{name}-sw13579.patch
 Patch2003: %{name}-rh757881.patch
 
 # Upstream BZ 13013
-Patch2005: %{name}-rh730856.patch
+Patch2004: %{name}-rh730856.patch
 
-Patch2007: %{name}-rh729661.patch
+Patch2006: %{name}-rh729661.patch
 
 # Upstream BZ 13197
-Patch2008: %{name}-rh446078.patch
-
-# Upstream BZ 13905
-Patch2009: %{name}-rh454629.patch
+Patch2007: %{name}-rh446078.patch
 
 # Upstream BZ 13948
-Patch2011: %{name}-rh622499.patch
+Patch2008: %{name}-rh622499.patch
 
 # Upstream BZ 13618
-Patch2015: %{name}-sw13618.patch
-Patch2016: %{name}-sw13618-2.patch
+Patch2012: %{name}-sw13618-2.patch
 
-Patch2017: %{name}-rh783979.patch
-Patch2020: %{name}-rh741105.patch
-Patch2021: %{name}-rh770869.patch
-Patch2022: %{name}-rh691912.patch
-Patch2024: %{name}-rh770439.patch
-Patch2025: %{name}-rh789209.patch
+Patch2015: %{name}-rh741105.patch
+Patch2016: %{name}-rh770869.patch
+Patch2017: %{name}-rh691912.patch
+Patch2019: %{name}-rh770439.patch
+Patch2020: %{name}-rh789209.patch
 
 # Upstream BZ 13604
-Patch2028: %{name}-rh790292.patch
+Patch2022: %{name}-rh790292.patch
 
 # Upstream BZ 13603
-Patch2029: %{name}-rh790298.patch
+Patch2023: %{name}-rh790298.patch
 
 # Upstream BZ 13698
-Patch2030: %{name}-rh791161.patch
+Patch2024: %{name}-rh791161.patch
 
 # Upstream BZ 12377
-Patch2031: %{name}-rh697149.patch
+Patch2025: %{name}-rh697149.patch
 
 # Upstream BZ 9954
-Patch2032: %{name}-rh739743.patch
+Patch2026: %{name}-rh739743.patch
 
 # Upstream BZ 13939
-Patch2033: %{name}-rh789238.patch
+Patch2027: %{name}-rh789238.patch
 
 #Upstream BZ 13818
-Patch2040: %{name}-rh800224.patch
+Patch2028: %{name}-rh800224.patch
 
-Patch2045: %{name}-rh803286.patch
+Patch2030: %{name}-rh803286.patch
 
 
 # Upstream BZ 13939
-Patch2049: %{name}-rh789238-2.patch
+Patch2031: %{name}-rh789238-2.patch
 
 # Upstream BZ 13946
-Patch2050: %{name}-rh682500.patch
+Patch2032: %{name}-rh682500.patch
 
 # Upstream BZ 13761
-Patch2051: %{name}-rh788989-2.patch
-
-# Upstream, see libc-alpha posting from Carlos O'Donell 5/5/2012
-Patch2054: %{name}-arm-hardfloat-1.patch
-Patch2055: %{name}-arm-hardfloat-2.patch
-
-# Upstream BZ 13753/14059
-Patch2056: %{name}-rh801650.patch
+Patch2033: %{name}-rh788989-2.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -407,61 +380,36 @@ rm -rf %{glibcportsdir}
 %patch0001 -E -p1
 %patch2002 -p1
 %patch2003 -p1
-%patch1004 -p1
-%patch2005 -p1
-%patch0006 -p1
+%patch2004 -p1
+%patch0005 -p1
+%patch2006 -p1
 %patch2007 -p1
 %patch2008 -p1
-%patch2009 -p1
-%patch1010 -p1
-%patch2011 -p1
-%patch0012 -p1
+%patch0009 -p1
+%patch0010 -p1
+%patch0011 -p1
+%patch2012 -p1
 %patch0013 -p1
 %patch0014 -p1
 %patch2015 -p1
 %patch2016 -p1
 %patch2017 -p1
 %patch0018 -p1
-%patch0019 -p1
+%patch2019 -p1
 %patch2020 -p1
-%patch2021 -p1
+%patch0021 -p1
 %patch2022 -p1
-%patch0023 -p1
+%patch2023 -p1
 %patch2024 -p1
 %patch2025 -p1
-%patch1026 -p1
-%patch0027 -p1
+%patch2026 -p1
+%patch2027 -p1
 %patch2028 -p1
-%patch2029 -p1
+#%patch0029 -p1
 %patch2030 -p1
 %patch2031 -p1
 %patch2032 -p1
 %patch2033 -p1
-%patch1034 -p1
-%patch1035 -p1
-%patch1036 -p1
-%patch1037 -p1
-%patch1038 -p1
-%patch1039 -p1
-%patch2040 -p1
-%patch1041 -p1
-%patch0044 -p1
-%patch2045 -p1
-%patch1046 -p1
-%patch1047 -p1
-%patch1048 -p1
-%patch2049 -p1
-%patch2050 -p1
-%patch2051 -p1
-%patch1052 -p1
-%patch2054 -p1
-
-pushd ../%{glibcportsdir}
-%patch1053 -p1
-%patch2055 -p1
-popd
-
-%patch2056 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -560,6 +508,7 @@ configure_CFLAGS="$build_CFLAGS -fno-asynchronous-unwind-tables"
 %ifarch %{multiarcharches}
 	--enable-multi-arch \
 %endif
+	--enable-obsolete-rpc \
 %ifarch %{systemtaparches}
 	--enable-systemtap \
 %endif
@@ -1252,8 +1201,8 @@ rm -f *.filelist*
 %attr(0600,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/cache/ldconfig/aux-cache
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/ld.so.cache
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/gai.conf
-%doc README NEWS INSTALL FAQ BUGS NOTES PROJECTS CONFORMANCE
-%doc COPYING COPYING.LIB README.libm LICENSES
+%doc README NEWS INSTALL BUGS PROJECTS CONFORMANCE
+%doc COPYING COPYING.LIB LICENSES
 %doc hesiod/README.hesiod
 
 %if %{xenpackage}
@@ -1318,6 +1267,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed May 23 2012  Jeff Law <law@redhat.com> - 2.15.90-1
+  - Resync with upstream sources.
+
 * Tue May 22 2012 Patsy Franklin <pfrankli@redhat.com> - 2.15-41
   - Fix tzdata trigger (#822200)
   - Make the symlink relative rather than linking into the buildroot (#822200).
