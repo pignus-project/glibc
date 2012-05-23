@@ -887,7 +887,7 @@ EOF
 # /etc/localtime
 rm -f $RPM_BUILD_ROOT/etc/localtime
 #cp -f $RPM_BUILD_ROOT%{_prefix}/share/zoneinfo/US/Eastern $RPM_BUILD_ROOT/etc/localtime
-ln -sf $RPM_BUILD_ROOT%{_prefix}/share/zoneinfo/US/Eastern $RPM_BUILD_ROOT/etc/localtime
+ln -sf ..%{_prefix}/share/zoneinfo/US/Eastern $RPM_BUILD_ROOT/etc/localtime
 
 rm -rf $RPM_BUILD_ROOT%{_prefix}/share/zoneinfo
 
@@ -1314,6 +1314,7 @@ rm -f *.filelist*
 
 %changelog
 * Tue May 22 2012 Patsy Franklin <pfrankli@redhat.com> - 2.15-41
+  - Make the symlink relative rather than linking into the buildroot.
   - Changed /etc/localtime to a symlink. 8222000 (#822200)
 
 * Tue May 15 2012 Jeff Law <law@redhat.com> - 2.15-40
