@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 2%{?dist}
+Release: 3%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1068,6 +1068,25 @@ if posix.access("/etc/ld.so.cache") then
   end
 end
 
+fd = io.open("/etc/sysconfig/clock")
+if not fd then return end
+zonename = nil
+for l in fd:lines() do
+  zone = string.match(l, "^[ \t]*ZONE[ \t]*=[ \t]*\"?([^ \t\n\"]*)");
+  if zone then
+    zonename = "/usr/share/zoneinfo/" .. zone
+    break
+  end
+end
+fd:close()
+if not zonename then return end
+posix.symlink (zonename, "/etc/localtime.tzupdate")
+posix.chmod("/etc/localtime.tzupdate", 0644)
+if not os.rename("/etc/localtime.tzupdate", "/etc/localtime") then
+  os.remove("/etc/localtime.tzupdate")
+end
+
+
 %triggerin common -p <lua> -- tzdata
 function update (filename, new_data)
   local fd = io.open(filename)
@@ -1271,6 +1290,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri May 25 2012  Jeff Law <law@redhat.com> - 2.15.90-3
+  - Work around RPM dropping the contents of /etc/localtime
+    when it turns into a symlink with %post common script (#825159).
+
 * Wed May 23 2012  Jeff Law <law@redhat.com> - 2.15.90-2
   - Fix option rotate when one IPV6 server is enabled (#804630)
   - Reenable slow/uberslow path taps slowpow/slowexp.
