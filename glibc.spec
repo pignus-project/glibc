@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.15.90-8b728fa3
+%define glibcsrcdir glibc-2.15.90-4d17e683
 %define glibcversion 2.15.90
-%define glibcportsdir glibc-ports-2.15.90-4645e97
+%define glibcportsdir glibc-ports-2.15.90-0387d093
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 4%{?dist}
+Release: 5%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -63,14 +63,14 @@ Source2: %{glibcsrcdir}-fedora.tar.gz
 # Still needs to be broken down into individual patches
 Patch0000: %{name}-fedora.patch
 
-# Systemtap and thus won't likely be accepted upstream
+# Is this still necessary, if so, it needs to go upstream
 Patch0001: %{name}-stap.patch
 
 # Reverting an upstream patch.  I don't think this has been discussed
 # upstream yet.
 Patch0005: %{name}-rh769421.patch
 
-# Depends on systemtap infrastructure, so can't go upstream
+# stap, needs to be sent upstream
 Patch0009: %{name}-rh179072.patch
 
 # Needs to be sent upstream
@@ -91,7 +91,7 @@ Patch0018: %{name}-rh688948.patch
 # Needs to be sent upstream
 Patch0021: %{name}-rh564528.patch
 
-# stap and thus will never be accepted upstream
+# stap, needs to be sent upstream
 Patch0029: %{name}-stap-libm.patch
 
 # Build info files in the source tree, then move to the build
@@ -1295,6 +1295,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed May 30 2012  Jeff Law <law@redhat.com> - 2.15.90-5
+  - Resync with upstream sources.
+
 * Tue May 29 2012  Jeff Law <law@redhat.com> - 2.15.90-4
   - Build info files in the source dir, then move to objdir
     to avoid multilib conflicts (#825061)
