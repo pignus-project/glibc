@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.15.90-4d17e683
+%define glibcsrcdir glibc-2.15.90-edf2933a
 %define glibcversion 2.15.90
-%define glibcportsdir glibc-ports-2.15.90-0387d093
+%define glibcportsdir glibc-ports-2.15.90-36d173fb
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 6%{?dist}
+Release: 7%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1299,8 +1299,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri June 01 2012 Jeff Law <law@redhat.com> - 2.15.90-7
+  - Resync with upstream sources.  (#827040)
+
 * Thu May 31 2012 Patsy Franklin <patsy@redhat.com> - 2.15.90-6
-- Fix fnmatch() when '*' wildcard is applied on a file name containing multibyte chars. (#819430)
+  - Fix fnmatch() when '*' wildcard is applied on a file name containing
+  multibyte chars. (#819430)
 
 * Wed May 30 2012  Jeff Law <law@redhat.com> - 2.15.90-5
   - Resync with upstream sources.
