@@ -1299,7 +1299,7 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri June 1 2012 Jeff Law <law@redhat.com> - 2.15.90-7
+* Fri Jun 1 2012 Jeff Law <law@redhat.com> - 2.15.90-7
   - Resync with upstream sources.  (#827040)
 
 * Thu May 31 2012 Patsy Franklin <patsy@redhat.com> - 2.15.90-6
