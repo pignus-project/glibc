@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.15.90-edf2933a
+%define glibcsrcdir glibc-2.15.90-6043738b
 %define glibcversion 2.15.90
 %define glibcportsdir glibc-ports-2.15.90-36d173fb
 ### glibc.spec.in follows:
@@ -71,32 +71,32 @@ Patch0001: %{name}-stap.patch
 Patch0005: %{name}-rh769421.patch
 
 # stap, needs to be sent upstream
-Patch0009: %{name}-rh179072.patch
+Patch0007: %{name}-rh179072.patch
 
 # Needs to be sent upstream
-Patch0010: %{name}-rh697421.patch
+Patch0008: %{name}-rh697421.patch
 
 # Needs to be sent upstream
-Patch0011: %{name}-rh740682.patch
+Patch0009: %{name}-rh740682.patch
 
 # Needs to be sent upstream
-Patch0013: %{name}-rh657588.patch
+Patch0011: %{name}-rh657588.patch
 
 # Not likely to be accepted upstream
-Patch0014: %{name}-rh787201.patch
+Patch0012: %{name}-rh787201.patch
 
 # Not necessary to send upstream, fedora specific
-Patch0018: %{name}-rh688948.patch
+Patch0016: %{name}-rh688948.patch
 
 # Needs to be sent upstream
-Patch0021: %{name}-rh564528.patch
+Patch0019: %{name}-rh564528.patch
 
 # stap, needs to be sent upstream
-Patch0029: %{name}-stap-libm.patch
+Patch0027: %{name}-stap-libm.patch
 
 # Build info files in the source tree, then move to the build
 # tree so that they're identical for multilib builds
-Patch0035: %{name}-rh825061.patch
+Patch0032: %{name}-rh825061.patch
 
 #
 # Patches from upstream
@@ -119,65 +119,56 @@ Patch2004: %{name}-rh730856.patch
 
 Patch2006: %{name}-rh729661.patch
 
-# Upstream BZ 13197
-Patch2007: %{name}-rh446078.patch
-
-# Upstream BZ 13948
-Patch2008: %{name}-rh622499.patch
-
 # Upstream BZ 13618
-Patch2012: %{name}-sw13618-2.patch
+Patch2010: %{name}-sw13618-2.patch
 
-Patch2015: %{name}-rh741105.patch
-Patch2016: %{name}-rh770869.patch
-Patch2017: %{name}-rh691912.patch
-Patch2019: %{name}-rh770439.patch
-Patch2020: %{name}-rh789209.patch
+Patch2013: %{name}-rh741105.patch
+Patch2014: %{name}-rh770869.patch
+Patch2015: %{name}-rh691912.patch
+Patch2017: %{name}-rh770439.patch
+Patch2018: %{name}-rh789209.patch
 
 # Upstream BZ 13604
-Patch2022: %{name}-rh790292.patch
+Patch2020: %{name}-rh790292.patch
 
 # Upstream BZ 13603
-Patch2023: %{name}-rh790298.patch
+Patch2021: %{name}-rh790298.patch
 
 # Upstream BZ 13698
-Patch2024: %{name}-rh791161.patch
+Patch2022: %{name}-rh791161.patch
 
 # Upstream BZ 12377
-Patch2025: %{name}-rh697149.patch
+Patch2023: %{name}-rh697149.patch
 
 # Upstream BZ 9954
-Patch2026: %{name}-rh739743.patch
+Patch2024: %{name}-rh739743.patch
 
 # Upstream BZ 13939
-Patch2027: %{name}-rh789238.patch
+Patch2025: %{name}-rh789238.patch
 
 #Upstream BZ 13818
-Patch2028: %{name}-rh800224.patch
+Patch2026: %{name}-rh800224.patch
 
-Patch2030: %{name}-rh803286.patch
+Patch2028: %{name}-rh803286.patch
 
 
 # Upstream BZ 13939
-Patch2031: %{name}-rh789238-2.patch
-
-# Upstream BZ 13946
-Patch2032: %{name}-rh682500.patch
+Patch2029: %{name}-rh789238-2.patch
 
 # Upstream BZ 13761
-Patch2033: %{name}-rh788989-2.patch
+Patch2030: %{name}-rh788989-2.patch
 
 # Upstream BZ 13027
-Patch2034: %{name}-rh804630.patch
+Patch2031: %{name}-rh804630.patch
 
 # Upstream BZ 14185
-Patch2035: %{name}-rh819430.patch
+Patch2033: %{name}-rh819430.patch
 
 # Upstream BZ 14134
-Patch2036: %{name}-rh823905.patch
+Patch2034: %{name}-rh823905.patch
 
 # See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
-Patch2037: %{name}-rh767693-2.patch
+Patch2035: %{name}-rh767693-2.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -399,38 +390,35 @@ rm -rf %{glibcportsdir}
 %patch2004 -p1
 %patch0005 -p1
 %patch2006 -p1
-%patch2007 -p1
-%patch2008 -p1
+%patch0007 -p1
+%patch0008 -p1
 %patch0009 -p1
-%patch0010 -p1
+%patch2010 -p1
 %patch0011 -p1
-%patch2012 -p1
-%patch0013 -p1
-%patch0014 -p1
+%patch0012 -p1
+%patch2013 -p1
+%patch2014 -p1
 %patch2015 -p1
-%patch2016 -p1
+%patch0016 -p1
 %patch2017 -p1
-%patch0018 -p1
-%patch2019 -p1
+%patch2018 -p1
+%patch0019 -p1
 %patch2020 -p1
-%patch0021 -p1
+%patch2021 -p1
 %patch2022 -p1
 %patch2023 -p1
 %patch2024 -p1
 %patch2025 -p1
 %patch2026 -p1
-%patch2027 -p1
+%patch0027 -p1
 %patch2028 -p1
-%patch0029 -p1
+%patch2029 -p1
 %patch2030 -p1
 %patch2031 -p1
-%patch2032 -p1
+%patch0032 -p1
 %patch2033 -p1
 %patch2034 -p1
-%patch0035 -p1
 %patch2035 -p1
-%patch2036 -p1
-%patch2037 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
@@ -1301,6 +1289,7 @@ rm -f *.filelist*
 
 %changelog
 * Tue Jun  5 2012 Jeff Law <law@redhat.com> - 2.15.90-9
+  - Resync with upstream sources, drop unnecessary patches.
   - Fix DoS in RPC implementation (#767693)
   - Remove deprecated alpha support.
   - Remove redundant hunk from patch. (#823905)
@@ -1317,7 +1306,7 @@ rm -f *.filelist*
   multibyte chars. (#819430)
 
 * Wed May 30 2012  Jeff Law <law@redhat.com> - 2.15.90-5
-  - Resync with upstream sources.
+  - Resync with upstream sources, drop unnecessary patches.
 
 * Tue May 29 2012  Jeff Law <law@redhat.com> - 2.15.90-4
   - Build info files in the source dir, then move to objdir
@@ -1332,7 +1321,7 @@ rm -f *.filelist*
   - Reenable slow/uberslow path taps slowpow/slowexp.
 
 * Wed May 23 2012  Jeff Law <law@redhat.com> - 2.15.90-1
-  - Resync with upstream sources.
+  - Resync with upstream sources, drop unnecessary patches.
 
 * Tue May 22 2012 Patsy Franklin <pfrankli@redhat.com> - 2.15-41
   - Fix tzdata trigger (#822200)
