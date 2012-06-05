@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 8%{?dist}
+Release: 9%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -175,6 +175,9 @@ Patch2035: %{name}-rh819430.patch
 
 # Upstream BZ 14134
 Patch2036: %{name}-rh823905.patch
+
+# See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
+Patch2037: %{name}-rh767693-2.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -427,11 +430,11 @@ rm -rf %{glibcportsdir}
 %patch0035 -p1
 %patch2035 -p1
 %patch2036 -p1
+%patch2037 -p1
 
 # A lot of programs still misuse memcpy when they have to use
 # memmove. The memcpy implementation below is not tolerant at
 # all.
-rm -f sysdeps/alpha/alphaev6/memcpy.S
 %if %{buildpower6}
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -457,9 +460,6 @@ BuildFlags="$BuildFlags -mno-tls-direct-seg-refs"
 %endif
 %ifarch x86_64
 BuildFlags="-mtune=generic"
-%endif
-%ifarch alphaev6
-BuildFlags="-mcpu=ev6"
 %endif
 %ifarch sparc
 BuildFlags="-fcall-used-g6"
@@ -997,9 +997,6 @@ cat debuginfocommon.sources >> debuginfo.filelist
 %ifarch %{ix86}
 %define basearch i686
 %endif
-%ifarch alpha alphaev6
-%define basearch alpha
-%endif
 %ifarch sparc sparcv9
 %define basearch sparc
 %endif
@@ -1303,9 +1300,14 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jun  5 2012 Jeff Law <law@redhat.com> - 2.15.90-9
+  - Fix DoS in RPC implementation (#767693)
+  - Remove deprecated alpha support.
+  - Remove redundant hunk from patch. (#823905)
+
 * Fri Jun  1 2012 Patsy Franklin <patsy@redhat.com> - 2.15.90-8
-  - Fix iconv() segfault when the invalid multibyte character 0xffff is input when 
-    converting from IBM930 (823905)
+  - Fix iconv() segfault when the invalid multibyte character 0xffff is input
+    when converting from IBM930 (#823905)
 
 * Fri Jun 1 2012 Jeff Law <law@redhat.com> - 2.15.90-7
   - Resync with upstream sources.  (#827040)
