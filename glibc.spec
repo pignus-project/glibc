@@ -420,13 +420,10 @@ rm -rf %{glibcportsdir}
 %patch2034 -p1
 %patch2035 -p1
 
-# A lot of programs still misuse memcpy when they have to use
-# memmove. The memcpy implementation below is not tolerant at
-# all.
-%if %{buildpower6}
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
 # with power6 libs.
+%if %{buildpower6}
 rm -f sysdeps/powerpc/powerpc32/power4/hp-timing.[ch]
 %endif
 
