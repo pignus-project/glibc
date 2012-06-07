@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 9%{?dist}
+Release: 10%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1067,8 +1067,9 @@ fd = io.open("/etc/sysconfig/clock")
 if not fd then return end
 zonename = nil
 for l in fd:lines() do
-  zone = string.match(l, "^[ \t]*ZONE[ \t]*=[ \t]*\"?([^ \t\n\"]*)");
+  zone = string.match(l, "^[ \t]*ZONE[ \t]*=[ \t]*\"?([^\t\n\"]*)");
   if zone then
+    zone = string.gsub (zone, " ", "_")
     zonename = "/usr/share/zoneinfo/" .. zone
     break
   end
@@ -1105,8 +1106,9 @@ fd = io.open("/etc/sysconfig/clock")
 if not fd then return end
 zonename = nil
 for l in fd:lines() do
-  zone = string.match(l, "^[ \t]*ZONE[ \t]*=[ \t]*\"?([^ \t\n\"]*)");
+  zone = string.match(l, "^[ \t]*ZONE[ \t]*=[ \t]*\"?([^\t\n\"]*)");
   if zone then
+    zone = string.gsub (zone, " ", "_")
     zonename = "/usr/share/zoneinfo/" .. zone
     break
   end
@@ -1285,6 +1287,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jun  7 2012 Jeff Law <law@redhat.com> - 2.15.90-10
+  - Fix parsing of /etc/sysconfig/clock when ZONE has spaces. (#828291)
+
 * Tue Jun  5 2012 Jeff Law <law@redhat.com> - 2.15.90-9
   - Resync with upstream sources, drop unnecessary patches.
   - Fix DoS in RPC implementation (#767693)
