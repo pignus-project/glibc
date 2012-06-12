@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 10%{?dist}
+Release: 11%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -97,6 +97,10 @@ Patch0027: %{name}-stap-libm.patch
 # Build info files in the source tree, then move to the build
 # tree so that they're identical for multilib builds
 Patch0032: %{name}-rh825061.patch
+
+# Horrible hack, never to be upstreamed.  Can go away once the world
+# has been rebuilt to use the new ld.so path.
+Patch0061: %{name}-arm-hardfloat-3.patch
 
 #
 # Patches from upstream
@@ -176,6 +180,14 @@ Obsoletes: nss_db
 Provides: ldconfig
 # The dynamic linker supports DT_GNU_HASH
 Provides: rtld(GNU_HASH)
+
+# This is a short term need until everything is rebuilt in the ARM world
+# to use the new dynamic linker path
+%ifarch armv7hl armv7hnl
+Provides: ld-linux.so.3
+Provides: ld-linux.so.3(GLIBC_2.4)
+%endif
+
 Requires: glibc-common = %{version}-%{release}
 # Require libgcc in case some program calls pthread_cancel in its %%post
 Requires(pre): basesystem, libgcc
@@ -846,12 +858,17 @@ rm -rf $RPM_BUILD_ROOT%{_prefix}/share/zoneinfo
 touch -r fedora/glibc.spec.in $RPM_BUILD_ROOT/etc/ld.so.conf
 touch -r sunrpc/etc.rpc $RPM_BUILD_ROOT/etc/rpc
 
+# We allow undefined symbols in shared libraries because the libraries
+# referenced at link time here, particularly ld.so, may be different than
+# the one used at runtime.  This is really only needed during the ARM 
+# transition from ld-linux.so.3 to ld-linux-armhf.so.3.
 cd fedora
 $GCC -Os -g -o build-locale-archive build-locale-archive.c \
   ../build-%{target}/locale/locarchive.o \
   ../build-%{target}/locale/md5.o \
   -DDATADIR=\"%{_datadir}\" -DPREFIX=\"%{_prefix}\" \
   -L../build-%{target} \
+  -Wl,--allow-shlib-undefined \
   -B../build-%{target}/csu/ -lc -lc_nonshared
 install -m 700 build-locale-archive $RPM_BUILD_ROOT/usr/sbin/build-locale-archive
 cd ..
@@ -876,6 +893,12 @@ ln -sf /%{_lib}/ld64.so.1 $RPM_BUILD_ROOT/lib/ld64.so.1
 mkdir -p $RPM_BUILD_ROOT/lib
 ln -sf /%{_lib}/ld-linux-ia64.so.2 $RPM_BUILD_ROOT/lib/ld-linux-ia64.so.2
 %endif
+%endif
+
+# Leave a compatibility symlink for the dynamic loader on armhfp targets,
+# at least until the world gets rebuilt
+%ifarch armv7hl armv7hnl
+ln -sf /lib/ld-linux-armhf.so.3 $RPM_BUILD_ROOT/lib/ld-linux.so.3
 %endif
 
 %if %{run_glibc_tests}
@@ -1210,6 +1233,9 @@ rm -f *.filelist*
 /lib/ld-linux-ia64.so.2
 %endif
 %endif
+%ifarch armv7hl armv7hnl 
+/lib/ld-linux.so.3
+%endif
 %verify(not md5 size mtime) %config(noreplace) /etc/localtime
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/ld.so.conf
@@ -1287,6 +1313,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jun 11 2012 Dennis Gilmore <dennis@ausil.us> - 2.15.90-11
+- only deal with the arm linker compat hack on armhfp arches 
+- armsfp arches do not have a linker change
+- Backward compat hack for armhf binaries.
+
 * Thu Jun  7 2012 Jeff Law <law@redhat.com> - 2.15.90-10
   - Fix parsing of /etc/sysconfig/clock when ZONE has spaces. (#828291)
 
