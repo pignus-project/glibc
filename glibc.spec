@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 11%{?dist}
+Release: 12%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -431,6 +431,8 @@ rm -rf %{glibcportsdir}
 %patch2033 -p1
 %patch2034 -p1
 %patch2035 -p1
+
+%patch0061 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1313,6 +1315,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jun 11 2012 Dennis Gilmore <dennis@ausil.us> - 2.15.90-12
+- actually apply the arm linker hack
+
 * Mon Jun 11 2012 Dennis Gilmore <dennis@ausil.us> - 2.15.90-11
 - only deal with the arm linker compat hack on armhfp arches 
 - armsfp arches do not have a linker change
