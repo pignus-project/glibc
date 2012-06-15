@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 12%{?dist}
+Release: 13%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -100,7 +100,7 @@ Patch0032: %{name}-rh825061.patch
 
 # Horrible hack, never to be upstreamed.  Can go away once the world
 # has been rebuilt to use the new ld.so path.
-Patch0061: %{name}-arm-hardfloat-3.patch
+Patch0036: %{name}-arm-hardfloat-3.patch
 
 #
 # Patches from upstream
@@ -173,6 +173,9 @@ Patch2034: %{name}-rh823905.patch
 
 # See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
 Patch2035: %{name}-rh767693-2.patch
+
+# Upstream BZ 14247
+Patch2037: %{name}-rh827510.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -431,8 +434,8 @@ rm -rf %{glibcportsdir}
 %patch2033 -p1
 %patch2034 -p1
 %patch2035 -p1
-
-%patch0061 -p1
+%patch0036 -p1
+%patch2037 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1315,13 +1318,17 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jun 14 2012 Jeff Law <law@redhat.com> - 2.15.90-13
+  - Delay setting DECIDED field in locale file structure until
+    we have read the file's data (#827510).
+
 * Mon Jun 11 2012 Dennis Gilmore <dennis@ausil.us> - 2.15.90-12
-- actually apply the arm linker hack
+  - actually apply the arm linker hack
 
 * Mon Jun 11 2012 Dennis Gilmore <dennis@ausil.us> - 2.15.90-11
-- only deal with the arm linker compat hack on armhfp arches 
-- armsfp arches do not have a linker change
-- Backward compat hack for armhf binaries.
+  - only deal with the arm linker compat hack on armhfp arches 
+  - armsfp arches do not have a linker change
+  - Backward compat hack for armhf binaries.
 
 * Thu Jun  7 2012 Jeff Law <law@redhat.com> - 2.15.90-10
   - Fix parsing of /etc/sysconfig/clock when ZONE has spaces. (#828291)
