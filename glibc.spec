@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.15.90-6043738b
+%define glibcsrcdir glibc-2.15.90-f8308a72
 %define glibcversion 2.15.90
 %define glibcportsdir glibc-ports-2.15.90-36d173fb
 ### glibc.spec.in follows:
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 13%{?dist}
+Release: 14%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -100,7 +100,7 @@ Patch0032: %{name}-rh825061.patch
 
 # Horrible hack, never to be upstreamed.  Can go away once the world
 # has been rebuilt to use the new ld.so path.
-Patch0036: %{name}-arm-hardfloat-3.patch
+Patch0035: %{name}-arm-hardfloat-3.patch
 
 #
 # Patches from upstream
@@ -168,14 +168,11 @@ Patch2031: %{name}-rh804630.patch
 # Upstream BZ 14185
 Patch2033: %{name}-rh819430.patch
 
-# Upstream BZ 14134
-Patch2034: %{name}-rh823905.patch
-
 # See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
-Patch2035: %{name}-rh767693-2.patch
+Patch2034: %{name}-rh767693-2.patch
 
 # Upstream BZ 14247
-Patch2037: %{name}-rh827510.patch
+Patch2036: %{name}-rh827510.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -433,9 +430,8 @@ rm -rf %{glibcportsdir}
 %patch0032 -p1
 %patch2033 -p1
 %patch2034 -p1
-%patch2035 -p1
-%patch0036 -p1
-%patch2037 -p1
+%patch0035 -p1
+%patch2036 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1318,7 +1314,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Mon Jun 14 2012 Jeff Law <law@redhat.com> - 2.15.90-13
+* Fri Jun 15 2012 Jeff Law <law@redhat.com> - 2.15.90-14
+  - Resync with master.
+
+* Thu Jun 14 2012 Jeff Law <law@redhat.com> - 2.15.90-13
   - Delay setting DECIDED field in locale file structure until
     we have read the file's data (#827510).
 
