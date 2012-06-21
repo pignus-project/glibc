@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.15.90-f8308a72
+%define glibcsrcdir glibc-2.15.90-116a106a
 %define glibcversion 2.15.90
-%define glibcportsdir glibc-ports-2.15.90-36d173fb
+%define glibcportsdir glibc-ports-2.15.90-a20c2b3c
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -121,11 +121,6 @@ Patch2003: %{name}-rh757881.patch
 # Upstream BZ 13013
 Patch2004: %{name}-rh730856.patch
 
-Patch2006: %{name}-rh729661.patch
-
-# Upstream BZ 13618
-Patch2010: %{name}-sw13618-2.patch
-
 Patch2013: %{name}-rh741105.patch
 Patch2014: %{name}-rh770869.patch
 Patch2015: %{name}-rh691912.patch
@@ -173,9 +168,6 @@ Patch2034: %{name}-rh767693-2.patch
 
 # Upstream BZ 14247
 Patch2036: %{name}-rh827510.patch
-
-# Upstream BZ 14277
-Patch2037: %{name}-rh816647.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -404,11 +396,9 @@ rm -rf %{glibcportsdir}
 %patch2003 -p1
 %patch2004 -p1
 %patch0005 -p1
-%patch2006 -p1
 %patch0007 -p1
 %patch0008 -p1
 %patch0009 -p1
-%patch2010 -p1
 %patch0011 -p1
 %patch0012 -p1
 %patch2013 -p1
@@ -435,7 +425,6 @@ rm -rf %{glibcportsdir}
 %patch2034 -p1
 %patch0035 -p1
 %patch2036 -p1
-%patch2037 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1319,6 +1308,7 @@ rm -f *.filelist*
 
 %changelog
 * Thu Jun 21 2012 Jeff Law <law@redhat.com> - 2.15.90-15
+  - Resync with upstream sources (#834447).
   - Fix use-after-free in dcigettext.c (#816647).
 
 * Fri Jun 15 2012 Jeff Law <law@redhat.com> - 2.15.90-14
