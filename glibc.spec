@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 14%{?dist}
+Release: 15%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -173,6 +173,9 @@ Patch2034: %{name}-rh767693-2.patch
 
 # Upstream BZ 14247
 Patch2036: %{name}-rh827510.patch
+
+# Upstream BZ 14277
+Patch2037: %{name}-rh816647.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -432,6 +435,7 @@ rm -rf %{glibcportsdir}
 %patch2034 -p1
 %patch0035 -p1
 %patch2036 -p1
+%patch2037 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1314,6 +1318,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jun 21 2012 Jeff Law <law@redhat.com> - 2.15.90-15
+  - Fix use-after-free in dcigettext.c (#816647).
+
 * Fri Jun 15 2012 Jeff Law <law@redhat.com> - 2.15.90-14
   - Resync with master.
 
