@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.15.90-116a106a
+%define glibcsrcdir glibc-2.15.90-0479b30
 %define glibcversion 2.15.90
 %define glibcportsdir glibc-ports-2.15.90-a20c2b3c
 ### glibc.spec.in follows:
@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 15%{?dist}
+Release: 16%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -68,7 +68,22 @@ Patch0001: %{name}-stap.patch
 
 # Reverting an upstream patch.  I don't think this has been discussed
 # upstream yet.
-Patch0005: %{name}-rh769421.patch
+Patch0002: %{name}-rh769421.patch
+
+# Not likely to be accepted upstream
+Patch0003: %{name}-rh787201.patch
+
+# Not necessary to send upstream, fedora specific
+Patch0004: %{name}-rh688948.patch
+
+# Build info files in the source tree, then move to the build
+# tree so that they're identical for multilib builds
+Patch0005: %{name}-rh825061.patch
+
+# Horrible hack, never to be upstreamed.  Can go away once the world
+# has been rebuilt to use the new ld.so path.
+Patch0006: %{name}-arm-hardfloat-3.patch
+
 
 # stap, needs to be sent upstream
 Patch0007: %{name}-rh179072.patch
@@ -80,27 +95,13 @@ Patch0008: %{name}-rh697421.patch
 Patch0009: %{name}-rh740682.patch
 
 # Needs to be sent upstream
-Patch0011: %{name}-rh657588.patch
-
-# Not likely to be accepted upstream
-Patch0012: %{name}-rh787201.patch
-
-# Not necessary to send upstream, fedora specific
-Patch0016: %{name}-rh688948.patch
+Patch0010: %{name}-rh657588.patch
 
 # Needs to be sent upstream
-Patch0019: %{name}-rh564528.patch
+Patch0011: %{name}-rh564528.patch
 
 # stap, needs to be sent upstream
-Patch0027: %{name}-stap-libm.patch
-
-# Build info files in the source tree, then move to the build
-# tree so that they're identical for multilib builds
-Patch0032: %{name}-rh825061.patch
-
-# Horrible hack, never to be upstreamed.  Can go away once the world
-# has been rebuilt to use the new ld.so path.
-Patch0035: %{name}-arm-hardfloat-3.patch
+Patch0012: %{name}-stap-libm.patch
 
 #
 # Patches from upstream
@@ -113,19 +114,16 @@ Patch0035: %{name}-arm-hardfloat-3.patch
 # Obviously we're not there right now, but that's the goal
 #
 
-# Upstream BZ 13579
-Patch2002: %{name}-sw13579.patch
-
-Patch2003: %{name}-rh757881.patch
+Patch2013: %{name}-rh757881.patch
 
 # Upstream BZ 13013
-Patch2004: %{name}-rh730856.patch
+Patch2014: %{name}-rh730856.patch
 
-Patch2013: %{name}-rh741105.patch
-Patch2014: %{name}-rh770869.patch
-Patch2015: %{name}-rh691912.patch
+Patch2015: %{name}-rh741105.patch
+Patch2016: %{name}-rh770869.patch
 Patch2017: %{name}-rh770439.patch
 Patch2018: %{name}-rh789209.patch
+Patch2019: %{name}-rh691912.patch
 
 # Upstream BZ 13604
 Patch2020: %{name}-rh790292.patch
@@ -148,6 +146,9 @@ Patch2025: %{name}-rh789238.patch
 #Upstream BZ 13818
 Patch2026: %{name}-rh800224.patch
 
+# Upstream BZ 14247
+Patch2027: %{name}-rh827510.patch
+
 Patch2028: %{name}-rh803286.patch
 
 
@@ -161,13 +162,10 @@ Patch2030: %{name}-rh788989-2.patch
 Patch2031: %{name}-rh804630.patch
 
 # Upstream BZ 14185
-Patch2033: %{name}-rh819430.patch
+Patch2032: %{name}-rh819430.patch
 
 # See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
-Patch2034: %{name}-rh767693-2.patch
-
-# Upstream BZ 14247
-Patch2036: %{name}-rh827510.patch
+Patch2033: %{name}-rh767693-2.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -392,22 +390,24 @@ rm -rf %{glibcportsdir}
 
 %patch0000 -E -p1
 %patch0001 -E -p1
-%patch2002 -p1
-%patch2003 -p1
-%patch2004 -p1
+%patch0002 -p1
+%patch0003 -p1
+%patch0004 -p1
 %patch0005 -p1
+%patch0006 -p1
 %patch0007 -p1
 %patch0008 -p1
 %patch0009 -p1
+%patch0010 -p1
 %patch0011 -p1
 %patch0012 -p1
 %patch2013 -p1
 %patch2014 -p1
 %patch2015 -p1
-%patch0016 -p1
+%patch2016 -p1
 %patch2017 -p1
 %patch2018 -p1
-%patch0019 -p1
+%patch2019 -p1
 %patch2020 -p1
 %patch2021 -p1
 %patch2022 -p1
@@ -415,16 +415,13 @@ rm -rf %{glibcportsdir}
 %patch2024 -p1
 %patch2025 -p1
 %patch2026 -p1
-%patch0027 -p1
+%patch2027 -p1
 %patch2028 -p1
 %patch2029 -p1
 %patch2030 -p1
 %patch2031 -p1
-%patch0032 -p1
+%patch2032 -p1
 %patch2033 -p1
-%patch2034 -p1
-%patch0035 -p1
-%patch2036 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1307,6 +1304,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jun 21 2012 Jeff Law <law@redhat.com> - 2.15.90-16
+  - Resync with upstream sources, drop obsolete patch.
+
 * Thu Jun 21 2012 Jeff Law <law@redhat.com> - 2.15.90-15
   - Resync with upstream sources (#834447).
   - Fix use-after-free in dcigettext.c (#816647).

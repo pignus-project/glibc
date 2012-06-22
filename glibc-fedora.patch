@@ -685,14 +685,6 @@ diff -Nrup a/include/bits/wchar-ldbl.h b/include/bits/wchar-ldbl.h
 diff -Nrup a/include/link.h b/include/link.h
 --- a/include/link.h	2012-06-05 07:42:49.000000000 -0600
 +++ b/include/link.h	2012-06-07 12:15:21.581319556 -0600
-@@ -1,6 +1,6 @@
- /* Data structure for communication from the run-time dynamic linker for
-    loaded ELF shared objects.
--   Copyright (C) 1995-2006, 2007, 2009, 2010, 2011 Free Software Foundation, Inc.
-+   Copyright (C) 1995-2006, 2007, 2009, 2010 Free Software Foundation, Inc.
-    This file is part of the GNU C Library.
- 
-    The GNU C Library is free software; you can redistribute it and/or
 @@ -289,7 +289,7 @@ struct link_map
  #endif
  #ifndef FORCED_DYNAMIC_TLS_OFFSET
