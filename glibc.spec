@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 1%{?dist}
+Release: 2%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1090,7 +1090,7 @@ for l in fd:lines() do
 end
 fd:close()
 if not zonename then return end
-posix.symlink (zonename, "/etc/localtime.tzupdate")
+posix.link (zonename, "/etc/localtime.tzupdate", true)
 posix.chmod("/etc/localtime.tzupdate", 0644)
 if not os.rename("/etc/localtime.tzupdate", "/etc/localtime") then
   os.remove("/etc/localtime.tzupdate")
@@ -1135,7 +1135,7 @@ data = fd:read("*a")
 fd:close()
 if not data then return end
 update("/var/spool/postfix/etc/localtime", data)
-posix.symlink (zonename, "/etc/localtime.tzupdate")
+posix.link (zonename, "/etc/localtime.tzupdate", true)
 posix.chmod("/etc/localtime.tzupdate", 0644)
 if not os.rename("/etc/localtime.tzupdate", "/etc/localtime") then
   os.remove("/etc/localtime.tzupdate")
@@ -1304,6 +1304,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jul 5 2012 Jeff Law <law@redhat.com> - 2.16-2
+  - Use posix.link rather than posix.symlink in scriptlet to
+    update /etc/localtime (#837344).
+
 * Mon Jul 2 2012 Jeff Law <law@redhat.com> - 2.16-1
   - Resync with upstream glibc-2.16 release.
 
