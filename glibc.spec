@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 4%{?dist}
+Release: 5%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -102,6 +102,9 @@ Patch0011: %{name}-rh564528.patch
 
 # stap, needs to be sent upstream
 Patch0012: %{name}-stap-libm.patch
+
+# Needs to be sent upstream
+Patch0034: %{name}-rh841318.patch
 
 #
 # Patches from upstream
@@ -422,6 +425,7 @@ rm -rf %{glibcportsdir}
 %patch2031 -p1
 %patch2032 -p1
 %patch2033 -p1
+%patch0034 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1090,7 +1094,8 @@ for l in fd:lines() do
 end
 fd:close()
 if not zonename then return end
-posix.link (zonename, "/etc/localtime.tzupdate", true)
+os.remove("/etc/localtime.tzupdate")
+posix.symlink (zonename, "/etc/localtime.tzupdate")
 posix.chmod("/etc/localtime.tzupdate", 0644)
 if not os.rename("/etc/localtime.tzupdate", "/etc/localtime") then
   os.remove("/etc/localtime.tzupdate")
@@ -1135,7 +1140,8 @@ data = fd:read("*a")
 fd:close()
 if not data then return end
 update("/var/spool/postfix/etc/localtime", data)
-posix.link (zonename, "/etc/localtime.tzupdate", true)
+os.remove("/etc/localtime.tzupdate")
+posix.symlink (zonename, "/etc/localtime.tzupdate")
 posix.chmod("/etc/localtime.tzupdate", 0644)
 if not os.rename("/etc/localtime.tzupdate", "/etc/localtime") then
   os.remove("/etc/localtime.tzupdate")
@@ -1304,7 +1310,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Wed Jul 25 2012 Jeff Law <law@redhat.com> - 2.16-4
+* Wed Jul 25 2012 Jeff Law <law@redhat.com> - 2.16-5
+  - Avoid another unbound alloca in vfprintf (#841318)
+  - Remove /etc/localtime.tzupdate in lua scriptlets
+  - Revert back to using posix.symlink as posix.link with a 3rd
+    argument isn't supported in the lua version embedded in rpm.
   - Revert recent changes to res_send (804630, 835090).
   - Fix memcpy args in res_send (#841787).
 
