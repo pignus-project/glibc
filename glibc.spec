@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 5%{?dist}
+Release: 6%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -136,9 +136,6 @@ Patch2021: %{name}-rh790298.patch
 
 # Upstream BZ 13698
 Patch2022: %{name}-rh791161.patch
-
-# Upstream BZ 12377
-Patch2023: %{name}-rh697149.patch
 
 # Upstream BZ 9954
 Patch2024: %{name}-rh739743.patch
@@ -414,7 +411,6 @@ rm -rf %{glibcportsdir}
 %patch2020 -p1
 %patch2021 -p1
 %patch2022 -p1
-%patch2023 -p1
 %patch2024 -p1
 %patch2025 -p1
 %patch2026 -p1
@@ -1310,7 +1306,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Wed Jul 25 2012 Jeff Law <law@redhat.com> - 2.16-5
+* Wed Jul 25 2012 Jeff Law <law@redhat.com> - 2.16-6
+  - Revert patch for BZ696143, it made it impossible to use IPV6
+    addresses explicitly in getaddrinfo, which in turn broke
+    ssh, apache and other code. (#808147)
   - Avoid another unbound alloca in vfprintf (#841318)
   - Remove /etc/localtime.tzupdate in lua scriptlets
   - Revert back to using posix.symlink as posix.link with a 3rd
