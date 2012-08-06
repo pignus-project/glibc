@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 6%{?dist}
+Release: 7%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -109,6 +109,7 @@ Patch0034: %{name}-rh841318.patch
 #
 # Patches from upstream
 #
+Patch1035: %{name}-rh845960.patch
 
 
 #
@@ -422,6 +423,7 @@ rm -rf %{glibcportsdir}
 %patch2032 -p1
 %patch2033 -p1
 %patch0034 -p1
+%patch1035 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1306,6 +1308,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jul 25 2012 Jeff Law <law@redhat.com> - 2.16-7
+  - Pack IPv4 servers at the start of nsaddr_list and
+    only track the number of IPV4 servers in EXT(statp->nscounti (#808147)
+  - Mark set*uid, set*gid as __wur (warn unused result) (#845960)
+
 * Wed Jul 25 2012 Jeff Law <law@redhat.com> - 2.16-6
   - Revert patch for BZ696143, it made it impossible to use IPV6
     addresses explicitly in getaddrinfo, which in turn broke
