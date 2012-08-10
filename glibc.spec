@@ -28,7 +28,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 7%{?dist}
+Release: 8%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -109,6 +109,7 @@ Patch0034: %{name}-rh841318.patch
 #
 # Patches from upstream
 #
+Patch1025: %{name}-rh789238.patch
 Patch1035: %{name}-rh845960.patch
 
 
@@ -141,9 +142,6 @@ Patch2022: %{name}-rh791161.patch
 # Upstream BZ 9954
 Patch2024: %{name}-rh739743.patch
 
-# Upstream BZ 13939
-Patch2025: %{name}-rh789238.patch
-
 #Upstream BZ 13818
 Patch2026: %{name}-rh800224.patch
 
@@ -152,9 +150,6 @@ Patch2027: %{name}-rh827510.patch
 
 Patch2028: %{name}-rh803286.patch
 
-
-# Upstream BZ 13939
-Patch2029: %{name}-rh789238-2.patch
 
 # Upstream BZ 13761
 Patch2030: %{name}-rh788989-2.patch
@@ -413,11 +408,10 @@ rm -rf %{glibcportsdir}
 %patch2021 -p1
 %patch2022 -p1
 %patch2024 -p1
-%patch2025 -p1
+%patch1025 -p1
 %patch2026 -p1
 %patch2027 -p1
 %patch2028 -p1
-%patch2029 -p1
 %patch2030 -p1
 %patch2031 -p1
 %patch2032 -p1
@@ -1308,6 +1302,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Aug 10 2012 Jeff Law <law@redhat.com> - 2.16-8
+  - Replace patch for 789238 with official version from upstream.
+
 * Wed Jul 25 2012 Jeff Law <law@redhat.com> - 2.16-7
   - Pack IPv4 servers at the start of nsaddr_list and
     only track the number of IPV4 servers in EXT(statp->nscounti (#808147)
