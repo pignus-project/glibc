@@ -85,9 +85,6 @@ Patch0005: %{name}-rh825061.patch
 Patch0006: %{name}-arm-hardfloat-3.patch
 
 
-# stap, needs to be sent upstream
-Patch0007: %{name}-rh179072.patch
-
 # Needs to be sent upstream
 Patch0008: %{name}-rh697421.patch
 
@@ -96,9 +93,6 @@ Patch0009: %{name}-rh740682.patch
 
 # Needs to be sent upstream
 Patch0010: %{name}-rh657588.patch
-
-# Needs to be sent upstream
-Patch0011: %{name}-rh564528.patch
 
 # stap, needs to be sent upstream
 Patch0012: %{name}-stap-libm.patch
@@ -109,6 +103,8 @@ Patch0034: %{name}-rh841318.patch
 #
 # Patches from upstream
 #
+Patch1007: %{name}-rh179072.patch
+
 Patch1025: %{name}-rh789238.patch
 Patch1035: %{name}-rh845960.patch
 
@@ -118,6 +114,9 @@ Patch1035: %{name}-rh845960.patch
 # Each should be associated with a BZ.
 # Obviously we're not there right now, but that's the goal
 #
+
+# http://sourceware.org/ml/libc-alpha/2012-08/msg00224.html
+Patch2011: %{name}-rh564528.patch
 
 Patch2013: %{name}-rh757881.patch
 
@@ -391,11 +390,11 @@ rm -rf %{glibcportsdir}
 %patch0004 -p1
 %patch0005 -p1
 %patch0006 -p1
-%patch0007 -p1
+%patch1007 -p1
 %patch0008 -p1
 %patch0009 -p1
 %patch0010 -p1
-%patch0011 -p1
+%patch2011 -p1
 %patch0012 -p1
 %patch2013 -p1
 %patch2014 -p1
@@ -1302,6 +1301,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug 13 2012 Jeff Law <law@redhat.com> - 2.16-9
+  - Replace patch for 179072 with official version from upstream.
+
 * Fri Aug 10 2012 Jeff Law <law@redhat.com> - 2.16-8
   - Replace patch for 789238 with official version from upstream.
 
