@@ -1,6 +1,5 @@
-%define glibcsrcdir glibc-2.16-75f0d304
-%define glibcversion 2.16
-%define glibcportsdir glibc-ports-2.16-a20c2b3c
+%define glibcsrcdir glibc-2.16.90-42443a47
+%define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -28,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 9%{?dist}
+Release: 1%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -38,8 +37,7 @@ License: LGPLv2+ and LGPLv2+ with exceptions and GPLv2+
 Group: System Environment/Libraries
 URL: http://www.gnu.org/software/glibc/
 Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.gz
-Source1: %{?glibc_release_url}%{glibcportsdir}.tar.gz
-Source2: %{glibcsrcdir}-fedora.tar.gz
+Source1: %{glibcsrcdir}-fedora.tar.gz
 
 # 0000-0999 for patches which are unlikely to ever go upstream or which
 # have not been analyzed to see if they ought to go upstream yet.
@@ -86,27 +84,23 @@ Patch0006: %{name}-arm-hardfloat-3.patch
 
 
 # Needs to be sent upstream
-Patch0008: %{name}-rh697421.patch
+Patch0007: %{name}-rh697421.patch
 
 # Needs to be sent upstream
-Patch0009: %{name}-rh740682.patch
+Patch0008: %{name}-rh740682.patch
 
 # Needs to be sent upstream
-Patch0010: %{name}-rh657588.patch
+Patch0009: %{name}-rh657588.patch
 
 # stap, needs to be sent upstream
-Patch0012: %{name}-stap-libm.patch
+Patch0010: %{name}-stap-libm.patch
 
 # Needs to be sent upstream
-Patch0034: %{name}-rh841318.patch
+Patch0029: %{name}-rh841318.patch
 
 #
 # Patches from upstream
 #
-Patch1007: %{name}-rh179072.patch
-
-Patch1025: %{name}-rh789238.patch
-Patch1035: %{name}-rh845960.patch
 
 
 #
@@ -115,52 +109,49 @@ Patch1035: %{name}-rh845960.patch
 # Obviously we're not there right now, but that's the goal
 #
 
-# http://sourceware.org/ml/libc-alpha/2012-08/msg00224.html
-Patch2011: %{name}-rh564528.patch
-
-Patch2013: %{name}-rh757881.patch
+Patch2011: %{name}-rh757881.patch
 
 # Upstream BZ 13013
-Patch2014: %{name}-rh730856.patch
+Patch2012: %{name}-rh730856.patch
 
-Patch2015: %{name}-rh741105.patch
-Patch2016: %{name}-rh770869.patch
-Patch2017: %{name}-rh770439.patch
-Patch2018: %{name}-rh789209.patch
-Patch2019: %{name}-rh691912.patch
+Patch2013: %{name}-rh741105.patch
+Patch2014: %{name}-rh770869.patch
+Patch2015: %{name}-rh770439.patch
+Patch2016: %{name}-rh789209.patch
+Patch2017: %{name}-rh691912.patch
 
 # Upstream BZ 13604
-Patch2020: %{name}-rh790292.patch
+Patch2018: %{name}-rh790292.patch
 
 # Upstream BZ 13603
-Patch2021: %{name}-rh790298.patch
+Patch2019: %{name}-rh790298.patch
 
 # Upstream BZ 13698
-Patch2022: %{name}-rh791161.patch
+Patch2020: %{name}-rh791161.patch
 
 # Upstream BZ 9954
-Patch2024: %{name}-rh739743.patch
+Patch2021: %{name}-rh739743.patch
 
 #Upstream BZ 13818
-Patch2026: %{name}-rh800224.patch
+Patch2022: %{name}-rh800224.patch
 
 # Upstream BZ 14247
-Patch2027: %{name}-rh827510.patch
+Patch2023: %{name}-rh827510.patch
 
-Patch2028: %{name}-rh803286.patch
+Patch2024: %{name}-rh803286.patch
 
 
 # Upstream BZ 13761
-Patch2030: %{name}-rh788989-2.patch
+Patch2025: %{name}-rh788989-2.patch
 
 # Upstream BZ 13028
-Patch2031: %{name}-rh841787.patch
+Patch2026: %{name}-rh841787.patch
 
 # Upstream BZ 14185
-Patch2032: %{name}-rh819430.patch
+Patch2027: %{name}-rh819430.patch
 
 # See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
-Patch2033: %{name}-rh767693-2.patch
+Patch2028: %{name}-rh767693-2.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -380,8 +371,7 @@ package or when debugging this package.
 %endif
 
 %prep
-rm -rf %{glibcportsdir}
-%setup -q -n %{glibcsrcdir} -b1 -b2
+%setup -q -n %{glibcsrcdir} -b1
 
 %patch0000 -E -p1
 %patch0001 -E -p1
@@ -390,12 +380,12 @@ rm -rf %{glibcportsdir}
 %patch0004 -p1
 %patch0005 -p1
 %patch0006 -p1
-%patch1007 -p1
+%patch0007 -p1
 %patch0008 -p1
 %patch0009 -p1
 %patch0010 -p1
 %patch2011 -p1
-%patch0012 -p1
+%patch2012 -p1
 %patch2013 -p1
 %patch2014 -p1
 %patch2015 -p1
@@ -406,17 +396,13 @@ rm -rf %{glibcportsdir}
 %patch2020 -p1
 %patch2021 -p1
 %patch2022 -p1
+%patch2023 -p1
 %patch2024 -p1
-%patch1025 -p1
+%patch2025 -p1
 %patch2026 -p1
 %patch2027 -p1
 %patch2028 -p1
-%patch2030 -p1
-%patch2031 -p1
-%patch2032 -p1
-%patch2033 -p1
-%patch0034 -p1
-%patch1035 -p1
+%patch0029 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -502,7 +488,7 @@ build_CFLAGS="$BuildFlags -g -O3 $*"
 configure_CFLAGS="$build_CFLAGS -fno-asynchronous-unwind-tables"
 ../configure CC="$GCC" CXX="$GXX" CFLAGS="$configure_CFLAGS" \
 	--prefix=%{_prefix} \
-	--enable-add-ons=../%{glibcportsdir},nptl$AddOns \
+	--enable-add-ons=nptl$AddOns \
 	--with-headers=%{_prefix}/include $EnableKernel --enable-bind-now \
 	--build=%{target} \
 %ifarch %{multiarcharches}
@@ -1301,6 +1287,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug 13 2012 Jeff Law <law@redhat.com> - 2.16.90-1
+  - Resync with upstream sources, drop obsolete patches.
+  - Drop glibc-ports bits as they're part of the master
+    sources now.
+
 * Mon Aug 13 2012 Jeff Law <law@redhat.com> - 2.16-9
   - Replace patch for 179072 with official version from upstream.
 
