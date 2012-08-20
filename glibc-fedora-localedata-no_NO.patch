@@ -1,0 +1,102 @@
+* Mon Dec  1 2003 Jakub Jelinek <jakub@redhat.com> 2.3.3-1
+- for the time being, include both nb_NO* and no_NO* as locales
+  so that the distribution can catch up with the no_NO->nb_NO
+  transition
+
+diff -Nrup a/intl/locale.alias b/intl/locale.alias
+--- a/intl/locale.alias	2012-06-05 07:42:49.000000000 -0600
++++ b/intl/locale.alias	2012-06-07 12:15:21.583319548 -0600
+@@ -56,8 +56,6 @@ korean		ko_KR.eucKR
+ korean.euc 	ko_KR.eucKR
+ ko_KR		ko_KR.eucKR
+ lithuanian      lt_LT.ISO-8859-13
+-no_NO		nb_NO.ISO-8859-1
+-no_NO.ISO-8859-1 nb_NO.ISO-8859-1
+ norwegian       nb_NO.ISO-8859-1
+ nynorsk		nn_NO.ISO-8859-1
+ polish          pl_PL.ISO-8859-2
+diff -Nrup a/localedata/SUPPORTED b/localedata/SUPPORTED
+--- a/localedata/SUPPORTED	2012-06-05 07:42:49.000000000 -0600
++++ b/localedata/SUPPORTED	2012-06-07 12:15:21.805318719 -0600
+@@ -320,6 +320,8 @@ nl_NL/ISO-8859-1 \
+ nl_NL@euro/ISO-8859-15 \
+ nn_NO.UTF-8/UTF-8 \
+ nn_NO/ISO-8859-1 \
++no_NO.UTF-8/UTF-8 \
++no_NO/ISO-8859-1 \
+ nr_ZA/UTF-8 \
+ nso_ZA/UTF-8 \
+ oc_FR.UTF-8/UTF-8 \
+diff -Nrup a/localedata/locales/no_NO b/localedata/locales/no_NO
+--- a/localedata/locales/no_NO	1969-12-31 17:00:00.000000000 -0700
++++ b/localedata/locales/no_NO	2012-06-07 12:15:21.806318715 -0600
+@@ -0,0 +1,69 @@
++escape_char	/
++comment_char    %
++
++% Norwegian language locale for Norway
++% Source: Norsk Standardiseringsforbund
++% Address: University Library,
++%   Drammensveien 41, N-9242 Oslo, Norge
++% Contact: Kolbjoern Aamboe
++% Tel: +47 - 22859109
++% Fax: +47 - 22434497
++% Email: kolbjorn.aambo@usit.uio.no
++% Language: no
++% Territory: NO
++% Revision: 4.3
++% Date: 1996-10-15
++% Application: general
++% Users: general
++% Repertoiremap: mnemonic.ds
++% Charset: ISO-8859-1
++% Distribution and use is free, also
++% for commercial purposes.
++
++LC_IDENTIFICATION
++copy "nb_NO"
++END LC_IDENTIFICATION
++
++LC_COLLATE
++copy "nb_NO"
++END LC_COLLATE
++
++LC_CTYPE
++copy "nb_NO"
++END LC_CTYPE
++
++LC_MONETARY
++copy "nb_NO"
++END LC_MONETARY
++
++LC_NUMERIC
++copy "nb_NO"
++END LC_NUMERIC
++
++LC_TIME
++copy "nb_NO"
++END LC_TIME
++
++LC_MESSAGES
++copy "nb_NO"
++END LC_MESSAGES
++
++LC_PAPER
++copy "nb_NO"
++END LC_PAPER
++
++LC_TELEPHONE
++copy "nb_NO"
++END LC_TELEPHONE
++
++LC_MEASUREMENT
++copy "nb_NO"
++END LC_MEASUREMENT
++
++LC_NAME
++copy "nb_NO"
++END LC_NAME
++
++LC_ADDRESS
++copy "nb_NO"
++END LC_ADDRESS

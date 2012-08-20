@@ -1,0 +1,80 @@
+From 5a0546afb448a71cf045b980eb27c13bf5783920 Mon Sep 17 00:00:00 2001
+From: Andreas Schwab <schwab@redhat.com>
+Date: Thu, 9 Jun 2011 15:36:02 +0200
+Subject: [PATCH] Revert "Use .machine to prevent AS from complaining about
+ z9-109 instructions in iconv modules"
+
+This reverts commit 2739047682590b1df473401b4febf424f857fccf.
+---
+ ChangeLog                             |    7 -------
+ sysdeps/s390/s390-64/utf16-utf32-z9.c |    5 +----
+ sysdeps/s390/s390-64/utf8-utf16-z9.c  |    5 +----
+ sysdeps/s390/s390-64/utf8-utf32-z9.c  |    5 +----
+ 4 files changed, 3 insertions(+), 19 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 3ed77d0..90590d9 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -684,13 +684,6 @@
+ 	* stdlib/bug-getcontext.c: New file.
+ 	* stdlib/Makefile: Add rules to build and run bug-getcontext.
+ 
+-2011-04-13  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+-
+-	* sysdeps/s390/s390-64/utf16-utf32-z9.c: Wrap the z9-109
+-	instructions into .machine "z9-109".
+-	* sysdeps/s390/s390-64/utf8-utf16-z9.c: Likewise.
+-	* sysdeps/s390/s390-64/utf8-utf32-z9.c: Likewise.
+-
+ 2011-04-11  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+ 
+ 	* sysdeps/s390/s390-32/elf/start.S (_start): Skip extra zeroes
+diff --git a/sysdeps/s390/s390-64/utf16-utf32-z9.c b/sysdeps/s390/s390-64/utf16-utf32-z9.c
+index 5bcaaae..14daf21 100644
+--- a/sysdeps/s390/s390-64/utf16-utf32-z9.c
++++ b/sysdeps/s390/s390-64/utf16-utf32-z9.c
+@@ -169,10 +169,7 @@ gconv_end (struct __gconv_step *data)
+     register unsigned long long outlen asm("11") = outend - outptr;	\
+     uint64_t cc = 0;							\
+ 									\
+-    asm volatile (".machine push       \n\t"				\
+-                  ".machine \"z9-109\" \n\t"				\
+-		  "0: " INSTRUCTION "  \n\t"				\
+-                  ".machine pop        \n\t"				\
++    asm volatile ("0: " INSTRUCTION "  \n\t"				\
+                   "   jo     0b        \n\t"				\
+ 		  "   ipm    %2        \n"			        \
+ 		  : "+a" (pOutput), "+a" (pInput), "+d" (cc),		\
+diff --git a/sysdeps/s390/s390-64/utf8-utf16-z9.c b/sysdeps/s390/s390-64/utf8-utf16-z9.c
+index 812a42f..5f73f3c 100644
+--- a/sysdeps/s390/s390-64/utf8-utf16-z9.c
++++ b/sysdeps/s390/s390-64/utf8-utf16-z9.c
+@@ -151,10 +151,7 @@ gconv_end (struct __gconv_step *data)
+     register unsigned long long outlen asm("11") = outend - outptr;	\
+     uint64_t cc = 0;							\
+ 									\
+-    asm volatile (".machine push       \n\t"				\
+-                  ".machine \"z9-109\" \n\t"				\
+-		  "0: " INSTRUCTION "  \n\t"				\
+-                  ".machine pop        \n\t"				\
++    asm volatile ("0: " INSTRUCTION "  \n\t"				\
+                   "   jo     0b        \n\t"				\
+ 		  "   ipm    %2        \n"			        \
+ 		  : "+a" (pOutput), "+a" (pInput), "+d" (cc),		\
+diff --git a/sysdeps/s390/s390-64/utf8-utf32-z9.c b/sysdeps/s390/s390-64/utf8-utf32-z9.c
+index 0ffd848..17ef8bc 100644
+--- a/sysdeps/s390/s390-64/utf8-utf32-z9.c
++++ b/sysdeps/s390/s390-64/utf8-utf32-z9.c
+@@ -155,10 +155,7 @@ gconv_end (struct __gconv_step *data)
+     register unsigned long long outlen asm("11") = outend - outptr;	\
+     uint64_t cc = 0;							\
+ 									\
+-    asm volatile (".machine push       \n\t"				\
+-                  ".machine \"z9-109\" \n\t"				\
+-		  "0: " INSTRUCTION "  \n\t"				\
+-                  ".machine pop        \n\t"				\
++    asm volatile ("0: " INSTRUCTION "  \n\t"				\
+                   "   jo     0b        \n\t"				\
+ 		  "   ipm    %2        \n"				\
+ 		  : "+a" (pOutput), "+a" (pInput), "+d" (cc),		\

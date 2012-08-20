@@ -1,0 +1,31 @@
+From 8c508c82e7ded8bb87e2784e25be9d9f8871d6b9 Mon Sep 17 00:00:00 2001
+From: Jakub Jelinek <jakub@redhat.com>
+Date: Mon, 15 Nov 2004 13:15:02 +0000
+Subject: [PATCH] Restore change unintentionally killed during merge.
+
+---
+ debug/tst-chk1.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/debug/tst-chk1.c b/debug/tst-chk1.c
+index 37320c3..0e5ba88 100644
+--- a/debug/tst-chk1.c
++++ b/debug/tst-chk1.c
+@@ -244,7 +244,7 @@ do_test (void)
+   if (memcmp (a.buf1, "aabcdabcjj", 10))
+     FAIL ();
+ 
+-#if __USE_FORTIFY_LEVEL < 2
++#if __USE_FORTIFY_LEVEL < 2 || !__GNUC_PREREQ (4, 0)
+   /* The following tests are supposed to crash with -D_FORTIFY_SOURCE=2
+      and sufficient GCC support, as the string operations overflow
+      from a.buf1 into a.buf2.  */
+@@ -359,7 +359,7 @@ do_test (void)
+   memset (a.buf1 + 9, 'j', l0 + 2);
+   CHK_FAIL_END
+ 
+-# if __USE_FORTIFY_LEVEL >= 2
++# if __USE_FORTIFY_LEVEL >= 2 && __GNUC_PREREQ (4, 0)
+ #  define O 0
+ # else
+ #  define O 1

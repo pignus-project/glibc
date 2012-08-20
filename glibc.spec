@@ -16,7 +16,7 @@
 %else
 %define buildpower6 0
 %endif
-%define rtkaioarches %{ix86} x86_64 ia64 ppc ppc64 s390 s390x
+%define rtkaioarches %{ix86} x86_64 ppc ppc64 s390 s390x
 %define biarcharches %{ix86} x86_64 ppc ppc64 s390 s390x
 %define debuginfocommonarches %{biarcharches} alpha alphaev6
 %define multiarcharches ppc ppc64 %{ix86} x86_64 %{sparc}
@@ -58,9 +58,6 @@ Source1: %{glibcsrcdir}-fedora.tar.gz
 #
 # Patches that are highly unlikely to ever be accepated upstream.
 #
-# Still needs to be broken down into individual patches
-Patch0000: %{name}-fedora.patch
-
 # Is this still necessary, if so, it needs to go upstream
 Patch0001: %{name}-stap.patch
 
@@ -98,6 +95,49 @@ Patch0010: %{name}-stap-libm.patch
 # Needs to be sent upstream
 Patch0029: %{name}-rh841318.patch
 
+# All these were from the glibc-fedora.patch mega-patch and need another
+# round of reviewing.  Ideally they'll either be submitted upstream or
+# dropped.
+
+Patch0031: %{name}-fedora-__libc_multiple_libcs.patch
+Patch0032: %{name}-fedora-cdefs-gnuc.patch
+Patch0033: %{name}-fedora-elf-ORIGIN.patch
+Patch0034: %{name}-fedora-elf-init-hidden_undef.patch
+Patch0035: %{name}-fedora-elf-rh737223.patch
+Patch0036: %{name}-fedora-gai-canonical.patch
+Patch0037: %{name}-fedora-gai-rfc1918.patch
+Patch0038: %{name}-fedora-getconf.patch
+Patch0039: %{name}-fedora-getrlimit-PLT.patch
+Patch0040: %{name}-fedora-i386-tls-direct-seg-refs.patch
+Patch0041: %{name}-fedora-i686-nopl.patch
+Patch0042: %{name}-fedora-include-bits-ldbl.patch
+Patch0043: %{name}-fedora-ldd.patch
+Patch0044: %{name}-fedora-linux-tcsetattr.patch
+Patch0045: %{name}-fedora-locale-euro.patch
+Patch0046: %{name}-fedora-localedata-locales-fixes.patch
+Patch0047: %{name}-fedora-localedata-no_NO.patch
+Patch0048: %{name}-fedora-localedata-rh61908.patch
+Patch0049: %{name}-fedora-localedef.patch
+Patch0050: %{name}-fedora-locarchive.patch
+Patch0051: %{name}-fedora-manual-dircategory.patch
+Patch0052: %{name}-fedora-nis-rh188246.patch
+Patch0053: %{name}-fedora-nptl-linklibc.patch
+Patch0054: %{name}-fedora-nscd.patch
+Patch0055: %{name}-fedora-nss-files-overflow-fix.patch
+Patch0056: %{name}-fedora-path-vi.patch
+Patch0057: %{name}-fedora-ppc-unwind.patch
+Patch0058: %{name}-fedora-pt_chown.patch
+Patch0059: %{name}-fedora-regcomp-sw11561.patch
+Patch0060: %{name}-fedora-s390-rh711330.patch
+Patch0061: %{name}-fedora-streams-rh436349.patch
+Patch0062: %{name}-fedora-strict-aliasing.patch
+Patch0063: %{name}-fedora-test-debug-gnuc-compat.patch
+Patch0064: %{name}-fedora-test-debug-gnuc-hack.patch
+Patch0065: %{name}-fedora-tls-offset-rh731228.patch
+Patch0066: %{name}-fedora-uname-getrlimit.patch
+Patch0067: %{name}-fedora-vfprintf-sw6530.patch
+
+
 #
 # Patches from upstream
 #
@@ -132,7 +172,7 @@ Patch2020: %{name}-rh791161.patch
 # Upstream BZ 9954
 Patch2021: %{name}-rh739743.patch
 
-#Upstream BZ 13818
+# Upstream BZ 13818
 Patch2022: %{name}-rh800224.patch
 
 # Upstream BZ 14247
@@ -153,7 +193,7 @@ Patch2027: %{name}-rh819430.patch
 # See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
 Patch2028: %{name}-rh767693-2.patch
 
-# Upstrem BZ 14459
+# Upstream BZ 14459
 Patch2030: %{name}-rh847718.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -376,7 +416,6 @@ package or when debugging this package.
 %prep
 %setup -q -n %{glibcsrcdir} -b1
 
-%patch0000 -E -p1
 %patch0001 -E -p1
 %patch0002 -p1
 %patch0003 -p1
@@ -407,6 +446,43 @@ package or when debugging this package.
 %patch2028 -p1
 %patch0029 -p1
 %patch2030 -p1
+%patch0031 -p1
+%patch0032 -p1
+%patch0033 -p1
+%patch0034 -p1
+%patch0035 -p1
+%patch0036 -p1
+%patch0037 -p1
+%patch0038 -p1
+%patch0039 -p1
+%patch0040 -p1
+%patch0041 -p1
+%patch0042 -p1
+%patch0043 -p1
+%patch0044 -p1
+%patch0045 -p1
+%patch0046 -p1
+%patch0047 -p1
+%patch0048 -p1
+%patch0049 -p1
+%patch0050 -p1
+%patch0051 -p1
+%patch0052 -p1
+%patch0053 -p1
+%patch0054 -p1
+%patch0055 -p1
+%patch0056 -p1
+%patch0057 -p1
+%patch0058 -p1
+%patch0059 -p1
+%patch0060 -p1
+%patch0061 -p1
+%patch0062 -p1
+%patch0063 -p1
+%patch0064 -p1
+%patch0065 -p1
+%patch0066 -p1
+%patch0067 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -863,13 +939,6 @@ cp posix/gai.conf documentation/
 mkdir -p $RPM_BUILD_ROOT/lib
 ln -sf /%{_lib}/ld64.so.1 $RPM_BUILD_ROOT/lib/ld64.so.1
 %endif
-%ifarch ia64
-%if "%{_lib}" == "lib64"
-# Compatibility symlink
-mkdir -p $RPM_BUILD_ROOT/lib
-ln -sf /%{_lib}/ld-linux-ia64.so.2 $RPM_BUILD_ROOT/lib/ld-linux-ia64.so.2
-%endif
-%endif
 
 # Leave a compatibility symlink for the dynamic loader on armhfp targets,
 # at least until the world gets rebuilt
@@ -1206,11 +1275,6 @@ rm -f *.filelist*
 %ifarch s390x
 /lib/ld64.so.1
 %endif
-%ifarch ia64
-%if "%{_lib}" == "lib64"
-/lib/ld-linux-ia64.so.2
-%endif
-%endif
 %ifarch armv7hl armv7hnl 
 /lib/ld-linux.so.3
 %endif
@@ -1292,8 +1356,10 @@ rm -f *.filelist*
 
 %changelog
 * Mon Aug 20 2012 Jeff Law <law@redhat.com> - 2.16.90-3
-  - Remove obsolete patches from glibc-fedora.patch.  Thanks to
+  - Remove obsolete patches from glibc-fedora.patch.  Explode
+    remaining patches into distinct patchfiles.  Thanks to
     Dmitry V. Levin for identifying them!
+    Drop ia64 specific patches and specfile fragments
 
 * Wed Aug 15 2012 Jeff Law <law@redhat.com> - 2.16.90-2
   - Fix integer overflow leading to buffer overflow in strto* (#847718)
