@@ -1,18 +1,6 @@
 diff -Nrup a/ChangeLog b/ChangeLog
 --- a/ChangeLog	2012-08-13 13:12:18.000000000 -0600
 +++ b/ChangeLog	2012-08-13 13:31:50.488136763 -0600
-@@ -14009,6 +14009,11 @@
- 
- 	* sysdeps/mach/hurd/sys/param.h (DEV_BSIZE): New macro.
- 
-+2011-09-02  Andreas Schwab  <schwab@redhat.com>
-+
-+	* nscd/selinux.c (avc_create_thread): Set PR_SET_KEEPCAPS before
-+	spawning AVC thread.
-+
- 2011-09-08  Andreas Schwab  <schwab@redhat.com>
- 
- 	* elf/dl-load.c (lose): Check for non-null L.
 @@ -14271,6 +14276,11 @@
  	* sysdeps/i386/dl-trampoline.S (_dl_runtime_profile): Fix cfi
  	directive.
@@ -201,16 +189,6 @@ diff -Nrup a/ChangeLog.15 b/ChangeLog.15
 diff -Nrup a/ChangeLog.16 b/ChangeLog.16
 --- a/ChangeLog.16	2012-08-13 13:12:18.000000000 -0600
 +++ b/ChangeLog.16	2012-08-13 13:31:50.510136674 -0600
-@@ -2042,6 +2042,9 @@
- 	(__MATHDECL_2): Use __REDIRECT_NTH instead of __REDIRECT
- 	followed by __THROW.
- 
-+	* sysdeps/unix/sysv/linux/futimesat.c (futimesat): If
-+	file == NULL, use __futimes unconditionally.
-+
- 2006-02-02  Ulrich Drepper  <drepper@redhat.com>
- 
- 	* sysdeps/unix/sysv/linux/futimesat.c [__NR_futimesat]
 @@ -2101,6 +2104,11 @@
  	* sysdeps/ieee754/ldbl-128/s_llrintl.c (__llrintl): Fix a typo.
  	* sysdeps/s390/fpu/libm-test-ulps: Remove llrint ulps.
@@ -239,18 +217,6 @@ diff -Nrup a/ChangeLog.17 b/ChangeLog.17
  2010-04-05  Thomas Schwinge  <thomas@schwinge.name>
  
  	* sysdeps/gnu/unwind-resume.c: New, moved from nptl/sysdeps/pthread/.
-@@ -2953,6 +2959,11 @@ d2009-10-30  Ulrich Drepper  <drepper@re
- 	* sysdeps/generic/ldsodefs.h (struct rtld_global): The map element in
- 	the unique symbol hash table should not be const.
- 
-+2009-07-22  Jakub Jelinek  <jakub@redhat.com>
-+
-+	* Makeconfig (ASFLAGS): Append $(sysdep-ASFLAGS).
-+	* sysdeps/i386/Makefile (sysdep-ASFLAGS): Add -U__i686.
-+
- 2009-07-21  Ulrich Drepper  <drepper@redhat.com>
- 
- 	* sysdeps/x86_64/multiarch/strstr.c: Minor cleanups.  Remove
 @@ -11818,6 +11829,10 @@ d2009-10-30  Ulrich Drepper  <drepper@re
  	[BZ #4368]
  	* stdlib/stdlib.h: Remove obsolete part of comment for realpath.
@@ -262,61 +228,6 @@ diff -Nrup a/ChangeLog.17 b/ChangeLog.17
  2007-04-16  Ulrich Drepper  <drepper@redhat.com>
  
  	[BZ #4364]
-@@ -13075,6 +13090,15 @@ d2009-10-30  Ulrich Drepper  <drepper@re
- 	separators also if no non-zero digits found.
- 	* stdlib/Makefile (tests): Add tst-strtod3.
- 
-+2006-12-10  Jakub Jelinek  <jakub@redhat.com>
-+
-+	* sysdeps/unix/sysv/linux/netlinkaccess.h: Include linux/if_addr.h
-+	if IFA_MAX is not defined.
-+	(IFA_RTA, IFA_PAYLOAD, IFLA_RTA, IFLA_PAYLOAD): Define if not
-+	defined.
-+	* sysdeps/unix/sysv/linux/check_pf.c: Include netlinkaccess.h
-+	instead of asm/types.h, linux/netlink.h and linux/rtnetlink.h.
-+
- 2006-12-09  Ulrich Drepper  <drepper@redhat.com>
- 
- 	[BZ #3632]
-diff -Nrup a/Makeconfig b/Makeconfig
---- a/Makeconfig	2012-08-13 13:12:18.000000000 -0600
-+++ b/Makeconfig	2012-08-13 13:31:50.520136634 -0600
-@@ -799,12 +799,12 @@ endif
- # The assembler can generate debug information too.
- ifndef ASFLAGS
- ifeq ($(have-cpp-asm-debuginfo),yes)
--ASFLAGS := $(filter -g% -fdebug-prefix-map=%,$(CFLAGS))
-+ASFLAGS = $(filter -g% -fdebug-prefix-map=%,$(CFLAGS))
- else
--ASFLAGS :=
-+ASFLAGS =
- endif
- endif
--ASFLAGS += $(ASFLAGS-config) $(asflags-cpu)
-+ASFLAGS += $(ASFLAGS-config) $(asflags-cpu) $(sysdep-ASFLAGS)
- 
- ifndef BUILD_CC
- BUILD_CC = $(CC)
-diff -Nrup a/NEWS b/NEWS
---- a/NEWS	2012-08-13 13:12:18.000000000 -0600
-+++ b/NEWS	2012-08-13 13:31:50.521136630 -0600
-@@ -237,16 +237,6 @@ Version 2.14
-   12724, 12734, 12738, 12746, 12766, 12775, 12777, 12782, 12788, 12792,
-   12795, 12811, 12813, 12814, 12841
- 
--* The RPC implementation in libc is obsoleted.  Old programs keep working
--  but new programs cannot be linked with the routines in libc anymore.
--  Programs in need of RPC functionality must be linked against TI-RPC.
--  The TI-RPC implementation is IPv6 enabled and there are other benefits.
--
--  Visible changes of this change include (obviously) the inability to link
--  programs using RPC functions without referencing the TI-RPC library and the
--  removal of the RPC headers from the glibc headers.
--  Implemented by Ulrich Drepper.
--
- * New Linux interfaces: clock_adjtime, name_to_handle_at, open_by_handle_at,
-   syncfs, setns, sendmmsg
- 
 diff -Nrup a/csu/elf-init.c b/csu/elf-init.c
 --- a/csu/elf-init.c	2012-08-13 13:12:18.000000000 -0600
 +++ b/csu/elf-init.c	2012-08-13 13:31:50.522136626 -0600
@@ -727,22 +638,6 @@ diff -Nrup a/intl/locale.alias b/intl/locale.alias
  norwegian       nb_NO.ISO-8859-1
  nynorsk		nn_NO.ISO-8859-1
  polish          pl_PL.ISO-8859-2
-diff -Nrup a/libio/stdio.h b/libio/stdio.h
---- a/libio/stdio.h	2012-08-13 13:12:18.000000000 -0600
-+++ b/libio/stdio.h	2012-08-13 13:31:50.536136569 -0600
-@@ -168,10 +168,12 @@ typedef _G_fpos64_t fpos64_t;
- extern struct _IO_FILE *stdin;		/* Standard input stream.  */
- extern struct _IO_FILE *stdout;		/* Standard output stream.  */
- extern struct _IO_FILE *stderr;		/* Standard error output stream.  */
-+#ifdef __STDC__
- /* C89/C99 say they're macros.  Make them happy.  */
- #define stdin stdin
- #define stdout stdout
- #define stderr stderr
-+#endif
- 
- __BEGIN_NAMESPACE_STD
- /* Remove file FILENAME.  */
 diff -Nrup a/locale/iso-4217.def b/locale/iso-4217.def
 --- a/locale/iso-4217.def	2012-08-13 13:12:18.000000000 -0600
 +++ b/locale/iso-4217.def	2012-08-13 13:31:50.536136569 -0600
@@ -871,24 +766,6 @@ diff -Nrup a/locale/programs/locarchive.c b/locale/programs/locarchive.c
  add_alias (struct locarhandle *ah, const char *alias, bool replace,
  	   const char *oldname, uint32_t *locrec_offset_p)
  {
-diff -Nrup a/localedata/ChangeLog b/localedata/ChangeLog
---- a/localedata/ChangeLog	2012-08-13 13:12:18.000000000 -0600
-+++ b/localedata/ChangeLog	2012-08-13 13:31:50.611136263 -0600
-@@ -187,6 +187,14 @@
- 	* tests-mbwc/tst_funcs.h (TST_DECL_VARS, TST_HEAD_LOCALE):
- 	Remove unused variable.
- 
-+2011-06-28  Andreas Schwab  <schwab@redhat.com>
-+
-+	* charmaps/GB18030: Correct some entries.
-+
-+2011-06-21  Andreas Schwab  <schwab@redhat.com>
-+
-+	* charmaps/GB18030: Readd lost characters.
-+
- 2011-05-21  Ulrich Drepper  <drepper@gmail.com>
- 
- 	[BZ #12788]
 diff -Nrup a/localedata/Makefile b/localedata/Makefile
 --- a/localedata/Makefile	2012-08-13 13:12:18.000000000 -0600
 +++ b/localedata/Makefile	2012-08-13 13:31:50.612136258 -0600
@@ -1301,16 +1178,6 @@ diff -Nrup a/nptl/sysdeps/unix/sysv/linux/i386/smp.h b/nptl/sysdeps/unix/sysv/li
      cp = u.uts.version;
    else
      {
-diff -Nrup a/nptl/sysdeps/unix/sysv/linux/kernel-features.h b/nptl/sysdeps/unix/sysv/linux/kernel-features.h
---- a/nptl/sysdeps/unix/sysv/linux/kernel-features.h	1969-12-31 17:00:00.000000000 -0700
-+++ b/nptl/sysdeps/unix/sysv/linux/kernel-features.h	2012-08-13 13:31:50.623136214 -0600
-@@ -0,0 +1,6 @@
-+#include_next <kernel-features.h>
-+
-+/* NPTL can always assume all clone thread flags work.  */
-+#ifndef __ASSUME_CLONE_THREAD_FLAGS
-+# define __ASSUME_CLONE_THREAD_FLAGS	1
-+#endif
 diff -Nrup a/nscd/nscd.conf b/nscd/nscd.conf
 --- a/nscd/nscd.conf	2012-08-13 13:12:18.000000000 -0600
 +++ b/nscd/nscd.conf	2012-08-13 13:31:50.623136214 -0600
@@ -1402,28 +1269,6 @@ diff -Nrup a/nscd/nscd.init b/nscd/nscd.init
  	;;
      *)
  	echo $"Usage: $0 {start|stop|status|restart|reload|condrestart}"
-diff -Nrup a/nscd/selinux.c b/nscd/selinux.c
---- a/nscd/selinux.c	2012-08-13 13:12:18.000000000 -0600
-+++ b/nscd/selinux.c	2012-08-13 13:31:50.624136210 -0600
-@@ -269,6 +269,18 @@ avc_create_thread (void (*run) (void))
- {
-   int rc;
- 
-+#if defined HAVE_LIBAUDIT && defined HAVE_LIBCAP
-+  if (server_user != NULL && getuid () == 0)
-+    {
-+      /* We need to preserve the capabilities in the AVC thread.  */
-+      if (prctl (PR_SET_KEEPCAPS, 1) == -1)
-+	{
-+	  dbg_log (_("Failed to set keep-capabilities"));
-+	  error (EXIT_FAILURE, errno, _("prctl(KEEPCAPS) failed"));
-+	}
-+    }
-+#endif
-+
-   rc =
-     pthread_create (&avc_notify_thread, NULL, (void *(*) (void *)) run, NULL);
-   if (rc != 0)
 diff -Nrup a/nss/Makefile b/nss/Makefile
 --- a/nss/Makefile	2012-08-13 13:12:18.000000000 -0600
 +++ b/nss/Makefile	2012-08-13 13:31:50.624136210 -0600
@@ -1760,15 +1605,6 @@ diff -Nrup a/streams/Makefile b/streams/Makefile
 diff -Nrup a/sunrpc/Makefile b/sunrpc/Makefile
 --- a/sunrpc/Makefile	2012-08-13 13:12:18.000000000 -0600
 +++ b/sunrpc/Makefile	2012-08-13 13:31:50.631136182 -0600
-@@ -52,7 +52,7 @@ headers-in-tirpc = $(addprefix rpc/,auth
- 				    des_crypt.h)
- headers-not-in-tirpc = $(addprefix rpc/,key_prot.h rpc_des.h) \
- 		       $(rpcsvc:%=rpcsvc/%) rpcsvc/bootparam.h
--headers = rpc/netdb.h
-+headers = rpc/netdb.h $(headers-in-tirpc) $(headers-not-in-tirpc)
- install-others = $(inst_sysconfdir)/rpc
- generated = $(rpcsvc:%.x=rpcsvc/%.h) $(rpcsvc:%.x=x%.c) $(rpcsvc:%.x=x%.stmp) \
- 	    $(rpcsvc:%.x=rpcsvc/%.stmp) rpcgen
 @@ -150,6 +150,10 @@ sunrpc-CPPFLAGS = -D_RPC_THREAD_SAFE_
  CPPFLAGS += $(sunrpc-CPPFLAGS)
  BUILD_CPPFLAGS += $(sunrpc-CPPFLAGS)
@@ -1801,15 +1637,6 @@ diff -Nrup a/sysdeps/generic/dl-cache.h b/sysdeps/generic/dl-cache.h
 diff -Nrup a/sysdeps/i386/Makefile b/sysdeps/i386/Makefile
 --- a/sysdeps/i386/Makefile	2012-08-13 13:12:18.000000000 -0600
 +++ b/sysdeps/i386/Makefile	2012-08-13 13:31:50.632136178 -0600
-@@ -2,6 +2,8 @@
- # Every i386 port in use uses gas syntax (I think).
- asm-CPPFLAGS += -DGAS_SYNTAX
- 
-+sysdep-ASFLAGS += -U__i686
-+
- # The i386 `long double' is a distinct type we support.
- long-double-fcts = yes
- 
 @@ -62,6 +64,14 @@ endif
  
  ifneq (,$(filter -mno-tls-direct-seg-refs,$(CFLAGS)))
@@ -2132,90 +1959,6 @@ diff -Nrup a/sysdeps/s390/s390-64/utf8-utf32-z9.c b/sysdeps/s390/s390-64/utf8-ut
                    "   jo     0b        \n\t"				\
  		  "   ipm    %2        \n"				\
  		  : "+a" (pOutput), "+a" (pInput), "+d" (cc),		\
-diff -Nrup a/sysdeps/unix/nice.c b/sysdeps/unix/nice.c
---- a/sysdeps/unix/nice.c	2012-08-13 13:12:18.000000000 -0600
-+++ b/sysdeps/unix/nice.c	2012-08-13 13:31:50.636136161 -0600
-@@ -41,7 +41,12 @@ nice (int incr)
- 	__set_errno (save);
-     }
- 
--  result = setpriority (PRIO_PROCESS, 0, prio + incr);
-+  prio += incr;
-+  if (prio < PRIO_MIN)
-+    prio = PRIO_MIN;
-+  else if (prio >= PRIO_MAX)
-+    prio = PRIO_MAX - 1;
-+  result = setpriority (PRIO_PROCESS, 0, prio);
-   if (result == -1)
-     {
-       if (errno == EACCES)
-diff -Nrup a/sysdeps/unix/sysv/linux/check_pf.c b/sysdeps/unix/sysv/linux/check_pf.c
---- a/sysdeps/unix/sysv/linux/check_pf.c	2012-08-13 13:12:18.000000000 -0600
-+++ b/sysdeps/unix/sysv/linux/check_pf.c	2012-08-13 13:31:50.636136161 -0600
-@@ -26,16 +26,14 @@
- #include <unistd.h>
- #include <sys/socket.h>
- 
--#include <asm/types.h>
--#include <linux/netlink.h>
--#include <linux/rtnetlink.h>
--
- #include <not-cancel.h>
- #include <kernel-features.h>
- #include <bits/libc-lock.h>
- #include <atomic.h>
- #include <nscd/nscd-client.h>
- 
-+#include "netlinkaccess.h"
-+
- 
- #ifndef IFA_F_HOMEADDRESS
- # define IFA_F_HOMEADDRESS 0
-diff -Nrup a/sysdeps/unix/sysv/linux/futimesat.c b/sysdeps/unix/sysv/linux/futimesat.c
---- a/sysdeps/unix/sysv/linux/futimesat.c	2012-08-13 13:12:18.000000000 -0600
-+++ b/sysdeps/unix/sysv/linux/futimesat.c	2012-08-13 13:31:50.636136161 -0600
-@@ -36,14 +36,14 @@ futimesat (fd, file, tvp)
- {
-   int result;
- 
-+  if (file == NULL)
-+    return __futimes (fd, tvp);
-+
- #ifdef __NR_futimesat
- # ifndef __ASSUME_ATFCTS
-   if (__have_atfcts >= 0)
- # endif
-     {
--      if (file == NULL)
--	return __futimes (fd, tvp);
--
-       result = INLINE_SYSCALL (futimesat, 3, fd, file, tvp);
- # ifndef __ASSUME_ATFCTS
-       if (result == -1 && errno == ENOSYS)
-@@ -57,22 +57,7 @@ futimesat (fd, file, tvp)
- #ifndef __ASSUME_ATFCTS
-   char *buf = NULL;
- 
--  if (file == NULL)
--    {
--      static const char procfd[] = "/proc/self/fd/%d";
--      /* Buffer for the path name we are going to use.  It consists of
--	 - the string /proc/self/fd/
--	 - the file descriptor number.
--	 The final NUL is included in the sizeof.   A bit of overhead
--	 due to the format elements compensates for possible negative
--	 numbers.  */
--      size_t buflen = sizeof (procfd) + sizeof (int) * 3;
--      buf = alloca (buflen);
--
--      __snprintf (buf, buflen, procfd, fd);
--      file = buf;
--    }
--  else if (fd != AT_FDCWD && file[0] != '/')
-+  if (fd != AT_FDCWD && file[0] != '/')
-     {
-       size_t filelen = strlen (file);
-       if (__builtin_expect (filelen == 0, 0))
 diff -Nrup a/sysdeps/unix/sysv/linux/i386/dl-cache.h b/sysdeps/unix/sysv/linux/i386/dl-cache.h
 --- a/sysdeps/unix/sysv/linux/i386/dl-cache.h	1969-12-31 17:00:00.000000000 -0700
 +++ b/sysdeps/unix/sysv/linux/i386/dl-cache.h	2012-08-13 13:31:50.637136157 -0600
@@ -2297,34 +2040,6 @@ diff -Nrup a/sysdeps/unix/sysv/linux/ia64/dl-procinfo.h b/sysdeps/unix/sysv/linu
 +#else
 +#include <sysdeps/generic/dl-procinfo.h>
 +#endif
-diff -Nrup a/sysdeps/unix/sysv/linux/netlinkaccess.h b/sysdeps/unix/sysv/linux/netlinkaccess.h
---- a/sysdeps/unix/sysv/linux/netlinkaccess.h	2012-08-13 13:12:18.000000000 -0600
-+++ b/sysdeps/unix/sysv/linux/netlinkaccess.h	2012-08-13 13:31:50.637136157 -0600
-@@ -24,6 +24,24 @@
- 
- #include <kernel-features.h>
- 
-+#ifndef IFA_MAX
-+/* 2.6.19 kernel headers helpfully removed some macros and
-+   moved lots of stuff into new headers, some of which aren't
-+   included by linux/rtnetlink.h.  */
-+#include <linux/if_addr.h>
-+#endif
-+
-+#ifndef IFA_RTA
-+# define IFA_RTA(r) \
-+  ((struct rtattr*) ((char*)(r) + NLMSG_ALIGN (sizeof (struct ifaddrmsg))))
-+# define IFA_PAYLOAD(n) NLMSG_PAYLOAD (n, sizeof (struct ifaddrmsg))
-+#endif
-+
-+#ifndef IFLA_RTA
-+# define IFLA_RTA(r) \
-+  ((struct rtattr*) ((char*)(r) + NLMSG_ALIGN (sizeof (struct ifinfomsg))))
-+# define IFLA_PAYLOAD(n) NLMSG_PAYLOAD (n, sizeof (struct ifinfomsg))
-+#endif
- 
- struct netlink_res
- {
 diff -Nrup a/sysdeps/unix/sysv/linux/paths.h b/sysdeps/unix/sysv/linux/paths.h
 --- a/sysdeps/unix/sysv/linux/paths.h	2012-08-13 13:12:18.000000000 -0600
 +++ b/sysdeps/unix/sysv/linux/paths.h	2012-08-13 13:31:50.637136157 -0600
