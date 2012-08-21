@@ -1278,7 +1278,6 @@ rm -f *.filelist*
 %ifarch armv7hl armv7hnl 
 /lib/ld-linux.so.3
 %endif
-%verify(not md5 size mtime) %config(noreplace) /etc/localtime
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/ld.so.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/rpc
@@ -1307,6 +1306,7 @@ rm -f *.filelist*
 %attr(0644,root,root) %verify(not md5 size mtime mode) %ghost %config(missingok,noreplace) %{_prefix}/lib/locale/locale-archive
 %dir %attr(755,root,root) /etc/default
 %verify(not md5 size mtime) %config(noreplace) /etc/default/nss
+%verify(not md5 size mtime) %config(noreplace) /etc/localtime
 %attr(755,root,root) %caps(cap_chown,cap_fowner=pe) %{_prefix}/libexec/pt_chown
 %doc documentation/*
 
@@ -1355,6 +1355,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug 20 2012 Jeff Law <law@redhat.com> - 2.16.90-4
+  - Move /etc/localtime into glibc-common package since glibc-common
+    owns the scriptlets which update it.
+
 * Mon Aug 20 2012 Jeff Law <law@redhat.com> - 2.16.90-3
   - Remove obsolete patches from glibc-fedora.patch.  Explode
     remaining patches into distinct patchfiles.  Thanks to
