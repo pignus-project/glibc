@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-42443a47
+%define glibcsrcdir glibc-2.16.90-07e51550
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 5%{?dist}
+Release: 6%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1347,6 +1347,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Aug 22 2012 Jeff Law <law@redhat.com> - 2.16.90-6
+  - Resync with upstream sources.
+
 * Tue Aug 21 2012 Jeff Law <law@redhat.com> - 2.16.90-5
   - Replace manual systemd scriptlets with macroized scriptlets (#850129)
 
