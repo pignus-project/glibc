@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-07e51550
+%define glibcsrcdir glibc-2.16.90-d22e28b0
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 6%{?dist}
+Release: 7%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -192,9 +192,6 @@ Patch2027: %{name}-rh819430.patch
 
 # See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
 Patch2028: %{name}-rh767693-2.patch
-
-# Upstream BZ 14459
-Patch2030: %{name}-rh847718.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -445,7 +442,6 @@ package or when debugging this package.
 %patch2027 -p1
 %patch2028 -p1
 %patch0029 -p1
-%patch2030 -p1
 %patch0031 -p1
 %patch0032 -p1
 %patch0033 -p1
@@ -1347,6 +1343,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Aug 30 2012 Jeff Law <law@redhat.com> - 2.16.90-7
+  - Resync with upstream sources.
+  
 * Wed Aug 22 2012 Jeff Law <law@redhat.com> - 2.16.90-6
   - Resync with upstream sources.
 

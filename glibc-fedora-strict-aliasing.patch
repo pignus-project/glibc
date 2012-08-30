@@ -12,10 +12,9 @@ Subject: [PATCH] Avoid strict-aliasing issues
  sunrpc/Makefile                        |    4 ++++
  sysdeps/powerpc/powerpc64/elf/Makefile |    2 ++
  7 files changed, 13 insertions(+), 0 deletions(-)
-
 diff -Nrup a/elf/Makefile b/elf/Makefile
---- a/elf/Makefile	2012-08-13 13:12:18.000000000 -0600
-+++ b/elf/Makefile	2012-08-20 13:34:00.070089702 -0600
+--- a/elf/Makefile	2012-08-29 07:45:37.000000000 -0600
++++ b/elf/Makefile	2012-08-30 09:42:41.980592920 -0600
 @@ -50,6 +50,7 @@ include ../Makeconfig
  ifeq ($(unwind-find-fde),yes)
  routines += unwind-dw2-fde-glibc
@@ -25,8 +24,8 @@ diff -Nrup a/elf/Makefile b/elf/Makefile
  
  before-compile  = $(objpfx)trusted-dirs.h
 diff -Nrup a/inet/Makefile b/inet/Makefile
---- a/inet/Makefile	2012-08-13 13:12:18.000000000 -0600
-+++ b/inet/Makefile	2012-08-20 13:34:00.099089572 -0600
+--- a/inet/Makefile	2012-08-29 07:45:37.000000000 -0600
++++ b/inet/Makefile	2012-08-30 09:42:41.981592916 -0600
 @@ -54,6 +54,8 @@ tests := htontest test_ifindex tst-ntoa
  
  include ../Rules
@@ -35,10 +34,10 @@ diff -Nrup a/inet/Makefile b/inet/Makefile
 +
  ifeq ($(have-thread-library),yes)
  
- CFLAGS-gethstbyad_r.c = -DUSE_NSCD=1 -fexceptions
+ CFLAGS-gethstbyad_r.c = -fexceptions
 diff -Nrup a/nis/Makefile b/nis/Makefile
---- a/nis/Makefile	2012-08-13 13:12:18.000000000 -0600
-+++ b/nis/Makefile	2012-08-20 13:34:01.338084016 -0600
+--- a/nis/Makefile	2012-08-29 07:45:37.000000000 -0600
++++ b/nis/Makefile	2012-08-30 09:42:41.982592912 -0600
 @@ -71,6 +71,8 @@ libnss_nisplus-inhibit-o = $(filter-out
  
  include ../Rules
@@ -49,8 +48,8 @@ diff -Nrup a/nis/Makefile b/nis/Makefile
  $(objpfx)libnss_compat.so: $(objpfx)libnsl.so$(libnsl.so-version)
  $(objpfx)libnss_nis.so: $(objpfx)libnsl.so$(libnsl.so-version) \
 diff -Nrup a/nss/Makefile b/nss/Makefile
---- a/nss/Makefile	2012-08-13 13:12:18.000000000 -0600
-+++ b/nss/Makefile	2012-08-20 13:34:01.491083332 -0600
+--- a/nss/Makefile	2012-08-29 07:45:37.000000000 -0600
++++ b/nss/Makefile	2012-08-30 09:42:42.021592753 -0600
 @@ -101,6 +101,7 @@ $(libnss_db-dbs:%=$(objpfx)%.c): $(objpf
  	 echo '#include "$<"') > $@.new
  	mv -f $@.new $@
@@ -60,8 +59,8 @@ diff -Nrup a/nss/Makefile b/nss/Makefile
  $(objpfx)makedb: $(makedb-modules:%=$(objpfx)%.o)
  
 diff -Nrup a/resolv/Makefile b/resolv/Makefile
---- a/resolv/Makefile	2012-08-13 13:12:18.000000000 -0600
-+++ b/resolv/Makefile	2012-08-20 13:34:01.492083327 -0600
+--- a/resolv/Makefile	2012-08-29 07:45:37.000000000 -0600
++++ b/resolv/Makefile	2012-08-30 09:42:42.023592745 -0600
 @@ -80,6 +80,7 @@ ifeq (yes,$(have-ssp))
  CFLAGS-libresolv += -fstack-protector
  endif
@@ -71,8 +70,8 @@ diff -Nrup a/resolv/Makefile b/resolv/Makefile
  # The BIND code elicits some harmless warnings.
  +cflags += -Wno-strict-prototypes -Wno-write-strings
 diff -Nrup a/sunrpc/Makefile b/sunrpc/Makefile
---- a/sunrpc/Makefile	2012-08-13 13:12:18.000000000 -0600
-+++ b/sunrpc/Makefile	2012-08-20 13:34:01.495083314 -0600
+--- a/sunrpc/Makefile	2012-08-29 07:45:37.000000000 -0600
++++ b/sunrpc/Makefile	2012-08-30 09:42:42.024592741 -0600
 @@ -150,6 +150,10 @@ sunrpc-CPPFLAGS = -D_RPC_THREAD_SAFE_
  CPPFLAGS += $(sunrpc-CPPFLAGS)
  BUILD_CPPFLAGS += $(sunrpc-CPPFLAGS)
@@ -85,8 +84,8 @@ diff -Nrup a/sunrpc/Makefile b/sunrpc/Makefile
  $(objpfx)tst-xdrmem: $(common-objpfx)linkobj/libc.so
  $(objpfx)tst-xdrmem2: $(common-objpfx)linkobj/libc.so
 diff -Nrup a/sysdeps/powerpc/powerpc64/Makefile b/sysdeps/powerpc/powerpc64/Makefile
---- a/sysdeps/powerpc/powerpc64/Makefile	2012-08-20 13:33:29.453227506 -0600
-+++ b/sysdeps/powerpc/powerpc64/Makefile	2012-08-20 13:34:01.496083309 -0600
+--- a/sysdeps/powerpc/powerpc64/Makefile	2012-08-30 09:42:17.872692135 -0600
++++ b/sysdeps/powerpc/powerpc64/Makefile	2012-08-30 09:42:42.024592741 -0600
 @@ -37,6 +37,8 @@ CFLAGS-rtld-strnlen.os = $(no-special-re
  
  CFLAGS-libc-start.c += -fno-asynchronous-unwind-tables
