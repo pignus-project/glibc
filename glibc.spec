@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 9%{?dist}
+Release: 10%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -567,7 +567,7 @@ build_CFLAGS="$BuildFlags -g -O3 $*"
 configure_CFLAGS="$build_CFLAGS -fno-asynchronous-unwind-tables"
 ../configure CC="$GCC" CXX="$GXX" CFLAGS="$configure_CFLAGS" \
 	--prefix=%{_prefix} \
-	--enable-add-ons=nptl$AddOns \
+	--enable-add-ons=ports,nptl$AddOns \
 	--with-headers=%{_prefix}/include $EnableKernel --enable-bind-now \
 	--build=%{target} \
 %ifarch %{multiarcharches}
@@ -1349,6 +1349,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Sep  8 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 2.16.90-10
+- Enable ports to fix FTBFS on ARM
+
 * Wed Sep 5 2012 Jeff Law <law@redhat.com> - 2.16.90-9
   - Resync with upstream sources.
 
