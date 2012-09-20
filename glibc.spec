@@ -490,7 +490,7 @@ package or when debugging this package.
 %patch0066 -p1
 %patch0067 -p1
 %patch2068 -p1
-%patch2069 -p1
+%patch0069 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
