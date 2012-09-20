@@ -138,6 +138,10 @@ Patch0066: %{name}-fedora-uname-getrlimit.patch
 Patch0067: %{name}-fedora-vfprintf-sw6530.patch
 
 
+# Reverting an upstream patch.  Once upstream fixes the problem
+# Remove this patch and resync. 
+Patch0069: %{name}-rh858274.patch
+
 #
 # Patches from upstream
 #
@@ -486,6 +490,7 @@ package or when debugging this package.
 %patch0066 -p1
 %patch0067 -p1
 %patch2068 -p1
+%patch2069 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1281,6 +1286,7 @@ rm -f *.filelist*
 
 %changelog
 * Thu Sep 20 2012 Jeff Law <law@redhat.com> - 2.16.90-12
+  - Revert recent upstream strstr changes (#858274)
   - Demangle function pointers before testing them (#816647)
   - Remove handling of /etc/localtime and /var/spool/postfix/etc/localtime
     as systemd will be handling them from now on (#858735).
