@@ -193,6 +193,9 @@ Patch2027: %{name}-rh819430.patch
 # See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
 Patch2028: %{name}-rh767693-2.patch
 
+# Upstream BZ 14594
+Patch2068: %{name}-rh816647.patch
+
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Obsoletes: nss_db
@@ -482,6 +485,7 @@ package or when debugging this package.
 %patch0065 -p1
 %patch0066 -p1
 %patch0067 -p1
+%patch2068 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1277,6 +1281,7 @@ rm -f *.filelist*
 
 %changelog
 * Thu Sep 20 2012 Jeff Law <law@redhat.com> - 2.16.90-12
+  - Demangle function pointers before testing them (#816647)
   - Remove handling of /etc/localtime and /var/spool/postfix/etc/localtime
     as systemd will be handling them from now on (#858735).
 
