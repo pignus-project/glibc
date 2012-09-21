@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 13%{?dist}
+Release: 14%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -136,11 +136,6 @@ Patch0064: %{name}-fedora-test-debug-gnuc-hack.patch
 Patch0065: %{name}-fedora-tls-offset-rh731228.patch
 Patch0066: %{name}-fedora-uname-getrlimit.patch
 Patch0067: %{name}-fedora-vfprintf-sw6530.patch
-
-
-# Reverting an upstream patch.  Once upstream fixes the problem
-# Remove this patch and resync. 
-Patch0069: %{name}-rh858274.patch
 
 #
 # Patches from upstream
@@ -490,7 +485,6 @@ package or when debugging this package.
 %patch0066 -p1
 %patch0067 -p1
 %patch2068 -p1
-%patch0069 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1285,6 +1279,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Sep 21 2012 Jeff Law <law@redhat.com> - 2.16.90-14
+  - Revert patch for 816647, it's blatently broken.
+
 * Fri Sep 21 2012 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.16.90-13
   - Bring back byteswap-16.h (#859268).
 
