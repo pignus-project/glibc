@@ -192,9 +192,6 @@ Patch2027: %{name}-rh819430.patch
 # See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
 Patch2028: %{name}-rh767693-2.patch
 
-# Upstream BZ 14594
-Patch2068: %{name}-rh816647.patch
-
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Obsoletes: nss_db
