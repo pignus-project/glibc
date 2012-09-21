@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 12%{?dist}
+Release: 13%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1285,6 +1285,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Sep 21 2012 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.16.90-13
+  - Bring back byteswap-16.h (#859268).
+
 * Thu Sep 20 2012 Jeff Law <law@redhat.com> - 2.16.90-12
   - Revert recent upstream strstr changes (#858274)
   - Demangle function pointers before testing them (#816647)
