@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 14%{?dist}
+Release: 15%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -105,11 +105,9 @@ Patch0033: %{name}-fedora-elf-ORIGIN.patch
 Patch0034: %{name}-fedora-elf-init-hidden_undef.patch
 Patch0035: %{name}-fedora-elf-rh737223.patch
 Patch0036: %{name}-fedora-gai-canonical.patch
-Patch0037: %{name}-fedora-gai-rfc1918.patch
 Patch0038: %{name}-fedora-getconf.patch
 Patch0039: %{name}-fedora-getrlimit-PLT.patch
 Patch0040: %{name}-fedora-i386-tls-direct-seg-refs.patch
-Patch0041: %{name}-fedora-i686-nopl.patch
 Patch0042: %{name}-fedora-include-bits-ldbl.patch
 Patch0043: %{name}-fedora-ldd.patch
 Patch0044: %{name}-fedora-linux-tcsetattr.patch
@@ -124,7 +122,6 @@ Patch0052: %{name}-fedora-nis-rh188246.patch
 Patch0053: %{name}-fedora-nptl-linklibc.patch
 Patch0054: %{name}-fedora-nscd.patch
 Patch0055: %{name}-fedora-nss-files-overflow-fix.patch
-Patch0056: %{name}-fedora-path-vi.patch
 Patch0057: %{name}-fedora-ppc-unwind.patch
 Patch0058: %{name}-fedora-pt_chown.patch
 Patch0059: %{name}-fedora-regcomp-sw11561.patch
@@ -183,7 +180,6 @@ Patch2023: %{name}-rh827510.patch
 
 Patch2024: %{name}-rh803286.patch
 
-
 # Upstream BZ 13761
 Patch2025: %{name}-rh788989-2.patch
 
@@ -195,6 +191,9 @@ Patch2027: %{name}-rh819430.patch
 
 # See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
 Patch2028: %{name}-rh767693-2.patch
+
+# Upstream BZ 11438 
+Patch2037: %{name}-fedora-gai-rfc1918.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -454,11 +453,10 @@ package or when debugging this package.
 %patch0034 -p1
 %patch0035 -p1
 %patch0036 -p1
-%patch0037 -p1
+%patch2037 -p1
 %patch0038 -p1
 %patch0039 -p1
 %patch0040 -p1
-%patch0041 -p1
 %patch0042 -p1
 %patch0043 -p1
 %patch0044 -p1
@@ -473,7 +471,6 @@ package or when debugging this package.
 %patch0053 -p1
 %patch0054 -p1
 %patch0055 -p1
-%patch0056 -p1
 %patch0057 -p1
 %patch0058 -p1
 %patch0059 -p1
@@ -1280,6 +1277,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Sep 21 2012 Jeff Law <law@redhat.com> - 2.16.90-15
+  - Remove most of fedora-nscd patch as we no longer use the
+    old init files, but systemd instead.
+  - Remove path-to-vi patch.  With the usr-move changes that
+    patch is totally unnecessary.
+  - Remove i686-nopl patch.  Gas was changed back in 2011 to
+    avoid nopl.
+  - Move gai-rfc1918 patch to submitted upstream status
+ 
 * Fri Sep 21 2012 Jeff Law <law@redhat.com> - 2.16.90-14
   - Revert patch for 816647, it's blatently broken.
 
