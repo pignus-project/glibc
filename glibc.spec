@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-97bc38d7
+%define glibcsrcdir glibc-2.16.90-f6a2737f
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 15%{?dist}
+Release: 16%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1277,6 +1277,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Sep 25 2012 Jeff Law <law@redhat.com> - 2.16.90-16
+  - Resync with upstream sources.
+
 * Fri Sep 21 2012 Jeff Law <law@redhat.com> - 2.16.90-15
   - Remove most of fedora-nscd patch as we no longer use the
     old init files, but systemd instead.
