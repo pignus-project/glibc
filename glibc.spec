@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 16%{?dist}
+Release: 17%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -63,7 +63,8 @@ Patch0001: %{name}-stap.patch
 
 # Reverting an upstream patch.  I don't think this has been discussed
 # upstream yet.
-Patch0002: %{name}-rh769421.patch
+# rh552960 now does this and adds a real fix.
+# Patch0002: %{name}-rh769421.patch
 
 # Not likely to be accepted upstream
 Patch0003: %{name}-rh787201.patch
@@ -194,6 +195,9 @@ Patch2028: %{name}-rh767693-2.patch
 
 # Upstream BZ 11438 
 Patch2037: %{name}-fedora-gai-rfc1918.patch
+
+# Upstream BZ 14417
+Patch2070: %{name}-rh552960.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -419,7 +423,7 @@ package or when debugging this package.
 %setup -q -n %{glibcsrcdir} -b1
 
 %patch0001 -E -p1
-%patch0002 -p1
+#%patch0002 -p1
 %patch0003 -p1
 %patch0004 -p1
 %patch0005 -p1
@@ -483,6 +487,7 @@ package or when debugging this package.
 %patch0066 -p1
 %patch0067 -p1
 %patch0069 -p1
+%patch2070 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1277,6 +1282,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Sep 28 2012 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.16.90-17
+  - Release mutex before going back to wait for PI mutexes (#552960).
+
 * Tue Sep 25 2012 Jeff Law <law@redhat.com> - 2.16.90-16
   - Resync with upstream sources.
 
