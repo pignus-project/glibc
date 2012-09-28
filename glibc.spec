@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-f6a2737f
+%define glibcsrcdir glibc-2.16.90-715a900c
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 17%{?dist}
+Release: 18%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -60,11 +60,6 @@ Source1: %{glibcsrcdir}-fedora.tar.gz
 #
 # Is this still necessary, if so, it needs to go upstream
 Patch0001: %{name}-stap.patch
-
-# Reverting an upstream patch.  I don't think this has been discussed
-# upstream yet.
-# rh552960 now does this and adds a real fix.
-# Patch0002: %{name}-rh769421.patch
 
 # Not likely to be accepted upstream
 Patch0003: %{name}-rh787201.patch
@@ -101,7 +96,6 @@ Patch0029: %{name}-rh841318.patch
 # dropped.
 
 Patch0031: %{name}-fedora-__libc_multiple_libcs.patch
-Patch0032: %{name}-fedora-cdefs-gnuc.patch
 Patch0033: %{name}-fedora-elf-ORIGIN.patch
 Patch0034: %{name}-fedora-elf-init-hidden_undef.patch
 Patch0035: %{name}-fedora-elf-rh737223.patch
@@ -114,7 +108,6 @@ Patch0043: %{name}-fedora-ldd.patch
 Patch0044: %{name}-fedora-linux-tcsetattr.patch
 Patch0045: %{name}-fedora-locale-euro.patch
 Patch0046: %{name}-fedora-localedata-locales-fixes.patch
-Patch0047: %{name}-fedora-localedata-no_NO.patch
 Patch0048: %{name}-fedora-localedata-rh61908.patch
 Patch0049: %{name}-fedora-localedef.patch
 Patch0050: %{name}-fedora-locarchive.patch
@@ -133,7 +126,6 @@ Patch0063: %{name}-fedora-test-debug-gnuc-compat.patch
 Patch0064: %{name}-fedora-test-debug-gnuc-hack.patch
 Patch0065: %{name}-fedora-tls-offset-rh731228.patch
 Patch0066: %{name}-fedora-uname-getrlimit.patch
-Patch0067: %{name}-fedora-vfprintf-sw6530.patch
 
 # Reverting an upstream patch.  Once upstream fixes the problem
 # Remove this patch and resync.
@@ -192,9 +184,6 @@ Patch2027: %{name}-rh819430.patch
 
 # See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
 Patch2028: %{name}-rh767693-2.patch
-
-# Upstream BZ 11438 
-Patch2037: %{name}-fedora-gai-rfc1918.patch
 
 # Upstream BZ 14417
 Patch2070: %{name}-rh552960.patch
@@ -423,7 +412,6 @@ package or when debugging this package.
 %setup -q -n %{glibcsrcdir} -b1
 
 %patch0001 -E -p1
-#%patch0002 -p1
 %patch0003 -p1
 %patch0004 -p1
 %patch0005 -p1
@@ -452,12 +440,10 @@ package or when debugging this package.
 %patch2028 -p1
 %patch0029 -p1
 %patch0031 -p1
-%patch0032 -p1
 %patch0033 -p1
 %patch0034 -p1
 %patch0035 -p1
 %patch0036 -p1
-%patch2037 -p1
 %patch0038 -p1
 %patch0039 -p1
 %patch0040 -p1
@@ -466,7 +452,6 @@ package or when debugging this package.
 %patch0044 -p1
 %patch0045 -p1
 %patch0046 -p1
-%patch0047 -p1
 %patch0048 -p1
 %patch0049 -p1
 %patch0050 -p1
@@ -485,7 +470,6 @@ package or when debugging this package.
 %patch0064 -p1
 %patch0065 -p1
 %patch0066 -p1
-%patch0067 -p1
 %patch0069 -p1
 %patch2070 -p1
 
@@ -1282,6 +1266,17 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Sep 28 2012 Jeff Law <law@redhat.com> - 2.16.90-18
+  - Resync with upstream sources.
+  - Drop fedora-cdefs-gnuc.patch, it's not needed anymore.
+  - Drop fedora-gai-rfc1918.patch, it's upstream now.
+  - Drop fedora-localedata-no_NO.patch, it was supposed to be
+    temporary -- that was back in 2003.   This should have been
+    sorted out long ago.  We'll just have to deal with the
+    fallout.
+  - Drop fedora-vfprintf-sw6530.patch, it's upstream now.
+  - Drop rh769421.patch; Siddhesh has fixed this properly with 552960.
+
 * Fri Sep 28 2012 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.16.90-17
   - Release mutex before going back to wait for PI mutexes (#552960).
 
