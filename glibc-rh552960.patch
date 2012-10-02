@@ -1,17 +1,16 @@
-diff --git a/nptl/Makefile b/nptl/Makefile
-index 6f2b66c..16ba845 100644
---- a/nptl/Makefile
-+++ b/nptl/Makefile
+diff -Nrup a/nptl/Makefile b/nptl/Makefile
+--- a/nptl/Makefile	2012-10-02 06:37:02.202769148 -0600
++++ b/nptl/Makefile	2012-10-02 06:38:22.574397081 -0600
 @@ -206,7 +206,7 @@ tests = tst-typesizes \
  	tst-cond1 tst-cond2 tst-cond3 tst-cond4 tst-cond5 tst-cond6 tst-cond7 \
  	tst-cond8 tst-cond9 tst-cond10 tst-cond11 tst-cond12 tst-cond13 \
  	tst-cond14 tst-cond15 tst-cond16 tst-cond17 tst-cond18 tst-cond19 \
--	tst-cond20 tst-cond21 tst-cond22 tst-cond23 \
-+	tst-cond20 tst-cond21 tst-cond22 tst-cond23 tst-cond24 \
+-	tst-cond20 tst-cond21 tst-cond22 tst-cond23 tst-cond-except \
++	tst-cond20 tst-cond21 tst-cond22 tst-cond23 tst-cond24 tst-cond-except \
  	tst-robust1 tst-robust2 tst-robust3 tst-robust4 tst-robust5 \
  	tst-robust6 tst-robust7 tst-robust8 tst-robust9 \
  	tst-robustpi1 tst-robustpi2 tst-robustpi3 tst-robustpi4 tst-robustpi5 \
-@@ -274,6 +274,7 @@ gen-as-const-headers = pthread-errnos.sym
+@@ -274,6 +274,7 @@ gen-as-const-headers = pthread-errnos.sy
  
  LDFLAGS-pthread.so = -Wl,--enable-new-dtags,-z,nodelete,-z,initfirst
  
@@ -19,17 +18,17 @@ index 6f2b66c..16ba845 100644
  
  include ../Makeconfig
  
-diff --git a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S
-index 5f1fd5d..a2679ef 100644
---- a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S
-+++ b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S
-@@ -271,9 +271,24 @@ __pthread_cond_timedwait:
+diff -Nrup a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S
+--- a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S	2012-10-02 06:05:17.000000000 -0600
++++ b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S	2012-10-02 06:37:54.959525283 -0600
+@@ -273,9 +273,24 @@ __pthread_cond_timedwait:
  	jne	9f
  
  15:	cmpl	$-ETIMEDOUT, %esi
 -	jne	8b
 +	je	28f
-+
+ 
+-	addl	$1, wakeup_seq(%ebx)
 +	/* We need to go back to futex_wait.  If we're using requeue_pi, then
 +	   release the mutex we had acquired and go back.  */
 +	movl	24(%esp), %edx
@@ -44,16 +43,14 @@ index 5f1fd5d..a2679ef 100644
 +	xorl	%edx, %edx
 +	call	__pthread_mutex_unlock_usercnt
 +	jmp	8b
- 
--	addl	$1, wakeup_seq(%ebx)
++
 +28:	addl	$1, wakeup_seq(%ebx)
  	adcl	$0, wakeup_seq+4(%ebx)
  	addl	$1, cond_futex(%ebx)
  	movl	$ETIMEDOUT, %esi
-diff --git a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S
-index 2ae7af2..fe6a69c 100644
---- a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S
-+++ b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S
+diff -Nrup a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S
+--- a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S	2012-10-02 06:05:17.000000000 -0600
++++ b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S	2012-10-02 06:37:54.961525273 -0600
 @@ -136,7 +136,6 @@ __pthread_cond_wait:
  	cmpl	$PI_BIT, %eax
  	jne	18f
@@ -62,7 +59,7 @@ index 2ae7af2..fe6a69c 100644
  	movl	$(FUTEX_WAIT_REQUEUE_PI|FUTEX_PRIVATE_FLAG), %ecx
  	movl	%ebp, %edx
  	xorl	%esi, %esi
-@@ -150,9 +149,6 @@ __pthread_cond_wait:
+@@ -152,9 +151,6 @@ __pthread_cond_wait:
  	sete	16(%esp)
  	je	19f
  
@@ -72,7 +69,7 @@ index 2ae7af2..fe6a69c 100644
  	/* Normal and PI futexes dont mix. Use normal futex functions only
  	   if the kernel does not support the PI futex functions.  */
  	cmpl	$-ENOSYS, %eax
-@@ -204,12 +200,12 @@ __pthread_cond_wait:
+@@ -206,12 +202,12 @@ __pthread_cond_wait:
  	cmpl	8(%esp), %edx
  	jne	7f
  	cmpl	4(%esp), %edi
@@ -87,7 +84,7 @@ index 2ae7af2..fe6a69c 100644
  
  9:	addl	$1, woken_seq(%ebx)
  	adcl	$0, woken_seq+4(%ebx)
-@@ -285,6 +281,22 @@ __pthread_cond_wait:
+@@ -287,6 +283,22 @@ __pthread_cond_wait:
  	jmp	20b
  
  	cfi_adjust_cfa_offset(-FRAME_SIZE);
@@ -110,7 +107,7 @@ index 2ae7af2..fe6a69c 100644
  	/* Initial locking failed.  */
  1:
  #if cond_lock == 0
-@@ -398,77 +410,6 @@ __pthread_cond_wait:
+@@ -400,77 +412,6 @@ __pthread_cond_wait:
  	call	__lll_unlock_wake
  	jmp	11b
  
@@ -188,7 +185,7 @@ index 2ae7af2..fe6a69c 100644
  	.size	__pthread_cond_wait, .-__pthread_cond_wait
  versioned_symbol (libpthread, __pthread_cond_wait, pthread_cond_wait,
  		  GLIBC_2_3_2)
-@@ -641,10 +582,6 @@ __condvar_w_cleanup:
+@@ -651,10 +592,6 @@ __condvar_w_cleanup:
  	.long	.LcleanupEND-.Lsub_cond_futex
  	.long	__condvar_w_cleanup-.LSTARTCODE
  	.uleb128  0
@@ -199,10 +196,9 @@ index 2ae7af2..fe6a69c 100644
  	.long	.LcallUR-.LSTARTCODE
  	.long	.LENDCODE-.LcallUR
  	.long	0
-diff --git a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S
-index a1c8ca8..21ccb7a 100644
---- a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S
-+++ b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S
+diff -Nrup a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S
+--- a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S	2012-10-02 06:05:17.000000000 -0600
++++ b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S	2012-10-02 06:37:55.000525092 -0600
 @@ -103,7 +103,7 @@ __pthread_cond_timedwait:
  	mov	%RSI_LP, dep_mutex(%rdi)
  
@@ -287,10 +283,9 @@ index a1c8ca8..21ccb7a 100644
  	jnz	64f
  
  	callq	__pthread_mutex_cond_lock
-diff --git a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
-index 6194852..84c5fef 100644
---- a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
-+++ b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
+diff -Nrup a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
+--- a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S	2012-10-02 06:05:17.000000000 -0600
++++ b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S	2012-10-02 06:37:55.002525084 -0600
 @@ -136,19 +136,33 @@ __pthread_cond_wait:
  	cmpl	$PI_BIT, %eax
  	jne	61f
@@ -467,11 +462,9 @@ index 6194852..84c5fef 100644
  	.uleb128 .LcallUR-.LSTARTCODE
  	.uleb128 .LENDCODE-.LcallUR
  	.uleb128 0
-diff --git a/nptl/tst-cond24.c b/nptl/tst-cond24.c
-new file mode 100644
-index 0000000..2eb2df1
---- /dev/null
-+++ b/nptl/tst-cond24.c
+diff -Nrup a/nptl/tst-cond24.c b/nptl/tst-cond24.c
+--- a/nptl/tst-cond24.c	1969-12-31 17:00:00.000000000 -0700
++++ b/nptl/tst-cond24.c	2012-10-02 06:37:55.003525080 -0600
 @@ -0,0 +1,249 @@
 +/* Verify that condition variables synchronized by PI mutexes don't hang.
 +   Copyright (C) 2012 Free Software Foundation, Inc.

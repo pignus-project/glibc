@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-bec749fd
+%define glibcsrcdir glibc-2.16.90-05699367
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 19%{?dist}
+Release: 20%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -60,6 +60,10 @@ Source1: %{glibcsrcdir}-fedora.tar.gz
 #
 # Is this still necessary, if so, it needs to go upstream
 Patch0001: %{name}-stap.patch
+
+# Reverting an upstream patch.  Once upstream fixes the problem
+# Remove this patch and resync.
+Patch0002: %{name}-rh858274.patch
 
 # Not likely to be accepted upstream
 Patch0003: %{name}-rh787201.patch
@@ -95,19 +99,24 @@ Patch0029: %{name}-rh841318.patch
 # round of reviewing.  Ideally they'll either be submitted upstream or
 # dropped.
 
+Patch0030: %{name}-fedora-uname-getrlimit.patch
 Patch0031: %{name}-fedora-__libc_multiple_libcs.patch
+Patch0032: %{name}-fedora-tls-offset-rh731228.patch
 Patch0033: %{name}-fedora-elf-ORIGIN.patch
 Patch0034: %{name}-fedora-elf-init-hidden_undef.patch
 Patch0035: %{name}-fedora-elf-rh737223.patch
 Patch0036: %{name}-fedora-gai-canonical.patch
+Patch0037: %{name}-fedora-test-debug-gnuc-hack.patch
 Patch0038: %{name}-fedora-getconf.patch
 Patch0039: %{name}-fedora-getrlimit-PLT.patch
 Patch0040: %{name}-fedora-i386-tls-direct-seg-refs.patch
+Patch0041: %{name}-fedora-test-debug-gnuc-compat.patch
 Patch0042: %{name}-fedora-include-bits-ldbl.patch
 Patch0043: %{name}-fedora-ldd.patch
 Patch0044: %{name}-fedora-linux-tcsetattr.patch
 Patch0045: %{name}-fedora-locale-euro.patch
 Patch0046: %{name}-fedora-localedata-locales-fixes.patch
+Patch0047: %{name}-fedora-streams-rh436349.patch
 Patch0048: %{name}-fedora-localedata-rh61908.patch
 Patch0049: %{name}-fedora-localedef.patch
 Patch0050: %{name}-fedora-locarchive.patch
@@ -116,20 +125,11 @@ Patch0052: %{name}-fedora-nis-rh188246.patch
 Patch0053: %{name}-fedora-nptl-linklibc.patch
 Patch0054: %{name}-fedora-nscd.patch
 Patch0055: %{name}-fedora-nss-files-overflow-fix.patch
+Patch0056: %{name}-fedora-s390-rh711330.patch
 Patch0057: %{name}-fedora-ppc-unwind.patch
 Patch0058: %{name}-fedora-pt_chown.patch
 Patch0059: %{name}-fedora-regcomp-sw11561.patch
-Patch0060: %{name}-fedora-s390-rh711330.patch
-Patch0061: %{name}-fedora-streams-rh436349.patch
-Patch0062: %{name}-fedora-strict-aliasing.patch
-Patch0063: %{name}-fedora-test-debug-gnuc-compat.patch
-Patch0064: %{name}-fedora-test-debug-gnuc-hack.patch
-Patch0065: %{name}-fedora-tls-offset-rh731228.patch
-Patch0066: %{name}-fedora-uname-getrlimit.patch
-
-# Reverting an upstream patch.  Once upstream fixes the problem
-# Remove this patch and resync.
-Patch0069: %{name}-rh858274.patch
+Patch0060: %{name}-fedora-strict-aliasing.patch
 
 #
 # Patches from upstream
@@ -186,7 +186,7 @@ Patch2027: %{name}-rh819430.patch
 Patch2028: %{name}-rh767693-2.patch
 
 # Upstream BZ 14417
-Patch2070: %{name}-rh552960.patch
+Patch2061: %{name}-rh552960.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -412,6 +412,7 @@ package or when debugging this package.
 %setup -q -n %{glibcsrcdir} -b1
 
 %patch0001 -E -p1
+%patch0002 -p1
 %patch0003 -p1
 %patch0004 -p1
 %patch0005 -p1
@@ -439,19 +440,24 @@ package or when debugging this package.
 %patch2027 -p1
 %patch2028 -p1
 %patch0029 -p1
+%patch0030 -p1
 %patch0031 -p1
+%patch0032 -p1
 %patch0033 -p1
 %patch0034 -p1
 %patch0035 -p1
 %patch0036 -p1
+%patch0037 -p1
 %patch0038 -p1
 %patch0039 -p1
 %patch0040 -p1
+%patch0041 -p1
 %patch0042 -p1
 %patch0043 -p1
 %patch0044 -p1
 %patch0045 -p1
 %patch0046 -p1
+%patch0047 -p1
 %patch0048 -p1
 %patch0049 -p1
 %patch0050 -p1
@@ -460,18 +466,12 @@ package or when debugging this package.
 %patch0053 -p1
 %patch0054 -p1
 %patch0055 -p1
+%patch0056 -p1
 %patch0057 -p1
 %patch0058 -p1
 %patch0059 -p1
 %patch0060 -p1
-%patch0061 -p1
-%patch0062 -p1
-%patch0063 -p1
-%patch0064 -p1
-%patch0065 -p1
-%patch0066 -p1
-%patch0069 -p1
-%patch2070 -p1
+%patch2061 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1266,6 +1266,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Oct 2 2012 Jeff Law <law@redhat.com> - 2.16.90-20
+  - Resync with upstream sources.
+  - Repack patchlist.
+
 * Mon Oct 1 2012 Jeff Law <law@redhat.com> - 2.16.90-19
   - Resync with upstream sources to pick up fma fixes
 
