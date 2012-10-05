@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-05699367
+%define glibcsrcdir glibc-2.16.90-c30e8edf
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 21%{?dist}
+Release: 22%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -56,10 +56,12 @@ Source1: %{glibcsrcdir}-fedora.tar.gz
 
 
 #
-# Patches that are highly unlikely to ever be accepated upstream.
+# Patches that are highly unlikely to ever be accepted upstream.
 #
-# Is this still necessary, if so, it needs to go upstream
-Patch0001: %{name}-stap.patch
+
+# Configuration twiddle, not sure there's a good case to get upstream to
+# change this.
+Patch0001: %{name}-fedora-nscd.patch
 
 # Reverting an upstream patch.  Once upstream fixes the problem
 # Remove this patch and resync.
@@ -110,7 +112,6 @@ Patch0037: %{name}-fedora-test-debug-gnuc-hack.patch
 Patch0038: %{name}-fedora-getconf.patch
 Patch0039: %{name}-fedora-getrlimit-PLT.patch
 Patch0040: %{name}-fedora-i386-tls-direct-seg-refs.patch
-Patch0041: %{name}-fedora-test-debug-gnuc-compat.patch
 Patch0042: %{name}-fedora-include-bits-ldbl.patch
 Patch0043: %{name}-fedora-ldd.patch
 Patch0044: %{name}-fedora-linux-tcsetattr.patch
@@ -123,9 +124,7 @@ Patch0050: %{name}-fedora-locarchive.patch
 Patch0051: %{name}-fedora-manual-dircategory.patch
 Patch0052: %{name}-fedora-nis-rh188246.patch
 Patch0053: %{name}-fedora-nptl-linklibc.patch
-Patch0054: %{name}-fedora-nscd.patch
 Patch0055: %{name}-fedora-nss-files-overflow-fix.patch
-Patch0056: %{name}-fedora-s390-rh711330.patch
 Patch0057: %{name}-fedora-ppc-unwind.patch
 Patch0058: %{name}-fedora-pt_chown.patch
 Patch0059: %{name}-fedora-regcomp-sw11561.patch
@@ -184,9 +183,6 @@ Patch2027: %{name}-rh819430.patch
 
 # See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
 Patch2028: %{name}-rh767693-2.patch
-
-# Upstream BZ 14417
-Patch2061: %{name}-rh552960.patch
 
 # Upstream BZ 14652
 Patch2062: %{name}-rh552960-2.patch
@@ -414,7 +410,7 @@ package or when debugging this package.
 %prep
 %setup -q -n %{glibcsrcdir} -b1
 
-%patch0001 -E -p1
+%patch0001 -p1
 %patch0002 -p1
 %patch0003 -p1
 %patch0004 -p1
@@ -454,7 +450,6 @@ package or when debugging this package.
 %patch0038 -p1
 %patch0039 -p1
 %patch0040 -p1
-%patch0041 -p1
 %patch0042 -p1
 %patch0043 -p1
 %patch0044 -p1
@@ -467,14 +462,11 @@ package or when debugging this package.
 %patch0051 -p1
 %patch0052 -p1
 %patch0053 -p1
-%patch0054 -p1
 %patch0055 -p1
-%patch0056 -p1
 %patch0057 -p1
 %patch0058 -p1
 %patch0059 -p1
 %patch0060 -p1
-%patch2061 -p1
 %patch2062 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
@@ -1270,6 +1262,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Oct 5 2012 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.16.90-22
+  - Resync with upstream sources
+  - Drop local 552960 patch now that it's upstream
+  - Drop local stap patch now obsolete
+  - Drop local s390 patch which avoided problems with old assemblers
+  - Drop old fortify source patch to deal with old compilers
+
 * Thu Oct 4 2012 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.16.90-21
   - Take mutex in cleanup only if it is not already taken.
 

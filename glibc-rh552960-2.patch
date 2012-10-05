@@ -1,18 +1,16 @@
-diff --git a/nptl/Makefile b/nptl/Makefile
-index f21276c..de324fa 100644
---- a/nptl/Makefile
-+++ b/nptl/Makefile
-@@ -206,7 +206,8 @@ tests = tst-typesizes \
+diff -Nrup a/nptl/Makefile b/nptl/Makefile
+--- a/nptl/Makefile	2012-10-05 07:42:57.935825028 -0600
++++ b/nptl/Makefile	2012-10-05 07:44:08.989533264 -0600
+@@ -206,7 +206,7 @@ tests = tst-typesizes \
  	tst-cond1 tst-cond2 tst-cond3 tst-cond4 tst-cond5 tst-cond6 tst-cond7 \
  	tst-cond8 tst-cond9 tst-cond10 tst-cond11 tst-cond12 tst-cond13 \
  	tst-cond14 tst-cond15 tst-cond16 tst-cond17 tst-cond18 tst-cond19 \
--	tst-cond20 tst-cond21 tst-cond22 tst-cond23 tst-cond24 tst-cond-except \
+-	tst-cond20 tst-cond21 tst-cond22 tst-cond23 tst-cond24 \
 +	tst-cond20 tst-cond21 tst-cond22 tst-cond23 tst-cond24 tst-cond25 \
-+	tst-cond-except \
+ 	tst-cond-except \
  	tst-robust1 tst-robust2 tst-robust3 tst-robust4 tst-robust5 \
  	tst-robust6 tst-robust7 tst-robust8 tst-robust9 \
- 	tst-robustpi1 tst-robustpi2 tst-robustpi3 tst-robustpi4 tst-robustpi5 \
-@@ -276,6 +276,7 @@ gen-as-const-headers = pthread-errnos.sym
+@@ -276,6 +276,7 @@ gen-as-const-headers = pthread-errnos.sy
  LDFLAGS-pthread.so = -Wl,--enable-new-dtags,-z,nodelete,-z,initfirst
  
  LDFLAGS-tst-cond24 = -lrt
@@ -20,10 +18,9 @@ index f21276c..de324fa 100644
  
  include ../Makeconfig
  
-diff --git a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S
-index 6761c13..884987c 100644
---- a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S
-+++ b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S
+diff -Nrup a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S
+--- a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S	2012-10-05 07:22:36.000000000 -0600
++++ b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_timedwait.S	2012-10-05 07:43:27.448703838 -0600
 @@ -649,10 +649,24 @@ __condvar_tw_cleanup:
  	movl	$0x7fffffff, %edx
  	ENTER_KERNEL
@@ -38,23 +35,22 @@ index 6761c13..884987c 100644
 +	andl	$(ROBUST_BIT|PI_BIT), %ebx
 +	cmpl	$PI_BIT, %ebx
 +	jne	8f
-+
+ 
+-	movl	%esi, (%esp)
 +	movl	(%eax), %ebx
 +	andl	$TID_MASK, %ebx
 +	cmpl	%ebx, %gs:TID
 +	je	9f
 +
 +8:	call	__pthread_mutex_cond_lock
- 
--	movl	%esi, (%esp)
++
 +9:	movl	%esi, (%esp)
  .LcallUR:
  	call	_Unwind_Resume
  	hlt
-diff --git a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S
-index 0af06ac..bf1e5fe 100644
---- a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S
-+++ b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S
+diff -Nrup a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S
+--- a/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S	2012-10-05 07:22:36.000000000 -0600
++++ b/nptl/sysdeps/unix/sysv/linux/i386/i486/pthread_cond_wait.S	2012-10-05 07:43:27.449703835 -0600
 @@ -566,10 +566,24 @@ __condvar_w_cleanup:
  	movl	$0x7fffffff, %edx
  	ENTER_KERNEL
@@ -69,32 +65,30 @@ index 0af06ac..bf1e5fe 100644
 +	andl	$(ROBUST_BIT|PI_BIT), %ebx
 +	cmpl	$PI_BIT, %ebx
 +	jne	8f
-+
+ 
+-	movl	%esi, (%esp)
 +	movl	(%eax), %ebx
 +	andl	$TID_MASK, %ebx
 +	cmpl	%ebx, %gs:TID
 +	je	9f
 +
 +8:	call	__pthread_mutex_cond_lock
- 
--	movl	%esi, (%esp)
++
 +9:	movl	%esi, (%esp)
  .LcallUR:
  	call	_Unwind_Resume
  	hlt
-diff --git a/nptl/sysdeps/unix/sysv/linux/pthread-pi-defines.sym b/nptl/sysdeps/unix/sysv/linux/pthread-pi-defines.sym
-index 46fbd0d..0ac51db 100644
---- a/nptl/sysdeps/unix/sysv/linux/pthread-pi-defines.sym
-+++ b/nptl/sysdeps/unix/sysv/linux/pthread-pi-defines.sym
-@@ -6,3 +6,4 @@ MUTEX_KIND	offsetof (pthread_mutex_t, __data.__kind)
+diff -Nrup a/nptl/sysdeps/unix/sysv/linux/pthread-pi-defines.sym b/nptl/sysdeps/unix/sysv/linux/pthread-pi-defines.sym
+--- a/nptl/sysdeps/unix/sysv/linux/pthread-pi-defines.sym	2012-10-05 07:22:36.000000000 -0600
++++ b/nptl/sysdeps/unix/sysv/linux/pthread-pi-defines.sym	2012-10-05 07:43:27.487703680 -0600
+@@ -6,3 +6,4 @@ MUTEX_KIND	offsetof (pthread_mutex_t, __
  ROBUST_BIT	PTHREAD_MUTEX_ROBUST_NORMAL_NP
  PI_BIT		PTHREAD_MUTEX_PRIO_INHERIT_NP
  PS_BIT		PTHREAD_MUTEX_PSHARED_BIT
 +TID_MASK	FUTEX_TID_MASK
-diff --git a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S
-index b669abb..eb13326 100644
---- a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S
-+++ b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S
+diff -Nrup a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S
+--- a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S	2012-10-05 07:22:36.000000000 -0600
++++ b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S	2012-10-05 07:43:27.489703672 -0600
 @@ -771,10 +771,24 @@ __condvar_cleanup2:
  	movl	$SYS_futex, %eax
  	syscall
@@ -109,23 +103,22 @@ index b669abb..eb13326 100644
 +	andl	$(ROBUST_BIT|PI_BIT), %eax
 +	cmpl	$PI_BIT, %eax
 +	jne	7f
-+
+ 
+-	movq	24(%rsp), %rdi
 +	movl	(%rdi), %eax
 +	andl	$TID_MASK, %eax
 +	cmpl	%eax, %fs:TID
 +	je	8f
 +
 +7:	callq	__pthread_mutex_cond_lock
- 
--	movq	24(%rsp), %rdi
++
 +8:	movq	24(%rsp), %rdi
  	movq	FRAME_SIZE(%rsp), %r15
  	movq	FRAME_SIZE+8(%rsp), %r14
  	movq	FRAME_SIZE+16(%rsp), %r13
-diff --git a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
-index ec403cd..6c6dc0e 100644
---- a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
-+++ b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
+diff -Nrup a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
+--- a/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S	2012-10-05 07:22:36.000000000 -0600
++++ b/nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S	2012-10-05 07:43:27.490703667 -0600
 @@ -495,10 +495,24 @@ __condvar_cleanup1:
  	movl	$SYS_futex, %eax
  	syscall
@@ -140,24 +133,22 @@ index ec403cd..6c6dc0e 100644
 +	andl	$(ROBUST_BIT|PI_BIT), %eax
 +	cmpl	$PI_BIT, %eax
 +	jne	7f
-+
+ 
+-	movq	24(%rsp), %rdi
 +	movl	(%rdi), %eax
 +	andl	$TID_MASK, %eax
 +	cmpl	%eax, %fs:TID
 +	je	8f
 +
 +7:	callq	__pthread_mutex_cond_lock
- 
--	movq	24(%rsp), %rdi
++
 +8:	movq	24(%rsp), %rdi
  .LcallUR:
  	call	_Unwind_Resume@PLT
  	hlt
-diff --git a/nptl/tst-cond25.c b/nptl/tst-cond25.c
-new file mode 100644
-index 0000000..4488e74
---- /dev/null
-+++ b/nptl/tst-cond25.c
+diff -Nrup a/nptl/tst-cond25.c b/nptl/tst-cond25.c
+--- a/nptl/tst-cond25.c	1969-12-31 17:00:00.000000000 -0700
++++ b/nptl/tst-cond25.c	2012-10-05 07:43:27.491703663 -0600
 @@ -0,0 +1,282 @@
 +/* Verify that condition variables synchronized by PI mutexes don't hang on
 +   on cancellation.
