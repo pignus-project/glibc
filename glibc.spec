@@ -1265,7 +1265,7 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri Oct 10 2012 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.16.90-23
+* Wed Oct 10 2012 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.16.90-23
   - Fix Marathi names for Wednesday, September and October (#rh864820).
 
 * Fri Oct  5 2012 Jeff Law <law@redhat.com> - 2.16.90-22
