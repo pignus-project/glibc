@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 22%{?dist}
+Release: 23%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -186,6 +186,8 @@ Patch2028: %{name}-rh767693-2.patch
 
 # Upstream BZ 14652
 Patch2062: %{name}-rh552960-2.patch
+
+Patch2063: %{name}-rh864820.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -468,6 +470,7 @@ package or when debugging this package.
 %patch0059 -p1
 %patch0060 -p1
 %patch2062 -p1
+%patch2063 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1262,7 +1265,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri Oct 5 2012 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.16.90-22
+* Fri Oct 10 2012 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.16.90-23
+  - Fix Marathi names for Wednesday, September and October (#rh864820).
+
+* Fri Oct  5 2012 Jeff Law <law@redhat.com> - 2.16.90-22
   - Resync with upstream sources
   - Drop local 552960 patch now that it's upstream
   - Drop local stap patch now obsolete
