@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-c30e8edf
+%define glibcsrcdir glibc-2.16.90-54a41734
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 23%{?dist}
+Release: 24%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -63,9 +63,7 @@ Source1: %{glibcsrcdir}-fedora.tar.gz
 # change this.
 Patch0001: %{name}-fedora-nscd.patch
 
-# Reverting an upstream patch.  Once upstream fixes the problem
-# Remove this patch and resync.
-Patch0002: %{name}-rh858274.patch
+Patch0002: %{name}-fedora-regcomp-sw11561.patch
 
 # Not likely to be accepted upstream
 Patch0003: %{name}-rh787201.patch
@@ -112,6 +110,7 @@ Patch0037: %{name}-fedora-test-debug-gnuc-hack.patch
 Patch0038: %{name}-fedora-getconf.patch
 Patch0039: %{name}-fedora-getrlimit-PLT.patch
 Patch0040: %{name}-fedora-i386-tls-direct-seg-refs.patch
+Patch0041: %{name}-fedora-pt_chown.patch
 Patch0042: %{name}-fedora-include-bits-ldbl.patch
 Patch0043: %{name}-fedora-ldd.patch
 Patch0044: %{name}-fedora-linux-tcsetattr.patch
@@ -124,11 +123,9 @@ Patch0050: %{name}-fedora-locarchive.patch
 Patch0051: %{name}-fedora-manual-dircategory.patch
 Patch0052: %{name}-fedora-nis-rh188246.patch
 Patch0053: %{name}-fedora-nptl-linklibc.patch
+Patch0054: %{name}-fedora-ppc-unwind.patch
 Patch0055: %{name}-fedora-nss-files-overflow-fix.patch
-Patch0057: %{name}-fedora-ppc-unwind.patch
-Patch0058: %{name}-fedora-pt_chown.patch
-Patch0059: %{name}-fedora-regcomp-sw11561.patch
-Patch0060: %{name}-fedora-strict-aliasing.patch
+Patch0056: %{name}-fedora-strict-aliasing.patch
 
 #
 # Patches from upstream
@@ -184,10 +181,7 @@ Patch2027: %{name}-rh819430.patch
 # See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
 Patch2028: %{name}-rh767693-2.patch
 
-# Upstream BZ 14652
-Patch2062: %{name}-rh552960-2.patch
-
-Patch2063: %{name}-rh864820.patch
+Patch2057: %{name}-rh864820.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -452,6 +446,7 @@ package or when debugging this package.
 %patch0038 -p1
 %patch0039 -p1
 %patch0040 -p1
+%patch0041 -p1
 %patch0042 -p1
 %patch0043 -p1
 %patch0044 -p1
@@ -464,13 +459,10 @@ package or when debugging this package.
 %patch0051 -p1
 %patch0052 -p1
 %patch0053 -p1
+%patch0054 -p1
 %patch0055 -p1
-%patch0057 -p1
-%patch0058 -p1
-%patch0059 -p1
-%patch0060 -p1
-%patch2062 -p1
-%patch2063 -p1
+%patch0056 -p1
+%patch2057 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1265,6 +1257,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Oct 11 2012 Jeff Law <law@redhat.com> - 2.16.90-24
+  - Rsync with upstream sources
+  - Drop local 552960-2 patch now that it's upstream.
+  - Drop local 858274 patch now that the root problem is fixed upstream.
+  - Repack patchlist.
+
 * Wed Oct 10 2012 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.16.90-23
   - Fix Marathi names for Wednesday, September and October (#rh864820).
 
