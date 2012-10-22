@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-54a41734
+%define glibcsrcdir glibc-2.16.90-2a0e2669
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 24%{?dist}
+Release: 25%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -180,8 +180,6 @@ Patch2027: %{name}-rh819430.patch
 
 # See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
 Patch2028: %{name}-rh767693-2.patch
-
-Patch2057: %{name}-rh864820.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -462,7 +460,6 @@ package or when debugging this package.
 %patch0054 -p1
 %patch0055 -p1
 %patch0056 -p1
-%patch2057 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1257,6 +1254,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Oct 22 2012 Jeff Law <law@redhat.com> - 2.16.90-25
+  - Rsync with upstream sources
+  - Drop 864820 patch as now that it's upstream.
+  - Add sss to /etc/nsswitch.conf (#867473)
+
 * Thu Oct 11 2012 Jeff Law <law@redhat.com> - 2.16.90-24
   - Rsync with upstream sources
   - Drop local 552960-2 patch now that it's upstream.
