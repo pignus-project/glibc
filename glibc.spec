@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-2a0e2669
+%define glibcsrcdir glibc-2.16.90-d6cffd3e
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 25%{?dist}
+Release: 26%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1254,6 +1254,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Nov 1 2012 Jeff Law <law@redhat.com> - 2.16.90-26
+  - Resync with upstream sources (#872336)
+
 * Mon Oct 22 2012 Jeff Law <law@redhat.com> - 2.16.90-25
   - Rsync with upstream sources
   - Drop 864820 patch as now that it's upstream.
