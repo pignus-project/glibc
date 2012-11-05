@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-d6cffd3e
+%define glibcsrcdir glibc-2.16.90-8f861542
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 26%{?dist}
+Release: 27%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -65,11 +65,9 @@ Patch0001: %{name}-fedora-nscd.patch
 
 Patch0002: %{name}-fedora-regcomp-sw11561.patch
 
-# Not likely to be accepted upstream
-Patch0003: %{name}-rh787201.patch
+Patch0003: %{name}-fedora-nss-files-overflow-fix.patch
 
-# Not necessary to send upstream, fedora specific
-Patch0004: %{name}-rh688948.patch
+Patch0004: %{name}-fedora-ppc-unwind.patch
 
 # Build info files in the source tree, then move to the build
 # tree so that they're identical for multilib builds
@@ -91,6 +89,8 @@ Patch0009: %{name}-rh657588.patch
 
 # stap, needs to be sent upstream
 Patch0010: %{name}-stap-libm.patch
+
+Patch0014: %{name}-fedora-nptl-linklibc.patch
 
 # Needs to be sent upstream
 Patch0029: %{name}-rh841318.patch
@@ -122,10 +122,7 @@ Patch0049: %{name}-fedora-localedef.patch
 Patch0050: %{name}-fedora-locarchive.patch
 Patch0051: %{name}-fedora-manual-dircategory.patch
 Patch0052: %{name}-fedora-nis-rh188246.patch
-Patch0053: %{name}-fedora-nptl-linklibc.patch
-Patch0054: %{name}-fedora-ppc-unwind.patch
-Patch0055: %{name}-fedora-nss-files-overflow-fix.patch
-Patch0056: %{name}-fedora-strict-aliasing.patch
+Patch0053: %{name}-fedora-strict-aliasing.patch
 
 #
 # Patches from upstream
@@ -144,7 +141,6 @@ Patch2011: %{name}-rh757881.patch
 Patch2012: %{name}-rh730856.patch
 
 Patch2013: %{name}-rh741105.patch
-Patch2014: %{name}-rh770869.patch
 Patch2015: %{name}-rh770439.patch
 Patch2016: %{name}-rh789209.patch
 Patch2017: %{name}-rh691912.patch
@@ -417,7 +413,7 @@ package or when debugging this package.
 %patch2011 -p1
 %patch2012 -p1
 %patch2013 -p1
-%patch2014 -p1
+%patch0014 -p1
 %patch2015 -p1
 %patch2016 -p1
 %patch2017 -p1
@@ -457,9 +453,6 @@ package or when debugging this package.
 %patch0051 -p1
 %patch0052 -p1
 %patch0053 -p1
-%patch0054 -p1
-%patch0055 -p1
-%patch0056 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -513,7 +506,7 @@ GCC="gcc -m64"
 GXX="g++ -m64"
 %endif
 %ifarch %{power64}
-BuildFlags="-mno-minimal-toc"
+BuildFlags=""
 GCC="gcc -m64"
 GXX="g++ -m64"
 %endif
@@ -1254,6 +1247,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Nov 5 2012 Jeff Law <law@redhat.com> - 2.16.90-27
+  - Resync with upstream sources.
+  - Don't use distinct patches for 770869, 787201 and 688948
+    as they all modify stuff under fedora/
+  - Repack patchlist
+
 * Thu Nov 1 2012 Jeff Law <law@redhat.com> - 2.16.90-26
   - Resync with upstream sources (#872336)
 
