@@ -37,7 +37,7 @@ License: LGPLv2+ and LGPLv2+ with exceptions and GPLv2+
 Group: System Environment/Libraries
 URL: http://www.gnu.org/software/glibc/
 Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.gz
-Source1: %{glibcsrcdir}-fedora.tar.gz
+Source1: %{glibcsrcdir}-1-fedora.tar.gz
 
 # 0000-0999 for patches which are unlikely to ever go upstream or which
 # have not been analyzed to see if they ought to go upstream yet.
