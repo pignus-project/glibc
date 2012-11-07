@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-8f861542
+%define glibcsrcdir glibc-2.16.90-01f34a3b
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 27%{?dist}
+Release: 28%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -37,7 +37,7 @@ License: LGPLv2+ and LGPLv2+ with exceptions and GPLv2+
 Group: System Environment/Libraries
 URL: http://www.gnu.org/software/glibc/
 Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.gz
-Source1: %{glibcsrcdir}-1-fedora.tar.gz
+Source1: %{glibcsrcdir}-fedora.tar.gz
 
 # 0000-0999 for patches which are unlikely to ever go upstream or which
 # have not been analyzed to see if they ought to go upstream yet.
@@ -1247,6 +1247,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov 7 2012 Jeff Law <law@redhat.com> - 2.16.90-28
+  - Resync with upstream sources (#873397)
+
 * Mon Nov 5 2012 Jeff Law <law@redhat.com> - 2.16.90-27
   - Resync with upstream sources.
   - Don't use distinct patches for 770869, 787201 and 688948
