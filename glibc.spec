@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-01f34a3b
+%define glibcsrcdir glibc-2.16.90-d14fbb17
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 28%{?dist}
+Release: 29%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -92,6 +92,11 @@ Patch0010: %{name}-stap-libm.patch
 
 Patch0014: %{name}-fedora-nptl-linklibc.patch
 
+Patch0018: %{name}-fedora-strict-aliasing.patch
+Patch0019: %{name}-fedora-nis-rh188246.patch
+Patch0020: %{name}-fedora-manual-dircategory.patch
+Patch0024: %{name}-fedora-locarchive.patch
+
 # Needs to be sent upstream
 Patch0029: %{name}-rh841318.patch
 
@@ -119,10 +124,6 @@ Patch0046: %{name}-fedora-localedata-locales-fixes.patch
 Patch0047: %{name}-fedora-streams-rh436349.patch
 Patch0048: %{name}-fedora-localedata-rh61908.patch
 Patch0049: %{name}-fedora-localedef.patch
-Patch0050: %{name}-fedora-locarchive.patch
-Patch0051: %{name}-fedora-manual-dircategory.patch
-Patch0052: %{name}-fedora-nis-rh188246.patch
-Patch0053: %{name}-fedora-strict-aliasing.patch
 
 #
 # Patches from upstream
@@ -145,15 +146,6 @@ Patch2015: %{name}-rh770439.patch
 Patch2016: %{name}-rh789209.patch
 Patch2017: %{name}-rh691912.patch
 
-# Upstream BZ 13604
-Patch2018: %{name}-rh790292.patch
-
-# Upstream BZ 13603
-Patch2019: %{name}-rh790298.patch
-
-# Upstream BZ 13698
-Patch2020: %{name}-rh791161.patch
-
 # Upstream BZ 9954
 Patch2021: %{name}-rh739743.patch
 
@@ -162,8 +154,6 @@ Patch2022: %{name}-rh800224.patch
 
 # Upstream BZ 14247
 Patch2023: %{name}-rh827510.patch
-
-Patch2024: %{name}-rh803286.patch
 
 # Upstream BZ 13761
 Patch2025: %{name}-rh788989-2.patch
@@ -417,13 +407,13 @@ package or when debugging this package.
 %patch2015 -p1
 %patch2016 -p1
 %patch2017 -p1
-%patch2018 -p1
-%patch2019 -p1
-%patch2020 -p1
+%patch0018 -p1
+%patch0019 -p1
+%patch0020 -p1
 %patch2021 -p1
 %patch2022 -p1
 %patch2023 -p1
-%patch2024 -p1
+%patch0024 -p1
 %patch2025 -p1
 %patch2026 -p1
 %patch2027 -p1
@@ -449,10 +439,6 @@ package or when debugging this package.
 %patch0047 -p1
 %patch0048 -p1
 %patch0049 -p1
-%patch0050 -p1
-%patch0051 -p1
-%patch0052 -p1
-%patch0053 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1247,6 +1233,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Nov 16 2012 Jeff Law <law@redhat.com> - 2.16.90-29
+  - Rsync with upstream sources
+  - Drop local patches for 803286, 791161, 790292, 790298
+
 * Wed Nov 7 2012 Jeff Law <law@redhat.com> - 2.16.90-28
   - Resync with upstream sources (#873397)
 
