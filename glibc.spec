@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-d14fbb17
+%define glibcsrcdir glibc-2.16.90-3e2e43e2
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 29%{?dist}
+Release: 30%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -112,7 +112,7 @@ Patch0034: %{name}-fedora-elf-init-hidden_undef.patch
 Patch0035: %{name}-fedora-elf-rh737223.patch
 Patch0036: %{name}-fedora-gai-canonical.patch
 Patch0037: %{name}-fedora-test-debug-gnuc-hack.patch
-Patch0038: %{name}-fedora-getconf.patch
+Patch0038: %{name}-fedora-localedef.patch
 Patch0039: %{name}-fedora-getrlimit-PLT.patch
 Patch0040: %{name}-fedora-i386-tls-direct-seg-refs.patch
 Patch0041: %{name}-fedora-pt_chown.patch
@@ -123,7 +123,6 @@ Patch0045: %{name}-fedora-locale-euro.patch
 Patch0046: %{name}-fedora-localedata-locales-fixes.patch
 Patch0047: %{name}-fedora-streams-rh436349.patch
 Patch0048: %{name}-fedora-localedata-rh61908.patch
-Patch0049: %{name}-fedora-localedef.patch
 
 #
 # Patches from upstream
@@ -438,7 +437,6 @@ package or when debugging this package.
 %patch0046 -p1
 %patch0047 -p1
 %patch0048 -p1
-%patch0049 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1233,6 +1231,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Nov 26 2012 Jeff Law <law@redhat.com> - 2.16.90-30
+  - Resync with upstream sources
+  - Drop local patch for getconf.
+  - Repack patchlist.
+
 * Fri Nov 16 2012 Jeff Law <law@redhat.com> - 2.16.90-29
   - Rsync with upstream sources
   - Drop local patches for 803286, 791161, 790292, 790298
