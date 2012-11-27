@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 30%{?dist}
+Release: 31%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -165,6 +165,12 @@ Patch2027: %{name}-rh819430.patch
 
 # See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
 Patch2028: %{name}-rh767693-2.patch
+
+# RH BZ 878913
+Patch2049: %{name}-rh878913.patch
+
+# RH BZ 880666
+Patch2050: %{name}-rh880666.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -437,6 +443,8 @@ package or when debugging this package.
 %patch0046 -p1
 %patch0047 -p1
 %patch0048 -p1
+%patch2049 -p1
+%patch2050 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1231,6 +1239,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Nov 27 2012 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.16.90-31
+  - Ensure that hashtable size is greater than 3 (#878913).
+  - fwrite returns 0 on EOF (#880666).
+
 * Mon Nov 26 2012 Jeff Law <law@redhat.com> - 2.16.90-30
   - Resync with upstream sources
   - Drop local patch for getconf.

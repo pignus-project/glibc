@@ -1,0 +1,148 @@
+commit d2e8e5132b806951a389ee87bccc7e55ccf4a02e
+Author: Siddhesh Poyarekar <siddhesh@redhat.com>
+Date:   Sun Nov 25 15:30:07 2012 +0530
+
+    Make fwrite return 0 on EOF
+
+diff --git a/libio/Makefile b/libio/Makefile
+index 9ccd6a0..83d90d0 100644
+--- a/libio/Makefile
++++ b/libio/Makefile
+@@ -59,7 +59,8 @@ tests = tst_swprintf tst_wprintf tst_swscanf tst_wscanf tst_getwc tst_putwc   \
+ 	tst-memstream1 tst-memstream2 \
+ 	tst-wmemstream1 tst-wmemstream2 \
+ 	bug-memstream1 bug-wmemstream1 \
+-	tst-setvbuf1 tst-popen1 tst-fgetwc bug-wsetpos bug-fclose1 tst-fseek
++	tst-setvbuf1 tst-popen1 tst-fgetwc bug-wsetpos bug-fclose1 tst-fseek \
++	tst-fwrite-error
+ ifeq (yes,$(build-shared))
+ # Add test-fopenloc only if shared library is enabled since it depends on
+ # shared localedata objects.
+diff --git a/libio/iofwrite.c b/libio/iofwrite.c
+index d4610f7..e93a656 100644
+--- a/libio/iofwrite.c
++++ b/libio/iofwrite.c
+@@ -43,11 +43,19 @@ _IO_fwrite (buf, size, count, fp)
+     written = _IO_sputn (fp, (const char *) buf, request);
+   _IO_release_lock (fp);
+   /* We have written all of the input in case the return value indicates
+-     this or EOF is returned.  The latter is a special case where we
+-     simply did not manage to flush the buffer.  But the data is in the
+-     buffer and therefore written as far as fwrite is concerned.  */
+-  if (written == request || written == EOF)
++     this.  */
++  if (written == request)
+     return count;
++  /* It is possible that the data was written out into buffer and we just
++     failed to flush it out.  However, this is not necessarily always the
++     case and we cannot really differentiate this with a case when a flush
++     failed and all of the data was not in the buffer.  Hence, just return 0
++     (the flush failure should already have set the errno) and let the user
++     decide what to do.  A future enhancement could be to find out how much
++     data is in the buffer and return that as a short write instead of just
++     0.  */
++  else if (written == EOF)
++    return 0;
+   else
+     return written / size;
+ }
+diff --git a/libio/iofwrite_u.c b/libio/iofwrite_u.c
+index a1077ee..bc533dd 100644
+--- a/libio/iofwrite_u.c
++++ b/libio/iofwrite_u.c
+@@ -45,11 +45,19 @@ fwrite_unlocked (buf, size, count, fp)
+     {
+       written = _IO_sputn (fp, (const char *) buf, request);
+       /* We have written all of the input in case the return value indicates
+-	 this or EOF is returned.  The latter is a special case where we
+-	 simply did not manage to flush the buffer.  But the data is in the
+-	 buffer and therefore written as far as fwrite is concerned.  */
+-      if (written == request || written == EOF)
++	 this.  */
++      if (written == request)
+ 	return count;
++      /* It is possible that the data was written out into buffer and we just
++	 failed to flush it out.  However, this is not necessarily always the
++	 case and we cannot really differentiate this with a case when a flush
++	 failed and all of the data was not in the buffer.  Hence, just return 0
++	 (the flush failure should already have set the errno) and let the user
++	 decide what to do.  A future enhancement could be to find out how much
++	 data is in the buffer and return that as a short write instead of just
++	 0.  */
++      else if (written == EOF)
++	return 0;
+     }
+ 
+   return written / size;
+diff --git a/libio/tst-fwrite-error.c b/libio/tst-fwrite-error.c
+new file mode 100644
+index 0000000..3c0cf49
+--- /dev/null
++++ b/libio/tst-fwrite-error.c
+@@ -0,0 +1,66 @@
++/* Test of fwrite() function, adapted from gnulib-tests in grep.
++   Copyright (C) 2011-2012 Free Software Foundation, Inc.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3, or (at your option)
++   any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
++
++#include <errno.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <stdio.h>
++
++static int
++do_test (void)
++{
++  char tmpl[] = "/tmp/tst-fwrite-error.XXXXXX";
++  int fd = mkstemp (tmpl);
++  if (fd == -1)
++    {
++      printf ("mkstemp failed with errno %d\n", errno);
++      return 1;
++    }
++  FILE *fp = fdopen (fd, "w");
++  if (fp == NULL)
++    {
++      printf ("fdopen failed with errno %d\n", errno);
++      return 1;
++    }
++
++  char buf[5] = "world";
++  setvbuf (fp, NULL, _IONBF, 0);
++  close (fd);
++  unlink (tmpl);
++  errno = 0;
++
++  int ret = fwrite (buf, 1, sizeof (buf), fp);
++  if (ret != 0)
++    {
++      printf ("fwrite returned %d\n", ret);
++      return 1;
++    }
++  if (errno != EBADF)
++    {
++      printf ("Errno is not EBADF: %d\n", errno);
++      return 1;
++    }
++  if (ferror (fp) == 0)
++    {
++      printf ("ferror not set\n");
++      return 1;
++    }
++
++  return 0;
++}
++
++#define TEST_FUNCTION do_test ()
++#include "../test-skeleton.c"
