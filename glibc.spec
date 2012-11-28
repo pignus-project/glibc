@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-3e2e43e2
+%define glibcsrcdir glibc-2.16.90-14bc93a9
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 31%{?dist}
+Release: 32%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -96,6 +96,7 @@ Patch0018: %{name}-fedora-strict-aliasing.patch
 Patch0019: %{name}-fedora-nis-rh188246.patch
 Patch0020: %{name}-fedora-manual-dircategory.patch
 Patch0024: %{name}-fedora-locarchive.patch
+Patch0028: %{name}-fedora-localedata-rh61908.patch
 
 # Needs to be sent upstream
 Patch0029: %{name}-rh841318.patch
@@ -122,7 +123,6 @@ Patch0044: %{name}-fedora-linux-tcsetattr.patch
 Patch0045: %{name}-fedora-locale-euro.patch
 Patch0046: %{name}-fedora-localedata-locales-fixes.patch
 Patch0047: %{name}-fedora-streams-rh436349.patch
-Patch0048: %{name}-fedora-localedata-rh61908.patch
 
 #
 # Patches from upstream
@@ -162,15 +162,6 @@ Patch2026: %{name}-rh841787.patch
 
 # Upstream BZ 14185
 Patch2027: %{name}-rh819430.patch
-
-# See http://sourceware.org/ml/libc-alpha/2012-06/msg00074.html
-Patch2028: %{name}-rh767693-2.patch
-
-# RH BZ 878913
-Patch2049: %{name}-rh878913.patch
-
-# RH BZ 880666
-Patch2050: %{name}-rh880666.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -422,7 +413,7 @@ package or when debugging this package.
 %patch2025 -p1
 %patch2026 -p1
 %patch2027 -p1
-%patch2028 -p1
+%patch0028 -p1
 %patch0029 -p1
 %patch0030 -p1
 %patch0031 -p1
@@ -442,9 +433,6 @@ package or when debugging this package.
 %patch0045 -p1
 %patch0046 -p1
 %patch0047 -p1
-%patch0048 -p1
-%patch2049 -p1
-%patch2050 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1239,6 +1227,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov 28 2012 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.16.90-32
+  - Resync with master.
+  - Drop local patch for 878913.
+  - Drop local patch for 880666.
+  - Drop local patch for 767693.
+  - Repack patchlist.
+
 * Tue Nov 27 2012 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.16.90-31
   - Ensure that hashtable size is greater than 3 (#878913).
   - fwrite returns 0 on EOF (#880666).
