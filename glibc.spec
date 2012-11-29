@@ -1224,7 +1224,7 @@ rm -f *.filelist*
 
 %changelog
 * Thu Nov 29 2012 Jeff Law <law@redhat.com> - 2.16.90-33
-  - Resync with msater.
+  - Resync with master.
   - Drop local patch for 788989.
   - Repack patchlist.
 
