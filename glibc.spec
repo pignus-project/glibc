@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 33%{?dist}
+Release: 34%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1223,6 +1223,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Nov 29 2012 Jeff Law <law@redhat.com> - 2.16.90-34
+  - Remove hunks from strict-aliasing patch that are no longer
+    needed.
+
 * Thu Nov 29 2012 Jeff Law <law@redhat.com> - 2.16.90-33
   - Resync with master.
   - Drop local patch for 788989.
