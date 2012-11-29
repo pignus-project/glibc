@@ -121,8 +121,7 @@ Patch0041: %{name}-fedora-pt_chown.patch
 Patch0042: %{name}-fedora-include-bits-ldbl.patch
 Patch0043: %{name}-fedora-ldd.patch
 Patch0044: %{name}-fedora-linux-tcsetattr.patch
-Patch0045: %{name}-fedora-locale-euro.patch
-Patch0046: %{name}-fedora-localedata-locales-fixes.patch
+Patch0045: %{name}-fedora-localedata-locales-fixes.patch
 
 #
 # Patches from upstream
@@ -428,7 +427,6 @@ package or when debugging this package.
 %patch0043 -p1
 %patch0044 -p1
 %patch0045 -p1
-%patch0046 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1224,6 +1222,8 @@ rm -f *.filelist*
 
 %changelog
 * Thu Nov 29 2012 Jeff Law <law@redhat.com> - 2.16.90-34
+  - Remove local patch which "temporarily" re-added currences
+    obsoleted by the Euro.
   - Remove hunks from strict-aliasing patch that are no longer
     needed.
 
