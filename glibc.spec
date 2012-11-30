@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-2af1b328
+%define glibcsrcdir glibc-2.16.90-1a538b9f
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 34%{?dist}
+Release: 35%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -90,9 +90,9 @@ Patch0009: %{name}-rh657588.patch
 # stap, needs to be sent upstream
 Patch0010: %{name}-stap-libm.patch
 
+Patch0012: %{name}-fedora-linux-tcsetattr.patch
 Patch0014: %{name}-fedora-nptl-linklibc.patch
-
-Patch0018: %{name}-fedora-strict-aliasing.patch
+Patch0018: %{name}-fedora-localedata-locales-fixes.patch
 Patch0019: %{name}-fedora-nis-rh188246.patch
 Patch0020: %{name}-fedora-manual-dircategory.patch
 Patch0024: %{name}-fedora-locarchive.patch
@@ -120,8 +120,6 @@ Patch0040: %{name}-fedora-i386-tls-direct-seg-refs.patch
 Patch0041: %{name}-fedora-pt_chown.patch
 Patch0042: %{name}-fedora-include-bits-ldbl.patch
 Patch0043: %{name}-fedora-ldd.patch
-Patch0044: %{name}-fedora-linux-tcsetattr.patch
-Patch0045: %{name}-fedora-localedata-locales-fixes.patch
 
 #
 # Patches from upstream
@@ -135,9 +133,6 @@ Patch0045: %{name}-fedora-localedata-locales-fixes.patch
 #
 
 Patch2011: %{name}-rh757881.patch
-
-# Upstream BZ 13013
-Patch2012: %{name}-rh730856.patch
 
 Patch2013: %{name}-rh741105.patch
 Patch2015: %{name}-rh770439.patch
@@ -393,7 +388,7 @@ package or when debugging this package.
 %patch0009 -p1
 %patch0010 -p1
 %patch2011 -p1
-%patch2012 -p1
+%patch0012 -p1
 %patch2013 -p1
 %patch0014 -p1
 %patch2015 -p1
@@ -425,8 +420,6 @@ package or when debugging this package.
 %patch0041 -p1
 %patch0042 -p1
 %patch0043 -p1
-%patch0044 -p1
-%patch0045 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1221,6 +1214,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Nov 30 2012 Jeff Law <law@redhat.com> - 2.16.90-35
+  - Resync with master (#882137).
+  - Remove local patch for strict-aliasing warnings that
+    is no longer needed.
+  - Remove local patch for 730856 that is no longer needed.
+  - Repack patchlist.
+
 * Thu Nov 29 2012 Jeff Law <law@redhat.com> - 2.16.90-34
   - Remove local patch which "temporarily" re-added currences
     obsoleted by the Euro.
