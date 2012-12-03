@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-1a538b9f
+%define glibcsrcdir glibc-2.16.90-70e5aee4
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 35%{?dist}
+Release: 36%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -64,8 +64,7 @@ Source1: %{glibcsrcdir}-fedora.tar.gz
 Patch0001: %{name}-fedora-nscd.patch
 
 Patch0002: %{name}-fedora-regcomp-sw11561.patch
-
-Patch0003: %{name}-fedora-nss-files-overflow-fix.patch
+Patch0003: %{name}-fedora-ldd.patch
 
 Patch0004: %{name}-fedora-ppc-unwind.patch
 
@@ -83,9 +82,7 @@ Patch0007: %{name}-rh697421.patch
 
 # Needs to be sent upstream
 Patch0008: %{name}-rh740682.patch
-
-# Needs to be sent upstream
-Patch0009: %{name}-rh657588.patch
+Patch0009: %{name}-fedora-include-bits-ldbl.patch
 
 # stap, needs to be sent upstream
 Patch0010: %{name}-stap-libm.patch
@@ -118,8 +115,6 @@ Patch0038: %{name}-fedora-localedef.patch
 Patch0039: %{name}-fedora-getrlimit-PLT.patch
 Patch0040: %{name}-fedora-i386-tls-direct-seg-refs.patch
 Patch0041: %{name}-fedora-pt_chown.patch
-Patch0042: %{name}-fedora-include-bits-ldbl.patch
-Patch0043: %{name}-fedora-ldd.patch
 
 #
 # Patches from upstream
@@ -418,8 +413,6 @@ package or when debugging this package.
 %patch0039 -p1
 %patch0040 -p1
 %patch0041 -p1
-%patch0042 -p1
-%patch0043 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1214,6 +1207,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Dec 3 2012 Jeff Law <law@redhat.com> - 2.16.90-36
+  - Resync with master
+  - Drop local patch for 657588 that is no longer needed.
+  - Drop lotch patch for nss-files-overflow that seems
+    useless.
+  - Repack patchlist.
+
 * Fri Nov 30 2012 Jeff Law <law@redhat.com> - 2.16.90-35
   - Resync with master (#882137).
   - Remove local patch for strict-aliasing warnings that
