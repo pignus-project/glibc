@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-70e5aee4
+%define glibcsrcdir glibc-2.16.90-0136fe2a
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -81,7 +81,7 @@ Patch0006: %{name}-arm-hardfloat-3.patch
 Patch0007: %{name}-rh697421.patch
 
 # Needs to be sent upstream
-Patch0008: %{name}-rh740682.patch
+Patch0008: %{name}-fedora-getrlimit-PLT.patch
 Patch0009: %{name}-fedora-include-bits-ldbl.patch
 
 # stap, needs to be sent upstream
@@ -89,7 +89,9 @@ Patch0010: %{name}-stap-libm.patch
 
 Patch0012: %{name}-fedora-linux-tcsetattr.patch
 Patch0014: %{name}-fedora-nptl-linklibc.patch
-Patch0018: %{name}-fedora-localedata-locales-fixes.patch
+Patch0015: %{name}-fedora-localedef.patch
+Patch0016: %{name}-fedora-i386-tls-direct-seg-refs.patch
+Patch0018: %{name}-fedora-pt_chown.patch
 Patch0019: %{name}-fedora-nis-rh188246.patch
 Patch0020: %{name}-fedora-manual-dircategory.patch
 Patch0024: %{name}-fedora-locarchive.patch
@@ -110,11 +112,6 @@ Patch0033: %{name}-fedora-elf-ORIGIN.patch
 Patch0034: %{name}-fedora-elf-init-hidden_undef.patch
 Patch0035: %{name}-fedora-elf-rh737223.patch
 Patch0036: %{name}-fedora-gai-canonical.patch
-Patch0037: %{name}-fedora-test-debug-gnuc-hack.patch
-Patch0038: %{name}-fedora-localedef.patch
-Patch0039: %{name}-fedora-getrlimit-PLT.patch
-Patch0040: %{name}-fedora-i386-tls-direct-seg-refs.patch
-Patch0041: %{name}-fedora-pt_chown.patch
 
 #
 # Patches from upstream
@@ -130,8 +127,6 @@ Patch0041: %{name}-fedora-pt_chown.patch
 Patch2011: %{name}-rh757881.patch
 
 Patch2013: %{name}-rh741105.patch
-Patch2015: %{name}-rh770439.patch
-Patch2016: %{name}-rh789209.patch
 Patch2017: %{name}-rh691912.patch
 
 # Upstream BZ 9954
@@ -386,8 +381,8 @@ package or when debugging this package.
 %patch0012 -p1
 %patch2013 -p1
 %patch0014 -p1
-%patch2015 -p1
-%patch2016 -p1
+%patch0015 -p1
+%patch0016 -p1
 %patch2017 -p1
 %patch0018 -p1
 %patch0019 -p1
@@ -408,11 +403,6 @@ package or when debugging this package.
 %patch0034 -p1
 %patch0035 -p1
 %patch0036 -p1
-%patch0037 -p1
-%patch0038 -p1
-%patch0039 -p1
-%patch0040 -p1
-%patch0041 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1210,8 +1200,14 @@ rm -f *.filelist*
 * Mon Dec 3 2012 Jeff Law <law@redhat.com> - 2.16.90-36
   - Resync with master
   - Drop local patch for 657588 that is no longer needed.
+  - Drop local patch for 740682 that is no longer needed.
+  - Drop local patch for 770439 that is no longer needed.
+  - Drop local patch for 789209 that is no longer needed.
   - Drop lotch patch for nss-files-overflow that seems
     useless.
+  - Drop localedata-locales-fixes as they were rejected
+    upstream.
+  - Drop test-debug-gnuc-hack.patch that seems useless now.
   - Repack patchlist.
 
 * Fri Nov 30 2012 Jeff Law <law@redhat.com> - 2.16.90-35
