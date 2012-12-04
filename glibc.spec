@@ -107,7 +107,6 @@ Patch0029: %{name}-rh841318.patch
 
 Patch0030: %{name}-fedora-uname-getrlimit.patch
 Patch0031: %{name}-fedora-__libc_multiple_libcs.patch
-Patch0032: %{name}-fedora-tls-offset-rh731228.patch
 Patch0033: %{name}-fedora-elf-ORIGIN.patch
 Patch0034: %{name}-fedora-elf-init-hidden_undef.patch
 Patch0035: %{name}-fedora-elf-rh737223.patch
@@ -143,6 +142,9 @@ Patch2026: %{name}-rh841787.patch
 
 # Upstream BZ 14185
 Patch2027: %{name}-rh819430.patch
+
+# Upstream BZ 14898
+Patch2032: %{name}-fedora-tls-offset-rh731228.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -398,7 +400,7 @@ package or when debugging this package.
 %patch0029 -p1
 %patch0030 -p1
 %patch0031 -p1
-%patch0032 -p1
+%patch2032 -p1
 %patch0033 -p1
 %patch0034 -p1
 %patch0035 -p1
