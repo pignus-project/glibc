@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-0136fe2a
+%define glibcsrcdir glibc-2.16.90-82123268
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -78,7 +78,6 @@ Patch0006: %{name}-arm-hardfloat-3.patch
 
 
 # Needs to be sent upstream
-Patch0007: %{name}-rh697421.patch
 
 # Needs to be sent upstream
 Patch0008: %{name}-fedora-getrlimit-PLT.patch
@@ -87,30 +86,28 @@ Patch0009: %{name}-fedora-include-bits-ldbl.patch
 # stap, needs to be sent upstream
 Patch0010: %{name}-stap-libm.patch
 
-Patch0012: %{name}-fedora-linux-tcsetattr.patch
-Patch0014: %{name}-fedora-nptl-linklibc.patch
-Patch0015: %{name}-fedora-localedef.patch
-Patch0016: %{name}-fedora-i386-tls-direct-seg-refs.patch
-Patch0018: %{name}-fedora-pt_chown.patch
-Patch0019: %{name}-fedora-nis-rh188246.patch
-Patch0020: %{name}-fedora-manual-dircategory.patch
-Patch0024: %{name}-fedora-locarchive.patch
-Patch0025: %{name}-fedora-streams-rh436349.patch
-Patch0028: %{name}-fedora-localedata-rh61908.patch
-
 # Needs to be sent upstream
 Patch0029: %{name}-rh841318.patch
 
 # All these were from the glibc-fedora.patch mega-patch and need another
 # round of reviewing.  Ideally they'll either be submitted upstream or
 # dropped.
-
+Patch0012: %{name}-fedora-linux-tcsetattr.patch
+Patch0014: %{name}-fedora-nptl-linklibc.patch
+Patch0015: %{name}-fedora-localedef.patch
+Patch0016: %{name}-fedora-i386-tls-direct-seg-refs.patch
+Patch0017: %{name}-fedora-gai-canonical.patch
+Patch0018: %{name}-fedora-pt_chown.patch
+Patch0019: %{name}-fedora-nis-rh188246.patch
+Patch0020: %{name}-fedora-manual-dircategory.patch
+Patch0024: %{name}-fedora-locarchive.patch
+Patch0025: %{name}-fedora-streams-rh436349.patch
+Patch0028: %{name}-fedora-localedata-rh61908.patch
 Patch0030: %{name}-fedora-uname-getrlimit.patch
 Patch0031: %{name}-fedora-__libc_multiple_libcs.patch
 Patch0033: %{name}-fedora-elf-ORIGIN.patch
 Patch0034: %{name}-fedora-elf-init-hidden_undef.patch
 Patch0035: %{name}-fedora-elf-rh737223.patch
-Patch0036: %{name}-fedora-gai-canonical.patch
 
 #
 # Patches from upstream
@@ -122,11 +119,12 @@ Patch0036: %{name}-fedora-gai-canonical.patch
 # Each should be associated with a BZ.
 # Obviously we're not there right now, but that's the goal
 #
+# http://sourceware.org/ml/libc-alpha/2012-12/msg00103.html
+Patch2007: %{name}-rh697421.patch
 
 Patch2011: %{name}-rh757881.patch
 
 Patch2013: %{name}-rh741105.patch
-Patch2017: %{name}-rh691912.patch
 
 # Upstream BZ 9954
 Patch2021: %{name}-rh739743.patch
@@ -375,7 +373,7 @@ package or when debugging this package.
 %patch0004 -p1
 %patch0005 -p1
 %patch0006 -p1
-%patch0007 -p1
+%patch2007 -p1
 %patch0008 -p1
 %patch0009 -p1
 %patch0010 -p1
@@ -385,7 +383,7 @@ package or when debugging this package.
 %patch0014 -p1
 %patch0015 -p1
 %patch0016 -p1
-%patch2017 -p1
+%patch0017 -p1
 %patch0018 -p1
 %patch0019 -p1
 %patch0020 -p1
@@ -404,7 +402,6 @@ package or when debugging this package.
 %patch0033 -p1
 %patch0034 -p1
 %patch0035 -p1
-%patch0036 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1199,13 +1196,18 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Dec 6 2012 Jeff Law <law@redhat.com> - 2.16.90-37
+  - Resync with master
+  - Patch for 697421 has been submitted upstream.
+  - Drop local patch for 691912 that is no longer needed.
+
 * Mon Dec 3 2012 Jeff Law <law@redhat.com> - 2.16.90-36
   - Resync with master
   - Drop local patch for 657588 that is no longer needed.
   - Drop local patch for 740682 that is no longer needed.
   - Drop local patch for 770439 that is no longer needed.
   - Drop local patch for 789209 that is no longer needed.
-  - Drop lotch patch for nss-files-overflow that seems
+  - Drop local patch for nss-files-overflow that seems
     useless.
   - Drop localedata-locales-fixes as they were rejected
     upstream.
