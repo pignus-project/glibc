@@ -1,4 +1,4 @@
-%define glibcsrcdir glibc-2.16.90-82123268
+%define glibcsrcdir glibc-2.16.90-67cbf9a2
 %define glibcversion 2.16.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 37%{?dist}
+Release: 38%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -105,9 +105,9 @@ Patch0025: %{name}-fedora-streams-rh436349.patch
 Patch0028: %{name}-fedora-localedata-rh61908.patch
 Patch0030: %{name}-fedora-uname-getrlimit.patch
 Patch0031: %{name}-fedora-__libc_multiple_libcs.patch
+Patch0032: %{name}-fedora-elf-rh737223.patch
 Patch0033: %{name}-fedora-elf-ORIGIN.patch
 Patch0034: %{name}-fedora-elf-init-hidden_undef.patch
-Patch0035: %{name}-fedora-elf-rh737223.patch
 
 #
 # Patches from upstream
@@ -140,9 +140,6 @@ Patch2026: %{name}-rh841787.patch
 
 # Upstream BZ 14185
 Patch2027: %{name}-rh819430.patch
-
-# Upstream BZ 14898
-Patch2032: %{name}-fedora-tls-offset-rh731228.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -398,10 +395,9 @@ package or when debugging this package.
 %patch0029 -p1
 %patch0030 -p1
 %patch0031 -p1
-%patch2032 -p1
+%patch0032 -p1
 %patch0033 -p1
 %patch0034 -p1
-%patch0035 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1196,6 +1192,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Dec 7 2012 Jeff Law <law@redhat.com> - 2.16.90-38
+  - Resync with master
+  - Drop patch for 731228 that is no longer needed.
+
 * Thu Dec 6 2012 Jeff Law <law@redhat.com> - 2.16.90-37
   - Resync with master
   - Patch for 697421 has been submitted upstream.
