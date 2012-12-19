@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 38%{?dist}
+Release: 39%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1126,7 +1126,7 @@ rm -f *.filelist*
 %attr(0600,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/cache/ldconfig/aux-cache
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/ld.so.cache
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/gai.conf
-%doc README NEWS INSTALL BUGS PROJECTS CONFORMANCE
+%doc README NEWS INSTALL BUGS PROJECTS CONFORMANCE elf/rtld-debugger-interface.txt
 %doc COPYING COPYING.LIB LICENSES
 %doc hesiod/README.hesiod
 
@@ -1192,6 +1192,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Dec 19 2012 Jeff Law <law@redhat.com> - 2.16.90-39
+  - Add rtld-debugger-interface.txt as documentation. (#872242)
+
 * Fri Dec 7 2012 Jeff Law <law@redhat.com> - 2.16.90-38
   - Resync with master
   - Drop patch for 731228 that is no longer needed.
