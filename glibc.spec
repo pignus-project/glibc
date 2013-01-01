@@ -1,5 +1,5 @@
-%define glibcsrcdir glibc-2.16.90-2bc2d8e8
-%define glibcversion 2.16.90
+%define glibcsrcdir glibc-2.17-c758a686
+%define glibcversion 2.17
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 40%{?dist}
+Release: 1%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1192,6 +1192,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jan 1 2013 Jeff Law <law@redhat.com> - 2.17-1
+  - Resync with official glibc-2.17 release
+
 * Fri Dec 21 2012 Jeff Law <law@redhat.com> - 2.16.90-40
   - Resync with master
 
