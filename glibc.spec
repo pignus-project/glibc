@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 1%{?dist}
+Release: 2%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -140,6 +140,9 @@ Patch2026: %{name}-rh841787.patch
 
 # Upstream BZ 14185
 Patch2027: %{name}-rh819430.patch
+
+# Upstream BZ 15006
+Patch2028: %{name}-rh905184.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -398,6 +401,7 @@ package or when debugging this package.
 %patch0032 -p1
 %patch0033 -p1
 %patch0034 -p1
+%patch2028 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1091,6 +1095,7 @@ rm -f *.filelist*
 
 %files -f rpm.filelist
 %defattr(-,root,root)
+%dir /usr/%{_lib}/audit
 %ifarch %{rtkaioarches}
 %dir /%{_lib}/rtkaio
 %endif
@@ -1192,6 +1197,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Feb 7 2013 Carlos O'Donell <carlos@redhat.com> - 2.17-2
+  - Fix ownership of /usr/lib[64]/audit (#894307).
+  - Support unmarked ARM objects in ld.so.cache and aux cache (#905184).
+
 * Tue Jan 1 2013 Jeff Law <law@redhat.com> - 2.17-1
   - Resync with official glibc-2.17 release
 
