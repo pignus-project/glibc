@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 2%{?dist}
+Release: 3%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -37,7 +37,7 @@ License: LGPLv2+ and LGPLv2+ with exceptions and GPLv2+
 Group: System Environment/Libraries
 URL: http://www.gnu.org/software/glibc/
 Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.gz
-Source1: %{glibcsrcdir}-fedora.tar.gz
+Source1: %{glibcsrcdir}-releng.tar.gz
 
 # 0000-0999 for patches which are unlikely to ever go upstream or which
 # have not been analyzed to see if they ought to go upstream yet.
@@ -108,6 +108,9 @@ Patch0031: %{name}-fedora-__libc_multiple_libcs.patch
 Patch0032: %{name}-fedora-elf-rh737223.patch
 Patch0033: %{name}-fedora-elf-ORIGIN.patch
 Patch0034: %{name}-fedora-elf-init-hidden_undef.patch
+
+# Needs to be sent upstream
+Patch0035: %{name}-rh911307.patch
 
 #
 # Patches from upstream
@@ -402,6 +405,7 @@ package or when debugging this package.
 %patch0033 -p1
 %patch0034 -p1
 %patch2028 -p1
+%patch0035 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -519,7 +523,7 @@ build nosegneg -mno-tls-direct-seg-refs
 platform=`LD_SHOW_AUXV=1 /bin/true | sed -n 's/^AT_PLATFORM:[[:blank:]]*//p'`
 if [ "$platform" != power6 ]; then
   mkdir -p power6emul/{lib,lib64}
-  $GCC -shared -O2 -fpic -o power6emul/%{_lib}/power6emul.so fedora/power6emul.c -Wl,-z,initfirst
+  $GCC -shared -O2 -fpic -o power6emul/%{_lib}/power6emul.so releng/power6emul.c -Wl,-z,initfirst
 %ifarch ppc
   gcc -shared -nostdlib -O2 -fpic -m64 -o power6emul/lib64/power6emul.so -xc - </dev/null
 %endif
@@ -536,7 +540,7 @@ build power6
 %endif
 
 cd build-%{target}
-$GCC -static -L. -Os -g ../fedora/glibc_post_upgrade.c -o glibc_post_upgrade.%{_target_cpu} \
+$GCC -static -L. -Os -g ../releng/glibc_post_upgrade.c -o glibc_post_upgrade.%{_target_cpu} \
   '-DLIBTLS="/%{_lib}/tls/"' \
   '-DGCONV_MODULES_DIR="%{_prefix}/%{_lib}/gconv"' \
   '-DLD_SO_CONF="/etc/ld.so.conf"' \
@@ -640,7 +644,7 @@ rm -f $RPM_BUILD_ROOT/%{_lib}/libNoVersion*
 # the generic one (#162634)
 cp -a bits/stdio-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/stdio-lock.h
 # And <bits/libc-lock.h> needs sanitizing as well.
-cp -a fedora/libc-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/libc-lock.h
+cp -a releng/libc-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/libc-lock.h
 
 if [ -d $RPM_BUILD_ROOT%{_prefix}/info -a "%{_infodir}" != "%{_prefix}/info" ]; then
   mkdir -p $RPM_BUILD_ROOT%{_infodir}
@@ -652,7 +656,7 @@ gzip -9nvf $RPM_BUILD_ROOT%{_infodir}/libc*
 
 ln -sf libbsd-compat.a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libbsd.a
 
-install -p -m 644 fedora/nsswitch.conf $RPM_BUILD_ROOT/etc/nsswitch.conf
+install -p -m 644 releng/nsswitch.conf $RPM_BUILD_ROOT/etc/nsswitch.conf
 
 %ifnarch %{auxarches}
 mkdir -p $RPM_BUILD_ROOT/etc/default
@@ -661,9 +665,9 @@ install -p -m 644 nis/nss $RPM_BUILD_ROOT/etc/default/nss
 # This is for ncsd - in glibc 2.2
 install -m 644 nscd/nscd.conf $RPM_BUILD_ROOT/etc
 mkdir -p $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/
-install -m 644 fedora/nscd.conf %{buildroot}/usr/lib/tmpfiles.d/
+install -m 644 releng/nscd.conf %{buildroot}/usr/lib/tmpfiles.d/
 mkdir -p $RPM_BUILD_ROOT/lib/systemd/system
-install -m 644 fedora/nscd.service fedora/nscd.socket $RPM_BUILD_ROOT/lib/systemd/system
+install -m 644 releng/nscd.service releng/nscd.socket $RPM_BUILD_ROOT/lib/systemd/system
 %endif
 
 # Include ld.so.conf
@@ -824,14 +828,14 @@ EOF
 rm -rf $RPM_BUILD_ROOT%{_prefix}/share/zoneinfo
 
 # Make sure %config files have the same timestamp
-touch -r fedora/glibc.spec.in $RPM_BUILD_ROOT/etc/ld.so.conf
+touch -r releng/glibc.spec.in $RPM_BUILD_ROOT/etc/ld.so.conf
 touch -r sunrpc/etc.rpc $RPM_BUILD_ROOT/etc/rpc
 
 # We allow undefined symbols in shared libraries because the libraries
 # referenced at link time here, particularly ld.so, may be different than
 # the one used at runtime.  This is really only needed during the ARM 
 # transition from ld-linux.so.3 to ld-linux-armhf.so.3.
-cd fedora
+cd releng 
 $GCC -Os -g -o build-locale-archive build-locale-archive.c \
   ../build-%{target}/locale/locarchive.o \
   ../build-%{target}/locale/md5.o \
@@ -1197,6 +1201,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Feb 27 2013 Carlos O'Donell <carlos@redhat.com> - 2.17-3
+  - Renamed release engineering directory to `releng' (#903754).
+  - Fix building with gcc 4.8.0 (#911307).
+
 * Thu Feb 7 2013 Carlos O'Donell <carlos@redhat.com> - 2.17-2
   - Fix ownership of /usr/lib[64]/audit (#894307).
   - Support unmarked ARM objects in ld.so.cache and aux cache (#905184).
