@@ -21,13 +21,13 @@
 %define debuginfocommonarches %{biarcharches} alpha alphaev6
 %define multiarcharches ppc %{power64} %{ix86} x86_64 %{sparc}
 %define systemtaparches %{ix86} x86_64
-# Remove -s to get verbose output.
-%define silentrules PARALLELMFLAGS=-s
+# Add -s for a less verbose build output.
+%define silentrules PARALLELMFLAGS=
 
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 3%{?dist}
+Release: 4%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -115,7 +115,8 @@ Patch0035: %{name}-rh911307.patch
 #
 # Patches from upstream
 #
-
+# Upstream BZ 15078
+Patch2029: %{name}-rh905877.patch
 
 #
 # Patches submitted, but not yet approved upstream.
@@ -406,6 +407,7 @@ package or when debugging this package.
 %patch0034 -p1
 %patch2028 -p1
 %patch0035 -p1
+%patch2029 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -424,10 +426,14 @@ GXX=g++
 %ifarch %{ix86}
 BuildFlags="-march=%{_target_cpu} -mtune=generic"
 %endif
-%ifarch i686
+# We don't support building for i386. The generic i386 architecture lacks the
+# atomic primitives required for NPTL support. However, when a user asks to
+# build for i386 we interpret that as "for whatever works on x86" and we 
+# select i686. Thus we treat i386 as an alias for i686.
+%ifarch i386 i686
 BuildFlags="-march=i686 -mtune=generic"
 %endif
-%ifarch i386 i486 i586
+%ifarch i486 i586
 BuildFlags="$BuildFlags -mno-tls-direct-seg-refs"
 %endif
 %ifarch x86_64
@@ -1201,6 +1207,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Mar 17 2013 Carlos O'Donell <carlos@redhat.com> - 2.17-4
+  - Fixed i386 glibc builds (#917161).
+  - Fixed multibyte character processing crash in regexp (#905877, CVE-2013-0242)
+
 * Wed Feb 27 2013 Carlos O'Donell <carlos@redhat.com> - 2.17-3
   - Renamed release engineering directory to `releng' (#903754).
   - Fix building with gcc 4.8.0 (#911307).
