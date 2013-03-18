@@ -76,9 +76,6 @@ Patch0005: %{name}-rh825061.patch
 # has been rebuilt to use the new ld.so path.
 Patch0006: %{name}-arm-hardfloat-3.patch
 
-
-# Needs to be sent upstream
-
 # Needs to be sent upstream
 Patch0008: %{name}-fedora-getrlimit-PLT.patch
 Patch0009: %{name}-fedora-include-bits-ldbl.patch
