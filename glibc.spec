@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 4%{?dist}
+Release: 5%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -114,6 +114,8 @@ Patch0035: %{name}-rh911307.patch
 #
 # Upstream BZ 15078
 Patch2029: %{name}-rh905877.patch
+
+Patch1030: %{name}-rh921760.patch
 
 #
 # Patches submitted, but not yet approved upstream.
@@ -405,6 +407,7 @@ package or when debugging this package.
 %patch2028 -p1
 %patch0035 -p1
 %patch2029 -p1
+%patch1030 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1204,6 +1207,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Mar 28 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.17-5
+  - Don't add input group during initgroups_dyn in hesiod (#921760).
+
 * Sun Mar 17 2013 Carlos O'Donell <carlos@redhat.com> - 2.17-4
   - Fixed i386 glibc builds (#917161).
   - Fixed multibyte character processing crash in regexp (#905877, CVE-2013-0242)
