@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 8%{?dist}
+Release: 9%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -149,6 +149,9 @@ Patch2027: %{name}-rh819430.patch
 
 # Upstream BZ 15006
 Patch2028: %{name}-rh905184.patch
+
+# Upstream BZ 15465
+Patch2039: %{name}-rh961238.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -414,6 +417,7 @@ package or when debugging this package.
 %patch2029 -p1
 %patch1030 -p1
 %patch0038 -p1
+%patch2039 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1213,6 +1217,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue May 14 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.17-9
+  - Avoid crashing in LD_DEBUG when program name is unavailable (#961238).
+
 * Sun May  5 2013 Patsy Franklin <pfrankli@redhat.com> - 2.17-8
   - Fix _nl_find_msg malloc failure case, and callers. (#959034).
 
