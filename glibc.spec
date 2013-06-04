@@ -1,5 +1,5 @@
-%define glibcsrcdir glibc-2.17-c758a686
-%define glibcversion 2.17
+%define glibcsrcdir glibc-2.17-757-g96df079
+%define glibcversion 2.17.90
 ### glibc.spec.in follows:
 %define run_glibc_tests 1
 %define auxarches athlon alphaev6
@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 9%{?dist}
+Release: 1%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -63,7 +63,6 @@ Source1: %{glibcsrcdir}-releng.tar.gz
 # change this.
 Patch0001: %{name}-fedora-nscd.patch
 
-Patch0002: %{name}-fedora-regcomp-sw11561.patch
 Patch0003: %{name}-fedora-ldd.patch
 
 Patch0004: %{name}-fedora-ppc-unwind.patch
@@ -108,17 +107,11 @@ Patch0034: %{name}-fedora-elf-init-hidden_undef.patch
 
 # Needs to be sent upstream
 Patch0035: %{name}-rh911307.patch
-Patch0036: %{name}-rh892777.patch
 Patch0037: %{name}-rh952799.patch
-Patch0038: %{name}-rh959034.patch
 
 #
 # Patches from upstream
 #
-# Upstream BZ 15078
-Patch2029: %{name}-rh905877.patch
-
-Patch1030: %{name}-rh921760.patch
 
 #
 # Patches submitted, but not yet approved upstream.
@@ -146,12 +139,6 @@ Patch2026: %{name}-rh841787.patch
 
 # Upstream BZ 14185
 Patch2027: %{name}-rh819430.patch
-
-# Upstream BZ 15006
-Patch2028: %{name}-rh905184.patch
-
-# Upstream BZ 15465
-Patch2039: %{name}-rh961238.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
@@ -377,7 +364,6 @@ package or when debugging this package.
 %setup -q -n %{glibcsrcdir} -b1
 
 %patch0001 -p1
-%patch0002 -p1
 %patch0003 -p1
 %patch0004 -p1
 %patch0005 -p1
@@ -410,14 +396,8 @@ package or when debugging this package.
 %patch0032 -p1
 %patch0033 -p1
 %patch0034 -p1
-%patch2028 -p1
 %patch0035 -p1
-%patch0036 -p1
 %patch0037 -p1
-%patch2029 -p1
-%patch1030 -p1
-%patch0038 -p1
-%patch2039 -p1
 
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
@@ -1217,6 +1197,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jun  4 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.17.90-1
+  - Resync with upstream master.
+
 * Tue May 14 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.17-9
   - Avoid crashing in LD_DEBUG when program name is unavailable (#961238).
 
