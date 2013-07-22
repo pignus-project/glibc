@@ -27,7 +27,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 4%{?dist}
+Release: 5%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -296,9 +296,9 @@ Group: System Environment/Daemons
 Requires: %{name} = %{version}-%{release}
 Requires: libselinux >= 1.17.10-1, audit-libs >= 1.1.3
 Requires(pre): /usr/sbin/useradd, coreutils
-Requires(post): systemd-units
-Requires(preun): systemd-units
-Requires(postun): systemd-units, /usr/sbin/userdel
+Requires(post): systemd
+Requires(preun): systemd
+Requires(postun): systemd, /usr/sbin/userdel
 
 %description -n nscd
 Nscd caches name service lookups and can dramatically improve
@@ -500,6 +500,7 @@ configure_CFLAGS="$build_CFLAGS -fno-asynchronous-unwind-tables"
 %ifarch ppc64p7
 	--with-cpu=power7 \
 %endif
+	--enable-lock-elision \
 	--disable-profile --enable-nss-crypt ||
 { cat config.log; false; }
 
@@ -1197,6 +1198,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jul 12 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.17.90-5
+- Enable lock elision support (#982363).
+- Depend on systemd instead of systemd-units (#983760).
+
 * Tue Jul  9 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.17.90-4
 - Resync with upstream master.
 
