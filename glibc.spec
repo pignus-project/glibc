@@ -69,7 +69,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 5%{?dist}
+Release: 6%{?dist}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -268,6 +268,10 @@ BuildRequires: gcc >= 4.1.0-0.17
 BuildRequires: elfutils >= 0.72
 BuildRequires: rpm >= 4.2-0.56
 %endif
+
+# The testsuite builds static C++ binaries that require a static
+# C++ runtime from libstdc++-static.
+BuildRequires: libstdc++-static
 
 # Filter out all GLIBC_PRIVATE symbols since they are internal to
 # the package and should be examined by any other tool.
@@ -1516,6 +1520,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jul 24 2013 Carlos O'Donell <carlos@redhat.com> - 2.17.90-6
+- Add build requirement on static libstdc++ library to fix testsuite failures
+  for static C++ tests.
+
 * Fri Jul 12 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.17.90-5
 - Enable lock elision support (#982363).
 - Depend on systemd instead of systemd-units (#983760).
