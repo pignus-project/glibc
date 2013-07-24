@@ -41,8 +41,8 @@ Source1: %{glibcsrcdir}-releng.tar.gz
 
 # 0000-0999 for patches which are unlikely to ever go upstream or which
 # have not been analyzed to see if they ought to go upstream yet.
-# 
-# 1000-2000 for patches that are already upstream. 
+#
+# 1000-2000 for patches that are already upstream.
 #
 # 2000-3000 for patches that are awaiting upstream approval
 #
@@ -418,7 +418,7 @@ BuildFlags="-march=%{_target_cpu} -mtune=generic"
 %endif
 # We don't support building for i386. The generic i386 architecture lacks the
 # atomic primitives required for NPTL support. However, when a user asks to
-# build for i386 we interpret that as "for whatever works on x86" and we 
+# build for i386 we interpret that as "for whatever works on x86" and we
 # select i686. Thus we treat i386 as an alias for i686.
 %ifarch i386 i686
 BuildFlags="-march=i686 -mtune=generic"
@@ -830,9 +830,9 @@ touch -r sunrpc/etc.rpc $RPM_BUILD_ROOT/etc/rpc
 
 # We allow undefined symbols in shared libraries because the libraries
 # referenced at link time here, particularly ld.so, may be different than
-# the one used at runtime.  This is really only needed during the ARM 
+# the one used at runtime.  This is really only needed during the ARM
 # transition from ld-linux.so.3 to ld-linux-armhf.so.3.
-cd releng 
+cd releng
 $GCC -Os -g -o build-locale-archive build-locale-archive.c \
   ../build-%{target}/locale/locarchive.o \
   ../build-%{target}/locale/md5.o \
@@ -1119,7 +1119,7 @@ rm -f *.filelist*
 %ifarch s390x
 /lib/ld64.so.1
 %endif
-%ifarch armv7hl armv7hnl 
+%ifarch armv7hl armv7hnl
 /lib/ld-linux.so.3
 %endif
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
@@ -1379,7 +1379,7 @@ rm -f *.filelist*
 - Remove i686-nopl patch.  Gas was changed back in 2011 to
   avoid nopl.
 - Move gai-rfc1918 patch to submitted upstream status
- 
+
 * Fri Sep 21 2012 Jeff Law <law@redhat.com> - 2.16.90-14
 - Revert patch for 816647, it's blatently broken.
 
@@ -1406,7 +1406,7 @@ rm -f *.filelist*
 
 * Thu Aug 30 2012 Jeff Law <law@redhat.com> - 2.16.90-7
 - Resync with upstream sources.
-  
+
 * Wed Aug 22 2012 Jeff Law <law@redhat.com> - 2.16.90-6
 - Resync with upstream sources.
 
@@ -1481,7 +1481,7 @@ rm -f *.filelist*
 - actually apply the arm linker hack
 
 * Mon Jun 11 2012 Dennis Gilmore <dennis@ausil.us> - 2.15.90-11
-- only deal with the arm linker compat hack on armhfp arches 
+- only deal with the arm linker compat hack on armhfp arches
 - armsfp arches do not have a linker change
 - Backward compat hack for armhf binaries.
 
@@ -1557,8 +1557,8 @@ rm -f *.filelist*
 - Fix first day of week for lv_LV (#682500)
 
 * Mon Apr 2 2012 Jeff Law <law@redhat.com> - 2.15-31
-- When retrying after main arena failure, always retry in a 
-    different arena. (#789238)
+- When retrying after main arena failure, always retry in a
+  different arena. (#789238)
 
 * Tue Mar 27 2012 Jeff Law <law@redhat.com> - 2.15-30
 - Avoid unbound alloca usage in *-crypt routines (#804792)
@@ -1587,7 +1587,7 @@ rm -f *.filelist*
 - Correctly handle dns request where large numbers of A and AAA records
   are returned (#795498)
 - Fix nscd crash when group has many members (#788989)
- 
+
 * Mon Feb 20 2012 Jeff Law <law@redhat.com> - 2.15-23
 - Avoid "nargs" integer overflow which could be used to bypass FORTIFY_SOURCE (#794797)
 
@@ -1699,10 +1699,10 @@ rm -f *.filelist*
 * Fri Nov 18 2011 Jeff Law <law@redhat.com> - 2.14.90-19
 - Check malloc arena atomically (BZ#13071)
 - Don't call reused_arena when _int_new_arena failed (#753601)
-  
+
 * Wed Nov 16 2011 Jeff Law <law@redhat.com> - 2.14.90-18
 - Fix grouping and reuse other locales in various locales (BZ#13147)
-  
+
 * Tue Nov 15 2011 Jeff Law <law@redhat.com> - 2.14.90-17
 - Revert bogus commits/rebasing of Nov 14, Nov 11 and Nov 8.  Sources
   should be equivalent to Fedora 16's initial release.
