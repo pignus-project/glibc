@@ -1,8 +1,19 @@
 %define glibcsrcdir glibc-2.17-906-g8ab0740
 %define glibcversion 2.17.90
-### glibc.spec.in follows:
+##############################################################################
+# If run_glibc_tests is zero then tests are not run for the build.
+# You must always set run_glibc_tests to one for production builds.
 %define run_glibc_tests 1
+##############################################################################
+# Auxiliary arches are those arches that can be built in addition
+# to the core supported arches. You either install an auxarch or
+# you install the base arch, not both. You would do this in order
+# to provide a more optimized version of the package for your arch.
 %define auxarches athlon alphaev6
+##############################################################################
+# We build a special package for Xen that includes TLS support with
+# no negative segment offsets for use with Xen guests. This is
+# purely an optimization for increased performance on those arches.
 %define xenarches i686 athlon
 %ifarch %{xenarches}
 %define buildxen 1
@@ -11,19 +22,50 @@
 %define buildxen 0
 %define xenpackage 0
 %endif
+##############################################################################
+# For Power we actually support alternate runtimes in the same base package.
+# If we build for Power or Power64 we additionally build a power6 runtime that
+# is enabled by AT_HWCAPS selection and an alternate runtime directory.
 %ifarch ppc ppc64
 %define buildpower6 1
 %else
 %define buildpower6 0
 %endif
+##############################################################################
+# We build librtkaio for all rtkaioarches. The library is installed into
+# a distinct subdirectory in the lib dir. This define enables the rtkaio
+# add-on during the build. Upstream does not have rtkaio and it is provided
+# strictly as part of our builds.
 %define rtkaioarches %{ix86} x86_64 ppc %{power64} s390 s390x
+##############################################################################
+# Any architecture/kernel combination that supports running 32-bit and 64-bit
+# code in userspace is considered a biarch arch.
 %define biarcharches %{ix86} x86_64 ppc %{power64} s390 s390x
+##############################################################################
+# If the debug information is split into two packages, the core debuginfo
+# pacakge and the common debuginfo package then the arch should be listed
+# here. If the arch is not listed here then a single core debuginfo package
+# will be created for the architecture.
 %define debuginfocommonarches %{biarcharches} alpha alphaev6
+##############################################################################
+# If the architecture has multiarch support in glibc then it should be listed
+# here to enable support in the build. Multiarch support is a single library
+# with implementations of certain functions for multiple architectures. The
+# most optimal function is selected at runtime based on the hardware that is
+# detected by glibc. The underlying support for function selection and
+# execution is provided by STT_GNU_IFUNC.
 %define multiarcharches ppc %{power64} %{ix86} x86_64 %{sparc}
+##############################################################################
+# If the architecture has SDT probe point support then we build glibc with
+# --enable-systemtap and include all SDT probe points in the library. It is
+# the eventual goal that all supported arches should be on this list.
 %define systemtaparches %{ix86} x86_64
+##############################################################################
 # Add -s for a less verbose build output.
 %define silentrules PARALLELMFLAGS=
-
+##############################################################################
+# %%package glibc - The GNU C Library (glibc) core package.
+##############################################################################
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
@@ -36,9 +78,22 @@ Release: 5%{?dist}
 License: LGPLv2+ and LGPLv2+ with exceptions and GPLv2+
 Group: System Environment/Libraries
 URL: http://www.gnu.org/software/glibc/
+# We do not use usptream source tarballs as the start place for our package.
+# We should use upstream source tarballs for official releases though and
+# it will look like this:
+# Source0: http://ftp.gnu.org/gnu/glibc/%{glibcsrcdir}.tar.gz
+# Source1: %{glibcsrcdir}-releng.tar.gz
+# TODO:
+# The Source1 URL will never reference an upstream URL. In fact the plan
+# should be to merge the entire release engineering tarball into upstream
+# instead of keeping it around as a large dump of files. Distro specific
+# changes should then be a very very small patch set.
 Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.gz
 Source1: %{glibcsrcdir}-releng.tar.gz
 
+##############################################################################
+# Start of glibc patches
+##############################################################################
 # 0000-0999 for patches which are unlikely to ever go upstream or which
 # have not been analyzed to see if they ought to go upstream yet.
 #
@@ -139,11 +194,18 @@ Patch2026: %{name}-rh841787.patch
 
 # Upstream BZ 14185
 Patch2027: %{name}-rh819430.patch
+##############################################################################
+# End of glibc patches.
+##############################################################################
 
+##############################################################################
+# Continued list of core "glibc" package information:
+##############################################################################
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
 Obsoletes: nss_db
 Provides: ldconfig
+
 # The dynamic linker supports DT_GNU_HASH
 Provides: rtld(GNU_HASH)
 
@@ -155,8 +217,10 @@ Provides: ld-linux.so.3(GLIBC_2.4)
 %endif
 
 Requires: glibc-common = %{version}-%{release}
+
 # Require libgcc in case some program calls pthread_cancel in its %%post
 Requires(pre): basesystem, libgcc
+
 # This is for building auxiliary programs like memusage, nscd
 # For initial glibc bootstraps it can be commented out
 BuildRequires: gd-devel libpng-devel zlib-devel texinfo, libselinux-devel >= 1.33.4-3
@@ -165,6 +229,7 @@ BuildRequires: /bin/ps, /bin/kill, /bin/awk
 %ifarch %{systemtaparches}
 BuildRequires: systemtap-sdt-devel
 %endif
+
 # This is to ensure that __frame_state_for is exported by glibc
 # will be compatible with egcs 1.x.y
 BuildRequires: gcc >= 3.2
@@ -177,6 +242,7 @@ Conflicts: kernel < %{enablekernel}
 %ifarch %{power64}
 %define target ppc64-redhat-linux
 %endif
+
 %ifarch %{multiarcharches}
 # Need STT_IFUNC support
 %ifarch ppc %{power64}
@@ -193,6 +259,7 @@ Conflicts: prelink < 0.4.2
 # Need --hash-style=* support
 BuildRequires: binutils >= 2.17.50.0.2-5
 %endif
+
 BuildRequires: gcc >= 3.2.1-5
 %ifarch ppc s390 s390x
 BuildRequires: gcc >= 4.1.0-0.17
@@ -201,6 +268,9 @@ BuildRequires: gcc >= 4.1.0-0.17
 BuildRequires: elfutils >= 0.72
 BuildRequires: rpm >= 4.2-0.56
 %endif
+
+# Filter out all GLIBC_PRIVATE symbols since they are internal to
+# the package and should be examined by any other tool.
 %global __filter_GLIBC_PRIVATE 1
 
 %description
@@ -212,6 +282,9 @@ contains the most important sets of shared libraries: the standard C
 library and the standard math library. Without these two libraries, a
 Linux system will not function.
 
+##############################################################################
+# glibc "xen" sub-package
+##############################################################################
 %if %{xenpackage}
 %package xen
 Summary: The GNU libc libraries (optimized for running under Xen)
@@ -226,6 +299,9 @@ library binaries that will be selected instead when running under Xen.
 Install glibc-xen if you might run your system under the Xen hypervisor.
 %endif
 
+##############################################################################
+# glibc "devel" sub-package
+##############################################################################
 %package devel
 Summary: Object files for development using standard C libraries.
 Group: Development/Libraries
@@ -245,6 +321,9 @@ executables.
 Install glibc-devel if you are going to develop programs which will
 use the standard C libraries.
 
+##############################################################################
+# glibc "static" sub-package
+##############################################################################
 %package static
 Summary: C library static libraries for -static linking.
 Group: Development/Libraries
@@ -255,6 +334,9 @@ The glibc-static package contains the C library static libraries
 for -static linking.  You don't need these, unless you link statically,
 which is highly discouraged.
 
+##############################################################################
+# glibc "headers" sub-package
+##############################################################################
 %package headers
 Summary: Header files for development using standard C libraries.
 Group: Development/Libraries
@@ -280,6 +362,9 @@ executables.
 Install glibc-headers if you are going to develop programs which will
 use the standard C libraries.
 
+##############################################################################
+# glibc "common" sub-package
+##############################################################################
 %package common
 Summary: Common binaries and locale data for glibc
 Requires: %{name} = %{version}-%{release}
@@ -290,6 +375,9 @@ Group: System Environment/Base
 The glibc-common package includes common binaries for the GNU libc
 libraries, as well as national language (locale) support.
 
+##############################################################################
+# glibc "nscd" sub-package
+##############################################################################
 %package -n nscd
 Summary: A Name Service Caching Daemon (nscd).
 Group: System Environment/Daemons
@@ -304,6 +392,9 @@ Requires(postun): systemd, /usr/sbin/userdel
 Nscd caches name service lookups and can dramatically improve
 performance with NIS+, and may help with DNS as well.
 
+##############################################################################
+# glibc "utils" sub-package
+##############################################################################
 %package utils
 Summary: Development utilities from GNU C library
 Group: Development/Tools
@@ -321,6 +412,9 @@ If unsure if you need this, don't install this package.
 %define __debug_install_post %{nil}
 %global __debug_package 1
 
+##############################################################################
+# glibc core "debuginfo" sub-package
+##############################################################################
 %package debuginfo
 Summary: Debug information for package %{name}
 Group: Development/Debug
@@ -345,6 +439,9 @@ one or more of the standard C libraries.
 To use this debugging information, you need to link binaries
 with -static -L%{_prefix}/lib/debug%{_prefix}/%{_lib} compiler options.
 
+##############################################################################
+# glibc common "debuginfo-common" sub-package
+##############################################################################
 %ifarch %{debuginfocommonarches}
 
 %package debuginfo-common
@@ -357,12 +454,17 @@ This package provides debug information for package %{name}.
 Debug information is useful when developing applications that use this
 package or when debugging this package.
 
-%endif
-%endif
+%endif # %{debuginfocommonarches}
+%endif # 0%{?_enable_debug_packages}
 
+##############################################################################
+# Prepare for the build.
+##############################################################################
 %prep
 %setup -q -n %{glibcsrcdir} -b1
 
+# Patch order is important as some patches depend on other patches and
+# therefore the order must not be changed.
 %patch0001 -p1
 %patch0003 -p1
 %patch0004 -p1
@@ -399,20 +501,46 @@ package or when debugging this package.
 %patch0035 -p1
 %patch0037 -p1
 
+##############################################################################
+# %%prep - Additional prep required...
+##############################################################################
+
+# XXX: This sounds entirely out of date, particularly in light of the fact
+#      that we want to be building newer Power support. We should review this
+#      and potentially remove this workaround. However it will require
+#      determining which arches we support building for on our distributions.
+# ~~~
 # On powerpc32, hp timing is only available in power4/power6
 # libs, not in base, so pre-power4 dynamic linker is incompatible
 # with power6 libs.
+# ~~~
 %if %{buildpower6}
 rm -f sysdeps/powerpc/powerpc32/power4/hp-timing.[ch]
 %endif
 
+# Remove all files generated from patching.
 find . -type f -size 0 -o -name "*.orig" -exec rm -f {} \;
+
+# Ensure timestamps on configure files are current to prevent
+# regenerating them.
 touch `find . -name configure`
+
+# Ensure *-kw.h files are current to prevent regenerating them.
 touch locale/programs/*-kw.h
 
+##############################################################################
+# Build glibc...
+##############################################################################
 %build
+
+# We built using the native system compilers.
 GCC=gcc
 GXX=g++
+
+##############################################################################
+# %%build - x86 options.
+##############################################################################
+# On x86 we build for the specific target cpu rpm is using.
 %ifarch %{ix86}
 BuildFlags="-march=%{_target_cpu} -mtune=generic"
 %endif
@@ -429,6 +557,10 @@ BuildFlags="$BuildFlags -mno-tls-direct-seg-refs"
 %ifarch x86_64
 BuildFlags="-mtune=generic"
 %endif
+
+##############################################################################
+# %%build - SPARC options.
+##############################################################################
 %ifarch sparc
 BuildFlags="-fcall-used-g6"
 GCC="gcc -m32"
@@ -460,6 +592,9 @@ GCC="gcc -m64"
 GXX="g++ -m64"
 %endif
 
+##############################################################################
+# %%build - Generic options.
+##############################################################################
 BuildFlags="$BuildFlags -fasynchronous-unwind-tables"
 # Add -DNDEBUG unless using a prerelease
 case %{version} in
@@ -469,12 +604,21 @@ case %{version} in
      ;;
 esac
 EnableKernel="--enable-kernel=%{enablekernel}"
+# Save the used compiler and options into the file "Gcc" for use later
+# by %%install.
 echo "$GCC" > Gcc
 AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(linuxthreads\|nptl\|rtkaio\|powerpc-cpu\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
 %ifarch %{rtkaioarches}
 AddOns=,rtkaio$AddOns
 %endif
 
+##############################################################################
+# build()
+#	Build glibc in `build-%{target}$1', passing the rest of the arguments
+#	as CFLAGS to the build (not the same as configure CFLAGS). Several
+#	global values are used to determine build flags, add-ons, kernel
+#	version, multiarch support, system tap support, etc.
+##############################################################################
 build()
 {
 builddir=build-%{target}${1:+-$1}
@@ -509,12 +653,25 @@ make %{?_smp_mflags} -r CFLAGS="$build_CFLAGS" %{silentrules}
 popd
 }
 
+##############################################################################
+# Build glibc for the default set of options.
+##############################################################################
 build
 
+##############################################################################
+# Build glibc for xen:
+# If we support xen build glibc again for xen support.
+##############################################################################
 %if %{buildxen}
 build nosegneg -mno-tls-direct-seg-refs
 %endif
 
+##############################################################################
+# Build glibc for power6:
+# If we support building a power6 alternate runtime then built glibc again for
+# power6.
+# XXX: We build in a sub-shell for no apparent reason.
+##############################################################################
 %if %{buildpower6}
 (
 platform=`LD_SHOW_AUXV=1 /bin/true | sed -n 's/^AT_PLATFORM:[[:blank:]]*//p'`
@@ -536,6 +693,12 @@ build power6
 )
 %endif
 
+##############################################################################
+# Build the glibc post-upgrade program:
+# We only build one of these with the default set of options. This program
+# must be able to run on all hardware for the lowest common denomintor since
+# we only build it once.
+##############################################################################
 pushd build-%{target}
 $GCC -static -L. -Os -g ../releng/glibc_post_upgrade.c -o glibc_post_upgrade.%{_target_cpu} \
   '-DLIBTLS="/%{_lib}/tls/"' \
@@ -544,13 +707,20 @@ $GCC -static -L. -Os -g ../releng/glibc_post_upgrade.c -o glibc_post_upgrade.%{_
   '-DICONVCONFIG="%{_sbindir}/iconvconfig.%{_target_cpu}"'
 popd
 
+##############################################################################
+# Install glibc...
+##############################################################################
 %install
+# Reload compiler and build options that were used during %%build.
 GCC=`cat Gcc`
 
+# Cleanup any previous installs...
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT
 make -j1 install_root=$RPM_BUILD_ROOT install -C build-%{target} %{silentrules}
 chmod +x $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown
+# If we are not building an auxiliary arch then install all of the supported
+# locales.
 %ifnarch %{auxarches}
 pushd build-%{target}
 make %{?_smp_mflags} install_root=$RPM_BUILD_ROOT install-locales -C ../localedata objdir=`pwd`
@@ -559,6 +729,9 @@ popd
 
 librtso=`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
 
+##############################################################################
+# Install rtkaio libraries.
+##############################################################################
 %ifarch %{rtkaioarches}
 rm -f $RPM_BUILD_ROOT{,%{_prefix}}/%{_lib}/librtkaio.*
 rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so.*
@@ -569,6 +742,9 @@ ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so` $RPM_BUILD_ROOT/%{_lib}/$li
 ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/$librtso
 %endif
 
+##############################################################################
+# Install the xen build files.
+##############################################################################
 %if %{buildxen}
 %define nosegneg_subdir_base i686
 %define nosegneg_subdir i686/nosegneg
@@ -602,6 +778,9 @@ ln -sf $librtkaioso $destdir/$librtso
 popd
 %endif
 
+##############################################################################
+# Install the power6 build files.
+##############################################################################
 %if %{buildpower6}
 pushd build-%{target}-power6
 destdir=$RPM_BUILD_ROOT/%{_lib}/power6
@@ -633,7 +812,13 @@ popd
 popd
 %endif
 
+##############################################################################
 # Remove the files we don't want to distribute
+##############################################################################
+
+# Remove the libNoVersion files.
+# XXX: This looks like a bug in glibc that accidentally installed these
+#      wrong files. We probably don't need this today.
 rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libNoVersion*
 rm -f $RPM_BUILD_ROOT/%{_lib}/libNoVersion*
 
@@ -643,15 +828,22 @@ cp -a bits/stdio-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/stdio-lock.h
 # And <bits/libc-lock.h> needs sanitizing as well.
 cp -a releng/libc-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/libc-lock.h
 
+# Move the info files if glibc installed them into the wrong location.
 if [ -d $RPM_BUILD_ROOT%{_prefix}/info -a "%{_infodir}" != "%{_prefix}/info" ]; then
   mkdir -p $RPM_BUILD_ROOT%{_infodir}
   mv -f $RPM_BUILD_ROOT%{_prefix}/info/* $RPM_BUILD_ROOT%{_infodir}
   rm -rf $RPM_BUILD_ROOT%{_prefix}/info
 fi
 
+# Compress all of the info files.
 gzip -9nvf $RPM_BUILD_ROOT%{_infodir}/libc*
 
+# XXX: What is this for?
 ln -sf libbsd-compat.a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libbsd.a
+
+##############################################################################
+# Install configuration files for services
+##############################################################################
 
 install -p -m 644 releng/nsswitch.conf $RPM_BUILD_ROOT/etc/nsswitch.conf
 
@@ -688,6 +880,12 @@ install -m 700 build-%{target}/glibc_post_upgrade.%{_target_cpu} \
 
 strip -g $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.o
 
+##############################################################################
+# Install debug copies of unstripped static libraries
+##############################################################################
+
+# If we are building a debug package then copy all of the static archives
+# into the debug directory to keep them as unstripped copies.
 %if 0%{?_enable_debug_packages}
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}
 cp -a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.a \
@@ -697,6 +895,10 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/*_p.a
 
 # rquota.x and rquota.h are now provided by quota
 rm -f $RPM_BUILD_ROOT%{_prefix}/include/rpcsvc/rquota.[hx]
+
+##############################################################################
+# Install locale files
+##############################################################################
 
 # Create archive of locale files
 %ifnarch %{auxarches}
@@ -715,6 +917,7 @@ mv locale-archive{,.tmpl}
 popd
 %endif
 
+# Remove the old nss modules.
 rm -f ${RPM_BUILD_ROOT}/%{_lib}/libnss1-*
 rm -f ${RPM_BUILD_ROOT}/%{_lib}/libnss-*.so.1
 
@@ -723,6 +926,37 @@ ln -f ${RPM_BUILD_ROOT}%{_sbindir}/iconvconfig{,.%{_target_cpu}}
 
 # In F7+ this is provided by rpcbind rpm
 rm -f $RPM_BUILD_ROOT%{_sbindir}/rpcinfo
+
+##############################################################################
+# Build the file lists used for describing the package and subpackages.
+##############################################################################
+# There are 11 file lists:
+# * rpm.fileslist
+#	- Master file list. Eventually, after removing files from this list
+#	  we are left with the list of files for the glibc package.
+# * workaround.filelist
+#	- This list contains files that are not shipped but for which we
+#	  may wish to include debug information. I don't see why we would
+#	  want to do that. The only file on this list right now is pt_chown.
+# * common.filelist
+#	- Contains the list of flies for the common subpackage.
+# * utils.filelist
+#	- Contains the list of files for the utils subpackage.
+# * nscd.filelist
+#	- Contains the list of files for the nscd subpackage.
+# * devel.filelist
+#	- Contains the list of files for the devel subpackage.
+# * headers.filelist
+#	- Contains the list of files for the headers subpackage.
+# * static.filelist
+#	- Contains the list of files for the static subpackage.
+# * nosegneg.filelist
+#	- Contains the list of files for the xen subpackage.
+# * debuginfo.filelist
+#	- Contains the list of files for the glibc debuginfo package.
+# * debuginfocommon.filelist
+#	- Contains the list of files for the glibc common debuginfo package.
+#
 
 # BUILD THE FILE LIST
 {
@@ -755,6 +989,10 @@ rm -f $RPM_BUILD_ROOT%{_sbindir}/rpcinfo
 
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/%{_lib}
 mv -f $RPM_BUILD_ROOT/%{_lib}/lib{pcprofile,memusage}.so $RPM_BUILD_ROOT%{_prefix}/%{_lib}
+
+# The xtrace and memusage scripts have hard-coded paths that need to be
+# translated to a correct set of paths using the $LIB token which is
+# dynamically translated by ld.so as the default lib directory.
 for i in $RPM_BUILD_ROOT%{_prefix}/bin/{xtrace,memusage}; do
   sed -e 's~=/%{_lib}/libpcprofile.so~=%{_prefix}/%{_lib}/libpcprofile.so~' \
       -e 's~=/%{_lib}/libmemusage.so~=%{_prefix}/%{_lib}/libmemusage.so~' \
@@ -763,57 +1001,96 @@ for i in $RPM_BUILD_ROOT%{_prefix}/bin/{xtrace,memusage}; do
       -i $i
 done
 
+# Put the info files into the devel file list.
 grep '%{_infodir}' < rpm.filelist | grep -v '%{_infodir}/dir' > devel.filelist
+
+# Put the stub headers into the devel file list.
 grep '%{_prefix}/include/gnu/stubs-[32164]\+\.h' < rpm.filelist >> devel.filelist || :
 
+# Put the include files into headers file list.
 grep '%{_prefix}/include' < rpm.filelist |
   egrep -v '%{_prefix}/include/(linuxthreads|gnu/stubs-[32164]+\.h)' \
 	> headers.filelist
 
+# Remove partial (lib*_p.a) static libraries, include files, and info files from
+# the core glibc package.
 sed -i -e '\|%{_prefix}/%{_lib}/lib.*_p.a|d' \
        -e '\|%{_prefix}/include|d' \
        -e '\|%{_infodir}|d' rpm.filelist
 
+# Put some static files into the devel package.
 grep '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist \
   | grep '/lib\(\(c\|pthread\|nldbl\)_nonshared\|bsd\(\|-compat\)\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
   >> devel.filelist
+
+# Put the rest of the static files into the static package.
 grep '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist \
   | grep -v '/lib\(\(c\|pthread\|nldbl\)_nonshared\|bsd\(\|-compat\)\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
   > static.filelist
+
+# Put all of the object files and *.so (not the versioned ones) into the
+# devel package.
 grep '%{_prefix}/%{_lib}/.*\.o' < rpm.filelist >> devel.filelist
 grep '%{_prefix}/%{_lib}/lib.*\.so' < rpm.filelist >> devel.filelist
 
+# Remove all of the static, object, unversioned DSOs, old linuxthreads stuff,
+# and nscd from the core glibc package.
 sed -i -e '\|%{_prefix}/%{_lib}/lib.*\.a|d' \
        -e '\|%{_prefix}/%{_lib}/.*\.o|d' \
        -e '\|%{_prefix}/%{_lib}/lib.*\.so|d' \
        -e '\|%{_prefix}/%{_lib}/linuxthreads|d' \
        -e '\|nscd|d' rpm.filelist
 
+# All of the bin and certain sbin files go into the common package.
+# We explicitly exclude certain sbin files that need to go into
+# the core glibc package for use during upgrades.
 grep '%{_prefix}/bin' < rpm.filelist >> common.filelist
 grep '%{_prefix}/sbin/[^gi]' < rpm.filelist >> common.filelist
+# All of the files under share go into the common package since
+# they should be multilib-independent.
 grep '%{_prefix}/share' < rpm.filelist | \
   grep -v -e '%{_prefix}/share/zoneinfo' -e '%%dir %{prefix}/share' \
        >> common.filelist
 
+# Remove the bin, locale, pt_chown, some sbin, and share from the
+# core glibc package. We cheat a bit and use the slightly dangerous
+# /usr/sbin/[^gi] to match the inverse of the search that put the
+# files into common.filelist. It's dangerous in that additional files
+# that start with g, or i would get put into common.filelist and
+# rpm.filelist.
 sed -i -e '\|%{_prefix}/bin|d' \
        -e '\|%{_prefix}/lib/locale|d' \
        -e '\|%{_prefix}/libexec/pt_chown|d' \
        -e '\|%{_prefix}/sbin/[^gi]|d' \
        -e '\|%{_prefix}/share|d' rpm.filelist
 
+##############################################################################
+# Build the xen package file list (nosegneg.filelist)
+##############################################################################
 > nosegneg.filelist
 %if %{xenpackage}
 grep '/%{_lib}/%{nosegneg_subdir}' < rpm.filelist >> nosegneg.filelist
 sed -i -e '\|/%{_lib}/%{nosegneg_subdir}|d' rpm.filelist
+# TODO: There are files in the nosegneg list which should be in the devel
+#	pacakge, but we leave them instead in the xen subpackage. We may
+#	wish to clean that up at some point.
 %endif
 
+# Add the binary to build localse to the common subpackage.
 echo '%{_prefix}/sbin/build-locale-archive' >> common.filelist
+
+# The nscd binary must go into the nscd subpackage.
 echo '%{_prefix}/sbin/nscd' > nscd.filelist
 
+# The memusage and pcprofile libraries are put back into the core
+# glibc package even though they are only used by utils package
+# scripts..
 cat >> rpm.filelist <<EOF
 %{_prefix}/%{_lib}/libmemusage.so
 %{_prefix}/%{_lib}/libpcprofile.so
 EOF
+
+# Add the utils scripts and programs to the utils subpackage.
 cat > utils.filelist <<EOF
 %{_prefix}/bin/memusage
 %{_prefix}/bin/memusagestat
@@ -822,6 +1099,9 @@ cat > utils.filelist <<EOF
 %{_prefix}/bin/xtrace
 EOF
 
+# Remove the zoneinfo files
+# XXX: Why isn't this don't earlier when we are removing files?
+#      Won't this impact what is shipped?
 rm -rf $RPM_BUILD_ROOT%{_prefix}/share/zoneinfo
 
 # Make sure %config files have the same timestamp
@@ -843,7 +1123,7 @@ $GCC -Os -g -o build-locale-archive build-locale-archive.c \
 install -m 700 build-locale-archive $RPM_BUILD_ROOT/usr/sbin/build-locale-archive
 popd
 
-# the last bit: more documentation
+# Lastly copy some additional documentation for the packages.
 rm -rf documentation
 mkdir documentation
 cp crypt/README.ufc-crypt documentation/README.ufc-crypt
@@ -864,12 +1144,17 @@ ln -sf /%{_lib}/ld64.so.1 $RPM_BUILD_ROOT/lib/ld64.so.1
 ln -sf /lib/ld-linux-armhf.so.3 $RPM_BUILD_ROOT/lib/ld-linux.so.3
 %endif
 
+##############################################################################
+# Run the glibc testsuite
+##############################################################################
 %if %{run_glibc_tests}
-
 # Increase timeouts
 export TIMEOUTFACTOR=16
 parent=$$
 echo ====================TESTING=========================
+##############################################################################
+# - Test the default runtime.
+##############################################################################
 pushd build-%{target}
 ( make %{?_smp_mflags} -k check %{silentrules} 2>&1
   sleep 10s
@@ -879,6 +1164,9 @@ pushd build-%{target}
 popd
 %if %{buildxen}
 echo ====================TESTING -mno-tls-direct-seg-refs=============
+##############################################################################
+# - Test the xen runtimes (nosegneg).
+##############################################################################
 pushd build-%{target}-nosegneg
 ( make %{?_smp_mflags} -k check %{silentrules} 2>&1
   sleep 10s
@@ -889,6 +1177,9 @@ popd
 %endif
 %if %{buildpower6}
 echo ====================TESTING -mcpu=power6=============
+##############################################################################
+# - Test the power6 runtimes.
+##############################################################################
 pushd build-%{target}-power6
 ( if [ -d ../power6emul ]; then
     export LD_PRELOAD=`cd ../power6emul; pwd`/\$LIB/power6emul.so
@@ -914,14 +1205,24 @@ echo ====================PLT RELOCS LIBC.SO==============
 readelf -Wr $RPM_BUILD_ROOT/%{_lib}/libc-*.so | sed -n -e "$PLTCMD"
 echo ====================PLT RELOCS END==================
 
-%endif
+%endif # %{run_glibc_tests}
 
+###############################################################################
+# Rebuild libpthread.a using --whole-archive to ensure all of libpthread
+# is included in a static link. This prevents any problems when linking
+# statically, using parts of libpthread, and other necessary parts not
+# being included. Upstream has decided that this is the wrong approach to
+# this problem and that the full set of dependencies should be resolved
+# such that static linking works and produces the most minimally sized
+# static application possible.
+###############################################################################
 pushd $RPM_BUILD_ROOT/usr/%{_lib}/
 $GCC -r -nostdlib -o libpthread.o -Wl,--whole-archive ./libpthread.a
 rm libpthread.a
 ar rcs libpthread.a libpthread.o
 rm libpthread.o
 popd
+###############################################################################
 
 %if 0%{?_enable_debug_packages}
 
@@ -930,6 +1231,9 @@ popd
 (cd locale; ln -s programs/*.gperf .)
 (cd iconv; ln -s ../locale/programs/charmap-kw.gperf .)
 
+# Print some diagnostic information in the builds about the
+# getconf binaries.
+# XXX: Why do we do this?
 ls -l $RPM_BUILD_ROOT/usr/bin/getconf
 ls -l $RPM_BUILD_ROOT/usr/libexec/getconf
 eu-readelf -hS $RPM_BUILD_ROOT/usr/bin/getconf $RPM_BUILD_ROOT/usr/libexec/getconf/*
@@ -946,6 +1250,7 @@ find_debuginfo_args="$find_debuginfo_args \
 %endif
 eval /usr/lib/rpm/find-debuginfo.sh "$find_debuginfo_args" -o debuginfo.filelist
 
+# List all of the *.a archives in the debug directory.
 list_debug_archives()
 {
   local dir=%{_prefix}/lib/debug%{_prefix}/%{_lib}
@@ -954,13 +1259,17 @@ list_debug_archives()
 
 %ifarch %{debuginfocommonarches}
 
+# Remove the source files from the common package debuginfo.
 sed -i '\#^%{_prefix}/src/debug/#d' debuginfocommon.filelist
+
+# Create a list of all of the source files we copied to the debug directory.
 find $RPM_BUILD_ROOT%{_prefix}/src/debug \
      \( -type d -printf '%%%%dir ' \) , \
      -printf '%{_prefix}/src/debug/%%P\n' > debuginfocommon.sources
 
 %ifarch %{biarcharches}
 
+# Add the source files to the core debuginfo package.
 cat debuginfocommon.sources >> debuginfo.filelist
 
 %else
@@ -972,33 +1281,42 @@ cat debuginfocommon.sources >> debuginfo.filelist
 %define basearch sparc
 %endif
 
-# auxarches get only these few source files
+# The auxarches get only these few source files.
 auxarches_debugsources=\
 '/(generic|linux|%{basearch}|nptl(_db)?)/|/%{glibcsrcdir}/build|/dl-osinfo\.h'
 
+# Place the source files into the core debuginfo pakcage.
 egrep "$auxarches_debugsources" debuginfocommon.sources >> debuginfo.filelist
 
+# Remove the source files from the common debuginfo package.
 egrep -v "$auxarches_debugsources" \
   debuginfocommon.sources >> debuginfocommon.filelist
 
 %endif
 
+# Add the list of *.a archives in the debug directory to
+# the common debuginfo package.
 list_debug_archives >> debuginfocommon.filelist
 
-%endif
+%endif # %{debuginfocommonarches}
 
-%endif
+%endif # 0%{?_enable_debug_packages}
 
+# Remove the `dir' info-heirarchy file which will be maintained
+# by the system as it adds info files to the install.
 rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 
 %ifarch %{auxarches}
 
+# Delete files that we do not intended to ship with the auxarch.
 echo Cutting down the list of unpackaged files
 >> debuginfocommon.filelist
 sed -e '/%%dir/d;/%%config/d;/%%verify/d;s/%%lang([^)]*) //;s#^/*##' \
     common.filelist devel.filelist static.filelist headers.filelist \
     utils.filelist nscd.filelist debuginfocommon.filelist |
 (cd $RPM_BUILD_ROOT; xargs --no-run-if-empty rm -f 2> /dev/null || :)
+
+# The auxarch doesn't install pt_chown.
 rm -f $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown
 
 %else
