@@ -480,7 +480,8 @@ build()
 builddir=build-%{target}${1:+-$1}
 ${1+shift}
 rm -rf $builddir
-mkdir $builddir ; cd $builddir
+mkdir $builddir
+pushd $builddir
 build_CFLAGS="$BuildFlags -g -O3 $*"
 # Some configure checks can spuriously fail for some architectures if
 # unwind info is present
@@ -505,8 +506,7 @@ configure_CFLAGS="$build_CFLAGS -fno-asynchronous-unwind-tables"
 { cat config.log; false; }
 
 make %{?_smp_mflags} -r CFLAGS="$build_CFLAGS" %{silentrules}
-
-cd ..
+popd
 }
 
 build
@@ -536,13 +536,13 @@ build power6
 )
 %endif
 
-cd build-%{target}
+pushd build-%{target}
 $GCC -static -L. -Os -g ../releng/glibc_post_upgrade.c -o glibc_post_upgrade.%{_target_cpu} \
   '-DLIBTLS="/%{_lib}/tls/"' \
   '-DGCONV_MODULES_DIR="%{_prefix}/%{_lib}/gconv"' \
   '-DLD_SO_CONF="/etc/ld.so.conf"' \
   '-DICONVCONFIG="%{_sbindir}/iconvconfig.%{_target_cpu}"'
-cd ..
+popd
 
 %install
 GCC=`cat Gcc`
@@ -552,9 +552,9 @@ mkdir -p $RPM_BUILD_ROOT
 make -j1 install_root=$RPM_BUILD_ROOT install -C build-%{target} %{silentrules}
 chmod +x $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown
 %ifnarch %{auxarches}
-cd build-%{target} && \
-  make %{?_smp_mflags} install_root=$RPM_BUILD_ROOT install-locales -C ../localedata objdir=`pwd` && \
-  cd ..
+pushd build-%{target}
+make %{?_smp_mflags} install_root=$RPM_BUILD_ROOT install-locales -C ../localedata objdir=`pwd`
+popd
 %endif
 
 librtso=`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
@@ -573,7 +573,7 @@ ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/librtkaio-*.so` $RPM_BUILD_ROOT/
 %define nosegneg_subdir_base i686
 %define nosegneg_subdir i686/nosegneg
 %define nosegneg_subdir_up ../..
-cd build-%{target}-nosegneg
+pushd build-%{target}-nosegneg
 destdir=$RPM_BUILD_ROOT/%{_lib}/%{nosegneg_subdir}
 mkdir -p $destdir
 for lib in libc math/libm nptl/libpthread rt/librt nptl_db/libthread_db
@@ -599,11 +599,11 @@ else
 fi
 ln -sf $librtkaioso $destdir/$librtso
 %endif
-cd ..
+popd
 %endif
 
 %if %{buildpower6}
-cd build-%{target}-power6
+pushd build-%{target}-power6
 destdir=$RPM_BUILD_ROOT/%{_lib}/power6
 mkdir -p ${destdir}
 for lib in libc math/libm nptl/libpthread rt/librt nptl_db/libthread_db
@@ -630,7 +630,7 @@ ln -sf ../power6/*.so .
 cp -a ../power6/*.so.* .
 popd
 %endif
-cd ..
+popd
 %endif
 
 # Remove the files we don't want to distribute
@@ -832,7 +832,7 @@ touch -r sunrpc/etc.rpc $RPM_BUILD_ROOT/etc/rpc
 # referenced at link time here, particularly ld.so, may be different than
 # the one used at runtime.  This is really only needed during the ARM
 # transition from ld-linux.so.3 to ld-linux-armhf.so.3.
-cd releng
+pushd releng
 $GCC -Os -g -o build-locale-archive build-locale-archive.c \
   ../build-%{target}/locale/locarchive.o \
   ../build-%{target}/locale/md5.o \
@@ -841,7 +841,7 @@ $GCC -Os -g -o build-locale-archive build-locale-archive.c \
   -Wl,--allow-shlib-undefined \
   -B../build-%{target}/csu/ -lc -lc_nonshared
 install -m 700 build-locale-archive $RPM_BUILD_ROOT/usr/sbin/build-locale-archive
-cd ..
+popd
 
 # the last bit: more documentation
 rm -rf documentation
@@ -870,26 +870,26 @@ ln -sf /lib/ld-linux-armhf.so.3 $RPM_BUILD_ROOT/lib/ld-linux.so.3
 export TIMEOUTFACTOR=16
 parent=$$
 echo ====================TESTING=========================
-cd build-%{target}
+pushd build-%{target}
 ( make %{?_smp_mflags} -k check %{silentrules} 2>&1
   sleep 10s
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
 ) | tee check.log || :
-cd ..
+popd
 %if %{buildxen}
 echo ====================TESTING -mno-tls-direct-seg-refs=============
-cd build-%{target}-nosegneg
+pushd build-%{target}-nosegneg
 ( make %{?_smp_mflags} -k check %{silentrules} 2>&1
   sleep 10s
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
 ) | tee check.log || :
-cd ..
+popd
 %endif
 %if %{buildpower6}
 echo ====================TESTING -mcpu=power6=============
-cd build-%{target}-power6
+pushd build-%{target}-power6
 ( if [ -d ../power6emul ]; then
     export LD_PRELOAD=`cd ../power6emul; pwd`/\$LIB/power6emul.so
   fi
@@ -898,7 +898,7 @@ cd build-%{target}-power6
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
 ) | tee check.log || :
-cd ..
+popd
 %endif
 echo ====================TESTING DETAILS=================
 for i in `sed -n 's|^.*\*\*\* \[\([^]]*\.out\)\].*$|\1|p' build-*-linux*/check.log`; do
