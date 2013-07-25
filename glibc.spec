@@ -626,36 +626,36 @@ AddOns=,rtkaio$AddOns
 ##############################################################################
 build()
 {
-builddir=build-%{target}${1:+-$1}
-${1+shift}
-rm -rf $builddir
-mkdir $builddir
-pushd $builddir
-build_CFLAGS="$BuildFlags -g -O3 $*"
-# Some configure checks can spuriously fail for some architectures if
-# unwind info is present
-configure_CFLAGS="$build_CFLAGS -fno-asynchronous-unwind-tables"
-../configure CC="$GCC" CXX="$GXX" CFLAGS="$configure_CFLAGS" \
-	--prefix=%{_prefix} \
-	--enable-add-ons=ports,nptl$AddOns \
-	--with-headers=%{_prefix}/include $EnableKernel --enable-bind-now \
-	--build=%{target} \
+	builddir=build-%{target}${1:+-$1}
+	${1+shift}
+	rm -rf $builddir
+	mkdir $builddir
+	pushd $builddir
+	build_CFLAGS="$BuildFlags -g -O3 $*"
+	# Some configure checks can spuriously fail for some architectures if
+	# unwind info is present
+	configure_CFLAGS="$build_CFLAGS -fno-asynchronous-unwind-tables"
+	../configure CC="$GCC" CXX="$GXX" CFLAGS="$configure_CFLAGS" \
+		--prefix=%{_prefix} \
+		--enable-add-ons=ports,nptl$AddOns \
+		--with-headers=%{_prefix}/include $EnableKernel --enable-bind-now \
+		--build=%{target} \
 %ifarch %{multiarcharches}
-	--enable-multi-arch \
+		--enable-multi-arch \
 %endif
-	--enable-obsolete-rpc \
+		--enable-obsolete-rpc \
 %ifarch %{systemtaparches}
-	--enable-systemtap \
+		--enable-systemtap \
 %endif
 %ifarch ppc64p7
-	--with-cpu=power7 \
+		--with-cpu=power7 \
 %endif
-	--enable-lock-elision \
-	--disable-profile --enable-nss-crypt ||
-{ cat config.log; false; }
+		--enable-lock-elision \
+		--disable-profile --enable-nss-crypt ||
+		{ cat config.log; false; }
 
-make %{?_smp_mflags} -r CFLAGS="$build_CFLAGS" %{silentrules}
-popd
+	make %{?_smp_mflags} -r CFLAGS="$build_CFLAGS" %{silentrules}
+	popd
 }
 
 ##############################################################################
@@ -679,22 +679,22 @@ build nosegneg -mno-tls-direct-seg-refs
 ##############################################################################
 %if %{buildpower6}
 (
-platform=`LD_SHOW_AUXV=1 /bin/true | sed -n 's/^AT_PLATFORM:[[:blank:]]*//p'`
-if [ "$platform" != power6 ]; then
-  mkdir -p power6emul/{lib,lib64}
-  $GCC -shared -O2 -fpic -o power6emul/%{_lib}/power6emul.so releng/power6emul.c -Wl,-z,initfirst
+	platform=`LD_SHOW_AUXV=1 /bin/true | sed -n 's/^AT_PLATFORM:[[:blank:]]*//p'`
+	if [ "$platform" != power6 ]; then
+		  mkdir -p power6emul/{lib,lib64}
+		  $GCC -shared -O2 -fpic -o power6emul/%{_lib}/power6emul.so releng/power6emul.c -Wl,-z,initfirst
 %ifarch ppc
-  gcc -shared -nostdlib -O2 -fpic -m64 -o power6emul/lib64/power6emul.so -xc - </dev/null
+		  gcc -shared -nostdlib -O2 -fpic -m64 -o power6emul/lib64/power6emul.so -xc - </dev/null
 %endif
 %ifarch ppc64
-  gcc -shared -nostdlib -O2 -fpic -m32 -o power6emul/lib/power6emul.so -xc - < /dev/null
+		  gcc -shared -nostdlib -O2 -fpic -m32 -o power6emul/lib/power6emul.so -xc - < /dev/null
 %endif
-  export LD_PRELOAD=`pwd`/power6emul/\$LIB/power6emul.so
-fi
-AddOns="$AddOns --with-cpu=power6"
-GCC="$GCC -mcpu=power6"
-GXX="$GXX -mcpu=power6"
-build power6
+		  export LD_PRELOAD=`pwd`/power6emul/\$LIB/power6emul.so
+	fi
+	AddOns="$AddOns --with-cpu=power6"
+	GCC="$GCC -mcpu=power6"
+	GXX="$GXX -mcpu=power6"
+	build power6
 )
 %endif
 
@@ -706,10 +706,10 @@ build power6
 ##############################################################################
 pushd build-%{target}
 $GCC -static -L. -Os -g ../releng/glibc_post_upgrade.c -o glibc_post_upgrade.%{_target_cpu} \
-  '-DLIBTLS="/%{_lib}/tls/"' \
-  '-DGCONV_MODULES_DIR="%{_prefix}/%{_lib}/gconv"' \
-  '-DLD_SO_CONF="/etc/ld.so.conf"' \
-  '-DICONVCONFIG="%{_sbindir}/iconvconfig.%{_target_cpu}"'
+	'-DLIBTLS="/%{_lib}/tls/"' \
+	'-DGCONV_MODULES_DIR="%{_prefix}/%{_lib}/gconv"' \
+	'-DLD_SO_CONF="/etc/ld.so.conf"' \
+	'-DICONVCONFIG="%{_sbindir}/iconvconfig.%{_target_cpu}"'
 popd
 
 ##############################################################################
@@ -722,13 +722,15 @@ GCC=`cat Gcc`
 # Cleanup any previous installs...
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT
-make -j1 install_root=$RPM_BUILD_ROOT install -C build-%{target} %{silentrules}
+make -j1 install_root=$RPM_BUILD_ROOT \
+	install -C build-%{target} %{silentrules}
 chmod +x $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown
 # If we are not building an auxiliary arch then install all of the supported
 # locales.
 %ifnarch %{auxarches}
 pushd build-%{target}
-make %{?_smp_mflags} install_root=$RPM_BUILD_ROOT install-locales -C ../localedata objdir=`pwd`
+make %{?_smp_mflags} install_root=$RPM_BUILD_ROOT \
+	install-locales -C ../localedata objdir=`pwd`
 popd
 %endif
 
@@ -863,10 +865,10 @@ rm locale-archive || :
 # Intentionally we do not pass --alias-file=, aliases will be added
 # by build-locale-archive.
 $olddir/build-%{target}/elf/ld.so \
-  --library-path $olddir/build-%{target}/ \
-  $olddir/build-%{target}/locale/localedef \
-    --prefix ${RPM_BUILD_ROOT} --add-to-archive \
-    *_*
+	--library-path $olddir/build-%{target}/ \
+	$olddir/build-%{target}/locale/localedef \
+	--prefix ${RPM_BUILD_ROOT} --add-to-archive \
+	*_*
 rm -rf *_*
 mv locale-archive{,.tmpl}
 popd
@@ -1127,12 +1129,12 @@ touch -r sunrpc/etc.rpc $RPM_BUILD_ROOT/etc/rpc
 # transition from ld-linux.so.3 to ld-linux-armhf.so.3.
 pushd releng
 $GCC -Os -g -o build-locale-archive build-locale-archive.c \
-  ../build-%{target}/locale/locarchive.o \
-  ../build-%{target}/locale/md5.o \
-  -DDATADIR=\"%{_datadir}\" -DPREFIX=\"%{_prefix}\" \
-  -L../build-%{target} \
-  -Wl,--allow-shlib-undefined \
-  -B../build-%{target}/csu/ -lc -lc_nonshared
+	../build-%{target}/locale/locarchive.o \
+	../build-%{target}/locale/md5.o \
+	-DDATADIR=\"%{_datadir}\" -DPREFIX=\"%{_prefix}\" \
+	-L../build-%{target} \
+	-Wl,--allow-shlib-undefined \
+	-B../build-%{target}/csu/ -lc -lc_nonshared
 install -m 700 build-locale-archive $RPM_BUILD_ROOT/usr/sbin/build-locale-archive
 popd
 
@@ -1257,19 +1259,25 @@ find_debuginfo_args='--strict-build-id -g'
 %ifarch %{debuginfocommonarches}
 echo %{_prefix}/libexec/pt_chown > workaround.filelist
 find_debuginfo_args="$find_debuginfo_args \
-  -l common.filelist -l utils.filelist -l nscd.filelist -l workaround.filelist \
-  -p '.*/(sbin|libexec)/.*' \
-  -o debuginfocommon.filelist \
-  -l rpm.filelist -l nosegneg.filelist \
+	-l common.filelist \
+	-l utils.filelist \
+	-l nscd.filelist \
+	-l workaround.filelist \
+	-p '.*/(sbin|libexec)/.*' \
+	-o debuginfocommon.filelist \
+	-l rpm.filelist \
+	-l nosegneg.filelist \
 "
 %endif
-eval /usr/lib/rpm/find-debuginfo.sh "$find_debuginfo_args" -o debuginfo.filelist
+eval /usr/lib/rpm/find-debuginfo.sh \
+	"$find_debuginfo_args" \
+	-o debuginfo.filelist
 
 # List all of the *.a archives in the debug directory.
 list_debug_archives()
 {
-  local dir=%{_prefix}/lib/debug%{_prefix}/%{_lib}
-  find $RPM_BUILD_ROOT$dir -name "*.a" -printf "$dir/%%P\n"
+	local dir=%{_prefix}/lib/debug%{_prefix}/%{_lib}
+	find $RPM_BUILD_ROOT$dir -name "*.a" -printf "$dir/%%P\n"
 }
 
 %ifarch %{debuginfocommonarches}
