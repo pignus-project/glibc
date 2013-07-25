@@ -274,7 +274,7 @@ BuildRequires: rpm >= 4.2-0.56
 BuildRequires: libstdc++-static
 
 # Filter out all GLIBC_PRIVATE symbols since they are internal to
-# the package and should be examined by any other tool.
+# the package and should not be examined by any other tool.
 %global __filter_GLIBC_PRIVATE 1
 
 %description
@@ -411,14 +411,14 @@ which can be helpful during program debugging.
 
 If unsure if you need this, don't install this package.
 
+##############################################################################
+# glibc core "debuginfo" sub-package
+##############################################################################
 %if 0%{?_enable_debug_packages}
 %define debug_package %{nil}
 %define __debug_install_post %{nil}
 %global __debug_package 1
 
-##############################################################################
-# glibc core "debuginfo" sub-package
-##############################################################################
 %package debuginfo
 Summary: Debug information for package %{name}
 Group: Development/Debug
@@ -537,7 +537,7 @@ touch locale/programs/*-kw.h
 ##############################################################################
 %build
 
-# We built using the native system compilers.
+# We build using the native system compilers.
 GCC=gcc
 GXX=g++
 
@@ -832,6 +832,10 @@ cp -a bits/stdio-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/stdio-lock.h
 # And <bits/libc-lock.h> needs sanitizing as well.
 cp -a releng/libc-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/libc-lock.h
 
+##############################################################################
+# Adjust info files
+##############################################################################
+
 # Move the info files if glibc installed them into the wrong location.
 if [ -d $RPM_BUILD_ROOT%{_prefix}/info -a "%{_infodir}" != "%{_prefix}/info" ]; then
   mkdir -p $RPM_BUILD_ROOT%{_infodir}
@@ -962,7 +966,6 @@ rm -f $RPM_BUILD_ROOT%{_sbindir}/rpcinfo
 #	- Contains the list of files for the glibc common debuginfo package.
 #
 
-# BUILD THE FILE LIST
 {
   find $RPM_BUILD_ROOT \( -type f -o -type l \) \
        \( \
@@ -1166,11 +1169,12 @@ pushd build-%{target}
   [ -n "$teepid" ] && kill $teepid
 ) | tee check.log || :
 popd
-%if %{buildxen}
-echo ====================TESTING -mno-tls-direct-seg-refs=============
+
 ##############################################################################
 # - Test the xen runtimes (nosegneg).
 ##############################################################################
+%if %{buildxen}
+echo ====================TESTING -mno-tls-direct-seg-refs=============
 pushd build-%{target}-nosegneg
 ( make %{?_smp_mflags} -k check %{silentrules} 2>&1
   sleep 10s
@@ -1179,11 +1183,12 @@ pushd build-%{target}-nosegneg
 ) | tee check.log || :
 popd
 %endif
-%if %{buildpower6}
-echo ====================TESTING -mcpu=power6=============
+
 ##############################################################################
 # - Test the power6 runtimes.
 ##############################################################################
+%if %{buildpower6}
+echo ====================TESTING -mcpu=power6=============
 pushd build-%{target}-power6
 ( if [ -d ../power6emul ]; then
     export LD_PRELOAD=`cd ../power6emul; pwd`/\$LIB/power6emul.so
@@ -1296,7 +1301,7 @@ egrep "$auxarches_debugsources" debuginfocommon.sources >> debuginfo.filelist
 egrep -v "$auxarches_debugsources" \
   debuginfocommon.sources >> debuginfocommon.filelist
 
-%endif
+%endif # %{biarcharches}
 
 # Add the list of *.a archives in the debug directory to
 # the common debuginfo package.
@@ -1328,7 +1333,7 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown
 mkdir -p $RPM_BUILD_ROOT/var/{db,run}/nscd
 touch $RPM_BUILD_ROOT/var/{db,run}/nscd/{passwd,group,hosts,services}
 touch $RPM_BUILD_ROOT/var/run/nscd/{socket,nscd.pid}
-%endif
+%endif # %{auxarches}
 
 %ifnarch %{auxarches}
 > $RPM_BUILD_ROOT/%{_prefix}/lib/locale/locale-archive
