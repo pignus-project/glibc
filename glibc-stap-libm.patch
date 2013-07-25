@@ -54,7 +54,7 @@ diff -rup c/sysdeps/ieee754/dbl-64/slowpow.c d/sysdeps/ieee754/dbl-64/slowpow.c
 +    {
 +      /* Track how often we get to the slow pow code plus
 +	 its input/output values.  */
-+      LIBC_PROBE (slowpow_p6, 4, &x, &y, &z, &res);
++      LIBC_PROBE (slowpow_p10, 4, &x, &y, &z, &res);
 +      return res;
 +    }
  

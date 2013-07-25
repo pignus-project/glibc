@@ -1,5 +1,6 @@
 %define glibcsrcdir glibc-2.17-906-g8ab0740
 %define glibcversion 2.17.90
+%define glibcrelease 6%{?dist}
 ##############################################################################
 # If run_glibc_tests is zero then tests are not run for the build.
 # You must always set run_glibc_tests to one for production builds.
@@ -69,7 +70,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: 6%{?dist}
+Release: %{glibcrelease}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -1530,6 +1531,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jul 25 2013 Carlos O'Donell <carlos@redhat.com> - 2.17.90-7
+- Correctly name the 240-bit slow path sytemtap probe slowpow_p10 for slowpow.
+
 * Wed Jul 24 2013 Carlos O'Donell <carlos@redhat.com> - 2.17.90-6
 - Add build requirement on static libstdc++ library to fix testsuite failures
   for static C++ tests.
