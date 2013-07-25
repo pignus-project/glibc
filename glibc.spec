@@ -681,22 +681,22 @@ build nosegneg -mno-tls-direct-seg-refs
 (
 	platform=`LD_SHOW_AUXV=1 /bin/true | sed -n 's/^AT_PLATFORM:[[:blank:]]*//p'`
 	if [ "$platform" != power6 ]; then
-		  mkdir -p power6emul/{lib,lib64}
-		  $GCC -shared -O2 -fpic -o power6emul/%{_lib}/power6emul.so releng/power6emul.c -Wl,-z,initfirst
+		mkdir -p power6emul/{lib,lib64}
+		$GCC -shared -O2 -fpic -o power6emul/%{_lib}/power6emul.so releng/power6emul.c -Wl,-z,initfirst
 %ifarch ppc
-		  gcc -shared -nostdlib -O2 -fpic -m64 -o power6emul/lib64/power6emul.so -xc - </dev/null
+		gcc -shared -nostdlib -O2 -fpic -m64 -o power6emul/lib64/power6emul.so -xc - </dev/null
 %endif
 %ifarch ppc64
-		  gcc -shared -nostdlib -O2 -fpic -m32 -o power6emul/lib/power6emul.so -xc - < /dev/null
+		gcc -shared -nostdlib -O2 -fpic -m32 -o power6emul/lib/power6emul.so -xc - < /dev/null
 %endif
-		  export LD_PRELOAD=`pwd`/power6emul/\$LIB/power6emul.so
+		export LD_PRELOAD=`pwd`/power6emul/\$LIB/power6emul.so
 	fi
 	AddOns="$AddOns --with-cpu=power6"
 	GCC="$GCC -mcpu=power6"
 	GXX="$GXX -mcpu=power6"
 	build power6
 )
-%endif
+%endif # %{buildpower6}
 
 ##############################################################################
 # Build the glibc post-upgrade program:
@@ -705,7 +705,8 @@ build nosegneg -mno-tls-direct-seg-refs
 # we only build it once.
 ##############################################################################
 pushd build-%{target}
-$GCC -static -L. -Os -g ../releng/glibc_post_upgrade.c -o glibc_post_upgrade.%{_target_cpu} \
+$GCC -static -L. -Os -g ../releng/glibc_post_upgrade.c \
+	-o glibc_post_upgrade.%{_target_cpu} \
 	'-DLIBTLS="/%{_lib}/tls/"' \
 	'-DGCONV_MODULES_DIR="%{_prefix}/%{_lib}/gconv"' \
 	'-DLD_SO_CONF="/etc/ld.so.conf"' \
@@ -783,7 +784,7 @@ fi
 ln -sf $librtkaioso $destdir/$librtso
 %endif
 popd
-%endif
+%endif # %{buildxen}
 
 ##############################################################################
 # Install the power6 build files.
@@ -817,7 +818,7 @@ cp -a ../power6/*.so.* .
 popd
 %endif
 popd
-%endif
+%endif # %{buildpower6}
 
 ##############################################################################
 # Remove the files we don't want to distribute
@@ -1024,7 +1025,7 @@ grep '%{_prefix}/include/gnu/stubs-[32164]\+\.h' < rpm.filelist >> devel.filelis
 
 # Put the include files into headers file list.
 grep '%{_prefix}/include' < rpm.filelist |
-  egrep -v '%{_prefix}/include/(linuxthreads|gnu/stubs-[32164]+\.h)' \
+	egrep -v '%{_prefix}/include/(linuxthreads|gnu/stubs-[32164]+\.h)' \
 	> headers.filelist
 
 # Remove partial (lib*_p.a) static libraries, include files, and info files from
@@ -1253,7 +1254,8 @@ popd
 # XXX: Why do we do this?
 ls -l $RPM_BUILD_ROOT/usr/bin/getconf
 ls -l $RPM_BUILD_ROOT/usr/libexec/getconf
-eu-readelf -hS $RPM_BUILD_ROOT/usr/bin/getconf $RPM_BUILD_ROOT/usr/libexec/getconf/*
+eu-readelf -hS $RPM_BUILD_ROOT/usr/bin/getconf \
+	$RPM_BUILD_ROOT/usr/libexec/getconf/*
 
 find_debuginfo_args='--strict-build-id -g'
 %ifarch %{debuginfocommonarches}
@@ -1266,8 +1268,7 @@ find_debuginfo_args="$find_debuginfo_args \
 	-p '.*/(sbin|libexec)/.*' \
 	-o debuginfocommon.filelist \
 	-l rpm.filelist \
-	-l nosegneg.filelist \
-"
+	-l nosegneg.filelist"
 %endif
 eval /usr/lib/rpm/find-debuginfo.sh \
 	"$find_debuginfo_args" \
@@ -1347,6 +1348,7 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown
 mkdir -p $RPM_BUILD_ROOT/var/{db,run}/nscd
 touch $RPM_BUILD_ROOT/var/{db,run}/nscd/{passwd,group,hosts,services}
 touch $RPM_BUILD_ROOT/var/run/nscd/{socket,nscd.pid}
+
 %endif # %{auxarches}
 
 %ifnarch %{auxarches}
