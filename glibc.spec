@@ -826,14 +826,18 @@ popd
 rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libNoVersion*
 rm -f $RPM_BUILD_ROOT/%{_lib}/libNoVersion*
 
-# NPTL <bits/stdio-lock.h> is not usable outside of glibc, so include
-# the generic one (#162634)
-cp -a bits/stdio-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/stdio-lock.h
-# And <bits/libc-lock.h> needs sanitizing as well.
-cp -a releng/libc-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/libc-lock.h
+# rquota.x and rquota.h are now provided by quota
+rm -f $RPM_BUILD_ROOT%{_prefix}/include/rpcsvc/rquota.[hx]
+
+# In F7+ this is provided by rpcbind rpm
+rm -f $RPM_BUILD_ROOT%{_sbindir}/rpcinfo
+
+# Remove the old nss modules.
+rm -f ${RPM_BUILD_ROOT}/%{_lib}/libnss1-*
+rm -f ${RPM_BUILD_ROOT}/%{_lib}/libnss-*.so.1
 
 ##############################################################################
-# Adjust info files
+# Install info files
 ##############################################################################
 
 # Move the info files if glibc installed them into the wrong location.
@@ -846,8 +850,26 @@ fi
 # Compress all of the info files.
 gzip -9nvf $RPM_BUILD_ROOT%{_infodir}/libc*
 
-# XXX: What is this for?
-ln -sf libbsd-compat.a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libbsd.a
+##############################################################################
+# Install locale files
+##############################################################################
+
+# Create archive of locale files
+%ifnarch %{auxarches}
+olddir=`pwd`
+pushd ${RPM_BUILD_ROOT}%{_prefix}/lib/locale
+rm locale-archive || :
+# Intentionally we do not pass --alias-file=, aliases will be added
+# by build-locale-archive.
+$olddir/build-%{target}/elf/ld.so \
+  --library-path $olddir/build-%{target}/ \
+  $olddir/build-%{target}/locale/localedef \
+    --prefix ${RPM_BUILD_ROOT} --add-to-archive \
+    *_*
+rm -rf *_*
+mv locale-archive{,.tmpl}
+popd
+%endif
 
 ##############################################################################
 # Install configuration files for services
@@ -882,12 +904,6 @@ mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
 > $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
 chmod 644 $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
 
-# Install the upgrade program
-install -m 700 build-%{target}/glibc_post_upgrade.%{_target_cpu} \
-  $RPM_BUILD_ROOT/usr/sbin/glibc_post_upgrade.%{_target_cpu}
-
-strip -g $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.o
-
 ##############################################################################
 # Install debug copies of unstripped static libraries
 ##############################################################################
@@ -901,39 +917,28 @@ cp -a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.a \
 rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/*_p.a
 %endif
 
-# rquota.x and rquota.h are now provided by quota
-rm -f $RPM_BUILD_ROOT%{_prefix}/include/rpcsvc/rquota.[hx]
-
 ##############################################################################
-# Install locale files
+# Misc...
 ##############################################################################
 
-# Create archive of locale files
-%ifnarch %{auxarches}
-olddir=`pwd`
-pushd ${RPM_BUILD_ROOT}%{_prefix}/lib/locale
-rm locale-archive || :
-# Intentionally we do not pass --alias-file=, aliases will be added
-# by build-locale-archive.
-$olddir/build-%{target}/elf/ld.so \
-  --library-path $olddir/build-%{target}/ \
-  $olddir/build-%{target}/locale/localedef \
-    --prefix ${RPM_BUILD_ROOT} --add-to-archive \
-    *_*
-rm -rf *_*
-mv locale-archive{,.tmpl}
-popd
-%endif
+# NPTL <bits/stdio-lock.h> is not usable outside of glibc, so include
+# the generic one (#162634)
+cp -a bits/stdio-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/stdio-lock.h
+# And <bits/libc-lock.h> needs sanitizing as well.
+cp -a releng/libc-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/libc-lock.h
 
-# Remove the old nss modules.
-rm -f ${RPM_BUILD_ROOT}/%{_lib}/libnss1-*
-rm -f ${RPM_BUILD_ROOT}/%{_lib}/libnss-*.so.1
+# XXX: What is this for?
+ln -sf libbsd-compat.a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libbsd.a
 
-# Ugly hack for buggy rpm
+# Install the upgrade program
+install -m 700 build-%{target}/glibc_post_upgrade.%{_target_cpu} \
+  $RPM_BUILD_ROOT/usr/sbin/glibc_post_upgrade.%{_target_cpu}
+
+# Strip all of the installed object files.
+strip -g $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.o
+
+# XXX: Ugly hack for buggy rpm. What bug? BZ? Is this fixed?
 ln -f ${RPM_BUILD_ROOT}%{_sbindir}/iconvconfig{,.%{_target_cpu}}
-
-# In F7+ this is provided by rpcbind rpm
-rm -f $RPM_BUILD_ROOT%{_sbindir}/rpcinfo
 
 ##############################################################################
 # Build the file lists used for describing the package and subpackages.
