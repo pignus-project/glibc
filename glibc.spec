@@ -444,7 +444,7 @@ debugging information.  You need this only if you want to step into
 C library routines during debugging programs statically linked against
 one or more of the standard C libraries.
 To use this debugging information, you need to link binaries
-with -static -L%{_prefix}/lib/debug%{_prefix}/%{_lib} compiler options.
+with -static -L%{_prefix}/lib/debug%{_libdir} compiler options.
 
 ##############################################################################
 # glibc common "debuginfo-common" sub-package
@@ -710,7 +710,7 @@ pushd build-%{target}
 $GCC -static -L. -Os -g ../releng/glibc_post_upgrade.c \
 	-o glibc_post_upgrade.%{_target_cpu} \
 	'-DLIBTLS="/%{_lib}/tls/"' \
-	'-DGCONV_MODULES_DIR="%{_prefix}/%{_lib}/gconv"' \
+	'-DGCONV_MODULES_DIR="%{_libdir}/gconv"' \
 	'-DLD_SO_CONF="/etc/ld.so.conf"' \
 	'-DICONVCONFIG="%{_sbindir}/iconvconfig.%{_target_cpu}"'
 popd
@@ -743,7 +743,7 @@ librtso=`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
 ##############################################################################
 %ifarch %{rtkaioarches}
 rm -f $RPM_BUILD_ROOT{,%{_prefix}}/%{_lib}/librtkaio.*
-rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/librt.so.*
+rm -f $RPM_BUILD_ROOT%{_libdir}/librt.so.*
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio
 mv $RPM_BUILD_ROOT/%{_lib}/librtkaio-*.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/
 rm -f $RPM_BUILD_ROOT/%{_lib}/$librtso
@@ -828,7 +828,7 @@ popd
 # Remove the libNoVersion files.
 # XXX: This looks like a bug in glibc that accidentally installed these
 #      wrong files. We probably don't need this today.
-rm -f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libNoVersion*
+rm -f $RPM_BUILD_ROOT%{_libdir}/libNoVersion*
 rm -f $RPM_BUILD_ROOT/%{_lib}/libNoVersion*
 
 # rquota.x and rquota.h are now provided by quota
@@ -905,9 +905,9 @@ truncate -s 0 $RPM_BUILD_ROOT/etc/sysconfig/nscd
 truncate -s 0 $RPM_BUILD_ROOT/etc/gai.conf
 %endif
 
-# Include %{_prefix}/%{_lib}/gconv/gconv-modules.cache
-truncate -s 0 $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
-chmod 644 $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
+# Include %{_libdir}/gconv/gconv-modules.cache
+truncate -s 0 $RPM_BUILD_ROOT%{_libdir}/gconv/gconv-modules.cache
+chmod 644 $RPM_BUILD_ROOT%{_libdir}/gconv/gconv-modules.cache
 
 ##############################################################################
 # Misc...
@@ -920,14 +920,14 @@ cp -a bits/stdio-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/stdio-lock.h
 cp -a releng/libc-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/libc-lock.h
 
 # XXX: What is this for?
-ln -sf libbsd-compat.a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/libbsd.a
+ln -sf libbsd-compat.a $RPM_BUILD_ROOT%{_libdir}/libbsd.a
 
 # Install the upgrade program
 install -m 700 build-%{target}/glibc_post_upgrade.%{_target_cpu} \
   $RPM_BUILD_ROOT/usr/sbin/glibc_post_upgrade.%{_target_cpu}
 
 # Strip all of the installed object files.
-strip -g $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.o
+strip -g $RPM_BUILD_ROOT%{_libdir}/*.o
 
 # XXX: Ugly hack for buggy rpm. What bug? BZ? Is this fixed?
 ln -f ${RPM_BUILD_ROOT}%{_sbindir}/iconvconfig{,.%{_target_cpu}}
@@ -941,10 +941,10 @@ ln -f ${RPM_BUILD_ROOT}%{_sbindir}/iconvconfig{,.%{_target_cpu}}
 # If we are building a debug package then copy all of the static archives
 # into the debug directory to keep them as unstripped copies.
 %if 0%{?_enable_debug_packages}
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}
-cp -a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.a \
-  $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/
-rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/*_p.a
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_libdir}
+cp -a $RPM_BUILD_ROOT%{_libdir}/*.a \
+	$RPM_BUILD_ROOT%{_prefix}/lib/debug%{_libdir}/
+rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_libdir}/*_p.a
 %endif
 
 ##############################################################################
@@ -1002,15 +1002,15 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/*_p.a
       -e '\,bin/\(memusage\|mtrace\|xtrace\|pcprofiledump\),d'
 } | sort > rpm.filelist
 
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/%{_lib}
-mv -f $RPM_BUILD_ROOT/%{_lib}/lib{pcprofile,memusage}.so $RPM_BUILD_ROOT%{_prefix}/%{_lib}
+mkdir -p $RPM_BUILD_ROOT%{_libdir}
+mv -f $RPM_BUILD_ROOT/%{_lib}/lib{pcprofile,memusage}.so $RPM_BUILD_ROOT%{_libdir}
 
 # The xtrace and memusage scripts have hard-coded paths that need to be
 # translated to a correct set of paths using the $LIB token which is
 # dynamically translated by ld.so as the default lib directory.
 for i in $RPM_BUILD_ROOT%{_prefix}/bin/{xtrace,memusage}; do
-  sed -e 's~=/%{_lib}/libpcprofile.so~=%{_prefix}/%{_lib}/libpcprofile.so~' \
-      -e 's~=/%{_lib}/libmemusage.so~=%{_prefix}/%{_lib}/libmemusage.so~' \
+  sed -e 's~=/%{_lib}/libpcprofile.so~=%{_libdir}/libpcprofile.so~' \
+      -e 's~=/%{_lib}/libmemusage.so~=%{_libdir}/libmemusage.so~' \
       -e 's~='\''/\\\$LIB/libpcprofile.so~='\''%{_prefix}/\\$LIB/libpcprofile.so~' \
       -e 's~='\''/\\\$LIB/libmemusage.so~='\''%{_prefix}/\\$LIB/libmemusage.so~' \
       -i $i
@@ -1029,31 +1029,31 @@ grep '%{_prefix}/include' < rpm.filelist |
 
 # Remove partial (lib*_p.a) static libraries, include files, and info files from
 # the core glibc package.
-sed -i -e '\|%{_prefix}/%{_lib}/lib.*_p.a|d' \
+sed -i -e '\|%{_libdir}/lib.*_p.a|d' \
        -e '\|%{_prefix}/include|d' \
        -e '\|%{_infodir}|d' rpm.filelist
 
 # Put some static files into the devel package.
-grep '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist \
+grep '%{_libdir}/lib.*\.a' < rpm.filelist \
   | grep '/lib\(\(c\|pthread\|nldbl\)_nonshared\|bsd\(\|-compat\)\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
   >> devel.filelist
 
 # Put the rest of the static files into the static package.
-grep '%{_prefix}/%{_lib}/lib.*\.a' < rpm.filelist \
+grep '%{_libdir}/lib.*\.a' < rpm.filelist \
   | grep -v '/lib\(\(c\|pthread\|nldbl\)_nonshared\|bsd\(\|-compat\)\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
   > static.filelist
 
 # Put all of the object files and *.so (not the versioned ones) into the
 # devel package.
-grep '%{_prefix}/%{_lib}/.*\.o' < rpm.filelist >> devel.filelist
-grep '%{_prefix}/%{_lib}/lib.*\.so' < rpm.filelist >> devel.filelist
+grep '%{_libdir}/.*\.o' < rpm.filelist >> devel.filelist
+grep '%{_libdir}/lib.*\.so' < rpm.filelist >> devel.filelist
 
 # Remove all of the static, object, unversioned DSOs, old linuxthreads stuff,
 # and nscd from the core glibc package.
-sed -i -e '\|%{_prefix}/%{_lib}/lib.*\.a|d' \
-       -e '\|%{_prefix}/%{_lib}/.*\.o|d' \
-       -e '\|%{_prefix}/%{_lib}/lib.*\.so|d' \
-       -e '\|%{_prefix}/%{_lib}/linuxthreads|d' \
+sed -i -e '\|%{_libdir}/lib.*\.a|d' \
+       -e '\|%{_libdir}/.*\.o|d' \
+       -e '\|%{_libdir}/lib.*\.so|d' \
+       -e '\|%{_libdir}/linuxthreads|d' \
        -e '\|nscd|d' rpm.filelist
 
 # All of the bin and certain sbin files go into the common package.
@@ -1100,8 +1100,8 @@ echo '%{_prefix}/sbin/nscd' > nscd.filelist
 # glibc package even though they are only used by utils package
 # scripts..
 cat >> rpm.filelist <<EOF
-%{_prefix}/%{_lib}/libmemusage.so
-%{_prefix}/%{_lib}/libpcprofile.so
+%{_libdir}/libmemusage.so
+%{_libdir}/libpcprofile.so
 EOF
 
 # Add the utils scripts and programs to the utils subpackage.
@@ -1273,7 +1273,7 @@ eval /usr/lib/rpm/find-debuginfo.sh \
 # List all of the *.a archives in the debug directory.
 list_debug_archives()
 {
-	local dir=%{_prefix}/lib/debug%{_prefix}/%{_lib}
+	local dir=%{_prefix}/lib/debug%{_libdir}
 	find $RPM_BUILD_ROOT$dir -name "*.a" -printf "$dir/%%P\n"
 }
 
@@ -1465,7 +1465,7 @@ rm -f *.filelist*
 %verify(not md5 size mtime) %config(noreplace) /etc/rpc
 %dir /etc/ld.so.conf.d
 %dir %{_prefix}/libexec/getconf
-%dir %{_prefix}/%{_lib}/gconv
+%dir %{_libdir}/gconv
 %dir %attr(0700,root,root) /var/cache/ldconfig
 %attr(0600,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/cache/ldconfig/aux-cache
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/ld.so.cache
