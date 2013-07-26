@@ -910,19 +910,6 @@ truncate -s 0 $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
 chmod 644 $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
 
 ##############################################################################
-# Install debug copies of unstripped static libraries
-##############################################################################
-
-# If we are building a debug package then copy all of the static archives
-# into the debug directory to keep them as unstripped copies.
-%if 0%{?_enable_debug_packages}
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}
-cp -a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.a \
-  $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/
-rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/*_p.a
-%endif
-
-##############################################################################
 # Misc...
 ##############################################################################
 
@@ -944,6 +931,21 @@ strip -g $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.o
 
 # XXX: Ugly hack for buggy rpm. What bug? BZ? Is this fixed?
 ln -f ${RPM_BUILD_ROOT}%{_sbindir}/iconvconfig{,.%{_target_cpu}}
+
+##############################################################################
+# Install debug copies of unstripped static libraries
+# - This step must be last in order to capture any additional static
+#   archives we might have added.
+##############################################################################
+
+# If we are building a debug package then copy all of the static archives
+# into the debug directory to keep them as unstripped copies.
+%if 0%{?_enable_debug_packages}
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}
+cp -a $RPM_BUILD_ROOT%{_prefix}/%{_lib}/*.a \
+  $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/
+rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_prefix}/%{_lib}/*_p.a
+%endif
 
 ##############################################################################
 # Build the file lists used for describing the package and subpackages.
