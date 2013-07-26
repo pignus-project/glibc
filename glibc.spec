@@ -895,17 +895,17 @@ install -m 644 releng/nscd.service releng/nscd.socket $RPM_BUILD_ROOT/lib/system
 
 # Include ld.so.conf
 echo 'include ld.so.conf.d/*.conf' > $RPM_BUILD_ROOT/etc/ld.so.conf
-truncate -size 0 $RPM_BUILD_ROOT/etc/ld.so.cache
+truncate -s 0 $RPM_BUILD_ROOT/etc/ld.so.cache
 chmod 644 $RPM_BUILD_ROOT/etc/ld.so.conf
 mkdir -p $RPM_BUILD_ROOT/etc/ld.so.conf.d
 %ifnarch %{auxarches}
 mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
-truncate -size 0 $RPM_BUILD_ROOT/etc/sysconfig/nscd
-truncate -size 0 $RPM_BUILD_ROOT/etc/gai.conf
+truncate -s 0 $RPM_BUILD_ROOT/etc/sysconfig/nscd
+truncate -s 0 $RPM_BUILD_ROOT/etc/gai.conf
 %endif
 
 # Include %{_prefix}/%{_lib}/gconv/gconv-modules.cache
-truncate -size 0 $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
+truncate -s 0 $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
 chmod 644 $RPM_BUILD_ROOT%{_prefix}/%{_lib}/gconv/gconv-modules.cache
 
 ##############################################################################
@@ -1083,7 +1083,7 @@ sed -i -e '\|%{_prefix}/bin|d' \
 ##############################################################################
 # Build the xen package file list (nosegneg.filelist)
 ##############################################################################
-truncate -size 0 nosegneg.filelist
+truncate -s 0 nosegneg.filelist
 %if %{xenpackage}
 grep '/%{_lib}/%{nosegneg_subdir}' < rpm.filelist >> nosegneg.filelist
 sed -i -e '\|/%{_lib}/%{nosegneg_subdir}|d' rpm.filelist
@@ -1354,11 +1354,11 @@ touch $RPM_BUILD_ROOT/var/run/nscd/{socket,nscd.pid}
 %endif # %{auxarches}
 
 %ifnarch %{auxarches}
-truncate -size 0 $RPM_BUILD_ROOT/%{_prefix}/lib/locale/locale-archive
+truncate -s 0 $RPM_BUILD_ROOT/%{_prefix}/lib/locale/locale-archive
 %endif
 
 mkdir -p $RPM_BUILD_ROOT/var/cache/ldconfig
-truncate -size 0 $RPM_BUILD_ROOT/var/cache/ldconfig/aux-cache
+truncate -s 0 $RPM_BUILD_ROOT/var/cache/ldconfig/aux-cache
 
 %pre -p <lua>
 -- Check that the running kernel is new enough
