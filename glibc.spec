@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.17-931-g30bbc0c
 %define glibcversion 2.17.90
-%define glibcrelease 8%{?dist}
+%define glibcrelease 9%{?dist}
 ##############################################################################
 # If run_glibc_tests is zero then tests are not run for the build.
 # You must always set run_glibc_tests to one for production builds.
@@ -194,6 +194,9 @@ Patch2026: %{name}-rh841787.patch
 
 # Upstream BZ 14185
 Patch2027: %{name}-rh819430.patch
+
+#Upstream BZ 14547
+Patch2028: %{name}-strcoll-cve.patch
 ##############################################################################
 # End of glibc patches.
 ##############################################################################
@@ -503,6 +506,7 @@ package or when debugging this package.
 %patch0034 -p1
 %patch0035 -p1
 %patch0037 -p1
+%patch2028 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1529,6 +1533,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jul 29 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.17.90-9
+- Fix strcoll flaws (#855399, CVE-2012-4412, CVE-2012-4424).
+
 * Mon Jul 29 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.17.90-8
 - Resync with upstream master.
 - Disable pt_chown (CVE-2013-2207).
