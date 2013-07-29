@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.17-931-g30bbc0c
 %define glibcversion 2.17.90
-%define glibcrelease 7%{?dist}
+%define glibcrelease 8%{?dist}
 ##############################################################################
 # If run_glibc_tests is zero then tests are not run for the build.
 # You must always set run_glibc_tests to one for production builds.
@@ -149,7 +149,6 @@ Patch0014: %{name}-fedora-nptl-linklibc.patch
 Patch0015: %{name}-fedora-localedef.patch
 Patch0016: %{name}-fedora-i386-tls-direct-seg-refs.patch
 Patch0017: %{name}-fedora-gai-canonical.patch
-Patch0018: %{name}-fedora-pt_chown.patch
 Patch0019: %{name}-fedora-nis-rh188246.patch
 Patch0020: %{name}-fedora-manual-dircategory.patch
 Patch0024: %{name}-fedora-locarchive.patch
@@ -486,7 +485,6 @@ package or when debugging this package.
 %patch0015 -p1
 %patch0016 -p1
 %patch0017 -p1
-%patch0018 -p1
 %patch0019 -p1
 %patch0020 -p1
 %patch2021 -p1
@@ -725,7 +723,6 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT
 make -j1 install_root=$RPM_BUILD_ROOT \
 	install -C build-%{target} %{silentrules}
-chmod +x $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown
 # If we are not building an auxiliary arch then install all of the supported
 # locales.
 %ifnarch %{auxarches}
@@ -951,10 +948,6 @@ ln -f ${RPM_BUILD_ROOT}%{_sbindir}/iconvconfig{,.%{_target_cpu}}
 # * rpm.fileslist
 #	- Master file list. Eventually, after removing files from this list
 #	  we are left with the list of files for the glibc package.
-# * workaround.filelist
-#	- This list contains files that are not shipped but for which we
-#	  may wish to include debug information. I don't see why we would
-#	  want to do that. The only file on this list right now is pt_chown.
 # * common.filelist
 #	- Contains the list of flies for the common subpackage.
 # * utils.filelist
@@ -1068,7 +1061,7 @@ grep '%{_prefix}/share' < rpm.filelist | \
   grep -v -e '%{_prefix}/share/zoneinfo' -e '%%dir %{prefix}/share' \
        >> common.filelist
 
-# Remove the bin, locale, pt_chown, some sbin, and share from the
+# Remove the bin, locale, some sbin, and share from the
 # core glibc package. We cheat a bit and use the slightly dangerous
 # /usr/sbin/[^gi] to match the inverse of the search that put the
 # files into common.filelist. It's dangerous in that additional files
@@ -1076,7 +1069,6 @@ grep '%{_prefix}/share' < rpm.filelist | \
 # rpm.filelist.
 sed -i -e '\|%{_prefix}/bin|d' \
        -e '\|%{_prefix}/lib/locale|d' \
-       -e '\|%{_prefix}/libexec/pt_chown|d' \
        -e '\|%{_prefix}/sbin/[^gi]|d' \
        -e '\|%{_prefix}/share|d' rpm.filelist
 
@@ -1259,12 +1251,10 @@ eu-readelf -hS $RPM_BUILD_ROOT/usr/bin/getconf \
 
 find_debuginfo_args='--strict-build-id -g'
 %ifarch %{debuginfocommonarches}
-echo %{_prefix}/libexec/pt_chown > workaround.filelist
 find_debuginfo_args="$find_debuginfo_args \
 	-l common.filelist \
 	-l utils.filelist \
 	-l nscd.filelist \
-	-l workaround.filelist \
 	-p '.*/(sbin|libexec)/.*' \
 	-o debuginfocommon.filelist \
 	-l rpm.filelist \
@@ -1341,9 +1331,6 @@ sed -e '/%%dir/d;/%%config/d;/%%verify/d;s/%%lang([^)]*) //;s#^/*##' \
 	debuginfocommon.filelist \
 %endif
 	| (cd $RPM_BUILD_ROOT; xargs --no-run-if-empty rm -f 2> /dev/null || :)
-
-# The auxarch doesn't install pt_chown.
-rm -f $RPM_BUILD_ROOT%{_prefix}/libexec/pt_chown
 
 %else
 
@@ -1495,7 +1482,6 @@ rm -f *.filelist*
 %attr(0644,root,root) %verify(not md5 size mtime mode) %ghost %config(missingok,noreplace) %{_prefix}/lib/locale/locale-archive
 %dir %attr(755,root,root) /etc/default
 %verify(not md5 size mtime) %config(noreplace) /etc/default/nss
-%attr(755,root,root) %caps(cap_chown,cap_fowner=pe) %{_prefix}/libexec/pt_chown
 %doc documentation/*
 
 %files -f devel.filelist devel
@@ -1543,6 +1529,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jul 29 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.17.90-8
+- Resync with upstream master.
+- Disable pt_chown (CVE-2013-2207).
+
 * Thu Jul 25 2013 Carlos O'Donell <carlos@redhat.com> - 2.17.90-7
 - Correctly name the 240-bit slow path sytemtap probe slowpow_p10 for slowpow.
 
