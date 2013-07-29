@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.17-931-g30bbc0c
 %define glibcversion 2.17.90
-%define glibcrelease 9%{?dist}
+%define glibcrelease 10%{?dist}
 ##############################################################################
 # If run_glibc_tests is zero then tests are not run for the build.
 # You must always set run_glibc_tests to one for production builds.
@@ -1535,6 +1535,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jul 29 2013 Carlos O'Donell <codonell@redhat.com> - 2.17.90-10
+- Fix missing libbsd.a in debuginfo packages.
+
 * Mon Jul 29 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.17.90-9
 - Fix strcoll flaws (#855399, CVE-2012-4412, CVE-2012-4424).
 
