@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.17-906-g8ab0740
+%define glibcsrcdir glibc-2.17-931-g30bbc0c
 %define glibcversion 2.17.90
-%define glibcrelease 6%{?dist}
+%define glibcrelease 7%{?dist}
 ##############################################################################
 # If run_glibc_tests is zero then tests are not run for the build.
 # You must always set run_glibc_tests to one for production builds.
