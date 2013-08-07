@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.17-931-g30bbc0c
 %define glibcversion 2.17.90
-%define glibcrelease 10%{?dist}
+%define glibcrelease 11%{?dist}
 ##############################################################################
 # If run_glibc_tests is zero then tests are not run for the build.
 # You must always set run_glibc_tests to one for production builds.
@@ -1535,6 +1535,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Aug 07 2013 Karsten Hopp <karsten@redhat.com> 2.17.90-11
+- rebuild with the latest rpm to fix missing ld64.so provides on PPC
+
 * Mon Jul 29 2013 Carlos O'Donell <codonell@redhat.com> - 2.17.90-10
 - Fix missing libbsd.a in debuginfo packages.
 
