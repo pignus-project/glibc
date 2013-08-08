@@ -863,7 +863,7 @@ gzip -9nvf $RPM_BUILD_ROOT%{_infodir}/libc*
 %ifnarch %{auxarches}
 olddir=`pwd`
 pushd ${RPM_BUILD_ROOT}%{_prefix}/lib/locale
-rm locale-archive || :
+rm -f locale-archive
 # Intentionally we do not pass --alias-file=, aliases will be added
 # by build-locale-archive.
 $olddir/build-%{target}/elf/ld.so \
@@ -1244,8 +1244,12 @@ popd
 
 # The #line directives gperf generates do not give the proper
 # file name relative to the build directory.
-(cd locale; ln -s programs/*.gperf .)
-(cd iconv; ln -s ../locale/programs/charmap-kw.gperf .)
+pushd locale
+ln -s programs/*.gperf .
+popd
+pushd iconv
+ln -s ../locale/programs/charmap-kw.gperf .
+popd
 
 # Print some diagnostic information in the builds about the
 # getconf binaries.
