@@ -1322,7 +1322,24 @@ egrep -v "$auxarches_debugsources" \
 # the common debuginfo package.
 list_debug_archives >> debuginfocommon.filelist
 
+# It happens that find-debuginfo.sh produces duplicate entries even
+# though the inputs are unique. Therefore we sort and unique the
+# entries in the debug file lists. This avoids the following warnings:
+# ~~~
+# Processing files: glibc-debuginfo-common-2.17.90-10.fc20.x86_64
+# warning: File listed twice: /usr/lib/debug/usr/sbin/build-locale-archive.debug
+# warning: File listed twice: /usr/lib/debug/usr/sbin/nscd.debug
+# warning: File listed twice: /usr/lib/debug/usr/sbin/zdump.debug
+# warning: File listed twice: /usr/lib/debug/usr/sbin/zic.debug
+# ~~~
+sort -u debuginfocommon.filelist > debuginfocommon2.filelist
+mv debuginfocommon2.filelist debuginfocommon.filelist
+
 %endif # %{debuginfocommonarches}
+
+# Remove any duplicates output by a buggy find-debuginfo.sh.
+sort -u debuginfo.filelist > debuginfo2.filelist
+mv debuginfo2.filelist debuginfo.filelist
 
 %endif # 0%{?_enable_debug_packages}
 
