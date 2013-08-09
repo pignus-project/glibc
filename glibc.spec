@@ -764,7 +764,7 @@ ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/librtkaio-*.so` $RPM_BUILD_ROOT/
 #	runtime.
 install_different()
 {
-	local lib libbase libbases dlibo
+	local lib libbase libbaseso dlib
 	local destdir="$1"
 	local subdir="$2"
 	local subdir_up="$3"
