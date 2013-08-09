@@ -736,12 +736,11 @@ make %{?_smp_mflags} install_root=$RPM_BUILD_ROOT \
 popd
 %endif
 
-librtso=`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
-
 ##############################################################################
 # Install rtkaio libraries.
 ##############################################################################
 %ifarch %{rtkaioarches}
+librtso=`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
 rm -f $RPM_BUILD_ROOT{,%{_prefix}}/%{_lib}/librtkaio.*
 rm -f $RPM_BUILD_ROOT%{_libdir}/librt.so.*
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio
@@ -751,6 +750,65 @@ ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so` $RPM_BUILD_ROOT/%{_lib}/$li
 ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/$librtso
 %endif
 
+# install_different:
+#	Install all core libraries into DESTDIR/SUBDIR. Either the file is
+#	installed as a copy or a symlink to the default install (if it is the
+#	same). The path SUBDIR_UP is the prefix used to go from
+#	DESTDIR/SUBDIR to the default installed libraries e.g.
+#	ln -s SUBDIR_UP/foo.so DESTDIR/SUBDIR/foo.so.
+#	When you call this function it is expected that you are in the root
+#	of the build directory, and that the default build directory is:
+#	"../build-%{target}" (relatively).
+#	The primary use of this function is to install alternate runtimes
+#	into the build directory and avoid duplicating this code for each
+#	runtime.
+install_different()
+{
+	local lib libbase libbases dlibo
+	local destdir="$1"
+	local subdir="$2"
+	local subdir_up="$3"
+	local libdestdir="$destdir/$subdir"
+	# All three arguments must be non-zero paths.
+	if ! [ "$destdir" \
+	       -a "$subdir" \
+	       -a "$subdir_up" ]; then
+		echo "One of the arguments to install_different was emtpy."
+		exit 1
+	fi
+	# Create the destination directory and the multilib directory.
+	mkdir -p "$destdir"
+	mkdir -p "$libdestdir"
+	# Walk all of the libraries we installed...
+	for lib in libc math/libm nptl/libpthread rt/librt nptl_db/libthread_db
+	do
+		libbase=${lib#*/}
+		# Take care that `libbaseso' has a * that needs expanding so
+		# take care with quoting.
+		libbaseso=$(basename $RPM_BUILD_ROOT/%{_lib}/${libbase}-*.so)
+		# Only install if different from default build library.
+		if cmp -s ${lib}.so ../build-%{target}/${lib}.so; then
+			ln -sf "$subdir_up"/$libbaseso $libdestdir/$libbaseso
+		else
+			cp -a ${lib}.so $libdestdir/$libbaseso
+		fi
+		dlib=$libdestdir/$(basename $RPM_BUILD_ROOT/%{_lib}/${libbase}.so.*)
+		ln -sf $libbaseso $dlib
+	done
+%ifarch %{rtkaioarches}
+	local rtkdestdir="$RPM_BUILD_ROOT/%{_lib}/rtkaio/$subdir"
+	local librtso=`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
+	mkdir -p $rkdestdir
+	librtkaioso=$(basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/)
+	if cmp -s rtkaio/librtkaio.so ../build-%{target}/rtkaio/librtkaio.so; then
+		ln -s %{nosegneg_subdir_up}/$librtkaioso $rtkdestdir/$librtkaioso
+	else
+		cp -a rtkaio/librtkaio.so $rtkdestdir/$librtkaioso
+	fi
+	ln -sf $librtkaioso $rtkdestdir/$librtso
+%endif
+}
+
 ##############################################################################
 # Install the xen build files.
 ##############################################################################
@@ -759,31 +817,8 @@ ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/librtkaio-*.so` $RPM_BUILD_ROOT/
 %define nosegneg_subdir i686/nosegneg
 %define nosegneg_subdir_up ../..
 pushd build-%{target}-nosegneg
-destdir=$RPM_BUILD_ROOT/%{_lib}/%{nosegneg_subdir}
-mkdir -p $destdir
-for lib in libc math/libm nptl/libpthread rt/librt nptl_db/libthread_db
-do
-  libbase=${lib#*/}
-  libbaseso=$(basename $RPM_BUILD_ROOT/%{_lib}/${libbase}-*.so)
-  # Only install if different from base lib
-  if cmp -s ${lib}.so ../build-%{target}/${lib}.so; then
-    ln -sf %{nosegneg_subdir_up}/$libbaseso $destdir/$libbaseso
-  else
-    cp -a ${lib}.so $destdir/$libbaseso
-  fi
-  ln -sf $libbaseso $destdir/$(basename $RPM_BUILD_ROOT/%{_lib}/${libbase}.so.*)
-done
-%ifarch %{rtkaioarches}
-destdir=$RPM_BUILD_ROOT/%{_lib}/rtkaio/%{nosegneg_subdir}
-mkdir -p $destdir
-librtkaioso=$(basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/)
-if cmp -s rtkaio/librtkaio.so ../build-%{target}/rtkaio/librtkaio.so; then
-  ln -s %{nosegneg_subdir_up}/$librtkaioso $destdir/$librtkaioso
-else
-  cp -a rtkaio/librtkaio.so $destdir/$librtkaioso
-fi
-ln -sf $librtkaioso $destdir/$librtso
-%endif
+destdir=$RPM_BUILD_ROOT/%{_lib}
+install_different "$destdir" "%{nosegneg_subdir}" "%{nosegneg_subdir_up}"
 popd
 %endif # %{buildxen}
 
@@ -791,29 +826,25 @@ popd
 # Install the power6 build files.
 ##############################################################################
 %if %{buildpower6}
+%define power6_subdir power6
+%define power6_subdir_up ..
+%define power6_legacy power6x
+%define power6_legacy_up ..
 pushd build-%{target}-power6
-destdir=$RPM_BUILD_ROOT/%{_lib}/power6
-mkdir -p ${destdir}
-for lib in libc math/libm nptl/libpthread rt/librt nptl_db/libthread_db
-do
-  libbase=${lib#*/}
-  libbaseso=$(basename $RPM_BUILD_ROOT/%{_lib}/${libbase}-*.so)
-  cp -a ${lib}.so $destdir/$libbaseso
-  ln -sf $libbaseso $destdir/$(basename $RPM_BUILD_ROOT/%{_lib}/${libbase}.so.*)
-done
-mkdir -p ${destdir}x
-pushd ${destdir}x
-ln -sf ../power6/*.so .
-cp -a ../power6/*.so.* .
+destdir=$RPM_BUILD_ROOT/%{_lib}
+install_different "$destdir" "%{power6_subdir_up}" "%{power6_subdir_up}"
+# Make a legacy /usr/lib[64]/power6x directory that is a symlink to the
+# power6 runtime.
+# XXX: When can we remove this? What is the history behind this?
+mkdir -p ${destdir}/%{power6_legacy}
+pushd ${destdir}/%{power6_legacy}
+ln -sf %{power6_legacy_up}/%{power6_subdir}/*.so .
+cp -a %{power6_legacy_up}/%{power6_subdir}/*.so.* .
 popd
 %ifarch %{rtkaioarches}
-destdir=$RPM_BUILD_ROOT/%{_lib}/rtkaio/power6
-mkdir -p $destdir
-librtkaioso=$(basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/)
-cp -a rtkaio/librtkaio.so $destdir/$librtkaioso
-ln -sf $librtkaioso $destdir/$librtso
-mkdir -p ${destdir}x
-pushd ${destdir}x
+destdir=${destdir}/rtkaio
+mkdir -p ${destdir}/%{power6_legacy}
+pushd ${destdir}/%{power6_legacy}
 ln -sf ../power6/*.so .
 cp -a ../power6/*.so.* .
 popd
