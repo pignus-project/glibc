@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.17-931-g30bbc0c
 %define glibcversion 2.17.90
-%define glibcrelease 11%{?dist}
+%define glibcrelease 12%{?dist}
 ##############################################################################
 # If run_glibc_tests is zero then tests are not run for the build.
 # You must always set run_glibc_tests to one for production builds.
@@ -725,13 +725,23 @@ GCC=`cat Gcc`
 # Cleanup any previous installs...
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT
+
+# Install the build into the build root. We set slibdir, sbindir and
+# rootsbindir to ensure that all of the files are installed under /usr per the
+# "Move to /usr" initiative: http://fedoraproject.org/wiki/Features/UsrMove
 make -j1 install_root=$RPM_BUILD_ROOT \
+	slibdir=%{_libdir} \
+	sbindir=%{_sbindir} \
+	rootsbindir=%{_sbindir} \
 	install -C build-%{target} %{silentrules}
 # If we are not building an auxiliary arch then install all of the supported
 # locales.
 %ifnarch %{auxarches}
 pushd build-%{target}
 make %{?_smp_mflags} install_root=$RPM_BUILD_ROOT \
+	slibdir=%{_libdir} \
+	sbindir=%{_sbindir} \
+	rootsbindir=%{_sbindir} \
 	install-locales -C ../localedata objdir=`pwd`
 popd
 %endif
@@ -740,14 +750,20 @@ popd
 # Install rtkaio libraries.
 ##############################################################################
 %ifarch %{rtkaioarches}
-librtso=`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
-rm -f $RPM_BUILD_ROOT{,%{_prefix}}/%{_lib}/librtkaio.*
-rm -f $RPM_BUILD_ROOT%{_libdir}/librt.so.*
-mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio
-mv $RPM_BUILD_ROOT/%{_lib}/librtkaio-*.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/
-rm -f $RPM_BUILD_ROOT/%{_lib}/$librtso
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so` $RPM_BUILD_ROOT/%{_lib}/$librtso
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/$librtso
+# The name of librt.so.x DSO to which we will link librtkaio-*.so.
+librtso=`basename $RPM_BUILD_ROOT%{_libdir}/librt.so.*`
+# Move all of the rtkaio libraries into /usr/lib[64]/rtkaio
+mkdir -p "$RPM_BUILD_ROOT%{_libdir}/rtkaio"
+mv $RPM_BUILD_ROOT%{_libdir}/librtkaio* "$RPM_BUILD_ROOT%{_libdir}/rtkaio/"
+# Remove the static archive for librtkaio.
+rm -f "$RPM_BUILD_ROOT%{_libdir}/rtkaio/librtkaio.a"
+# Remove the DSO symlink that won't be used by any application. Remember
+# that librtkaio.so is a dropin for librt.so, and the latter is the only
+# link we care about. No application will ever explicitly link against
+# librtkaio.so.
+rm -f $RPM_BUILD_ROOT%{_libdir}/rtkaio/librtkaio.*
+# Provided a librt.so.x link that is implemented by rtkaio.
+ln -sf librtkaio-%{glibcversion}.so "$RPM_BUILD_ROOT%{_libdir}/rtkaio/$librtso"
 %endif
 
 # install_different:
@@ -785,27 +801,28 @@ install_different()
 		libbase=${lib#*/}
 		# Take care that `libbaseso' has a * that needs expanding so
 		# take care with quoting.
-		libbaseso=$(basename $RPM_BUILD_ROOT/%{_lib}/${libbase}-*.so)
+		libbaseso=$(basename $RPM_BUILD_ROOT%{_libdir}/${libbase}-*.so)
 		# Only install if different from default build library.
 		if cmp -s ${lib}.so ../build-%{target}/${lib}.so; then
 			ln -sf "$subdir_up"/$libbaseso $libdestdir/$libbaseso
 		else
 			cp -a ${lib}.so $libdestdir/$libbaseso
 		fi
-		dlib=$libdestdir/$(basename $RPM_BUILD_ROOT/%{_lib}/${libbase}.so.*)
+		dlib=$libdestdir/$(basename $RPM_BUILD_ROOT%{_libdir}/${libbase}.so.*)
 		ln -sf $libbaseso $dlib
 	done
 %ifarch %{rtkaioarches}
-	local rtkdestdir="$RPM_BUILD_ROOT/%{_lib}/rtkaio/$subdir"
-	local librtso=`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
-	mkdir -p $rkdestdir
-	librtkaioso=$(basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/)
-	if cmp -s rtkaio/librtkaio.so ../build-%{target}/rtkaio/librtkaio.so; then
-		ln -s %{nosegneg_subdir_up}/$librtkaioso $rtkdestdir/$librtkaioso
+	local rtkdestdir="$destdir/rtkaio/$subdir"
+	local librtso=`basename $RPM_BUILD_ROOT%{_libdir}/librt.so.*`
+	mkdir -p $rtkdestdir
+	lib="rtkaio/librtkaio"
+	libbaseso=librtkaio-%{glibcversion}.so
+	if cmp -s "${lib}.so" "../build-%{target}/${lib}.so"; then
+		ln -s "$subdir_up"/$libbaseso "$rtkdestdir"/$libbaseso
 	else
-		cp -a rtkaio/librtkaio.so $rtkdestdir/$librtkaioso
+		cp -a "${lib}.so" "$rtkdestdir"/$libbaseso
 	fi
-	ln -sf $librtkaioso $rtkdestdir/$librtso
+	ln -sf "$libbaseso" $rtkdestdir/$librtso
 %endif
 }
 
@@ -817,7 +834,7 @@ install_different()
 %define nosegneg_subdir i686/nosegneg
 %define nosegneg_subdir_up ../..
 pushd build-%{target}-nosegneg
-destdir=$RPM_BUILD_ROOT/%{_lib}
+destdir=$RPM_BUILD_ROOT%{_libdir}
 install_different "$destdir" "%{nosegneg_subdir}" "%{nosegneg_subdir_up}"
 popd
 %endif # %{buildxen}
@@ -919,10 +936,10 @@ install -p -m 644 nis/nss $RPM_BUILD_ROOT/etc/default/nss
 
 # This is for ncsd - in glibc 2.2
 install -m 644 nscd/nscd.conf $RPM_BUILD_ROOT/etc
-mkdir -p $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/
-install -m 644 releng/nscd.conf %{buildroot}/usr/lib/tmpfiles.d/
-mkdir -p $RPM_BUILD_ROOT/lib/systemd/system
-install -m 644 releng/nscd.service releng/nscd.socket $RPM_BUILD_ROOT/lib/systemd/system
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/
+install -m 644 releng/nscd.conf %{buildroot}%{_prefix}/lib/tmpfiles.d/
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/systemd/system
+install -m 644 releng/nscd.service releng/nscd.socket $RPM_BUILD_ROOT%{_prefix}/lib/systemd/system
 %endif
 
 # Include ld.so.conf
@@ -955,7 +972,7 @@ ln -sf libbsd-compat.a $RPM_BUILD_ROOT%{_libdir}/libbsd.a
 
 # Install the upgrade program
 install -m 700 build-%{target}/glibc_post_upgrade.%{_target_cpu} \
-  $RPM_BUILD_ROOT/usr/sbin/glibc_post_upgrade.%{_target_cpu}
+  $RPM_BUILD_ROOT%{_prefix}/sbin/glibc_post_upgrade.%{_target_cpu}
 
 # Strip all of the installed object files.
 strip -g $RPM_BUILD_ROOT%{_libdir}/*.o
@@ -1033,9 +1050,6 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_libdir}/*_p.a
       -e '\,bin/\(memusage\|mtrace\|xtrace\|pcprofiledump\),d'
 } | sort > rpm.filelist
 
-mkdir -p $RPM_BUILD_ROOT%{_libdir}
-mv -f $RPM_BUILD_ROOT/%{_lib}/lib{pcprofile,memusage}.so $RPM_BUILD_ROOT%{_libdir}
-
 # The xtrace and memusage scripts have hard-coded paths that need to be
 # translated to a correct set of paths using the $LIB token which is
 # dynamically translated by ld.so as the default lib directory.
@@ -1077,45 +1091,72 @@ grep '%{_libdir}/lib.*\.a' < rpm.filelist \
 # Put all of the object files and *.so (not the versioned ones) into the
 # devel package.
 grep '%{_libdir}/.*\.o' < rpm.filelist >> devel.filelist
-grep '%{_libdir}/lib.*\.so' < rpm.filelist >> devel.filelist
+# This regexp is tricky because we want to match libfoo.so, but not
+# libfoo-X.Y.so or libfoo.so.1. The latter pair of libraries is needed for a
+# program to run (soname refers to them), whlie the former is needed only
+# when building an application (devel subpackage). We use the same regexp
+# in the in-place sed below to remove these files from the core glibc package.
+# We don't look for lib.*.so in rtkaio because we already removed those files
+# earlier.
+grep '^%{_libdir}/lib.*[[:alpha:]]\.so$' < rpm.filelist >> devel.filelist
+# Remove libSegFault.so from devel, as it doesn't match the above rule.
+sed -i -e '\|%{_libdir}/libSegFault\.so|d' devel.filelist
 
 # Remove all of the static, object, unversioned DSOs, old linuxthreads stuff,
 # and nscd from the core glibc package.
 sed -i -e '\|%{_libdir}/lib.*\.a|d' \
        -e '\|%{_libdir}/.*\.o|d' \
-       -e '\|%{_libdir}/lib.*\.so|d' \
+       -e '\|^%{_libdir}/lib.*[[:alpha:]]\.so$|d' \
+%ifarch %{rtkaioarches}
+       -e '\|^%{_libdir}/rtkaio/lib.*[[:alpha:]]\.so$|d' \
+%endif
        -e '\|%{_libdir}/linuxthreads|d' \
        -e '\|nscd|d' rpm.filelist
+# Add back libSegFault.so to the core glibc package since it's required by
+# anyone preloading it to catch segfaults. It should probably be in the
+# devel subpackage but it's too late for that.
+echo "%{_libdir}/libSegFault.so" >> rpm.filelist
 
 # All of the bin and certain sbin files go into the common package.
 # We explicitly exclude certain sbin files that need to go into
 # the core glibc package for use during upgrades.
-grep '%{_prefix}/bin' < rpm.filelist >> common.filelist
-grep '%{_prefix}/sbin/[^gi]' < rpm.filelist >> common.filelist
+# The files we exclude are:
+# * glibc_post_upgrade - Used in post-upgrade.
+# * iconvconfig - Used during upgrade to create iconv modules.
+# * ldconfig - Used to reprocess library cache after upgarde.
+# * sln - Used to make links when in the middle of upgrades i.e. static ln.
+grep '%{_prefix}/bin' < rpm.filelist > common.filelist
+
+grep -e '%{_prefix}/sbin/.*' < rpm.filelist |
+	grep -v -e '%{_prefix}/sbin/glibc_post_upgrade.*' \
+	-e '%{_prefix}/sbin/iconvconfig.*' \
+	-e '%{_prefix}/sbin/ldconfig.*' \
+	-e '%{_prefix}/sbin/sln.*' >> common.filelist
+
 # All of the files under share go into the common package since
-# they should be multilib-independent.
+# they should be multilib-independent. Remove the zoneinfo files
+# since we don't plan to ship them (see below for their removal).
 grep '%{_prefix}/share' < rpm.filelist | \
-  grep -v -e '%{_prefix}/share/zoneinfo' -e '%%dir %{prefix}/share' \
-       >> common.filelist
+  grep -v -e '%{_prefix}/share/zoneinfo' >> common.filelist
 
 # Remove the bin, locale, some sbin, and share from the
 # core glibc package. We cheat a bit and use the slightly dangerous
-# /usr/sbin/[^gi] to match the inverse of the search that put the
+# /usr/sbin/[^gils] to match the inverse of the search that put the
 # files into common.filelist. It's dangerous in that additional files
-# that start with g, or i would get put into common.filelist and
+# that start with g, i, l, or s would get put into common.filelist and
 # rpm.filelist.
 sed -i -e '\|%{_prefix}/bin|d' \
-       -e '\|%{_prefix}/lib/locale|d' \
-       -e '\|%{_prefix}/sbin/[^gi]|d' \
-       -e '\|%{_prefix}/share|d' rpm.filelist
+	-e '\|%{_prefix}/lib/locale|d' \
+	-e '\|%{_prefix}/sbin/[^gils]|d' \
+	-e '\|%{_prefix}/share|d' rpm.filelist
 
 ##############################################################################
 # Build the xen package file list (nosegneg.filelist)
 ##############################################################################
 truncate -s 0 nosegneg.filelist
 %if %{xenpackage}
-grep '/%{_lib}/%{nosegneg_subdir}' < rpm.filelist >> nosegneg.filelist
-sed -i -e '\|/%{_lib}/%{nosegneg_subdir}|d' rpm.filelist
+grep '%{_libdir}/%{nosegneg_subdir}' < rpm.filelist >> nosegneg.filelist
+sed -i -e '\|%{_libdir}/%{nosegneg_subdir}|d' rpm.filelist
 # TODO: There are files in the nosegneg list which should be in the devel
 #	pacakge, but we leave them instead in the xen subpackage. We may
 #	wish to clean that up at some point.
@@ -1144,9 +1185,12 @@ cat > utils.filelist <<EOF
 %{_prefix}/bin/xtrace
 EOF
 
-# Remove the zoneinfo files
-# XXX: Why isn't this don't earlier when we are removing files?
-#      Won't this impact what is shipped?
+# Remove the zoneinfo files.
+# TODO: This is done late in the process for no good reason.
+#       The zone info file are somewhat silently removed above
+#       by filtering them out of common.filelist and then
+#	by removing all of %{_prefix}/share from rpm.filelist.
+#       This should be done much earlier.
 rm -rf $RPM_BUILD_ROOT%{_prefix}/share/zoneinfo
 
 # Make sure %config files have the same timestamp
@@ -1165,7 +1209,7 @@ $GCC -Os -g -o build-locale-archive build-locale-archive.c \
 	-L../build-%{target} \
 	-Wl,--allow-shlib-undefined \
 	-B../build-%{target}/csu/ -lc -lc_nonshared
-install -m 700 build-locale-archive $RPM_BUILD_ROOT/usr/sbin/build-locale-archive
+install -m 700 build-locale-archive $RPM_BUILD_ROOT%{_prefix}/sbin/build-locale-archive
 popd
 
 # Lastly copy some additional documentation for the packages.
@@ -1177,16 +1221,16 @@ cp ChangeLog{,.15,.16} documentation
 bzip2 -9 documentation/ChangeLog*
 cp posix/gai.conf documentation/
 
-%ifarch s390x
 # Compatibility symlink
-mkdir -p $RPM_BUILD_ROOT/lib
-ln -sf /%{_lib}/ld64.so.1 $RPM_BUILD_ROOT/lib/ld64.so.1
+%ifarch s390x
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib
+ln -sf %{_libdir}/ld64.so.1 $RPM_BUILD_ROOT%{_prefix}/lib/ld64.so.1
 %endif
 
 # Leave a compatibility symlink for the dynamic loader on armhfp targets,
 # at least until the world gets rebuilt
 %ifarch armv7hl armv7hnl
-ln -sf /lib/ld-linux-armhf.so.3 $RPM_BUILD_ROOT/lib/ld-linux.so.3
+ln -sf %{_libdir}/ld-linux-armhf.so.3 $RPM_BUILD_ROOT%{_libdir}/ld-linux.so.3
 %endif
 
 ##############################################################################
@@ -1247,9 +1291,9 @@ done
 echo ====================TESTING END=====================
 PLTCMD='/^Relocation section .*\(\.rela\?\.plt\|\.rela\.IA_64\.pltoff\)/,/^$/p'
 echo ====================PLT RELOCS LD.SO================
-readelf -Wr $RPM_BUILD_ROOT/%{_lib}/ld-*.so | sed -n -e "$PLTCMD"
+readelf -Wr $RPM_BUILD_ROOT%{_libdir}/ld-*.so | sed -n -e "$PLTCMD"
 echo ====================PLT RELOCS LIBC.SO==============
-readelf -Wr $RPM_BUILD_ROOT/%{_lib}/libc-*.so | sed -n -e "$PLTCMD"
+readelf -Wr $RPM_BUILD_ROOT%{_libdir}/libc-*.so | sed -n -e "$PLTCMD"
 echo ====================PLT RELOCS END==================
 
 %endif # %{run_glibc_tests}
@@ -1263,7 +1307,7 @@ echo ====================PLT RELOCS END==================
 # such that static linking works and produces the most minimally sized
 # static application possible.
 ###############################################################################
-pushd $RPM_BUILD_ROOT/usr/%{_lib}/
+pushd $RPM_BUILD_ROOT%{_libdir}
 $GCC -r -nostdlib -o libpthread.o -Wl,--whole-archive ./libpthread.a
 rm libpthread.a
 ar rcs libpthread.a libpthread.o
@@ -1285,10 +1329,10 @@ popd
 # Print some diagnostic information in the builds about the
 # getconf binaries.
 # XXX: Why do we do this?
-ls -l $RPM_BUILD_ROOT/usr/bin/getconf
-ls -l $RPM_BUILD_ROOT/usr/libexec/getconf
-eu-readelf -hS $RPM_BUILD_ROOT/usr/bin/getconf \
-	$RPM_BUILD_ROOT/usr/libexec/getconf/*
+ls -l $RPM_BUILD_ROOT%{_prefix}/bin/getconf
+ls -l $RPM_BUILD_ROOT%{_prefix}/libexec/getconf
+eu-readelf -hS $RPM_BUILD_ROOT%{_prefix}/bin/getconf \
+	$RPM_BUILD_ROOT%{_prefix}/libexec/getconf/*
 
 find_debuginfo_args='--strict-build-id -g'
 %ifarch %{debuginfocommonarches}
@@ -1296,12 +1340,12 @@ find_debuginfo_args="$find_debuginfo_args \
 	-l common.filelist \
 	-l utils.filelist \
 	-l nscd.filelist \
-	-p '.*/(sbin|libexec)/.*' \
+	-p '%{_prefix}/(sbin|libexec)/.*' \
 	-o debuginfocommon.filelist \
 	-l rpm.filelist \
 	-l nosegneg.filelist"
 %endif
-eval /usr/lib/rpm/find-debuginfo.sh \
+eval %{_prefix}/lib/rpm/find-debuginfo.sh \
 	"$find_debuginfo_args" \
 	-o debuginfo.filelist
 
@@ -1413,9 +1457,9 @@ if rpm.vercmp(rel, required) < 0 then
   error("FATAL: kernel too old", 0)
 end
 
-%post -p /usr/sbin/glibc_post_upgrade.%{_target_cpu}
+%post -p %{_prefix}/sbin/glibc_post_upgrade.%{_target_cpu}
 
-%postun -p /sbin/ldconfig
+%postun -p %{_prefix}/sbin/ldconfig
 
 %triggerin common -p <lua> -- glibc
 if posix.stat("%{_prefix}/lib/locale/locale-archive.tmpl", "size") > 0 then
@@ -1453,9 +1497,9 @@ if [ "$1" = 0 ]; then
   /sbin/install-info --delete %{_infodir}/libc.info.gz %{_infodir}/dir > /dev/null 2>&1 || :
 fi
 
-%post utils -p /sbin/ldconfig
+%post utils -p %{_prefix}/sbin/ldconfig
 
-%postun utils -p /sbin/ldconfig
+%postun utils -p %{_prefix}/sbin/ldconfig
 
 %pre -n nscd
 getent group nscd >/dev/null || /usr/sbin/groupadd -g 28 -r nscd
@@ -1476,8 +1520,8 @@ fi
 %systemd_postun_with_restart nscd.service
 
 %if %{xenpackage}
-%post xen -p /sbin/ldconfig
-%postun xen -p /sbin/ldconfig
+%post xen -p %{_prefix}/sbin/ldconfig
+%postun xen -p %{_prefix}/sbin/ldconfig
 %endif
 
 %clean
@@ -1486,31 +1530,31 @@ rm -f *.filelist*
 
 %files -f rpm.filelist
 %defattr(-,root,root)
-%dir /usr/%{_lib}/audit
+%dir %{_libdir}/audit
 %ifarch %{rtkaioarches}
-%dir /%{_lib}/rtkaio
+%dir %{_libdir}/rtkaio
 %endif
 %if %{buildxen} && !%{xenpackage}
-%dir /%{_lib}/%{nosegneg_subdir_base}
-%dir /%{_lib}/%{nosegneg_subdir}
+%dir %{_libdir}/%{nosegneg_subdir_base}
+%dir %{_libdir}/%{nosegneg_subdir}
 %ifarch %{rtkaioarches}
-%dir /%{_lib}/rtkaio/%{nosegneg_subdir_base}
-%dir /%{_lib}/rtkaio/%{nosegneg_subdir}
+%dir %{_libdir}/rtkaio/%{nosegneg_subdir_base}
+%dir %{_libdir}/rtkaio/%{nosegneg_subdir}
 %endif
 %endif
 %if %{buildpower6}
-%dir /%{_lib}/power6
-%dir /%{_lib}/power6x
+%dir %{_libdir}/power6
+%dir %{_libdir}/power6x
 %ifarch %{rtkaioarches}
-%dir /%{_lib}/rtkaio/power6
-%dir /%{_lib}/rtkaio/power6x
+%dir %{_libdir}/rtkaio/power6
+%dir %{_libdir}/rtkaio/power6x
 %endif
 %endif
 %ifarch s390x
-/lib/ld64.so.1
+%{_prefix}/lib/ld64.so.1
 %endif
 %ifarch armv7hl armv7hnl
-/lib/ld-linux.so.3
+%{_prefix}/lib/ld-linux.so.3
 %endif
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/ld.so.conf
@@ -1529,8 +1573,8 @@ rm -f *.filelist*
 %if %{xenpackage}
 %files -f nosegneg.filelist xen
 %defattr(-,root,root)
-%dir /%{_lib}/%{nosegneg_subdir_base}
-%dir /%{_lib}/%{nosegneg_subdir}
+%dir %{_libdir}/%{nosegneg_subdir_base}
+%dir %{_libdir}/%{nosegneg_subdir}
 %endif
 
 %ifnarch %{auxarches}
@@ -1559,9 +1603,9 @@ rm -f *.filelist*
 %config(noreplace) /etc/nscd.conf
 %dir %attr(0755,root,root) /var/run/nscd
 %dir %attr(0755,root,root) /var/db/nscd
-/lib/systemd/system/nscd.service
-/lib/systemd/system/nscd.socket
-/usr/lib/tmpfiles.d/nscd.conf
+%{_prefix}/lib/systemd/system/nscd.service
+%{_prefix}/lib/systemd/system/nscd.socket
+%{_prefix}/lib/tmpfiles.d/nscd.conf
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/run/nscd/nscd.pid
 %attr(0666,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/run/nscd/socket
 %attr(0600,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/run/nscd/passwd
@@ -1587,6 +1631,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Aug 13 2013 Carlos O'Donell <codonell@redhat.com> - 2.17.90-12
+- Complete `Move to /usr' transition. All relevant files are now
+  installed into `/usr'.
+
 * Wed Aug 07 2013 Karsten Hopp <karsten@redhat.com> 2.17.90-11
 - rebuild with the latest rpm to fix missing ld64.so provides on PPC
 
