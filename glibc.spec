@@ -798,7 +798,7 @@ install_different()
 %ifarch %{rtkaioarches}
 	local rtkdestdir="$RPM_BUILD_ROOT/%{_lib}/rtkaio/$subdir"
 	local librtso=`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
-	mkdir -p $rkdestdir
+	mkdir -p $rtkdestdir
 	librtkaioso=$(basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/)
 	if cmp -s rtkaio/librtkaio.so ../build-%{target}/rtkaio/librtkaio.so; then
 		ln -s %{nosegneg_subdir_up}/$librtkaioso $rtkdestdir/$librtkaioso
