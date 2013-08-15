@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.17-931-g30bbc0c
 %define glibcversion 2.17.90
-%define glibcrelease 13%{?dist}
+%define glibcrelease 14%{?dist}
 ##############################################################################
 # If run_glibc_tests is zero then tests are not run for the build.
 # You must always set run_glibc_tests to one for production builds.
@@ -919,8 +919,8 @@ install -p -m 644 nis/nss $RPM_BUILD_ROOT/etc/default/nss
 
 # This is for ncsd - in glibc 2.2
 install -m 644 nscd/nscd.conf $RPM_BUILD_ROOT/etc
-mkdir -p $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/
-install -m 644 releng/nscd.conf %{buildroot}/usr/lib/tmpfiles.d/
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/
+install -m 644 releng/nscd.conf %{buildroot}%{_prefix}/lib/tmpfiles.d/
 mkdir -p $RPM_BUILD_ROOT/lib/systemd/system
 install -m 644 releng/nscd.service releng/nscd.socket $RPM_BUILD_ROOT/lib/systemd/system
 %endif
@@ -955,7 +955,7 @@ ln -sf libbsd-compat.a $RPM_BUILD_ROOT%{_libdir}/libbsd.a
 
 # Install the upgrade program
 install -m 700 build-%{target}/glibc_post_upgrade.%{_target_cpu} \
-  $RPM_BUILD_ROOT/usr/sbin/glibc_post_upgrade.%{_target_cpu}
+  $RPM_BUILD_ROOT%{_prefix}/sbin/glibc_post_upgrade.%{_target_cpu}
 
 # Strip all of the installed object files.
 strip -g $RPM_BUILD_ROOT%{_libdir}/*.o
@@ -1165,7 +1165,7 @@ $GCC -Os -g -o build-locale-archive build-locale-archive.c \
 	-L../build-%{target} \
 	-Wl,--allow-shlib-undefined \
 	-B../build-%{target}/csu/ -lc -lc_nonshared
-install -m 700 build-locale-archive $RPM_BUILD_ROOT/usr/sbin/build-locale-archive
+install -m 700 build-locale-archive $RPM_BUILD_ROOT%{_prefix}/sbin/build-locale-archive
 popd
 
 # Lastly copy some additional documentation for the packages.
@@ -1263,7 +1263,7 @@ echo ====================PLT RELOCS END==================
 # such that static linking works and produces the most minimally sized
 # static application possible.
 ###############################################################################
-pushd $RPM_BUILD_ROOT/usr/%{_lib}/
+pushd $RPM_BUILD_ROOT%{_prefix}/%{_lib}/
 $GCC -r -nostdlib -o libpthread.o -Wl,--whole-archive ./libpthread.a
 rm libpthread.a
 ar rcs libpthread.a libpthread.o
@@ -1285,10 +1285,10 @@ popd
 # Print some diagnostic information in the builds about the
 # getconf binaries.
 # XXX: Why do we do this?
-ls -l $RPM_BUILD_ROOT/usr/bin/getconf
-ls -l $RPM_BUILD_ROOT/usr/libexec/getconf
-eu-readelf -hS $RPM_BUILD_ROOT/usr/bin/getconf \
-	$RPM_BUILD_ROOT/usr/libexec/getconf/*
+ls -l $RPM_BUILD_ROOT%{_prefix}/bin/getconf
+ls -l $RPM_BUILD_ROOT%{_prefix}/libexec/getconf
+eu-readelf -hS $RPM_BUILD_ROOT%{_prefix}/bin/getconf \
+	$RPM_BUILD_ROOT%{_prefix}/libexec/getconf/*
 
 find_debuginfo_args='--strict-build-id -g'
 %ifarch %{debuginfocommonarches}
@@ -1413,7 +1413,7 @@ if rpm.vercmp(rel, required) < 0 then
   error("FATAL: kernel too old", 0)
 end
 
-%post -p /usr/sbin/glibc_post_upgrade.%{_target_cpu}
+%post -p %{_prefix}/sbin/glibc_post_upgrade.%{_target_cpu}
 
 %postun -p /sbin/ldconfig
 
@@ -1486,7 +1486,7 @@ rm -f *.filelist*
 
 %files -f rpm.filelist
 %defattr(-,root,root)
-%dir /usr/%{_lib}/audit
+%dir %{_prefix}/%{_lib}/audit
 %ifarch %{rtkaioarches}
 %dir /%{_lib}/rtkaio
 %endif
@@ -1561,7 +1561,7 @@ rm -f *.filelist*
 %dir %attr(0755,root,root) /var/db/nscd
 /lib/systemd/system/nscd.service
 /lib/systemd/system/nscd.socket
-/usr/lib/tmpfiles.d/nscd.conf
+%{_prefix}/lib/tmpfiles.d/nscd.conf
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/run/nscd/nscd.pid
 %attr(0666,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/run/nscd/socket
 %attr(0600,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/run/nscd/passwd
@@ -1587,6 +1587,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Aug 14 2013 Carlos O'Donell <codonell@redhat.com> - 2.17.90-14
+- Update spec file to use rpm prefix everywhere.
+
 * Tue Aug 13 2013 Carlos O'Donell <codonell@redhat.com> - 2.17.90-13
 - Revert `Move to /usr' transition.
 
