@@ -1,6 +1,15 @@
-%define glibcsrcdir glibc-2.17-931-g30bbc0c
-%define glibcversion 2.17.90
-%define glibcrelease 14%{?dist}
+%define glibcsrcdir glibc-2.18
+%define glibcversion 2.18
+%define glibcrelease 1%{?dist}
+# Pre-release tarballs are pulled in from git using a command that is
+# effectively:
+#
+# git archive HEAD --format=tar --prefix=$(git describe --match 'glibc-*')/ \
+#	> $(git describe --match 'glibc-*').tar
+# gzip -9 $(git describe --match 'glibc-*').tar
+#
+# glibc_release_url is only defined when we have a release tarball.
+%define glibc_release_url http://ftp.gnu.org/gnu/glibc/
 ##############################################################################
 # If run_glibc_tests is zero then tests are not run for the build.
 # You must always set run_glibc_tests to one for production builds.
@@ -79,11 +88,6 @@ Release: %{glibcrelease}
 License: LGPLv2+ and LGPLv2+ with exceptions and GPLv2+
 Group: System Environment/Libraries
 URL: http://www.gnu.org/software/glibc/
-# We do not use usptream source tarballs as the start place for our package.
-# We should use upstream source tarballs for official releases though and
-# it will look like this:
-# Source0: http://ftp.gnu.org/gnu/glibc/%{glibcsrcdir}.tar.gz
-# Source1: %{glibcsrcdir}-releng.tar.gz
 # TODO:
 # The Source1 URL will never reference an upstream URL. In fact the plan
 # should be to merge the entire release engineering tarball into upstream
@@ -1587,6 +1591,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Aug 16 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18-1
+- Upstream release 2.18.
+
 * Wed Aug 14 2013 Carlos O'Donell <codonell@redhat.com> - 2.17.90-14
 - Update spec file to use rpm prefix everywhere.
 
