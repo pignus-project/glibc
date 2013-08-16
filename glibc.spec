@@ -237,6 +237,9 @@ BuildRequires: /bin/ps, /bin/kill, /bin/awk
 BuildRequires: systemtap-sdt-devel
 %endif
 
+# We use systemd rpm macros for nscd
+BuildRequires: systemd
+
 # This is to ensure that __frame_state_for is exported by glibc
 # will be compatible with egcs 1.x.y
 BuildRequires: gcc >= 3.2
@@ -923,8 +926,8 @@ install -p -m 644 nis/nss $RPM_BUILD_ROOT/etc/default/nss
 
 # This is for ncsd - in glibc 2.2
 install -m 644 nscd/nscd.conf $RPM_BUILD_ROOT/etc
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/
-install -m 644 releng/nscd.conf %{buildroot}%{_prefix}/lib/tmpfiles.d/
+mkdir -p $RPM_BUILD_ROOT%{_tmpfilesdir}
+install -m 644 releng/nscd.conf %{buildroot}%{_tmpfilesdir}
 mkdir -p $RPM_BUILD_ROOT/lib/systemd/system
 install -m 644 releng/nscd.service releng/nscd.socket $RPM_BUILD_ROOT/lib/systemd/system
 %endif
@@ -1565,7 +1568,7 @@ rm -f *.filelist*
 %dir %attr(0755,root,root) /var/db/nscd
 /lib/systemd/system/nscd.service
 /lib/systemd/system/nscd.socket
-%{_prefix}/lib/tmpfiles.d/nscd.conf
+%{_tmpfilesdir}/nscd.conf
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/run/nscd/nscd.pid
 %attr(0666,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/run/nscd/socket
 %attr(0600,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/run/nscd/passwd
@@ -1593,6 +1596,7 @@ rm -f *.filelist*
 %changelog
 * Fri Aug 16 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18-1
 - Upstream release 2.18.
+- Pull in systemd during build and use the tmpfilesdir macro.
 
 * Wed Aug 14 2013 Carlos O'Donell <codonell@redhat.com> - 2.17.90-14
 - Update spec file to use rpm prefix everywhere.
