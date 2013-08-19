@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.18
 %define glibcversion 2.18
-%define glibcrelease 1%{?dist}
+%define glibcrelease 2%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -171,6 +171,7 @@ Patch0037: %{name}-rh952799.patch
 #
 # Patches from upstream
 #
+Patch1001: %{name}-rh995841.patch
 
 #
 # Patches submitted, but not yet approved upstream.
@@ -514,6 +515,7 @@ package or when debugging this package.
 %patch0035 -p1
 %patch0037 -p1
 %patch2028 -p1
+%patch1001 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1594,6 +1596,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug 19 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18-2
+- Fix buffer overflow in readdir_r (#995841, CVE-2013-4237).
+
 * Fri Aug 16 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18-1
 - Upstream release 2.18.
 - Pull in systemd during build and use the tmpfilesdir macro.
