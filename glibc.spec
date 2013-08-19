@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.18
 %define glibcversion 2.18
-%define glibcrelease 2%{?dist}
+%define glibcrelease 3%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -88,13 +88,15 @@ Release: %{glibcrelease}
 License: LGPLv2+ and LGPLv2+ with exceptions and GPLv2+
 Group: System Environment/Libraries
 URL: http://www.gnu.org/software/glibc/
-# TODO:
-# The Source1 URL will never reference an upstream URL. In fact the plan
-# should be to merge the entire release engineering tarball into upstream
-# instead of keeping it around as a large dump of files. Distro specific
-# changes should then be a very very small patch set.
 Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.gz
-Source1: %{glibcsrcdir}-releng.tar.gz
+Source1: build-locale-archive.c
+Source2: glibc_post_upgrade.c
+Source3: libc-lock.h
+Source4: nscd.conf
+Source5: nscd.service
+Source6: nscd.socket
+Source7: nsswitch.conf
+Source8: power6emul.c
 
 ##############################################################################
 # Start of glibc patches
@@ -167,6 +169,11 @@ Patch0034: %{name}-fedora-elf-init-hidden_undef.patch
 # Needs to be sent upstream
 Patch0035: %{name}-rh911307.patch
 Patch0037: %{name}-rh952799.patch
+
+# rtkaio and c_stubs.  Note that despite the numbering, these are always
+# applied first.
+Patch0038: %{name}-rtkaio.patch
+Patch0039: %{name}-c_stubs.patch
 
 #
 # Patches from upstream
@@ -476,10 +483,13 @@ package or when debugging this package.
 # Prepare for the build.
 ##############################################################################
 %prep
-%setup -q -n %{glibcsrcdir} -b1
+%setup -q -n %{glibcsrcdir}
 
 # Patch order is important as some patches depend on other patches and
-# therefore the order must not be changed.
+# therefore the order must not be changed.  First two are rtkaio and c_stubs;
+# we maintain this only in Fedora.
+%patch0038 -p1
+%patch0039 -p1
 %patch0001 -p1
 %patch0003 -p1
 %patch0004 -p1
@@ -693,7 +703,7 @@ build nosegneg -mno-tls-direct-seg-refs
 	platform=`LD_SHOW_AUXV=1 /bin/true | sed -n 's/^AT_PLATFORM:[[:blank:]]*//p'`
 	if [ "$platform" != power6 ]; then
 		mkdir -p power6emul/{lib,lib64}
-		$GCC -shared -O2 -fpic -o power6emul/%{_lib}/power6emul.so releng/power6emul.c -Wl,-z,initfirst
+		$GCC -shared -O2 -fpic -o power6emul/%{_lib}/power6emul.so %{SOURCE8} -Wl,-z,initfirst
 %ifarch ppc
 		gcc -shared -nostdlib -O2 -fpic -m64 -o power6emul/lib64/power6emul.so -xc - </dev/null
 %endif
@@ -716,7 +726,7 @@ build nosegneg -mno-tls-direct-seg-refs
 # we only build it once.
 ##############################################################################
 pushd build-%{target}
-$GCC -static -L. -Os -g ../releng/glibc_post_upgrade.c \
+$GCC -static -L. -Os -g %{SOURCE2} \
 	-o glibc_post_upgrade.%{_target_cpu} \
 	'-DLIBTLS="/%{_lib}/tls/"' \
 	'-DGCONV_MODULES_DIR="%{_libdir}/gconv"' \
@@ -920,7 +930,7 @@ popd
 # Install configuration files for services
 ##############################################################################
 
-install -p -m 644 releng/nsswitch.conf $RPM_BUILD_ROOT/etc/nsswitch.conf
+install -p -m 644 %{SOURCE7} $RPM_BUILD_ROOT/etc/nsswitch.conf
 
 %ifnarch %{auxarches}
 mkdir -p $RPM_BUILD_ROOT/etc/default
@@ -929,9 +939,9 @@ install -p -m 644 nis/nss $RPM_BUILD_ROOT/etc/default/nss
 # This is for ncsd - in glibc 2.2
 install -m 644 nscd/nscd.conf $RPM_BUILD_ROOT/etc
 mkdir -p $RPM_BUILD_ROOT%{_tmpfilesdir}
-install -m 644 releng/nscd.conf %{buildroot}%{_tmpfilesdir}
+install -m 644 %{SOURCE4} %{buildroot}%{_tmpfilesdir}
 mkdir -p $RPM_BUILD_ROOT/lib/systemd/system
-install -m 644 releng/nscd.service releng/nscd.socket $RPM_BUILD_ROOT/lib/systemd/system
+install -m 644 %{SOURCE5} %{SOURCE6} $RPM_BUILD_ROOT/lib/systemd/system
 %endif
 
 # Include ld.so.conf
@@ -957,7 +967,7 @@ chmod 644 $RPM_BUILD_ROOT%{_libdir}/gconv/gconv-modules.cache
 # the generic one (#162634)
 cp -a bits/stdio-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/stdio-lock.h
 # And <bits/libc-lock.h> needs sanitizing as well.
-cp -a releng/libc-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/libc-lock.h
+cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_prefix}/include/bits/libc-lock.h
 
 # XXX: What is this for?
 ln -sf libbsd-compat.a $RPM_BUILD_ROOT%{_libdir}/libbsd.a
@@ -1158,19 +1168,24 @@ EOF
 #      Won't this impact what is shipped?
 rm -rf $RPM_BUILD_ROOT%{_prefix}/share/zoneinfo
 
-# Make sure %config files have the same timestamp
-touch -r releng/glibc.spec.in $RPM_BUILD_ROOT/etc/ld.so.conf
+# Make sure %config files have the same timestamp across multilib packages.
+#
+# XXX: Ideally ld.so.conf should have the timestamp of the spec file, but there
+# doesn't seem to be any macro to give us that.  So we do the next best thing,
+# which is to at least keep the timestamp consistent.  The choice of using
+# glibc_post_upgrade.c is arbitrary.
+touch -r %{SOURCE2} $RPM_BUILD_ROOT/etc/ld.so.conf
 touch -r sunrpc/etc.rpc $RPM_BUILD_ROOT/etc/rpc
 
 # We allow undefined symbols in shared libraries because the libraries
 # referenced at link time here, particularly ld.so, may be different than
 # the one used at runtime.  This is really only needed during the ARM
 # transition from ld-linux.so.3 to ld-linux-armhf.so.3.
-pushd releng
-$GCC -Os -g -o build-locale-archive build-locale-archive.c \
+pushd build-%{target}
+$GCC -Os -g -o build-locale-archive %{SOURCE1} \
 	../build-%{target}/locale/locarchive.o \
 	../build-%{target}/locale/md5.o \
-	-DDATADIR=\"%{_datadir}\" -DPREFIX=\"%{_prefix}\" \
+	-I. -DDATADIR=\"%{_datadir}\" -DPREFIX=\"%{_prefix}\" \
 	-L../build-%{target} \
 	-Wl,--allow-shlib-undefined \
 	-B../build-%{target}/csu/ -lc -lc_nonshared
