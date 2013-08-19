@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.18
 %define glibcversion 2.18
-%define glibcrelease 3%{?dist}
+%define glibcrelease 2%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1613,6 +1613,7 @@ rm -f *.filelist*
 %changelog
 * Mon Aug 19 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18-2
 - Fix buffer overflow in readdir_r (#995841, CVE-2013-4237).
+- Remove releng tarball.
 
 * Fri Aug 16 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18-1
 - Upstream release 2.18.
