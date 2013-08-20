@@ -175,6 +175,9 @@ Patch0037: %{name}-rh952799.patch
 Patch0038: %{name}-rtkaio.patch
 Patch0039: %{name}-c_stubs.patch
 
+# Remove non-ELF support in rtkaio
+Patch0040: %{name}-rh731833-rtkaio.patch
+
 #
 # Patches from upstream
 #
@@ -526,6 +529,7 @@ package or when debugging this package.
 %patch0037 -p1
 %patch2028 -p1
 %patch1001 -p1
+%patch0040 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1611,6 +1615,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Aug 20 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18-3
+- Remove non-ELF support in rtkaio.
+
 * Mon Aug 19 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18-2
 - Fix buffer overflow in readdir_r (#995841, CVE-2013-4237).
 - Remove releng tarball.
