@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.18
 %define glibcversion 2.18
-%define glibcrelease 2%{?dist}
+%define glibcrelease 3%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -177,6 +177,7 @@ Patch0039: %{name}-c_stubs.patch
 
 # Remove non-ELF support in rtkaio
 Patch0040: %{name}-rh731833-rtkaio.patch
+Patch0041: %{name}-rh731833-rtkaio-2.patch
 
 #
 # Patches from upstream
@@ -530,6 +531,7 @@ package or when debugging this package.
 %patch2028 -p1
 %patch1001 -p1
 %patch0040 -p1
+%patch0041 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1617,6 +1619,7 @@ rm -f *.filelist*
 %changelog
 * Tue Aug 20 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18-3
 - Remove non-ELF support in rtkaio.
+- Avoid inlining of cleanup function for kaio_suspend.
 
 * Mon Aug 19 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18-2
 - Fix buffer overflow in readdir_r (#995841, CVE-2013-4237).
