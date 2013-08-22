@@ -1620,6 +1620,7 @@ rm -f *.filelist*
 * Tue Aug 20 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18-3
 - Remove non-ELF support in rtkaio.
 - Avoid inlining of cleanup function for kaio_suspend.
+- Expand sizes of some types in strcoll (#855399, CVE-2012-4424).
 
 * Mon Aug 19 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18-2
 - Fix buffer overflow in readdir_r (#995841, CVE-2013-4237).
