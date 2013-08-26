@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.18
 %define glibcversion 2.18
-%define glibcrelease 3%{?dist}
+%define glibcrelease 4%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -214,6 +214,9 @@ Patch2027: %{name}-rh819430.patch
 
 #Upstream BZ 14547
 Patch2028: %{name}-strcoll-cve.patch
+
+# Initialize res_hconf in nscd
+Patch2029: %{name}-rh1000924.patch
 ##############################################################################
 # End of glibc patches.
 ##############################################################################
@@ -534,6 +537,7 @@ package or when debugging this package.
 %patch0040 -p1
 %patch0041 -p1
 %patch0042 -p1
+%patch2029 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1619,6 +1623,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug 26 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18-4
+- Initialize res_hconf in nscd. (#1000924).
+
 * Tue Aug 20 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18-3
 - Remove non-ELF support in rtkaio.
 - Avoid inlining of cleanup function for kaio_suspend.
