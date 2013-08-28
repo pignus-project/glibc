@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.18
 %define glibcversion 2.18
-%define glibcrelease 4%{?dist}
+%define glibcrelease 5%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -217,6 +217,10 @@ Patch2028: %{name}-strcoll-cve.patch
 
 # Initialize res_hconf in nscd
 Patch2029: %{name}-rh1000924.patch
+
+# Pass dl_hwcap to IFUNC resolver on 32-bit ARM.
+Patch2030: %{name}-rh985342.patch
+
 ##############################################################################
 # End of glibc patches.
 ##############################################################################
@@ -538,6 +542,7 @@ package or when debugging this package.
 %patch0041 -p1
 %patch0042 -p1
 %patch2029 -p1
+%patch2030 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1623,6 +1628,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Aug 28 2013 Carlos O'Donell <carlos@redhat.com> - 2.18-5
+- Fix indirect function support to avoid calling optimized routines
+  for the wrong hardware (#985342).
+
 * Mon Aug 26 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18-4
 - Initialize res_hconf in nscd. (#1000924).
 
