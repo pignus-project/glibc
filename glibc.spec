@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.18
 %define glibcversion 2.18
-%define glibcrelease 5%{?dist}
+%define glibcrelease 6%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -868,7 +868,7 @@ popd
 %define power6_legacy_up ..
 pushd build-%{target}-power6
 destdir=$RPM_BUILD_ROOT/%{_lib}
-install_different "$destdir" "%{power6_subdir_up}" "%{power6_subdir_up}"
+install_different "$destdir" "%{power6_subdir}" "%{power6_subdir_up}"
 # Make a legacy /usr/lib[64]/power6x directory that is a symlink to the
 # power6 runtime.
 # XXX: When can we remove this? What is the history behind this?
@@ -1628,6 +1628,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Aug 29 2013 Carlos O'Donell <carlos@redhat.com> - 2.18-6
+- Fix Power build (#997531).
+
 * Wed Aug 28 2013 Carlos O'Donell <carlos@redhat.com> - 2.18-5
 - Fix indirect function support to avoid calling optimized routines
   for the wrong hardware (#985342).
