@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.18
-%define glibcversion 2.18
-%define glibcrelease 6%{?dist}
+%define glibcsrcdir glibc-2.18-79-gbb8ea71
+%define glibcversion 2.18.90
+%define glibcrelease 1%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -9,7 +9,7 @@
 # gzip -9 $(git describe --match 'glibc-*').tar
 #
 # glibc_release_url is only defined when we have a release tarball.
-%define glibc_release_url http://ftp.gnu.org/gnu/glibc/
+# % define glibc_release_url http://ftp.gnu.org/gnu/glibc/
 ##############################################################################
 # If run_glibc_tests is zero then tests are not run for the build.
 # You must always set run_glibc_tests to one for production builds.
@@ -183,7 +183,6 @@ Patch0042: %{name}-rh970865.patch
 #
 # Patches from upstream
 #
-Patch1001: %{name}-rh995841.patch
 
 #
 # Patches submitted, but not yet approved upstream.
@@ -200,9 +199,6 @@ Patch2013: %{name}-rh741105.patch
 # Upstream BZ 9954
 Patch2021: %{name}-rh739743.patch
 
-# Upstream BZ 13818
-Patch2022: %{name}-rh800224.patch
-
 # Upstream BZ 14247
 Patch2023: %{name}-rh827510.patch
 
@@ -214,12 +210,6 @@ Patch2027: %{name}-rh819430.patch
 
 #Upstream BZ 14547
 Patch2028: %{name}-strcoll-cve.patch
-
-# Initialize res_hconf in nscd
-Patch2029: %{name}-rh1000924.patch
-
-# Pass dl_hwcap to IFUNC resolver on 32-bit ARM.
-Patch2030: %{name}-rh985342.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -521,7 +511,6 @@ package or when debugging this package.
 %patch0019 -p1
 %patch0020 -p1
 %patch2021 -p1
-%patch2022 -p1
 %patch2023 -p1
 %patch0024 -p1
 %patch0025 -p1
@@ -537,12 +526,9 @@ package or when debugging this package.
 %patch0035 -p1
 %patch0037 -p1
 %patch2028 -p1
-%patch1001 -p1
 %patch0040 -p1
 %patch0041 -p1
 %patch0042 -p1
-%patch2029 -p1
-%patch2030 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1628,6 +1614,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Sep  5 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-1
+- Resync with upstream master.
+- Drop patch for #800224.
+
 * Thu Aug 29 2013 Carlos O'Donell <carlos@redhat.com> - 2.18-6
 - Fix Power build (#997531).
 
