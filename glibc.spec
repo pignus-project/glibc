@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.18-79-gbb8ea71
+%define glibcsrcdir glibc-2.18-113-gf06dd27
 %define glibcversion 2.18.90
-%define glibcrelease 1%{?dist}
+%define glibcrelease 2%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1614,6 +1614,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Sep 16 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-2
+- Resync with upstream master.
+- Fix CVE-2013-4332 (#1008299).
+
 * Thu Sep  5 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-1
 - Resync with upstream master.
 - Drop patch for #800224.
