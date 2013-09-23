@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.18-113-gf06dd27
 %define glibcversion 2.18.90
-%define glibcrelease 3%{?dist}
+%define glibcrelease 4%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -208,8 +208,11 @@ Patch2026: %{name}-rh841787.patch
 # Upstream BZ 14185
 Patch2027: %{name}-rh819430.patch
 
-#Upstream BZ 14547
+# Upstream BZ 14547
 Patch2028: %{name}-strcoll-cve.patch
+
+# Upstream BZ 15754
+Patch2029: %{name}-rh985625-CVE-2013-4788.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -536,6 +539,7 @@ package or when debugging this package.
 %patch0040 -p1
 %patch0041 -p1
 %patch0042 -p1
+%patch2029 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1621,6 +1625,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Sep 22 2013 Carlos O'Donell <carlos@redhat.com> - 2.18.90-4
+- Fix CVE-2013-4788: Static applications now support pointer mangling.
+  Existing static applications must be recompiled (#985625).
+
 * Wed Sep 18 2013 Patsy Franklin <pfrankli@redhat.com> - 2.18.90-3
 - Fix conditional requiring specific binutils for s390/s390x.
 
