@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.18-113-gf06dd27
+%define glibcsrcdir glibc-2.18-151-g303e567
 %define glibcversion 2.18.90
-%define glibcrelease 4%{?dist}
+%define glibcrelease 5%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -207,12 +207,6 @@ Patch2026: %{name}-rh841787.patch
 
 # Upstream BZ 14185
 Patch2027: %{name}-rh819430.patch
-
-# Upstream BZ 14547
-Patch2028: %{name}-strcoll-cve.patch
-
-# Upstream BZ 15754
-Patch2029: %{name}-rh985625-CVE-2013-4788.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -535,11 +529,9 @@ package or when debugging this package.
 %patch0034 -p1
 %patch0035 -p1
 %patch0037 -p1
-%patch2028 -p1
 %patch0040 -p1
 %patch0041 -p1
 %patch0042 -p1
-%patch2029 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1625,6 +1617,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Sep 23 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-5
+- Resync with upstream master.
+
 * Sun Sep 22 2013 Carlos O'Donell <carlos@redhat.com> - 2.18.90-4
 - Fix CVE-2013-4788: Static applications now support pointer mangling.
   Existing static applications must be recompiled (#985625).
