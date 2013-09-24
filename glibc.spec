@@ -1,6 +1,6 @@
 %define glibcsrcdir glibc-2.18-151-g303e567
 %define glibcversion 2.18.90
-%define glibcrelease 5%{?dist}
+%define glibcrelease 6%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -179,6 +179,9 @@ Patch0039: %{name}-c_stubs.patch
 Patch0040: %{name}-rh731833-rtkaio.patch
 Patch0041: %{name}-rh731833-rtkaio-2.patch
 Patch0042: %{name}-rh970865.patch
+
+# Avoid the use of __block which is a reserved keyword for clang++.
+Patch0043: %{name}-rh1009623.patch
 
 #
 # Patches from upstream
@@ -532,6 +535,7 @@ package or when debugging this package.
 %patch0040 -p1
 %patch0041 -p1
 %patch0042 -p1
+%patch0043 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1617,6 +1621,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Sep 24 2013 Carlos O'Donell <carlos@redhat.com> - 2.18.90-6
+- Avoid the use of __block which is a reserved keyword for clang++
+  (#1009623).
+
 * Mon Sep 23 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-5
 - Resync with upstream master.
 
