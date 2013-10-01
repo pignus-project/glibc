@@ -1,6 +1,6 @@
-%define glibcsrcdir glibc-2.18-151-g303e567
+%define glibcsrcdir  glibc-2.18-186-gfd96752
 %define glibcversion 2.18.90
-%define glibcrelease 6%{?dist}
+%define glibcrelease 7%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -210,6 +210,8 @@ Patch2026: %{name}-rh841787.patch
 
 # Upstream BZ 14185
 Patch2027: %{name}-rh819430.patch
+
+Patch2028: %{name}-rh1007590.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -536,6 +538,7 @@ package or when debugging this package.
 %patch0041 -p1
 %patch0042 -p1
 %patch0043 -p1
+%patch2028 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1621,6 +1624,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Oct  1 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-7
+- Fix check for PI mutex on non-x86 systems (#1007590).
+- Resync with upstream master.
+
 * Tue Sep 24 2013 Carlos O'Donell <carlos@redhat.com> - 2.18.90-6
 - Avoid the use of __block which is a reserved keyword for clang++
   (#1009623).
