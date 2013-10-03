@@ -102,7 +102,7 @@ open_tmpl_archive (struct locarhandle *ah)
   struct stat64 st;
   int fd;
   struct locarhead head;
-  const char *archivefname = tmpl_file;
+  const char *archivefname = ah->fname == NULL ? tmpl_file : ah->fname;
 
   /* Open the archive.  We must have exclusive write access.  */
   fd = open64 (archivefname, O_RDONLY);
@@ -256,7 +256,8 @@ compute_data (struct locarhandle *ah, struct nameent *name, size_t sumused,
 }
 
 static int
-fill_archive (struct locarhandle *tmpl_ah, size_t nlist, char *list[],
+fill_archive (struct locarhandle *tmpl_ah,
+	      const char *fname, size_t nlist, char *list[],
 	      const char *primary)
 {
   struct locarhandle ah;
@@ -310,6 +311,8 @@ fill_archive (struct locarhandle *tmpl_ah, size_t nlist, char *list[],
 
   /* Open the archive.  This call never returns if we cannot
      successfully open the archive.  */
+  if (fname != NULL)
+    ah.fname = fname;
   open_archive (&ah, false);
 
   if (primary != NULL)
@@ -538,7 +541,7 @@ fill_archive (struct locarhandle *tmpl_ah, size_t nlist, char *list[],
   return result;
 }
 
-int main ()
+int main (int argc, char *argv[])
 {
   char path[4096];
   DIR *dirp;
@@ -552,6 +555,10 @@ int main ()
   dirp = opendir (loc_path);
   if (dirp == NULL)
     error (EXIT_FAILURE, errno, "cannot open directory \"%s\"", loc_path);
+
+  /* Use the template file as specified on the command line.  */
+  if (argc > 1)
+    tmpl_ah.fname = argv[1];
 
   open_tmpl_archive (&tmpl_ah);
 
@@ -629,10 +636,12 @@ int main ()
       cnt++;
     }
   closedir (dirp);
-  fill_archive (&tmpl_ah, cnt, list, primary);
+  /* Store the archive to the file specified as the second argument on the
+     command line or the default locale archive.  */
+  fill_archive (&tmpl_ah, argc > 2 ? argv[2] : NULL, cnt, list, primary);
   close_archive (&tmpl_ah);
   truncate (tmpl_file, 0);
-  char *argv[] = { "/usr/sbin/tzdata-update", NULL };
-  execve (argv[0], (char *const *)argv, (char *const *)&argv[1]);
+  char *tz_argv[] = { "/usr/sbin/tzdata-update", NULL };
+  execve (tz_argv[0], (char *const *)tz_argv, (char *const *)&tz_argv[1]);
   exit (0);
 }

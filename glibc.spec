@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.18-186-gfd96752
 %define glibcversion 2.18.90
-%define glibcrelease 9%{?dist}
+%define glibcrelease 10%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -186,6 +186,12 @@ Patch0043: %{name}-rh1009623.patch
 # ARM: Accept that some objects marked hard ABI are now not because of a
 #      binutils bug.
 Patch0044: %{name}-rh1009145.patch
+
+# Provide localedef with --list-archive FILE support.
+Patch0045: %{name}-localedef-arg.patch
+
+# Allow applications to call pthread_atfork without libpthread.so.
+Patch0046: %{name}-rh1013801.patch
 
 #
 # Patches from upstream
@@ -544,6 +550,8 @@ package or when debugging this package.
 %patch0043 -p1
 %patch2028 -p1
 %patch0044 -p1
+%patch0045 -p1
+%patch0046 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1629,6 +1637,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Oct  3 2013 Carlos O'Donell <carlos@redhat.com> - 2.18.90-9
+- Allow applications to use pthread_atfork without explicitly
+  requiring libpthread.so. (#1013801)
+- Support `--list-archive FILE' in localedef utility.
+
 * Thu Oct  3 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-9
 - Define swap_endianness_p in build-locale-archive.
 
