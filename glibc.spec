@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.18-186-gfd96752
 %define glibcversion 2.18.90
-%define glibcrelease 7%{?dist}
+%define glibcrelease 8%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -182,6 +182,10 @@ Patch0042: %{name}-rh970865.patch
 
 # Avoid the use of __block which is a reserved keyword for clang++.
 Patch0043: %{name}-rh1009623.patch
+
+# ARM: Accept that some objects marked hard ABI are now not because of a
+#      binutils bug.
+Patch0044: %{name}-rh1009145.patch
 
 #
 # Patches from upstream
@@ -539,6 +543,7 @@ package or when debugging this package.
 %patch0042 -p1
 %patch0043 -p1
 %patch2028 -p1
+%patch0044 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1624,6 +1629,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Oct  1 2013 Carlos O'Donell <carlos@redhat.com> - 2.18.90-8
+- Allow ldconfig cached objects previously marked as hard or soft
+  ABI to now become unmarked without raising an error. This works
+  around a binutils bug that caused objects to become unmarked.
+  (#1009145)
+
 * Tue Oct  1 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-7
 - Fix check for PI mutex on non-x86 systems (#1007590).
 - Resync with upstream master.
