@@ -26,6 +26,12 @@ int verbose = 0;
 int max_locarchive_open_retry = 10;
 const char *output_prefix;
 
+/* Endianness should have been taken care of by localedef.  We don't need to do
+   additional swapping.  We need this variable exported however, since
+   locarchive.c uses it to determine if it needs to swap endianness of a value
+   before writing to or reading from the archive.  */
+bool swap_endianness_p = false;
+
 static const char *locnames[] =
   {
 #define DEFINE_CATEGORY(category, category_name, items, a) \

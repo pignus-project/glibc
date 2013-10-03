@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.18-186-gfd96752
 %define glibcversion 2.18.90
-%define glibcrelease 8%{?dist}
+%define glibcrelease 9%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1629,7 +1629,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Wed Oct  1 2013 Carlos O'Donell <carlos@redhat.com> - 2.18.90-8
+* Thu Oct  3 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-9
+- Define swap_endianness_p in build-locale-archive.
+
+* Wed Oct  2 2013 Carlos O'Donell <carlos@redhat.com> - 2.18.90-8
 - Allow ldconfig cached objects previously marked as hard or soft
   ABI to now become unmarked without raising an error. This works
   around a binutils bug that caused objects to become unmarked.
