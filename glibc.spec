@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.18-186-gfd96752
+%define glibcsrcdir  glibc-2.18-303-g1e14558
 %define glibcversion 2.18.90
-%define glibcrelease 10%{?dist}
+%define glibcrelease 11%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -141,9 +141,6 @@ Patch0006: %{name}-arm-hardfloat-3.patch
 Patch0008: %{name}-fedora-getrlimit-PLT.patch
 Patch0009: %{name}-fedora-include-bits-ldbl.patch
 
-# stap, needs to be sent upstream
-Patch0010: %{name}-stap-libm.patch
-
 # Needs to be sent upstream
 Patch0029: %{name}-rh841318.patch
 
@@ -220,8 +217,6 @@ Patch2026: %{name}-rh841787.patch
 
 # Upstream BZ 14185
 Patch2027: %{name}-rh819430.patch
-
-Patch2028: %{name}-rh1007590.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -519,7 +514,6 @@ package or when debugging this package.
 %patch2007 -p1
 %patch0008 -p1
 %patch0009 -p1
-%patch0010 -p1
 %patch2011 -p1
 %patch0012 -p1
 %patch2013 -p1
@@ -548,7 +542,6 @@ package or when debugging this package.
 %patch0041 -p1
 %patch0042 -p1
 %patch0043 -p1
-%patch2028 -p1
 %patch0044 -p1
 %patch0045 -p1
 %patch0046 -p1
@@ -1637,7 +1630,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Thu Oct  3 2013 Carlos O'Donell <carlos@redhat.com> - 2.18.90-9
+* Tue Oct 15 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-11
+- Sync with upstream master.
+
+* Thu Oct  3 2013 Carlos O'Donell <carlos@redhat.com> - 2.18.90-10
 - Allow applications to use pthread_atfork without explicitly
   requiring libpthread.so. (#1013801)
 - Support `--list-archive FILE' in localedef utility.
