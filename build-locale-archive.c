@@ -311,6 +311,7 @@ fill_archive (struct locarhandle *tmpl_ah,
 
   /* Open the archive.  This call never returns if we cannot
      successfully open the archive.  */
+  ah.fname = NULL;
   if (fname != NULL)
     ah.fname = fname;
   open_archive (&ah, false);
