@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.18-303-g1e14558
+%define glibcsrcdir  glibc-2.18-322-gd1f23d4
 %define glibcversion 2.18.90
-%define glibcrelease 11%{?dist}
+%define glibcrelease 12%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -151,7 +151,6 @@ Patch0012: %{name}-fedora-linux-tcsetattr.patch
 Patch0014: %{name}-fedora-nptl-linklibc.patch
 Patch0015: %{name}-fedora-localedef.patch
 Patch0016: %{name}-fedora-i386-tls-direct-seg-refs.patch
-Patch0017: %{name}-fedora-gai-canonical.patch
 Patch0019: %{name}-fedora-nis-rh188246.patch
 Patch0020: %{name}-fedora-manual-dircategory.patch
 Patch0024: %{name}-fedora-locarchive.patch
@@ -183,9 +182,6 @@ Patch0043: %{name}-rh1009623.patch
 # ARM: Accept that some objects marked hard ABI are now not because of a
 #      binutils bug.
 Patch0044: %{name}-rh1009145.patch
-
-# Provide localedef with --list-archive FILE support.
-Patch0045: %{name}-localedef-arg.patch
 
 # Allow applications to call pthread_atfork without libpthread.so.
 Patch0046: %{name}-rh1013801.patch
@@ -520,7 +516,6 @@ package or when debugging this package.
 %patch0014 -p1
 %patch0015 -p1
 %patch0016 -p1
-%patch0017 -p1
 %patch0019 -p1
 %patch0020 -p1
 %patch2021 -p1
@@ -543,7 +538,6 @@ package or when debugging this package.
 %patch0042 -p1
 %patch0043 -p1
 %patch0044 -p1
-%patch0045 -p1
 %patch0046 -p1
 
 ##############################################################################
@@ -1630,6 +1624,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Oct 21 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-12
+- Allow fill_archive to be called with NULL fname.
+- Sync with upstream master.
+
 * Tue Oct 15 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-11
 - Sync with upstream master.
 
