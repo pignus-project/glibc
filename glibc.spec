@@ -1622,6 +1622,7 @@ rm -f *.filelist*
 %changelog
 * Mon Oct 28 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-13
 - Sync with upstream master.
+  - Skip over unimplemented timezone format specifier in strptime (#947722).
 
 * Mon Oct 21 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-12
 - Allow fill_archive to be called with NULL fname.
