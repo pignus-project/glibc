@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.18-322-gd1f23d4
+%define glibcsrcdir  glibc-2.18-332-gb125d3e
 %define glibcversion 2.18.90
-%define glibcrelease 12%{?dist}
+%define glibcrelease 13%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -201,9 +201,6 @@ Patch2007: %{name}-rh697421.patch
 Patch2011: %{name}-rh757881.patch
 
 Patch2013: %{name}-rh741105.patch
-
-# Upstream BZ 9954
-Patch2021: %{name}-rh739743.patch
 
 # Upstream BZ 14247
 Patch2023: %{name}-rh827510.patch
@@ -518,7 +515,6 @@ package or when debugging this package.
 %patch0016 -p1
 %patch0019 -p1
 %patch0020 -p1
-%patch2021 -p1
 %patch2023 -p1
 %patch0024 -p1
 %patch0025 -p1
@@ -1624,6 +1620,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Oct 28 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-13
+- Sync with upstream master.
+
 * Mon Oct 21 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-12
 - Allow fill_archive to be called with NULL fname.
 - Sync with upstream master.
