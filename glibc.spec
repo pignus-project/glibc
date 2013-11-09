@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.18-332-gb125d3e
 %define glibcversion 2.18.90
-%define glibcrelease 13%{?dist}
+%define glibcrelease 14%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -210,6 +210,9 @@ Patch2026: %{name}-rh841787.patch
 
 # Upstream BZ 14185
 Patch2027: %{name}-rh819430.patch
+
+# Fix nscd to use permission names not constants.
+Patch2028: %{name}-rh1025126.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -535,6 +538,7 @@ package or when debugging this package.
 %patch0043 -p1
 %patch0044 -p1
 %patch0046 -p1
+%patch2028 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1620,6 +1624,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Nov  8 2013 Carlos O'Donell <carlos@redhat.com> - 2.18.90-14
+- Enhance NSCD's SELinux support to use dynamic permission names (#1025126).
+
 * Mon Oct 28 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-13
 - Sync with upstream master.
   - Skip over unimplemented timezone format specifier in strptime (#947722).
