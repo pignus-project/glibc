@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.18-332-gb125d3e
+%define glibcsrcdir  glibc-2.18-411-gf3fd262
 %define glibcversion 2.18.90
-%define glibcrelease 14%{?dist}
+%define glibcrelease 15%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1624,6 +1624,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov 20 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-15
+- Sync with upstream master.
+
 * Fri Nov  8 2013 Carlos O'Donell <carlos@redhat.com> - 2.18.90-14
 - Enhance NSCD's SELinux support to use dynamic permission names (#1025126).
 
