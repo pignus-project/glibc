@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.18-411-gf3fd262
+%define glibcsrcdir  glibc-2.18-456-g5a4c6d5
 %define glibcversion 2.18.90
-%define glibcrelease 15%{?dist}
+%define glibcrelease 16%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -175,9 +175,6 @@ Patch0039: %{name}-c_stubs.patch
 Patch0040: %{name}-rh731833-rtkaio.patch
 Patch0041: %{name}-rh731833-rtkaio-2.patch
 Patch0042: %{name}-rh970865.patch
-
-# Avoid the use of __block which is a reserved keyword for clang++.
-Patch0043: %{name}-rh1009623.patch
 
 # ARM: Accept that some objects marked hard ABI are now not because of a
 #      binutils bug.
@@ -535,7 +532,6 @@ package or when debugging this package.
 %patch0040 -p1
 %patch0041 -p1
 %patch0042 -p1
-%patch0043 -p1
 %patch0044 -p1
 %patch0046 -p1
 %patch2028 -p1
@@ -1624,6 +1620,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Nov 28 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-16
+- Sync with upstream master.
+
 * Wed Nov 20 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-15
 - Sync with upstream master.
 
