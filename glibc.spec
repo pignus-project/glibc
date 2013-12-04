@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.18-456-g5a4c6d5
+%define glibcsrcdir  glibc-2.18-488-gd674f0e
 %define glibcversion 2.18.90
-%define glibcrelease 16%{?dist}
+%define glibcrelease 17%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1620,6 +1620,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Dec  4 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-17
+- Sync with upstream master.
+  - Fix shm_open validation (#1037787);
+
 * Thu Nov 28 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-16
 - Sync with upstream master.
 
