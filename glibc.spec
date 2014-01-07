@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.18-702-g6c9642e
+%define glibcsrcdir  glibc-2.18-753-gd5780fe
 %define glibcversion 2.18.90
-%define glibcrelease 19%{?dist}
+%define glibcrelease 20%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -69,7 +69,7 @@
 # If the architecture has SDT probe point support then we build glibc with
 # --enable-systemtap and include all SDT probe points in the library. It is
 # the eventual goal that all supported arches should be on this list.
-%define systemtaparches %{ix86} x86_64
+%define systemtaparches %{ix86} x86_64 ppc ppc64 s390 s390x
 ##############################################################################
 # Add -s for a less verbose build output.
 %define silentrules PARALLELMFLAGS=
@@ -1620,6 +1620,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jan  7 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-20
+- Sync with upstream master.
+- Enable systemtap probes on Power and S/390.
+
 * Fri Dec 27 2013 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-19
 - Sync with upstream master.
 
