@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.18-753-gd5780fe
+%define glibcsrcdir  glibc-2.18-788-g497b1e6
 %define glibcversion 2.18.90
-%define glibcrelease 20%{?dist}
+%define glibcrelease 21%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -210,6 +210,9 @@ Patch2027: %{name}-rh819430.patch
 
 # Fix nscd to use permission names not constants.
 Patch2028: %{name}-rh1025126.patch
+
+# Upstream BZ 16398
+Patch2029: %{name}-rh1052846.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -535,6 +538,7 @@ package or when debugging this package.
 %patch0044 -p1
 %patch0046 -p1
 %patch2028 -p1
+%patch2029 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1620,6 +1624,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jan 14 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-21
+- Sync with upstream master.
+- Fix infinite loop in ftell when writing wide char data (#1052846).
+
 * Tue Jan  7 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-20
 - Sync with upstream master.
 - Enable systemtap probes on Power and S/390.
