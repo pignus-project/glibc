@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.18-788-g497b1e6
 %define glibcversion 2.18.90
-%define glibcrelease 21%{?dist}
+%define glibcrelease 22%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1624,6 +1624,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jan 16 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-22
+- Back out ftell test case (#1052846).
+
 * Tue Jan 14 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-21
 - Sync with upstream master.
 - Fix infinite loop in ftell when writing wide char data (#1052846).
