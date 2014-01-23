@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.18-788-g497b1e6
+%define glibcsrcdir  glibc-2.18-810-g7007c66
 %define glibcversion 2.18.90
-%define glibcrelease 22%{?dist}
+%define glibcrelease 23%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1624,6 +1624,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jan 23 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-23
+- Sync with upstream master.
+
 * Thu Jan 16 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-22
 - Back out ftell test case (#1052846).
 
