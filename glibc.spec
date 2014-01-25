@@ -1573,6 +1573,7 @@ rm -f *.filelist*
 %ifnarch %{auxarches}
 %files -f common.filelist common
 %defattr(-,root,root)
+%dir %{_prefix}/lib/locale
 %attr(0644,root,root) %verify(not md5 size mtime) %{_prefix}/lib/locale/locale-archive.tmpl
 %attr(0644,root,root) %verify(not md5 size mtime mode) %ghost %config(missingok,noreplace) %{_prefix}/lib/locale/locale-archive
 %dir %attr(755,root,root) /etc/default
@@ -1624,6 +1625,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Jan 25 2014 Ville Skyttä <ville.skytta@iki.fi>
+- Own the %%{_prefix}/lib/locale dir.
+
 * Thu Jan 23 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-23
 - Sync with upstream master.
 
