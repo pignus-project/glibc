@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.18-810-g7007c66
 %define glibcversion 2.18.90
-%define glibcrelease 23%{?dist}
+%define glibcrelease 24%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1625,7 +1625,7 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Sat Jan 25 2014 Ville Skyttä <ville.skytta@iki.fi>
+* Sat Jan 25 2014 Ville Skyttä <ville.skytta@iki.fi> - 2.18.90-24
 - Own the %%{_prefix}/lib/locale dir.
 
 * Thu Jan 23 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-23
