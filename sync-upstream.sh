@@ -2,6 +2,21 @@
 # Given a git source repo, generate a tarball from the desired branch, modify
 # the spec file and upload it to lookaside cache if the tarball unpacks and
 # gets patched cleanly.
+#
+# Usage:
+#
+#     1. Invoke the script as follows:
+#
+#           ./sync-upstream.sh upstream-repo
+#
+#       where upstream-repo is the path to the synced upstream git repo.
+#
+#    2. Watch the script run.  If it proceeds to building the package, then
+#       everything seems good and you just need to test the build after it
+#       is complete.  If it exits before the build (you'll know if you read
+#       the output of the script) then manual intervention is required to
+#       complete the sync.  This will typically happen when a patch fails
+#       to apply on the new sources.
 
 set -e
 
