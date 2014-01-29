@@ -91,7 +91,7 @@ rm -f "$tmpfile"
 rm -rf "$srcdir"
 echo "+ Source prep is clean, so we're good to go."
 fedpkg new-sources "$srcdir.tar.gz"
-git commit -a -m \"Sync with upstream $branch\"
+git commit -a -m "Sync with upstream $branch"
 fedpkg push
 fedpkg build
 echo "+ Done!"
