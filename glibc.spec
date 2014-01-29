@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.18-827-gfeab239
 %define glibcversion 2.18.90
-%define glibcrelease 25%{?dist}
+%define glibcrelease 26%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1083,11 +1083,11 @@ done
 grep '%{_infodir}' < rpm.filelist | grep -v '%{_infodir}/dir' > devel.filelist
 
 # Put the stub headers into the devel file list.
-grep '%{_prefix}/include/gnu/stubs-[32164]\+\.h' < rpm.filelist >> devel.filelist || :
+grep '%{_prefix}/include/gnu/stubs-[^.]\+\.h' < rpm.filelist >> devel.filelist || :
 
 # Put the include files into headers file list.
 grep '%{_prefix}/include' < rpm.filelist |
-	egrep -v '%{_prefix}/include/(linuxthreads|gnu/stubs-[32164]+\.h)' \
+	egrep -v '%{_prefix}/include/(linuxthreads|gnu/stubs-[^.]+\.h)' \
 	> headers.filelist
 
 # Remove partial (lib*_p.a) static libraries, include files, and info files from
@@ -1625,6 +1625,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jan 29 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-26
+- Modify regular expressions to include powerpcle stubs-*.h (#1058258).
+
 * Wed Jan 29 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-25
 - Sync with upstream master.
 
