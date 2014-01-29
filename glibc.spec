@@ -1626,7 +1626,7 @@ rm -f *.filelist*
 
 %changelog
 * Wed Jan 29 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-25
-- Sync with upstream master
+- Sync with upstream master.
 
 * Sat Jan 25 2014 Ville Skyttä <ville.skytta@iki.fi> - 2.18.90-24
 - Own the %%{_prefix}/lib/locale dir.
