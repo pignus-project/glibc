@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.18-827-gfeab239
+%define glibcsrcdir  glibc-2.18-880-gdc98b8f
 %define glibcversion 2.18.90
-%define glibcrelease 26%{?dist}
+%define glibcrelease 27%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1625,6 +1625,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Feb 04 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-27
+- Sync with upstream master.
+
 * Wed Jan 29 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-26
 - Modify regular expressions to include powerpcle stubs-*.h (#1058258).
 
