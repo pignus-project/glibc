@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.18-880-gdc98b8f
-%define glibcversion 2.18.90
-%define glibcrelease 27%{?dist}
+%define glibcsrcdir  glibc-2.19-58-ga4fb786
+%define glibcversion 2.19.90
+%define glibcrelease 1%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -210,9 +210,6 @@ Patch2027: %{name}-rh819430.patch
 
 # Fix nscd to use permission names not constants.
 Patch2028: %{name}-rh1025126.patch
-
-# Upstream BZ 16398
-Patch2029: %{name}-rh1052846.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -538,7 +535,6 @@ package or when debugging this package.
 %patch0044 -p1
 %patch0046 -p1
 %patch2028 -p1
-%patch2029 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1625,6 +1621,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Feb 18 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-1
+- Sync with upstream master.
+
 * Tue Feb 04 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.18.90-27
 - Sync with upstream master.
 

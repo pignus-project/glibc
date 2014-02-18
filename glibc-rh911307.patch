@@ -37,8 +37,8 @@ diff -urN glibc-2.17-c758a686/string/Makefile tmp/glibc-2.17-c758a686/string/Mak
 +CFLAGS-.oS += -fno-tree-loop-distribute-patterns
 +
  ifeq ($(run-built-tests),yes)
- tests: $(objpfx)tst-svc.out
- $(objpfx)tst-svc.out: tst-svc.input $(objpfx)tst-svc
+ tests: $(objpfx)tst-svc-cmp.out
+ $(objpfx)tst-svc-cmp.out: tst-svc.expect $(objpfx)tst-svc.out
 diff -urN glibc-2.17-c758a686/elf/Makefile tmp/glibc-2.17-c758a686/elf/Makefile
 --- glibc-2.17-c758a686/elf/Makefile	2013-02-27 18:07:13.812055613 -0500
 +++ tmp/glibc-2.17-c758a686/elf/Makefile	2013-02-27 18:08:16.075796160 -0500
