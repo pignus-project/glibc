@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.19-58-ga4fb786
 %define glibcversion 2.19.90
-%define glibcrelease 1%{?dist}
+%define glibcrelease 2%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1621,6 +1621,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Feb 24 2014 Carlos O'Donell <carlos@redhat.com> - 2.19.90-2
+- Fix build-locale-archive failure to open default template.
+
 * Tue Feb 18 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-1
 - Sync with upstream master.
 

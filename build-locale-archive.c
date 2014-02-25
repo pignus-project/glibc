@@ -558,6 +558,7 @@ int main (int argc, char *argv[])
     error (EXIT_FAILURE, errno, "cannot open directory \"%s\"", loc_path);
 
   /* Use the template file as specified on the command line.  */
+  tmpl_ah.fname = NULL;
   if (argc > 1)
     tmpl_ah.fname = argv[1];
 
