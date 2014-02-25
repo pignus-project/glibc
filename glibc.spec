@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.19-58-ga4fb786
+%define glibcsrcdir  glibc-2.19-76-g3ea0f74
 %define glibcversion 2.19.90
-%define glibcrelease 2%{?dist}
+%define glibcrelease 3%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -210,6 +210,10 @@ Patch2027: %{name}-rh819430.patch
 
 # Fix nscd to use permission names not constants.
 Patch2028: %{name}-rh1025126.patch
+
+# Separate ftell logic from fseek
+Patch2029: %{name}-rh1069559-1.patch
+Patch2030: %{name}-rh1069559-2.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -535,6 +539,8 @@ package or when debugging this package.
 %patch0044 -p1
 %patch0046 -p1
 %patch2028 -p1
+%patch2029 -p1
+%patch2030 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1621,6 +1627,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Feb 25 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-3
+- Sync with upstream master.
+- Separate ftell from fseek logic and avoid modifying FILE data (#1069559).
+
 * Mon Feb 24 2014 Carlos O'Donell <carlos@redhat.com> - 2.19.90-2
 - Fix build-locale-archive failure to open default template.
 
