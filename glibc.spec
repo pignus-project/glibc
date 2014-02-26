@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.19-76-g3ea0f74
 %define glibcversion 2.19.90
-%define glibcrelease 3%{?dist}
+%define glibcrelease 4%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -93,8 +93,6 @@ Source1: build-locale-archive.c
 Source2: glibc_post_upgrade.c
 Source3: libc-lock.h
 Source4: nscd.conf
-Source5: nscd.service
-Source6: nscd.socket
 Source7: nsswitch.conf
 Source8: power6emul.c
 
@@ -183,6 +181,8 @@ Patch0044: %{name}-rh1009145.patch
 # Allow applications to call pthread_atfork without libpthread.so.
 Patch0046: %{name}-rh1013801.patch
 
+Patch0047: %{name}-nscd-sysconfig.patch
+
 #
 # Patches from upstream
 #
@@ -214,6 +214,7 @@ Patch2028: %{name}-rh1025126.patch
 # Separate ftell logic from fseek
 Patch2029: %{name}-rh1069559-1.patch
 Patch2030: %{name}-rh1069559-2.patch
+Patch2031: %{name}-rh1070416.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -541,6 +542,8 @@ package or when debugging this package.
 %patch2028 -p1
 %patch2029 -p1
 %patch2030 -p1
+%patch2031 -p1
+%patch0047 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -956,7 +959,7 @@ install -m 644 nscd/nscd.conf $RPM_BUILD_ROOT/etc
 mkdir -p $RPM_BUILD_ROOT%{_tmpfilesdir}
 install -m 644 %{SOURCE4} %{buildroot}%{_tmpfilesdir}
 mkdir -p $RPM_BUILD_ROOT/lib/systemd/system
-install -m 644 %{SOURCE5} %{SOURCE6} $RPM_BUILD_ROOT/lib/systemd/system
+install -m 644 nscd/nscd.service nscd/nscd.socket $RPM_BUILD_ROOT/lib/systemd/system
 %endif
 
 # Include ld.so.conf
@@ -1627,6 +1630,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Feb 27 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-4
+- Use nscd service files from glibc sources.
+- Make nscd service forking in systemd service file.
+
 * Tue Feb 25 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-3
 - Sync with upstream master.
 - Separate ftell from fseek logic and avoid modifying FILE data (#1069559).

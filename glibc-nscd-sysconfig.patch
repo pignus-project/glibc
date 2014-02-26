@@ -1,0 +1,12 @@
+--- a/nscd/nscd.service	2014-02-27 00:04:13.684640521 +0530
++++ b/nscd/nscd.service	2014-02-27 00:06:14.996635380 +0530
+@@ -6,7 +6,8 @@
+ 
+ [Service]
+ Type=forking
+-ExecStart=/usr/sbin/nscd
++EnvironmentFile=-/etc/sysconfig/nscd
++ExecStart=/usr/sbin/nscd $NSCD_OPTIONS
+ ExecStop=/usr/sbin/nscd --shutdown
+ ExecReload=/usr/sbin/nscd -i passwd
+ ExecReload=/usr/sbin/nscd -i group

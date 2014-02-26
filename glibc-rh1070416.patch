@@ -1,0 +1,41 @@
+diff --git a/nscd/nscd.service b/nscd/nscd.service
+index 99c7563..a970186 100644
+--- a/nscd/nscd.service
++++ b/nscd/nscd.service
+@@ -2,17 +2,20 @@
+ 
+ [Unit]
+ Description=Name Service Cache Daemon
++After=syslog.target
+ 
+ [Service]
+-Type=simple
+-ExecStart=/usr/sbin/nscd --foreground
++Type=forking
++ExecStart=/usr/sbin/nscd
+ ExecStop=/usr/sbin/nscd --shutdown
+ ExecReload=/usr/sbin/nscd -i passwd
+ ExecReload=/usr/sbin/nscd -i group
+ ExecReload=/usr/sbin/nscd -i hosts
+ ExecReload=/usr/sbin/nscd -i services
++ExecReload=/usr/sbin/nscd -i netgroup
+ Restart=always
+ PIDFile=/run/nscd/nscd.pid
+ 
+ [Install]
+ WantedBy=multi-user.target
++Also=nscd.socket
+diff --git a/nscd/nscd.socket b/nscd/nscd.socket
+new file mode 100644
+index 0000000..7e512d5
+--- /dev/null
++++ b/nscd/nscd.socket
+@@ -0,0 +1,8 @@
++[Unit]
++Description=Name Service Cache Daemon Socket
++
++[Socket]
++ListenDatagram=/var/run/nscd/socket
++
++[Install]
++WantedBy=sockets.target
