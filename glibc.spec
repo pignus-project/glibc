@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.19-76-g3ea0f74
+%define glibcsrcdir  glibc-2.19-112-gd4b1725
 %define glibcversion 2.19.90
-%define glibcrelease 4%{?dist}
+%define glibcrelease 5%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -211,9 +211,6 @@ Patch2027: %{name}-rh819430.patch
 # Fix nscd to use permission names not constants.
 Patch2028: %{name}-rh1025126.patch
 
-# Separate ftell logic from fseek
-Patch2029: %{name}-rh1069559-1.patch
-Patch2030: %{name}-rh1069559-2.patch
 Patch2031: %{name}-rh1070416.patch
 
 ##############################################################################
@@ -540,8 +537,6 @@ package or when debugging this package.
 %patch0044 -p1
 %patch0046 -p1
 %patch2028 -p1
-%patch2029 -p1
-%patch2030 -p1
 %patch2031 -p1
 %patch0047 -p1
 
@@ -1630,6 +1625,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Mar 04 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-5
+- Sync with upstream master.
+
 * Thu Feb 27 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-4
 - Use nscd service files from glibc sources.
 - Make nscd service forking in systemd service file.
