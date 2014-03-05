@@ -115,9 +115,11 @@ Source8: power6emul.c
 # to twiddle the patch because of dependencies on prior patches and the like.
 
 
+##############################################################################
 #
-# Patches that are highly unlikely to ever be accepted upstream.
+# Patches that are unlikely to go upstream or not yet analyzed.
 #
+##############################################################################
 
 # Configuration twiddle, not sure there's a good case to get upstream to
 # change this.
@@ -183,15 +185,24 @@ Patch0046: %{name}-rh1013801.patch
 
 Patch0047: %{name}-nscd-sysconfig.patch
 
+##############################################################################
 #
 # Patches from upstream
 #
+##############################################################################
 
+# None!
+
+##############################################################################
 #
 # Patches submitted, but not yet approved upstream.
+#
+##############################################################################
+#
 # Each should be associated with a BZ.
 # Obviously we're not there right now, but that's the goal
 #
+
 # http://sourceware.org/ml/libc-alpha/2012-12/msg00103.html
 Patch2007: %{name}-rh697421.patch
 
