@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.19-112-gd4b1725
+%define glibcsrcdir  glibc-2.19-146-gabe6d90
 %define glibcversion 2.19.90
-%define glibcrelease 5%{?dist}
+%define glibcrelease 6%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -162,8 +162,8 @@ Patch0032: %{name}-fedora-elf-rh737223.patch
 Patch0033: %{name}-fedora-elf-ORIGIN.patch
 Patch0034: %{name}-fedora-elf-init-hidden_undef.patch
 
-# Needs to be sent upstream
-Patch0035: %{name}-rh911307.patch
+# Needs to be sent upstream.
+# Support mangling and demangling null pointers.
 Patch0037: %{name}-rh952799.patch
 
 # rtkaio and c_stubs.  Note that despite the numbering, these are always
@@ -540,7 +540,6 @@ package or when debugging this package.
 %patch0032 -p1
 %patch0033 -p1
 %patch0034 -p1
-%patch0035 -p1
 %patch0037 -p1
 %patch0040 -p1
 %patch0041 -p1
@@ -1636,6 +1635,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Mar 12 2014 Carlos O'Donell <carlos@redhat.com> - 2.19.90-6
+- Sync with upstream master.
+- Use cleaner upstream solution for -ftree-loop-distribute-patterns (#911307).
+
 * Tue Mar 04 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-5
 - Sync with upstream master.
 

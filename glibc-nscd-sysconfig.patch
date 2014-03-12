@@ -1,6 +1,8 @@
---- a/nscd/nscd.service	2014-02-27 00:04:13.684640521 +0530
-+++ b/nscd/nscd.service	2014-02-27 00:06:14.996635380 +0530
-@@ -6,7 +6,8 @@
+diff --git a/nscd/nscd.service b/nscd/nscd.service
+index b7428a3..19ba185 100644
+--- a/nscd/nscd.service
++++ b/nscd/nscd.service
+@@ -5,7 +5,8 @@ Description=Name Service Cache Daemon
  
  [Service]
  Type=forking
