@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.19-146-gabe6d90
+%define glibcsrcdir  glibc-2.19-195-gd71aeee
 %define glibcversion 2.19.90
-%define glibcrelease 6%{?dist}
+%define glibcrelease 7%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -223,6 +223,9 @@ Patch2027: %{name}-rh819430.patch
 Patch2028: %{name}-rh1025126.patch
 
 Patch2031: %{name}-rh1070416.patch
+
+# Upstream 16724
+Patch2032: %{name}-rh1078355.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -549,6 +552,7 @@ package or when debugging this package.
 %patch2028 -p1
 %patch2031 -p1
 %patch0047 -p1
+%patch2032 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1635,6 +1639,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Mar 19 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-7
+- Sync with upstream master.
+- Fix offset computation for append+ mode on switching from read (#1078355).
+
 * Wed Mar 12 2014 Carlos O'Donell <carlos@redhat.com> - 2.19.90-6
 - Sync with upstream master.
 - Use cleaner upstream solution for -ftree-loop-distribute-patterns (#911307).

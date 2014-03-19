@@ -8,13 +8,7 @@
  
  [Service]
  Type=forking
-@@ -12,8 +13,10 @@
- ExecReload=/usr/sbin/nscd -i group
- ExecReload=/usr/sbin/nscd -i hosts
- ExecReload=/usr/sbin/nscd -i services
-+ExecReload=/usr/sbin/nscd -i netgroup
- Restart=always
- PIDFile=/run/nscd/nscd.pid
+@@ -17,3 +18,4 @@
  
  [Install]
  WantedBy=multi-user.target
