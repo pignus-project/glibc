@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.19-195-gd71aeee
+%define glibcsrcdir  glibc-2.19-226-ga5e5f1e
 %define glibcversion 2.19.90
-%define glibcrelease 7%{?dist}
+%define glibcrelease 8%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1639,6 +1639,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Mar 26 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-8
+- Sync with upstream master.
+
 * Wed Mar 19 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-7
 - Sync with upstream master.
 - Fix offset computation for append+ mode on switching from read (#1078355).
