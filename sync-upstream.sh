@@ -61,7 +61,7 @@ nv=$(perl -ne 's/^%define glibcversion (.+)/printf("%s-", $1)/e;' \
 	  glibc.spec)
 
 # Our changelog entry.
-changelog="* $cldate $clname <$clemail> - $nv\n- Sync with upstream $branch.\n"
+changelog="* $cldate $clname <$clemail> - $nv\n- Auto-sync with upstream $branch.\n"
 
 # Change the glibcsrcdir variable, bump up the release number and add an extra
 # entry to the changelog.
@@ -91,7 +91,7 @@ rm -f "$tmpfile"
 rm -rf "$srcdir"
 echo "+ Source prep is clean, so we're good to go."
 fedpkg new-sources "$srcdir.tar.gz"
-git commit -a -m "Sync with upstream $branch."
+git commit -a -m "Auto-sync with upstream $branch."
 fedpkg push
 fedpkg build
 echo "+ Done!"
