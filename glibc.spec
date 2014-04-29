@@ -681,7 +681,7 @@ build()
 	configure_CFLAGS="$build_CFLAGS -fno-asynchronous-unwind-tables"
 	../configure CC="$GCC" CXX="$GXX" CFLAGS="$configure_CFLAGS" \
 		--prefix=%{_prefix} \
-		--enable-add-ons=ports,nptl$AddOns \
+		--enable-add-ons=nptl$AddOns \
 		--with-headers=%{_prefix}/include $EnableKernel --enable-bind-now \
 		--build=%{target} \
 %ifarch %{multiarcharches}
@@ -1637,6 +1637,7 @@ rm -f *.filelist*
 %changelog
 * Tue Apr 29 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-12
 - Auto-sync with upstream master.
+- Remove ports addon.
 
 * Fri Apr 18 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-11
 - Sync with upstream master.
