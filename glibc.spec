@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.19-323-g5abebba
 %define glibcversion 2.19.90
-%define glibcrelease 12%{?dist}
+%define glibcrelease 13%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -273,7 +273,11 @@ Conflicts: kernel < %{enablekernel}
 %define target %{_target_cpu}-redhat-linuxeabi
 %endif
 %ifarch %{power64}
+%ifarch ppc64le
+%define target ppc64le-redhat-linux
+%else
 %define target ppc64-redhat-linux
+%endif
 %endif
 
 %ifarch %{multiarcharches}
@@ -1635,6 +1639,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed May 14 2014 Carlos O'Donell <carlos@redhat.com> - 2.19.90-13
+- Add initial support for ppc64le.
+
 * Tue Apr 29 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-12
 - Auto-sync with upstream master.
 - Remove ports addon.
