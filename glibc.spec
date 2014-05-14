@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.19-323-g5abebba
 %define glibcversion 2.19.90
-%define glibcrelease 13%{?dist}
+%define glibcrelease 14%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1257,6 +1257,7 @@ pushd build-%{target}
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
 ) | tee check.log || :
+find . -name '*.test-result' | xargs cat;
 popd
 
 ##############################################################################
@@ -1270,6 +1271,7 @@ pushd build-%{target}-nosegneg
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
 ) | tee check.log || :
+find . -name '*.test-result' | xargs cat;
 popd
 %endif
 
@@ -1287,6 +1289,7 @@ pushd build-%{target}-power6
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
 ) | tee check.log || :
+find . -name '*.test-result' | xargs cat;
 popd
 %endif
 echo ====================TESTING DETAILS=================
@@ -1639,6 +1642,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed May 14 2014 Carlos O'Donell <carlos@redhat.com> - 2.19.90-14
+- Add support for displaying all test results in build logs.
+
 * Wed May 14 2014 Carlos O'Donell <carlos@redhat.com> - 2.19.90-13
 - Add initial support for ppc64le.
 
