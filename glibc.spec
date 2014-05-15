@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.19-323-g5abebba
+%define glibcsrcdir  glibc-2.19-418-ga5d87b3
 %define glibcversion 2.19.90
-%define glibcrelease 14%{?dist}
+%define glibcrelease 15%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1642,6 +1642,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu May 15 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-15
+- Sync with upstream master.
+
 * Wed May 14 2014 Carlos O'Donell <carlos@redhat.com> - 2.19.90-14
 - Add support for displaying all test results in build logs.
 
