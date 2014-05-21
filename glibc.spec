@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.19-418-ga5d87b3
 %define glibcversion 2.19.90
-%define glibcrelease 15%{?dist}
+%define glibcrelease 16%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -191,7 +191,7 @@ Patch0047: %{name}-nscd-sysconfig.patch
 #
 ##############################################################################
 
-# None!
+Patch1000: %{name}-aarch64-fix-handling-of-nocancel-syscall-failures.patch
 
 ##############################################################################
 #
@@ -553,6 +553,7 @@ package or when debugging this package.
 %patch2031 -p1
 %patch0047 -p1
 %patch2032 -p1
+%patch1000 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1642,6 +1643,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed May 21 2014 Kyle McMartin <kyle@fedoraproject.org> - 2.19.90-16
+- AArch64: Fix handling of nocancel syscall failures (#1098327)
+
 * Thu May 15 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-15
 - Sync with upstream master.
 
