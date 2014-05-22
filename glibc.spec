@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.19-418-ga5d87b3
 %define glibcversion 2.19.90
-%define glibcrelease 16%{?dist}
+%define glibcrelease 17%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -223,6 +223,8 @@ Patch2031: %{name}-rh1070416.patch
 
 # Upstream 16724
 Patch2032: %{name}-rh1078355.patch
+
+Patch2033: glibc-aarch64-tls-fixes.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -554,6 +556,7 @@ package or when debugging this package.
 %patch0047 -p1
 %patch2032 -p1
 %patch1000 -p1
+%patch2033 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1643,6 +1646,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed May 21 2014 Kyle McMartin <kyle@fedoraproject.org> - 2.19.90-17
+- Backport some upstream-wards patches to fix TLS issues on AArch64.
+
 * Wed May 21 2014 Kyle McMartin <kyle@fedoraproject.org> - 2.19.90-16
 - AArch64: Fix handling of nocancel syscall failures (#1098327)
 
