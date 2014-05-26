@@ -24,8 +24,8 @@ diff -pruN glibc-2.17-c758a686/rtkaio/Makefile glibc-2.17-c758a686.new/rtkaio/Ma
  # a statically-linked program that hasn't already loaded it.
  $(objpfx)librtkaio.so: $(common-objpfx)libc.so $(common-objpfx)libc_nonshared.a \
 -		   $(shared-thread-library) \
--		   $(if $(filter yes,$(elf)), $(elfobjdir)/ld.so)
-+		   $(shared-thread-library) $(elfobjdir)/ld.so
+-		   $(if $(filter yes,$(elf)), $(elf-objpfx)ld.so)
++		   $(shared-thread-library) $(elf-objpfx)ld.so
  
  ifeq (yes,$(build-shared))
  $(addprefix $(objpfx),$(tests)): $(objpfx)librtkaio.so $(shared-thread-library)

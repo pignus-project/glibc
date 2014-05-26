@@ -1645,6 +1645,7 @@ rm -f *.filelist*
 %changelog
 * Mon May 26 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-18
 - Sync with upstream master.
+- Adjust rtkaio patches to build with upstream master.
 
 * Wed May 21 2014 Kyle McMartin <kyle@fedoraproject.org> - 2.19.90-17
 - Backport some upstream-wards patches to fix TLS issues on AArch64.
