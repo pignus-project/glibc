@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.19-476-g15eaf6f
+%define glibcsrcdir  glibc-2.19-516-g9fa7661
 %define glibcversion 2.19.90
-%define glibcrelease 18%{?dist}
+%define glibcrelease 19%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -218,9 +218,6 @@ Patch2026: %{name}-rh841787.patch
 Patch2027: %{name}-rh819430.patch
 
 Patch2031: %{name}-rh1070416.patch
-
-# Upstream 16724
-Patch2032: %{name}-rh1078355.patch
 
 Patch2033: glibc-aarch64-tls-fixes.patch
 
@@ -552,7 +549,6 @@ package or when debugging this package.
 %patch0046 -p1
 %patch2031 -p1
 %patch0047 -p1
-%patch2032 -p1
 %patch2033 -p1
 
 ##############################################################################
@@ -1643,6 +1639,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jun 03 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-19
+- Sync with upstream master.
+
 * Mon May 26 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-18
 - Sync with upstream master.
 - Adjust rtkaio patches to build with upstream master.
