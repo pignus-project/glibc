@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.19-516-g9fa7661
+%define glibcsrcdir  glibc-2.19-564-g14642b8
 %define glibcversion 2.19.90
-%define glibcrelease 19%{?dist}
+%define glibcrelease 20%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1639,6 +1639,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jun 12 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-20
+- Auto-sync with upstream master.
+
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.19.90-19.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
