@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.19-591-ga729111
 %define glibcversion 2.19.90
-%define glibcrelease 21%{?dist}
+%define glibcrelease 22%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -219,7 +219,8 @@ Patch2027: %{name}-rh819430.patch
 
 Patch2031: %{name}-rh1070416.patch
 
-Patch2033: glibc-aarch64-tls-fixes.patch
+Patch2033: %{name}-aarch64-tls-fixes.patch
+Patch2034: %{name}-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -550,6 +551,7 @@ package or when debugging this package.
 %patch2031 -p1
 %patch0047 -p1
 %patch2033 -p1
+%patch2034 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1639,6 +1641,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jun 20 2014 Kyle McMartin <kmcmarti@redhat.com> - 2.19.90-22
+- AArch64: Save & restore NZCV (flags) upon entry to _dl_tlsdesc_dynamic
+  in order to work around GCC reordering compares across the TLS
+  descriptor sequence (GCC PR61545.) Committing a (temporary) fix here
+  allows us to avoid rebuilding the world with gcc 4.9.0-11.fc21.
+
 * Mon Jun 16 2014 Kyle McMartin <kmcmarti@redhat.com> - 2.19.90-21
 - Auto-sync with upstream master.
 
