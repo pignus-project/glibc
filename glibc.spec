@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.19-654-g4841e6a
+%define glibcsrcdir  glibc-2.19-743-g256aa66
 %define glibcversion 2.19.90
-%define glibcrelease 23%{?dist}
+%define glibcrelease 24%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -221,7 +221,6 @@ Patch2031: %{name}-rh1070416.patch
 
 Patch2033: %{name}-aarch64-tls-fixes.patch
 Patch2034: %{name}-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
-Patch2035: %{name}-scalbn-i386-abi.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -553,7 +552,6 @@ package or when debugging this package.
 %patch0047 -p1
 %patch2033 -p1
 %patch2034 -p1
-%patch2035 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1643,6 +1641,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jul 02 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-24
+- Sync with upstream master.
+
 * Tue Jun 24 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-23
 - Sync with upstream master.
 - Add fix to unbreak i386 ABI breakage due to a change in scalbn.
