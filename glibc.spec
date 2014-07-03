@@ -1256,7 +1256,11 @@ pushd build-%{target}
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
 ) | tee check.log || :
-find . -name '*.test-result' | xargs cat;
+echo ===================FAILED TESTS=====================
+grep -e ^FAIL -e ^ERROR tests.sum | awk '{print $2}' | while read testcase; do
+	echo "$testcase"
+	cat $testcase.out
+done
 popd
 
 ##############################################################################
@@ -1270,7 +1274,11 @@ pushd build-%{target}-nosegneg
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
 ) | tee check.log || :
-find . -name '*.test-result' | xargs cat;
+echo ===================FAILED TESTS=====================
+grep -e ^FAIL -e ^ERROR tests.sum | awk '{print $2}' | while read testcase; do
+	echo "$testcase"
+	cat $testcase.out
+done
 popd
 %endif
 
@@ -1288,7 +1296,12 @@ pushd build-%{target}-power6
   teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
   [ -n "$teepid" ] && kill $teepid
 ) | tee check.log || :
-find . -name '*.test-result' | xargs cat;
+echo ===================FAILED TESTS=====================
+grep -e ^FAIL -e ^ERROR tests.sum | awk '{print $2}' | while read testcase; do
+	echo "$testcase"
+	cat $testcase.out
+	echo -------------------------
+done
 popd
 %endif
 echo ====================TESTING DETAILS=================
