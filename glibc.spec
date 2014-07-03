@@ -684,7 +684,7 @@ build()
 	configure_CFLAGS="$build_CFLAGS -fno-asynchronous-unwind-tables"
 	../configure CC="$GCC" CXX="$GXX" CFLAGS="$configure_CFLAGS" \
 		--prefix=%{_prefix} \
-		--enable-add-ons=nptl$AddOns \
+		--enable-add-ons=$AddOns \
 		--with-headers=%{_prefix}/include $EnableKernel --enable-bind-now \
 		--build=%{target} \
 %ifarch %{multiarcharches}
