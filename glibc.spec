@@ -221,6 +221,7 @@ Patch2031: %{name}-rh1070416.patch
 
 Patch2033: %{name}-aarch64-tls-fixes.patch
 Patch2034: %{name}-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
+Patch2035: %{name}-rtkaio-testcase.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -552,6 +553,7 @@ package or when debugging this package.
 %patch0047 -p1
 %patch2033 -p1
 %patch2034 -p1
+%patch2035 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
