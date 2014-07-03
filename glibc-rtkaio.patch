@@ -544,7 +544,7 @@ diff -pruN glibc-2.17-931-g30bbc0c/rtkaio/Makefile glibc-2.17-931-g30bbc0c.new/r
 +
 +LDFLAGS-rtkaio.so = -Wl,-soname=lib$(libprefix)rt.so$(librt.so-version) \
 +		    -Wl,--enable-new-dtags,-z,nodelete
-+CPPFLAGS-librtkaio += -DIS_IN_librt=1 -I$(..)rt -I$(..)nptl
++CPPFLAGS-librtkaio += -DIS_IN_librt=1 -I$(..)rt
 +
 +rpath-dirs := $(patsubst rt,rtkaio,$(rpath-dirs))
 +
@@ -2261,7 +2261,7 @@ diff -pruN glibc-2.17-931-g30bbc0c/rtkaio/sysdeps/unix/sysv/linux/kaio_misc.h gl
 +   correct aio_suspend and lio_listio implementations.  */
 +
 +#include <assert.h>
-+#include <pthreadP.h>
++#include <nptl/pthreadP.h>
 +#include <lowlevellock.h>
 +
 +# define DONT_NEED_AIO_MISC_COND	1
