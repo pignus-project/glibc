@@ -21,9 +21,9 @@ GLIBC_PRIVATE.
 --- a/nptl/Version
 +++ b/nptl/Versions
 @@ -30,6 +30,7 @@ libc {
-     # Internal libc interface to libpthread
-     __libc_dl_error_tsd;
-     __libc_vfork;
+     __libc_pthread_init;
+     __libc_current_sigrtmin_private; __libc_current_sigrtmax_private;
+     __libc_allocate_rtsig_private;
 +    __getrlimit;
    }
  }
