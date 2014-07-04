@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.19-739-gd6505ce
+%define glibcsrcdir  glibc-2.19-778-gc0c5824
 %define glibcversion 2.19.90
-%define glibcrelease 25%{?dist}
+%define glibcrelease 26%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -221,7 +221,6 @@ Patch2031: %{name}-rh1070416.patch
 
 Patch2033: %{name}-aarch64-tls-fixes.patch
 Patch2034: %{name}-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
-Patch2035: %{name}-rtkaio-testcase.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -553,7 +552,6 @@ package or when debugging this package.
 %patch0047 -p1
 %patch2033 -p1
 %patch2034 -p1
-%patch2035 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1658,6 +1656,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jul 04 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-26
+- Sync with upstream roland/nptl branch.
+- Improve testsuite failure outputs in build.log
+
 * Thu Jul 03 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-25
 - Sync with upstream roland/nptl branch.
 
