@@ -1262,6 +1262,7 @@ echo ===================FAILED TESTS=====================
 grep -e ^FAIL -e ^ERROR tests.sum | awk '{print $2}' | while read testcase; do
 	echo "$testcase"
 	cat $testcase.out
+	echo -------------------------
 done
 popd
 
@@ -1280,6 +1281,7 @@ echo ===================FAILED TESTS=====================
 grep -e ^FAIL -e ^ERROR tests.sum | awk '{print $2}' | while read testcase; do
 	echo "$testcase"
 	cat $testcase.out
+	echo -------------------------
 done
 popd
 %endif
