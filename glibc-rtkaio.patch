@@ -568,7 +568,7 @@ diff -pruN glibc-2.17-931-g30bbc0c/rtkaio/Makefile glibc-2.17-931-g30bbc0c.new/r
 +$(tests:%=$(objpfx)%-bp): $(objpfx)librtkaio_b.a $(bounded-thread-library)
 +endif
 +
-+tst-mqueue7-ARGS = -- $(built-program-cmd)
++tst-mqueue7-ARGS = -- $(built-program-file)
 +
 +ifeq (yes,$(build-static-nss))
 +otherlibs += $(nssobjdir)/libnss_files.a $(resolvobjdir)/libnss_dns.a \
