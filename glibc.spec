@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.19-778-gc0c5824
+%define glibcsrcdir  glibc-2.19-776-gf4c4021
 %define glibcversion 2.19.90
-%define glibcrelease 26%{?dist}
+%define glibcrelease 27%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1656,6 +1656,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jul 07 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-27
+- Auto-sync with upstream master.
+
 * Fri Jul 04 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-26
 - Sync with upstream roland/nptl branch.
 - Improve testsuite failure outputs in build.log
