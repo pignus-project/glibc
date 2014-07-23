@@ -1657,7 +1657,7 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Thu Jul 23 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-30
+* Wed Jul 23 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-30
 - Undo last master sync to fix up rawhide.
 
 * Tue Jul 15 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.19.90-29
