@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.19-886-gdd763fd
-%define glibcversion 2.19.90
-%define glibcrelease 36%{?dist}
+%define glibcsrcdir  glibc-2.20-3-g645a0e9
+%define glibcversion 2.20.90
+%define glibcrelease 1%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -184,10 +184,6 @@ Patch0044: %{name}-rh1009145.patch
 Patch0046: %{name}-rh1013801.patch
 
 Patch0047: %{name}-nscd-sysconfig.patch
-
-Patch0048: %{name}-rh1133134-i386-tlsinit.patch
-
-Patch0049: %{name}-rh1119128.patch
 
 # Allow up to 32 libraries to use static TLS. Should go upstream after
 # more testing.
@@ -563,8 +559,6 @@ package or when debugging this package.
 %patch2033 -p1
 %patch2034 -p1
 %patch2035 -p1
-%patch0048 -p1
-%patch0049 -p1
 %patch0050 -p1
 
 ##############################################################################
@@ -1673,6 +1667,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Sep 08 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-1
+- Sync with upstream master.
+
 * Thu Sep  4 2014 Carlos O'Donell <carlos@redhat.com> - 2.19.90-36
 - Allow up to 32 dlopened modules to use static TLS (#1124987).
 - Run glibc tests in %%check section of RPM spec file.
