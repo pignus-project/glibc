@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.20-3-g645a0e9
 %define glibcversion 2.20.90
-%define glibcrelease 1%{?dist}
+%define glibcrelease 2%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1216,7 +1216,7 @@ touch -r sunrpc/etc.rpc $RPM_BUILD_ROOT/etc/rpc
 # the one used at runtime.  This is really only needed during the ARM
 # transition from ld-linux.so.3 to ld-linux-armhf.so.3.
 pushd build-%{target}
-$GCC -Os -g -o build-locale-archive %{SOURCE1} \
+$GCC -Os -g -static -o build-locale-archive %{SOURCE1} \
 	../build-%{target}/locale/locarchive.o \
 	../build-%{target}/locale/md5.o \
 	-I. -DDATADIR=\"%{_datadir}\" -DPREFIX=\"%{_prefix}\" \
@@ -1667,6 +1667,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Sep 08 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-2
+- Build build-locale-archive statically again.
+
 * Mon Sep 08 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-1
 - Sync with upstream master.
 
