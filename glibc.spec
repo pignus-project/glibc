@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.20-3-g645a0e9
+%define glibcsrcdir  glibc-2.20-35-gd330b98
 %define glibcversion 2.20.90
-%define glibcrelease 2%{?dist}
+%define glibcrelease 3%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -158,7 +158,6 @@ Patch0025: %{name}-fedora-streams-rh436349.patch
 Patch0028: %{name}-fedora-localedata-rh61908.patch
 Patch0030: %{name}-fedora-uname-getrlimit.patch
 Patch0031: %{name}-fedora-__libc_multiple_libcs.patch
-Patch0032: %{name}-fedora-elf-rh737223.patch
 Patch0033: %{name}-fedora-elf-ORIGIN.patch
 Patch0034: %{name}-fedora-elf-init-hidden_undef.patch
 
@@ -225,8 +224,6 @@ Patch2031: %{name}-rh1070416.patch
 
 Patch2033: %{name}-aarch64-tls-fixes.patch
 Patch2034: %{name}-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
-
-Patch2035: %{name}-extern-always-inline.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -545,7 +542,6 @@ package or when debugging this package.
 %patch0029 -p1
 %patch0030 -p1
 %patch0031 -p1
-%patch0032 -p1
 %patch0033 -p1
 %patch0034 -p1
 %patch0037 -p1
@@ -558,7 +554,6 @@ package or when debugging this package.
 %patch0047 -p1
 %patch2033 -p1
 %patch2034 -p1
-%patch2035 -p1
 %patch0050 -p1
 
 ##############################################################################
@@ -1667,6 +1662,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Sep 16 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-3
+- Sync with upstream master.
+- Revert patch for #737223.
+
 * Mon Sep 08 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-2
 - Build build-locale-archive statically again.
 
