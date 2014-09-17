@@ -583,8 +583,8 @@ diff -pruN glibc-2.17-931-g30bbc0c/rtkaio/shlib-versions glibc-2.17-931-g30bbc0c
 --- glibc-2.17-931-g30bbc0c/rtkaio/shlib-versions	1970-01-01 05:30:00.000000000 +0530
 +++ glibc-2.17-931-g30bbc0c.new/rtkaio/shlib-versions	2013-08-16 16:23:23.246028404 +0530
 @@ -0,0 +1,2 @@
-+mips.*-.*-linux.*	librtkaio=1		GLIBC_2.0 GLIBC_2.2
-+.*-.*-.*		librtkaio=1
++librtkaio=1		GLIBC_2.0 GLIBC_2.2
++librtkaio=1
 diff -pruN glibc-2.17-931-g30bbc0c/rtkaio/sysdeps/pthread/kaio_timer_routines.c glibc-2.17-931-g30bbc0c.new/rtkaio/sysdeps/pthread/kaio_timer_routines.c
 --- glibc-2.17-931-g30bbc0c/rtkaio/sysdeps/pthread/kaio_timer_routines.c	1970-01-01 05:30:00.000000000 +0530
 +++ glibc-2.17-931-g30bbc0c.new/rtkaio/sysdeps/pthread/kaio_timer_routines.c	2013-08-16 16:23:23.245028404 +0530
