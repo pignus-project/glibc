@@ -14,6 +14,8 @@
 # If run_glibc_tests is zero then tests are not run for the build.
 # You must always set run_glibc_tests to one for production builds.
 %define run_glibc_tests 1
+# Run valgrind test to ensure compatibility.
+%define run_valgrind_tests 1
 ##############################################################################
 # Auxiliary arches are those arches that can be built in addition
 # to the core supported arches. You either install an auxarch or
@@ -259,6 +261,10 @@ BuildRequires: audit-libs-devel >= 1.1.3, sed >= 3.95, libcap-devel, gettext, ns
 BuildRequires: /bin/ps, /bin/kill, /bin/awk
 %ifarch %{systemtaparches}
 BuildRequires: systemtap-sdt-devel
+%endif
+
+%if %{run_valgrind_tests}
+BuildRequires: /usr/bin/valgrind
 %endif
 
 # We use systemd rpm macros for nscd
@@ -1493,6 +1499,17 @@ echo ====================PLT RELOCS LIBC.SO==============
 readelf -Wr $RPM_BUILD_ROOT/%{_lib}/libc-*.so | sed -n -e "$PLTCMD"
 echo ====================PLT RELOCS END==================
 
+%if %{run_valgrind_tests}
+# Finally, check if valgrind runs with the new glibc.
+# We want to fail building if valgrind is not able to run with this glibc so
+# that we can then coordinate with valgrind to get it fixed before we update
+# glibc.
+pushd build-%{target}
+elf/ld.so --library-path .:elf:nptl:dlfcn /usr/bin/valgrind \
+	elf/ld.so --library-path .:elf:nptl:dlfcn /usr/bin/true
+popd
+%endif
+
 %endif # %{run_glibc_tests}
 
 
@@ -1682,6 +1699,7 @@ rm -f *.filelist*
 %changelog
 * Tue Sep 23 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-4
 - Don't own the common debuginfo directories (#1144853).
+- Run valgrind in the %%check section to ensure that it does not break.
 
 * Tue Sep 16 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-3
 - Sync with upstream master.
