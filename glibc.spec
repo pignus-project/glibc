@@ -1,4 +1,4 @@
-%define glibcsrcdir  glibc-2.20-35-gd330b98
+%define glibcsrcdir  glibc-2.20-44-g68870f1
 %define glibcversion 2.20.90
 %define glibcrelease 4%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
@@ -1698,6 +1698,7 @@ rm -f *.filelist*
 
 %changelog
 * Tue Sep 23 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-4
+- Sync with upstream master.
 - Don't own the common debuginfo directories (#1144853).
 - Run valgrind in the %%check section to ensure that it does not break.
 
