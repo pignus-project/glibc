@@ -1,0 +1,57 @@
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: stdlib/tst-strtod-round.c: Fix build on ARM
+From: Will Newton <will.newton@linaro.org>
+X-Patchwork-Id: 2870
+Message-Id: <1410903170-31206-2-git-send-email-will.newton@linaro.org>
+To: libc-alpha@sourceware.org
+Date: Tue, 16 Sep 2014 14:32:50 -0700
+
+Building this test on ARM fails because the prototypes for the long
+double variants of the math functions are unavailable.
+
+Add an additional include guard to math.h that enables long double math
+function declarations if _LIBC_TEST is defined and define _LIBC_TEST in
+stdlib/tst-strtod-round.c.
+
+ChangeLog:
+
+2014-09-16  Will Newton  <will.newton@linaro.org>
+
+	* math/math.h: Define long double math functions if
+	_LIBC_TEST is defined.
+	* stdlib/tst-strtod-round.c: Define _LIBC_TEST.
+
+---
+math/math.h               | 2 +-
+ stdlib/tst-strtod-round.c | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/math/math.h b/math/math.h
+index 72ec2ca..dc7ab2d 100644
+--- a/math/math.h
++++ b/math/math.h
+@@ -91,7 +91,7 @@ __BEGIN_DECLS
+ # undef _Mdouble_END_NAMESPACE
+ # undef	__MATH_PRECNAME
+ 
+-# if !(defined __NO_LONG_DOUBLE_MATH && defined _LIBC) \
++# if !(defined __NO_LONG_DOUBLE_MATH && defined _LIBC && !defined _LIBC_TEST) \
+      || defined __LDBL_COMPAT
+ #  ifdef __LDBL_COMPAT
+ 
+diff --git a/stdlib/tst-strtod-round.c b/stdlib/tst-strtod-round.c
+index f334b20..cbde457 100644
+--- a/stdlib/tst-strtod-round.c
++++ b/stdlib/tst-strtod-round.c
+@@ -17,6 +17,9 @@
+    License along with the GNU C Library; if not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
++/* Defining _LIBC_TEST ensures long double math functions are
++   declared in the headers.  */
++#define _LIBC_TEST 1
+ #include <fenv.h>
+ #include <float.h>
+ #include <math.h>
