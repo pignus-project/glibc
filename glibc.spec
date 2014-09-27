@@ -193,6 +193,9 @@ Patch0050: %{name}-rh1124987.patch
 # Fix the tst-strtod-round.c test build failure.
 Patch0051: %{name}-stdlib-tst-strtod-round.c-Fix-build-on-ARM.patch
 
+# Disable rwlock elision if --enable-lock-elision is not used.
+Patch0052: %{name}-disable-rwlock-elision.patch
+
 ##############################################################################
 #
 # Patches from upstream
@@ -565,6 +568,7 @@ package or when debugging this package.
 %patch2034 -p1
 %patch0050 -p1
 %patch0051 -p1
+%patch0052 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1722,6 +1726,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Sep 30 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-6
+- Disable more Intel TSX usage in rwlocks (#1146967).
+
 * Fri Sep 26 2014 Carlos O'Donell <carlos@redhat.com> - 2.20.90-5
 - Disable lock elision support for Intel hardware until microcode
   updates can be done in early bootup (#1146967).
