@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.20-44-g68870f1
 %define glibcversion 2.20.90
-%define glibcrelease 4%{?dist}
+%define glibcrelease 5%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -189,6 +189,9 @@ Patch0047: %{name}-nscd-sysconfig.patch
 # Allow up to 32 libraries to use static TLS. Should go upstream after
 # more testing.
 Patch0050: %{name}-rh1124987.patch
+
+# Fix the tst-strtod-round.c test build failure.
+Patch0051: %{name}-stdlib-tst-strtod-round.c-Fix-build-on-ARM.patch
 
 ##############################################################################
 #
@@ -561,6 +564,7 @@ package or when debugging this package.
 %patch2033 -p1
 %patch2034 -p1
 %patch0050 -p1
+%patch0051 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -690,6 +694,11 @@ build()
 	build_CFLAGS="$BuildFlags -g -O3 $*"
 	# Some configure checks can spuriously fail for some architectures if
 	# unwind info is present
+	#
+	# At the moment lock elision is temporarily disabled until we work
+	# out how to update the microcode in early boot to prevent the cpuid
+	# results from becoming stale. Once this is fixed add back:
+	#		--enable-lock-elision \
 	configure_CFLAGS="$build_CFLAGS -fno-asynchronous-unwind-tables"
 	../configure CC="$GCC" CXX="$GXX" CFLAGS="$configure_CFLAGS" \
 		--prefix=%{_prefix} \
@@ -706,7 +715,6 @@ build()
 %ifarch ppc64p7
 		--with-cpu=power7 \
 %endif
-		--enable-lock-elision \
 		--disable-profile --enable-nss-crypt ||
 		{ cat config.log; false; }
 
@@ -1422,6 +1430,53 @@ truncate -s 0 $RPM_BUILD_ROOT/var/cache/ldconfig/aux-cache
 ##############################################################################
 %check
 %if %{run_glibc_tests}
+
+# Run the glibc tests. If any tests fail to build we exit %check with an error
+# of 1, otherwise we print the test failure list and the failed test output
+# and exit with 0. In the future we want to compare against a baseline and
+# exit with 1 if the results deviate from the baseline.
+run_tests () {
+	truncate -s 0 check.log
+	tail -f check.log &
+	tailpid=$!
+	# Run the make a sub-shell (to avoid %check failing if make fails)
+	# but capture the status for use later. We use the normal sub-shell
+	# trick of printing the status. The actual result of the sub-shell
+	# is the successful execution of the echo.
+	status=$(set +e
+		 make %{?_smp_mflags} check %{silentrules} > check.log 2>&1
+		 status=$?
+		 echo $status)
+	# Wait for the tail to catch up with the output and then kill it.
+	sleep 10
+	kill $tailpid
+	# Print the header, so we can find it, but skip the error printing
+	# if there aren't any failrues.
+	echo ===================FAILED TESTS=====================
+	if [ $status -ne 0 ]; then
+		# We are not running with `-k`, therefore a test build failure
+		# terminates the test run and that terminates %check with an
+		# error which terminates the build. We want this behaviour to
+		# ensure that all tests build, and all tests run.
+		# If the test result summary is not present it means one of
+		# tests failed to build.
+		if ! grep 'Summary of test results:' check.log; then
+			echo "FAIL: Some glibc tests failed to build."
+			exit 1
+		fi
+
+		# Print out information about all of the failed tests.
+		grep -e ^FAIL -e ^ERROR tests.sum \
+			| awk '{print $2}' \
+			| while read testcase;
+		do
+			echo "$testcase"
+			cat $testcase.out
+			echo -------------------------
+		done
+	fi
+}
+
 # Increase timeouts
 export TIMEOUTFACTOR=16
 parent=$$
@@ -1430,17 +1485,7 @@ echo ====================TESTING=========================
 # - Test the default runtime.
 ##############################################################################
 pushd build-%{target}
-( make %{?_smp_mflags} check %{silentrules} 2>&1
-  sleep 10s
-  teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
-  [ -n "$teepid" ] && kill $teepid
-) | tee check.log || :
-echo ===================FAILED TESTS=====================
-grep -e ^FAIL -e ^ERROR tests.sum | awk '{print $2}' | while read testcase; do
-	echo "$testcase"
-	cat $testcase.out
-	echo -------------------------
-done
+run_tests
 popd
 
 ##############################################################################
@@ -1449,17 +1494,7 @@ popd
 %if %{buildxen}
 echo ====================TESTING -mno-tls-direct-seg-refs=============
 pushd build-%{target}-nosegneg
-( make %{?_smp_mflags} check %{silentrules} 2>&1
-  sleep 10s
-  teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
-  [ -n "$teepid" ] && kill $teepid
-) | tee check.log || :
-echo ===================FAILED TESTS=====================
-grep -e ^FAIL -e ^ERROR tests.sum | awk '{print $2}' | while read testcase; do
-	echo "$testcase"
-	cat $testcase.out
-	echo -------------------------
-done
+run_tests
 popd
 %endif
 
@@ -1469,20 +1504,10 @@ popd
 %if %{buildpower6}
 echo ====================TESTING -mcpu=power6=============
 pushd build-%{target}-power6
-( if [ -d ../power6emul ]; then
+if [ -d ../power6emul ]; then
     export LD_PRELOAD=`cd ../power6emul; pwd`/\$LIB/power6emul.so
-  fi
-  make %{?_smp_mflags} check %{silentrules} 2>&1
-  sleep 10s
-  teepid="`ps -eo ppid,pid,command | awk '($1 == '${parent}' && $3 ~ /^tee/) { print $2 }'`"
-  [ -n "$teepid" ] && kill $teepid
-) | tee check.log || :
-echo ===================FAILED TESTS=====================
-grep -e ^FAIL -e ^ERROR tests.sum | awk '{print $2}' | while read testcase; do
-	echo "$testcase"
-	cat $testcase.out
-	echo -------------------------
-done
+fi
+run_tests
 popd
 %endif
 echo ====================TESTING DETAILS=================
@@ -1697,6 +1722,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Sep 26 2014 Carlos O'Donell <carlos@redhat.com> - 2.20.90-5
+- Disable lock elision support for Intel hardware until microcode
+  updates can be done in early bootup (#1146967).
+- Fix building test tst-strtod-round for ARM.
+
 * Tue Sep 23 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-4
 - Sync with upstream master.
 - Don't own the common debuginfo directories (#1144853).
