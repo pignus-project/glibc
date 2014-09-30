@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.20-44-g68870f1
+%define glibcsrcdir  glibc-2.20-53-g754a15c
 %define glibcversion 2.20.90
-%define glibcrelease 5%{?dist}
+%define glibcrelease 6%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -198,9 +198,6 @@ Patch0047: %{name}-nscd-sysconfig.patch
 # Allow up to 32 libraries to use static TLS. Should go upstream after
 # more testing.
 Patch0050: %{name}-rh1124987.patch
-
-# Fix the tst-strtod-round.c test build failure.
-Patch0051: %{name}-stdlib-tst-strtod-round.c-Fix-build-on-ARM.patch
 
 # Disable rwlock elision if --enable-lock-elision is not used.
 Patch0052: %{name}-disable-rwlock-elision.patch
@@ -576,7 +573,6 @@ package or when debugging this package.
 %patch2033 -p1
 %patch2034 -p1
 %patch0050 -p1
-%patch0051 -p1
 %patch0052 -p1
 
 ##############################################################################
@@ -1734,6 +1730,7 @@ rm -f *.filelist*
 
 %changelog
 * Tue Sep 30 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-6
+- Sync with upstream master.
 - Disable more Intel TSX usage in rwlocks (#1146967).
 - Enable lock elision again on s390 and s390x.
 
