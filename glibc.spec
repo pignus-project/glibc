@@ -77,11 +77,6 @@
 # execution is provided by STT_GNU_IFUNC.
 %define multiarcharches ppc %{power64} %{ix86} x86_64 %{sparc}
 ##############################################################################
-# If the architecture has SDT probe point support then we build glibc with
-# --enable-systemtap and include all SDT probe points in the library. It is
-# the eventual goal that all supported arches should be on this list.
-%define systemtaparches %{ix86} x86_64 ppc ppc64 s390 s390x
-##############################################################################
 # Add -s for a less verbose build output.
 %define silentrules PARALLELMFLAGS=
 ##############################################################################
@@ -271,9 +266,7 @@ Requires(pre): basesystem, libgcc
 BuildRequires: gd-devel libpng-devel zlib-devel texinfo, libselinux-devel >= 1.33.4-3
 BuildRequires: audit-libs-devel >= 1.1.3, sed >= 3.95, libcap-devel, gettext, nss-devel
 BuildRequires: /bin/ps, /bin/kill, /bin/awk
-%ifarch %{systemtaparches}
 BuildRequires: systemtap-sdt-devel
-%endif
 
 %if %{run_valgrind_tests}
 BuildRequires: /usr/bin/valgrind
@@ -713,9 +706,7 @@ build()
 		--enable-multi-arch \
 %endif
 		--enable-obsolete-rpc \
-%ifarch %{systemtaparches}
 		--enable-systemtap \
-%endif
 %ifarch ppc64p7
 		--with-cpu=power7 \
 %endif
@@ -1733,6 +1724,7 @@ rm -f *.filelist*
 - Sync with upstream master.
 - Disable more Intel TSX usage in rwlocks (#1146967).
 - Enable lock elision again on s390 and s390x.
+- Enable Systemtap SDT probes for all architectures (#985109).
 
 * Fri Sep 26 2014 Carlos O'Donell <carlos@redhat.com> - 2.20.90-5
 - Disable lock elision support for Intel hardware until microcode
