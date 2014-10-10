@@ -197,6 +197,10 @@ Patch0050: %{name}-rh1124987.patch
 # Disable rwlock elision if --enable-lock-elision is not used.
 Patch0052: %{name}-disable-rwlock-elision.patch
 
+# confstr _CS_PATH should only return /usr/bin on Fedora since /bin is just a
+# symlink to it.
+Patch0053: %{name}-cs-path.patch
+
 ##############################################################################
 #
 # Patches from upstream
@@ -571,6 +575,7 @@ package or when debugging this package.
 %patch0050 -p1
 %patch0052 -p1
 %patch2035 -p1
+%patch0053 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1724,6 +1729,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov 05 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-8
+- Make getconf return only /usr/bin (#1138835).
+
 * Tue Nov 04 2014 Arjun Shankar <arjun.is@lostca.se> - 2.20.90-7
 - Add patch that modifies several tests to use test-skeleton.c.
   The patch is accepted but not yet committed upstream.
