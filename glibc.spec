@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.20-53-g754a15c
 %define glibcversion 2.20.90
-%define glibcrelease 6%{?dist}
+%define glibcrelease 7%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -233,6 +233,9 @@ Patch2031: %{name}-rh1070416.patch
 
 Patch2033: %{name}-aarch64-tls-fixes.patch
 Patch2034: %{name}-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
+
+# https://sourceware.org/ml/libc-alpha/2014-10/msg00744.html
+Patch2035: %{name}-fedora-use-test-skeleton.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -567,6 +570,7 @@ package or when debugging this package.
 %patch2034 -p1
 %patch0050 -p1
 %patch0052 -p1
+%patch2035 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1720,6 +1724,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Nov 04 2014 Arjun Shankar <arjun.is@lostca.se> - 2.20.90-7
+- Add patch that modifies several tests to use test-skeleton.c.
+  The patch is accepted but not yet committed upstream.
+  https://sourceware.org/ml/libc-alpha/2014-10/msg00744.html
+
 * Tue Sep 30 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-6
 - Sync with upstream master.
 - Disable more Intel TSX usage in rwlocks (#1146967).
