@@ -29,7 +29,7 @@ Subject: [PATCH] Properly set __libc_multiple_libcs
  
  
  static void
-@@ -132,9 +130,7 @@ _dl_init (struct link_map *main_map, int argc, char **argv, char **env)
+@@ -132,8 +130,6 @@ _dl_init (struct link_map *main_map, int argc, char **argv, char **env)
    while (i-- > 0)
      call_init (main_map->l_initfini[i], argc, argv, env);
  
@@ -38,7 +38,6 @@ Subject: [PATCH] Properly set __libc_multiple_libcs
    INTUSE(_dl_starting_up) = 0;
 -#endif
  }
- INTDEF (_dl_init)
 --- a/elf/dl-support.c
 +++ b/elf/dl-support.c
 @@ -81,10 +81,8 @@ unsigned long long _dl_load_adds;

@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.20-53-g754a15c
+%define glibcsrcdir  glibc-2.20-153-g29955b5
 %define glibcversion 2.20.90
-%define glibcrelease 7%{?dist}
+%define glibcrelease 8%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -237,9 +237,6 @@ Patch2031: %{name}-rh1070416.patch
 
 Patch2033: %{name}-aarch64-tls-fixes.patch
 Patch2034: %{name}-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
-
-# https://sourceware.org/ml/libc-alpha/2014-10/msg00744.html
-Patch2035: %{name}-fedora-use-test-skeleton.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -574,7 +571,6 @@ package or when debugging this package.
 %patch2034 -p1
 %patch0050 -p1
 %patch0052 -p1
-%patch2035 -p1
 %patch0053 -p1
 
 ##############################################################################
@@ -1731,6 +1727,7 @@ rm -f *.filelist*
 %changelog
 * Wed Nov 05 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-8
 - Make getconf return only /usr/bin (#1138835).
+- Sync with upstream master.
 
 * Tue Nov 04 2014 Arjun Shankar <arjun.is@lostca.se> - 2.20.90-7
 - Add patch that modifies several tests to use test-skeleton.c.
