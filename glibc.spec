@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.20-153-g29955b5
+%define glibcsrcdir  glibc-2.20-205-ga39208b
 %define glibcversion 2.20.90
-%define glibcrelease 8%{?dist}
+%define glibcrelease 9%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1725,6 +1725,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov 19 2014 Carlos O'Donell <carlos@redhat.com> - 2.20.90-9
+- Sync with upstream master.
+
 * Wed Nov 05 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-8
 - Make getconf return only /usr/bin (#1138835).
 - Sync with upstream master.
