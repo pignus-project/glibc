@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.20-276-g0e7e69b
 %define glibcversion 2.20.90
-%define glibcrelease 10%{?dist}
+%define glibcrelease 11%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -237,6 +237,7 @@ Patch2031: %{name}-rh1070416.patch
 
 Patch2033: %{name}-aarch64-tls-fixes.patch
 Patch2034: %{name}-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
+Patch2035: %{name}-aarch64-strchrnul-revert.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -569,6 +570,7 @@ package or when debugging this package.
 %patch0047 -p1
 %patch2033 -p1
 %patch2034 -p1
+%patch2035 -p1
 %patch0050 -p1
 %patch0052 -p1
 %patch0053 -p1
@@ -1725,6 +1727,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Dec 03 2014 Kyle McMartin <kyle@fedoraproject.org> - 2.20.90-11
+- aarch64: revert optimized strchrnul.S implementation (rhbz#1167501)
+  until it can be debugged.
+
 * Fri Nov 28 2014 Carlos O'Donell <carlos@redhat.com> - 2.20.90-10
 - Auto-sync with upstream master.
 
