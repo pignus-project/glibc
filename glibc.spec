@@ -1727,7 +1727,7 @@ rm -f *.filelist*
 
 %changelog
 * Fri Dec 05 2014 Siddhesh Poyarekar <siddhesh@redhat.com> -.2.20.90-12
-- Remove LIB_LANG since we don't install in /usr/lib/locale anymore.
+- Remove LIB_LANG since we don't install locales in /usr/lib/locale anymore.
 - Don't own any directories in /usr/share/locale.
 
 * Wed Dec 03 2014 Kyle McMartin <kyle@fedoraproject.org> - 2.20.90-11
