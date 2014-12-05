@@ -1082,10 +1082,13 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_libdir}/*_p.a
 	 -printf "%%%%verify(not md5 size mtime) " \
 	 , \
 	 ! -path "*/lib/debug/*" -printf "/%%P\n" \)
+  # Print all directories with a %%dir prefix.  We omit the info directory and
+  # all directories in (and including) /usr/share/locale.
   find $RPM_BUILD_ROOT -type d \
+       \( -path '*%{_prefix}/share/locale' -prune -o \
        \( -path '*%{_prefix}/share/*' ! -path '*%{_infodir}' -o \
 	  -path "*%{_prefix}/include/*" \
-       \) -printf "%%%%dir /%%P\n"
+       \) -printf "%%%%dir /%%P\n" \)
 } | {
 
   # primary filelist
@@ -1725,6 +1728,7 @@ rm -f *.filelist*
 %changelog
 * Fri Dec 05 2014 Siddhesh Poyarekar <siddhesh@redhat.com> -.2.20.90-12
 - Remove LIB_LANG since we don't install in /usr/lib/locale anymore.
+- Don't own any directories in /usr/share/locale.
 
 * Wed Dec 03 2014 Kyle McMartin <kyle@fedoraproject.org> - 2.20.90-11
 - aarch64: revert optimized strchrnul.S implementation (rhbz#1167501)
