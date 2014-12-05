@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.20-276-g0e7e69b
 %define glibcversion 2.20.90
-%define glibcrelease 11%{?dist}
+%define glibcrelease 12%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1090,11 +1090,7 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_libdir}/*_p.a
 
   # primary filelist
   SHARE_LANG='s|.*/share/locale/\([^/_]\+\).*/LC_MESSAGES/.*\.mo|%lang(\1) &|'
-  LIB_LANG='s|.*/lib/locale/\([^/_]\+\)|%lang(\1) &|'
-  # rpm does not handle %lang() tagged files hardlinked together accross
-  # languages very well, temporarily disable
-  LIB_LANG=''
-  sed -e "$LIB_LANG" -e "$SHARE_LANG" \
+  sed -e "$SHARE_LANG" \
       -e '\,/etc/\(localtime\|nsswitch.conf\|ld\.so\.conf\|ld\.so\.cache\|default\|rpc\|gai\.conf\),d' \
       -e '\,/%{_lib}/lib\(pcprofile\|memusage\)\.so,d' \
       -e '\,bin/\(memusage\|mtrace\|xtrace\|pcprofiledump\),d'
@@ -1727,6 +1723,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Dec 05 2014 Siddhesh Poyarekar <siddhesh@redhat.com> -.2.20.90-12
+- Remove LIB_LANG since we don't install in /usr/lib/locale anymore.
+
 * Wed Dec 03 2014 Kyle McMartin <kyle@fedoraproject.org> - 2.20.90-11
 - aarch64: revert optimized strchrnul.S implementation (rhbz#1167501)
   until it can be debugged.
