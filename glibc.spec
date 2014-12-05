@@ -1092,12 +1092,17 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_libdir}/*_p.a
 } | {
 
   # primary filelist
-  SHARE_LANG='s|.*/share/locale/\([^/_]\+\).*/LC_MESSAGES/.*\.mo|%lang(\1) &|'
-  sed -e "$SHARE_LANG" \
+
+  # Remove the *.mo entries.  We will add that using %%find_lang
+  sed -e '\,.*/share/locale/\([^/_]\+\).*/LC_MESSAGES/.*\.mo,d' \
       -e '\,/etc/\(localtime\|nsswitch.conf\|ld\.so\.conf\|ld\.so\.cache\|default\|rpc\|gai\.conf\),d' \
       -e '\,/%{_lib}/lib\(pcprofile\|memusage\)\.so,d' \
       -e '\,bin/\(memusage\|mtrace\|xtrace\|pcprofiledump\),d'
 } | sort > rpm.filelist
+
+# Our *.mo files.  Put them in glibc-common.
+%find_lang libc
+mv libc.lang common.filelist
 
 mkdir -p $RPM_BUILD_ROOT%{_libdir}
 mv -f $RPM_BUILD_ROOT/%{_lib}/lib{pcprofile,memusage}.so $RPM_BUILD_ROOT%{_libdir}
@@ -1728,7 +1733,8 @@ rm -f *.filelist*
 %changelog
 * Fri Dec 05 2014 Siddhesh Poyarekar <siddhesh@redhat.com> -.2.20.90-12
 - Remove LIB_LANG since we don't install locales in /usr/lib/locale anymore.
-- Don't own any directories in /usr/share/locale.
+- Don't own any directories in /usr/share/locale (#1167445).
+- Use the %%find_lang macro to get the *.mo files (#1167445).
 
 * Wed Dec 03 2014 Kyle McMartin <kyle@fedoraproject.org> - 2.20.90-11
 - aarch64: revert optimized strchrnul.S implementation (rhbz#1167501)
