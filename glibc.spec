@@ -1093,8 +1093,12 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_libdir}/*_p.a
 
   # primary filelist
 
+  # Add %%lang entries for language-specific locale files.  This allows users
+  # to set %%_install_lang and not install the unnecessary locale files.
+  I18N_LANG='s|.*/share/i18n/locales/\([a-z]\{2\}[a-z]\?\)_[A-Z]\{2\}.*|%lang(\1) &|'
   # Remove the *.mo entries.  We will add that using %%find_lang
   sed -e '\,.*/share/locale/\([^/_]\+\).*/LC_MESSAGES/.*\.mo,d' \
+      -e "$I18N_LANG" \
       -e '\,/etc/\(localtime\|nsswitch.conf\|ld\.so\.conf\|ld\.so\.cache\|default\|rpc\|gai\.conf\),d' \
       -e '\,/%{_lib}/lib\(pcprofile\|memusage\)\.so,d' \
       -e '\,bin/\(memusage\|mtrace\|xtrace\|pcprofiledump\),d'
@@ -1735,6 +1739,7 @@ rm -f *.filelist*
 - Remove LIB_LANG since we don't install locales in /usr/lib/locale anymore.
 - Don't own any directories in /usr/share/locale (#1167445).
 - Use the %%find_lang macro to get the *.mo files (#1167445).
+- Add %%lang tags to language locale files in /usr/share/i18n/locale (#1169044).
 
 * Wed Dec 03 2014 Kyle McMartin <kyle@fedoraproject.org> - 2.20.90-11
 - aarch64: revert optimized strchrnul.S implementation (rhbz#1167501)
