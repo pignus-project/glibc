@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.20-276-g0e7e69b
 %define glibcversion 2.20.90
-%define glibcrelease 12%{?dist}
+%define glibcrelease 13%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -786,6 +786,16 @@ popd
 # Install glibc...
 ##############################################################################
 %install
+
+# Ensure the permissions of errlist.c do not change.  When the file is
+# regenerated the Makefile sets the permissions to 444. We set it to 644
+# to match what comes out of git. The tarball of the git archive won't have
+# correct permissions because git doesn't track all of the permissions
+# accurately (see git-cache-meta if you need that). We also set it to 644 to
+# match pre-existing rpms. We do this *after* the build because the build
+# might regenerate the file and set the permissions to 444.
+chmod 644 sysdeps/gnu/errlist.c
+
 # Reload compiler and build options that were used during %%build.
 GCC=`cat Gcc`
 
@@ -1735,7 +1745,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
-* Fri Dec 05 2014 Siddhesh Poyarekar <siddhesh@redhat.com> -.2.20.90-12
+* Fri Dec 05 2014 Carlos O'Donell <carlos@redhat.com> - 2.20.90-13
+- Fix permission of debuginfo source files to allow multiarch
+  debuginfo packages to be installed and upgraded.
+
+* Fri Dec 05 2014 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-12
 - Remove LIB_LANG since we don't install locales in /usr/lib/locale anymore.
 - Don't own any directories in /usr/share/locale (#1167445).
 - Use the %%find_lang macro to get the *.mo files (#1167445).
