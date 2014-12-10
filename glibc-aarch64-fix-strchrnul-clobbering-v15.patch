@@ -1,0 +1,19 @@
+commit aa76a5c7010e98c737d79f37aa6ae668f60f7a00
+Author: Richard Earnshaw <rearnsha@arm.com>
+Date:   Wed Dec 10 09:54:09 2014 +0000
+
+    [AArch64] Fix strchrnul clobbering v15
+
+diff --git a/sysdeps/aarch64/strchrnul.S b/sysdeps/aarch64/strchrnul.S
+index b98c2e9..57835d8 100644
+--- a/sysdeps/aarch64/strchrnul.S
++++ b/sysdeps/aarch64/strchrnul.S
+@@ -46,7 +46,7 @@
+ #define vhas_nul2	v4
+ #define vhas_chr1	v5
+ #define vhas_chr2	v6
+-#define vrepmask	v15
++#define vrepmask	v7
+ #define vend1		v16
+ 
+ /* Core algorithm.

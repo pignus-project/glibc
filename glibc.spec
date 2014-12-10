@@ -237,7 +237,7 @@ Patch2031: %{name}-rh1070416.patch
 
 Patch2033: %{name}-aarch64-tls-fixes.patch
 Patch2034: %{name}-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
-Patch2035: %{name}-aarch64-strchrnul-revert.patch
+Patch2035: %{name}-aarch64-fix-strchrnul-clobbering-v15.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -1745,6 +1745,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Dec 10 2014 Kyle McMartin <kmcmarti@redhat.com>
+- aarch64: Drop strchrnul.S revert, apply fix from Richard Earnshaw.
+
 * Fri Dec 05 2014 Carlos O'Donell <carlos@redhat.com> - 2.20.90-13
 - Fix permission of debuginfo source files to allow multiarch
   debuginfo packages to be installed and upgraded.
