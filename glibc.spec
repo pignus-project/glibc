@@ -15,7 +15,9 @@
 # You must always set run_glibc_tests to one for production builds.
 %define run_glibc_tests 1
 # Run valgrind test to ensure compatibility.
+%ifarch %{ix86} x86_64 ppc ppc64 ppc64le s390x armv7hl aarch64
 %define run_valgrind_tests 1
+%endif
 ##############################################################################
 # Auxiliary arches are those arches that can be built in addition
 # to the core supported arches. You either install an auxarch or
@@ -273,7 +275,7 @@ BuildRequires: audit-libs-devel >= 1.1.3, sed >= 3.95, libcap-devel, gettext, ns
 BuildRequires: /bin/ps, /bin/kill, /bin/awk
 BuildRequires: systemtap-sdt-devel
 
-%if %{run_valgrind_tests}
+%if 0%{?run_valgrind_tests}
 BuildRequires: /usr/bin/valgrind
 %endif
 
@@ -1547,7 +1549,7 @@ echo ====================PLT RELOCS LIBC.SO==============
 readelf -Wr $RPM_BUILD_ROOT/%{_lib}/libc-*.so | sed -n -e "$PLTCMD"
 echo ====================PLT RELOCS END==================
 
-%if %{run_valgrind_tests}
+%if 0%{?run_valgrind_tests}
 # Finally, check if valgrind runs with the new glibc.
 # We want to fail building if valgrind is not able to run with this glibc so
 # that we can then coordinate with valgrind to get it fixed before we update
@@ -1745,6 +1747,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Dec 28 2014 Dan Horák <dan[at]danny.cz>
+- valgrind available only on selected arches (missing on s390)
+
 * Wed Dec 10 2014 Kyle McMartin <kmcmarti@redhat.com>
 - aarch64: Drop strchrnul.S revert, apply fix from Richard Earnshaw.
 
