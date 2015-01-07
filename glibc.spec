@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.20-276-g0e7e69b
+%define glibcsrcdir  glibc-2.20-480-g46abb64
 %define glibcversion 2.20.90
-%define glibcrelease 13%{?dist}
+%define glibcrelease 15%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -15,7 +15,7 @@
 # You must always set run_glibc_tests to one for production builds.
 %define run_glibc_tests 1
 # Run valgrind test to ensure compatibility.
-%ifarch %{ix86} x86_64 ppc ppc64 ppc64le s390x armv7hl aarch64
+%ifarch %{ix86} x86_64 ppc ppc64le s390x armv7hl aarch64
 %define run_valgrind_tests 1
 %endif
 ##############################################################################
@@ -146,11 +146,7 @@ Patch0005: %{name}-rh825061.patch
 Patch0006: %{name}-arm-hardfloat-3.patch
 
 # Needs to be sent upstream
-Patch0008: %{name}-fedora-getrlimit-PLT.patch
 Patch0009: %{name}-fedora-include-bits-ldbl.patch
-
-# Needs to be sent upstream
-Patch0029: %{name}-rh841318.patch
 
 # All these were from the glibc-fedora.patch mega-patch and need another
 # round of reviewing.  Ideally they'll either be submitted upstream or
@@ -239,7 +235,6 @@ Patch2031: %{name}-rh1070416.patch
 
 Patch2033: %{name}-aarch64-tls-fixes.patch
 Patch2034: %{name}-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
-Patch2035: %{name}-aarch64-fix-strchrnul-clobbering-v15.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -541,7 +536,6 @@ package or when debugging this package.
 %patch0005 -p1
 %patch0006 -p1
 %patch2007 -p1
-%patch0008 -p1
 %patch0009 -p1
 %patch2011 -p1
 %patch0012 -p1
@@ -557,7 +551,6 @@ package or when debugging this package.
 %patch2026 -p1
 %patch2027 -p1
 %patch0028 -p1
-%patch0029 -p1
 %patch0030 -p1
 %patch0031 -p1
 %patch0033 -p1
@@ -572,7 +565,6 @@ package or when debugging this package.
 %patch0047 -p1
 %patch2033 -p1
 %patch2034 -p1
-%patch2035 -p1
 %patch0050 -p1
 %patch0052 -p1
 %patch0053 -p1
@@ -721,6 +713,9 @@ build()
 %endif
 %ifarch %{lock_elision_arches}
 		--enable-lock-elision \
+%endif
+%ifarch armv7hl ppc64 ppc64p7 ppc64le
+		--disable-werror \
 %endif
 		--disable-profile --enable-nss-crypt ||
 		{ cat config.log; false; }
@@ -1747,6 +1742,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jan 07 2015 Siddhesh Poyarekar <siddhesh.poyarekar@gmail.com> - 2.20.90-14
+- Sync with upstream master.
+- Disable -Werror on powerpc and armv7hl.
+- Temporarily disable valgrind test on ppc64.
+
 * Sun Dec 28 2014 Dan Horák <dan[at]danny.cz>
 - valgrind available only on selected arches (missing on s390)
 
