@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.20-480-g46abb64
 %define glibcversion 2.20.90
-%define glibcrelease 15%{?dist}
+%define glibcrelease 16%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -714,7 +714,7 @@ build()
 %ifarch %{lock_elision_arches}
 		--enable-lock-elision \
 %endif
-%ifarch armv7hl ppc64 ppc64p7 ppc64le
+%ifarch armv7hl ppc64 ppc64p7 ppc64le s390 s390x
 		--disable-werror \
 %endif
 		--disable-profile --enable-nss-crypt ||
@@ -1742,6 +1742,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jan 07 2015 Siddhesh Poyarekar <siddhesh.poyarekar@gmail.com> - 2.20.90-16
+- Disable -Werror for s390 as well.
+
 * Wed Jan 07 2015 Siddhesh Poyarekar <siddhesh.poyarekar@gmail.com> - 2.20.90-14
 - Sync with upstream master.
 - Disable -Werror on powerpc and armv7hl.
