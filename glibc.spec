@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.20-480-g46abb64
 %define glibcversion 2.20.90
-%define glibcrelease 16%{?dist}
+%define glibcrelease 17%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -235,6 +235,8 @@ Patch2031: %{name}-rh1070416.patch
 
 Patch2033: %{name}-aarch64-tls-fixes.patch
 Patch2034: %{name}-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
+
+Patch2035: glibc-s390-tls-get-addr.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -568,6 +570,7 @@ package or when debugging this package.
 %patch0050 -p1
 %patch0052 -p1
 %patch0053 -p1
+%patch2035 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1742,6 +1745,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jan 08 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-17
+- Define a __tls_get_addr macro to avoid a conflicting declaration.
+
 * Wed Jan 07 2015 Siddhesh Poyarekar <siddhesh.poyarekar@gmail.com> - 2.20.90-16
 - Disable -Werror for s390 as well.
 
