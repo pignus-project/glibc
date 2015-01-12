@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.20-480-g46abb64
 %define glibcversion 2.20.90
-%define glibcrelease 17%{?dist}
+%define glibcrelease 18%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -716,9 +716,6 @@ build()
 %endif
 %ifarch %{lock_elision_arches}
 		--enable-lock-elision \
-%endif
-%ifarch armv7hl ppc64 ppc64p7 ppc64le s390 s390x
-		--disable-werror \
 %endif
 		--disable-profile --enable-nss-crypt ||
 		{ cat config.log; false; }
@@ -1745,6 +1742,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jan 12 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-18
+- Pass address of main_arena.mutex to mutex_lock/unlock.
+
 * Thu Jan 08 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-17
 - Define a __tls_get_addr macro to avoid a conflicting declaration.
 
