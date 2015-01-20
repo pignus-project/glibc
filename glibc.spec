@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.20-480-g46abb64
 %define glibcversion 2.20.90
-%define glibcrelease 18%{?dist}
+%define glibcrelease 19%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1260,8 +1260,6 @@ rm -rf documentation
 mkdir documentation
 cp crypt/README.ufc-crypt documentation/README.ufc-crypt
 cp timezone/README documentation/README.timezone
-cp ChangeLog{,.15,.16} documentation
-bzip2 -9 documentation/ChangeLog*
 cp posix/gai.conf documentation/
 
 %ifarch s390x
@@ -1742,6 +1740,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jan 20 2015 Peter Robinson <pbrobinson@fedoraproject.org> 2.20.90-19
+- Drop large ancient ChangeLogs (rhbz #1169546)
+
 * Mon Jan 12 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-18
 - Pass address of main_arena.mutex to mutex_lock/unlock.
 
