@@ -22,6 +22,9 @@
 %ifarch s390x
 %define disable_werror 1
 %endif
+# Disable -Werror if we're bootstrapping
+%{!?_with_bootstrap: %global disable_werror 1}
+
 ##############################################################################
 # Auxiliary arches are those arches that can be built in addition
 # to the core supported arches. You either install an auxarch or
