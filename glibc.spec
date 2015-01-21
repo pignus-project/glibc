@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.20-480-g46abb64
+%define glibcsrcdir  glibc-2.20-549-g86bba16
 %define glibcversion 2.20.90
-%define glibcrelease 19%{?dist}
+%define glibcrelease 20%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -17,6 +17,10 @@
 # Run valgrind test to ensure compatibility.
 %ifarch %{ix86} x86_64 ppc ppc64le s390x armv7hl aarch64
 %define run_valgrind_tests 1
+%endif
+# Disable -Werror in builds for these architectures
+%ifarch s390x
+%define disable_werror 1
 %endif
 ##############################################################################
 # Auxiliary arches are those arches that can be built in addition
@@ -235,8 +239,6 @@ Patch2031: %{name}-rh1070416.patch
 
 Patch2033: %{name}-aarch64-tls-fixes.patch
 Patch2034: %{name}-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
-
-Patch2035: glibc-s390-tls-get-addr.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -570,7 +572,6 @@ package or when debugging this package.
 %patch0050 -p1
 %patch0052 -p1
 %patch0053 -p1
-%patch2035 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -716,6 +717,9 @@ build()
 %endif
 %ifarch %{lock_elision_arches}
 		--enable-lock-elision \
+%endif
+%if 0%{?disable_werror}
+               --disable-werror \
 %endif
 		--disable-profile --enable-nss-crypt ||
 		{ cat config.log; false; }
@@ -1740,6 +1744,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jan 21 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-20
+- Sync with upstream master.
+- Disable werror on s390x.
+
 * Tue Jan 20 2015 Peter Robinson <pbrobinson@fedoraproject.org> 2.20.90-19
 - Drop large ancient ChangeLogs (rhbz #1169546)
 
