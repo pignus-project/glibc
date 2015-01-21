@@ -206,6 +206,9 @@ Patch0052: %{name}-disable-rwlock-elision.patch
 # symlink to it.
 Patch0053: %{name}-cs-path.patch
 
+# Temporary revert till I fix rtkaio build on i686.
+Patch0054: %{name}-revert-x86-vdso.patch
+
 ##############################################################################
 #
 # Patches from upstream
@@ -575,6 +578,7 @@ package or when debugging this package.
 %patch0050 -p1
 %patch0052 -p1
 %patch0053 -p1
+%patch0054 -p1 -R
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1750,6 +1754,7 @@ rm -f *.filelist*
 * Wed Jan 21 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-20
 - Sync with upstream master.
 - Disable werror on s390x.
+- Revert x86 vDSO support since it breaks i686 rtkaio build.
 
 * Tue Jan 20 2015 Peter Robinson <pbrobinson@fedoraproject.org> 2.20.90-19
 - Drop large ancient ChangeLogs (rhbz #1169546)
