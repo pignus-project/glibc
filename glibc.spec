@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.21-63-gebf27d1
 %define glibcversion 2.21.90
-%define glibcrelease 2%{?dist}
+%define glibcrelease 3%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1751,6 +1751,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Feb 12 2015 Carlos O'Donell <carlos@systemhalted.org> - 2.21.90-3
+- Fix missing clock_* IFUNCs in librtkaio.
+
 * Thu Feb 12 2015 Carlos O'Donell <carlos@systemhalted.org> - 2.21.90-2
 - Auto-sync with upstream master.
 
