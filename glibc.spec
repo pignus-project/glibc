@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.20-549-g86bba16
+%define glibcsrcdir  glibc-2.21-63-gebf27d1
 %define glibcversion 2.21.90
-%define glibcrelease 1%{?dist}
+%define glibcrelease 2%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1751,6 +1751,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Feb 12 2015 Carlos O'Donell <carlos@systemhalted.org> - 2.21.90-2
+- Auto-sync with upstream master.
+
 * Wed Feb 11 2015 Carlos O'Donell <carlos@systemhalted.org> - 2.21.90-1
 - Add back x86 vDSO support.
 - Fix rtkaio build to reference clock_* functions from libc.
