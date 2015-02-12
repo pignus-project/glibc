@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.20-549-g86bba16
-%define glibcversion 2.20.90
-%define glibcrelease 20%{?dist}
+%define glibcversion 2.21.90
+%define glibcrelease 1%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -206,8 +206,8 @@ Patch0052: %{name}-disable-rwlock-elision.patch
 # symlink to it.
 Patch0053: %{name}-cs-path.patch
 
-# Temporary revert till I fix rtkaio build on i686.
-Patch0054: %{name}-revert-x86-vdso.patch
+# Remove the clock_* functions and use the ones in libc like librt does.
+Patch0054: %{name}-rtkaio-clock.patch
 
 ##############################################################################
 #
@@ -578,7 +578,7 @@ package or when debugging this package.
 %patch0050 -p1
 %patch0052 -p1
 %patch0053 -p1
-%patch0054 -p1 -R
+%patch0054 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1751,6 +1751,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Feb 11 2015 Carlos O'Donell <carlos@systemhalted.org> - 2.21.90-1
+- Add back x86 vDSO support.
+- Fix rtkaio build to reference clock_* functions from libc.
+
 * Wed Jan 21 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.20.90-20
 - Sync with upstream master.
 - Disable werror on s390x.
