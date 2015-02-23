@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.21-63-gebf27d1
+%define glibcsrcdir  glibc-2.21-104-gbdf1ff0
 %define glibcversion 2.21.90
-%define glibcrelease 3%{?dist}
+%define glibcrelease 4%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1751,6 +1751,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Feb 23 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-4
+- Auto-sync with upstream master.
+
 * Sat Feb 21 2015 Till Maas <opensource@till.name> - 2.21.90-3.1
 - Rebuilt for Fedora 23 Change
   https://fedoraproject.org/wiki/Changes/Harden_all_packages_with_position-independent_code
