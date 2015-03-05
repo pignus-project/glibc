@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.21-104-gbdf1ff0
 %define glibcversion 2.21.90
-%define glibcrelease 4%{?dist}
+%define glibcrelease 5%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1579,22 +1579,22 @@ end
 
 %postun -p /sbin/ldconfig
 
-%triggerin common -p <lua> -- glibc
+%triggerin common -e -p <lua> -- glibc
 if posix.stat("%{_prefix}/lib/locale/locale-archive.tmpl", "size") > 0 then
   pid = posix.fork()
   if pid == 0 then
-    posix.exec("%{_prefix}/sbin/build-locale-archive")
+    posix.exec("%{_prefix}/sbin/build-locale-archive", "--install-langs", "%%{_install_langs}")
   elseif pid > 0 then
     posix.wait(pid)
   end
 end
 
-%post common -p <lua>
+%post common -e -p <lua>
 if posix.access("/etc/ld.so.cache") then
   if posix.stat("%{_prefix}/lib/locale/locale-archive.tmpl", "size") > 0 then
     pid = posix.fork()
     if pid == 0 then
-      posix.exec("%{_prefix}/sbin/build-locale-archive")
+      posix.exec("%{_prefix}/sbin/build-locale-archive", "--install-langs", "%%{_install_langs}")
     elseif pid > 0 then
       posix.wait(pid)
     end
@@ -1751,6 +1751,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Mar  3 2015 Mike Fabian <mfabian@redhat.com> - 2.21.90-5
+- Support installing only those locales specified by the RPM macro
+  %%_install_langs (#156477).
+
 * Mon Feb 23 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-4
 - Auto-sync with upstream master.
 
