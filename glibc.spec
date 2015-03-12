@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.21-104-gbdf1ff0
+%define glibcsrcdir  glibc-2.21-194-g2e807f2
 %define glibcversion 2.21.90
-%define glibcrelease 5%{?dist}
+%define glibcrelease 6%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1751,6 +1751,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Mar 12 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-6
+- Auto-sync with upstream master.
+
 * Tue Mar  3 2015 Mike Fabian <mfabian@redhat.com> - 2.21.90-5
 - Support installing only those locales specified by the RPM macro
   %%_install_langs (#156477).
