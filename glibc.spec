@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.21-194-g2e807f2
 %define glibcversion 2.21.90
-%define glibcrelease 6%{?dist}
+%define glibcrelease 7%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1579,22 +1579,22 @@ end
 
 %postun -p /sbin/ldconfig
 
-%triggerin common -e -p <lua> -- glibc
+%triggerin common -p <lua> -- glibc
 if posix.stat("%{_prefix}/lib/locale/locale-archive.tmpl", "size") > 0 then
   pid = posix.fork()
   if pid == 0 then
-    posix.exec("%{_prefix}/sbin/build-locale-archive", "--install-langs", "%%{_install_langs}")
+    posix.exec("%{_prefix}/sbin/build-locale-archive", "--install-langs", rpm.expand("%%{_install_langs}"))
   elseif pid > 0 then
     posix.wait(pid)
   end
 end
 
-%post common -e -p <lua>
+%post common -p <lua>
 if posix.access("/etc/ld.so.cache") then
   if posix.stat("%{_prefix}/lib/locale/locale-archive.tmpl", "size") > 0 then
     pid = posix.fork()
     if pid == 0 then
-      posix.exec("%{_prefix}/sbin/build-locale-archive", "--install-langs", "%%{_install_langs}")
+      posix.exec("%{_prefix}/sbin/build-locale-archive", "--install-langs", rpm.expand("%%{_install_langs}"))
     elseif pid > 0 then
       posix.wait(pid)
     end
@@ -1751,6 +1751,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Mar 17 2015 Carlos O'Donell <carlos@redhat.com> - 2.21.90-7
+- Use rpm.expand in scripts to reduce set of required RPM features.
+
 * Thu Mar 12 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-6
 - Auto-sync with upstream master.
 
