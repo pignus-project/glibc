@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.21-194-g2e807f2
+%define glibcsrcdir  glibc-2.21-217-g7e9c7b9
 %define glibcversion 2.21.90
-%define glibcrelease 7%{?dist}
+%define glibcrelease 8%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1751,6 +1751,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Mar 24 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-8
+- Auto-sync with upstream master.
+
 * Tue Mar 17 2015 Carlos O'Donell <carlos@redhat.com> - 2.21.90-7
 - Use rpm.expand in scripts to reduce set of required RPM features.
 
