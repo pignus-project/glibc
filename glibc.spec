@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.21-240-g9781a37
+%define glibcsrcdir  glibc-2.21-217-g7e9c7b9
 %define glibcversion 2.21.90
-%define glibcrelease 9%{?dist}
+%define glibcrelease 10%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1751,6 +1751,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Apr 07 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-10
+- Revert last auto-sync (#1209451).
+
 * Mon Apr 06 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-9
 - Auto-sync with upstream master.
 
