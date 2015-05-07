@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.21-217-g7e9c7b9
+%define glibcsrcdir  glibc-2.21-320-ga6d78c3
 %define glibcversion 2.21.90
-%define glibcrelease 10%{?dist}
+%define glibcrelease 11%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -208,6 +208,9 @@ Patch0053: %{name}-cs-path.patch
 
 # Remove the clock_* functions and use the ones in libc like librt does.
 Patch0054: %{name}-rtkaio-clock.patch
+
+# Temporarily revert a fix to work around bz #1209451.
+Patch0055: %{name}-revert-arena-threshold-fix.patch
 
 ##############################################################################
 #
@@ -579,6 +582,7 @@ package or when debugging this package.
 %patch0052 -p1
 %patch0053 -p1
 %patch0054 -p1
+%patch0055 -p1 -R
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1751,6 +1755,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu May 07 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-11
+- Auto-sync with upstream master.
+- Revert arena threshold fix to work around #1209451.
+
 * Tue Apr 07 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-10
 - Revert last auto-sync (#1209451).
 
