@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.21-320-ga6d78c3
 %define glibcversion 2.21.90
-%define glibcrelease 11%{?dist}
+%define glibcrelease 12%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
