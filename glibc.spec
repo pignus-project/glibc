@@ -14,6 +14,7 @@
 # If run_glibc_tests is zero then tests are not run for the build.
 # You must always set run_glibc_tests to one for production builds.
 %define run_glibc_tests 1
+%define build_benchtests 1
 # Run valgrind test to ensure compatibility.
 %ifarch %{ix86} x86_64 ppc ppc64le s390x armv7hl aarch64
 %define run_valgrind_tests 1
@@ -110,6 +111,8 @@ Source3: libc-lock.h
 Source4: nscd.conf
 Source7: nsswitch.conf
 Source8: power6emul.c
+Source9: bench.mk
+Source10: glibc-bench-compare
 
 ##############################################################################
 # Start of glibc patches
@@ -248,6 +251,14 @@ Patch2031: %{name}-rh1070416.patch
 
 Patch2033: %{name}-aarch64-tls-fixes.patch
 Patch2034: %{name}-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
+
+##############################################################################
+#
+# Benchmark comparison patches.
+#
+##############################################################################
+Patch3001: %{name}-bench-compare.patch
+Patch3002: %{name}-bench-build.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -532,6 +543,15 @@ package or when debugging this package.
 %endif # %{debuginfocommonarches}
 %endif # 0%{?_enable_debug_packages}
 
+%if %{build_benchtests}
+%package benchtests
+Summary: Benchmarking binaries and scripts for %{name}
+Group: Development/Debug
+%description benchtests
+This package provides built benchmark binaries and scripts to run
+microbenchmark tests on the system.
+%endif
+
 ##############################################################################
 # Prepare for the build.
 ##############################################################################
@@ -583,6 +603,8 @@ package or when debugging this package.
 %patch0053 -p1
 %patch0054 -p1
 %patch0055 -p1 -R
+%patch3001 -p1
+%patch3002 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -600,6 +622,9 @@ package or when debugging this package.
 %if %{buildpower6}
 rm -f sysdeps/powerpc/powerpc32/power4/hp-timing.[ch]
 %endif
+
+# Make benchmark scripts executable
+chmod +x benchtests/scripts/*.py scripts/pylint
 
 # Remove all files generated from patching.
 find . -type f -size 0 -o -name "*.orig" -exec rm -f {} \;
@@ -1289,6 +1314,38 @@ ln -sf /%{_lib}/ld64.so.1 $RPM_BUILD_ROOT/lib/ld64.so.1
 ln -sf /lib/ld-linux-armhf.so.3 $RPM_BUILD_ROOT/lib/ld-linux.so.3
 %endif
 
+# Build benchmark binaries.  Ignore the output of the benchmark runs.
+pushd build-%{target}
+make BENCH_DURATION=1 bench-build
+popd
+
+%if %{build_benchtests}
+# Copy over benchmark binaries.
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/libexec/glibc-benchtests
+cp $(find build-%{target}/benchtests -type f -executable) $RPM_BUILD_ROOT%{_prefix}/libexec/glibc-benchtests/
+
+find build-%{target}/benchtests -type f -executable | while read b; do
+	echo "%{_prefix}/libexec/glibc-benchtests/$(basename $b)"
+done >> benchtests.filelist
+
+# ... and the makefile.
+for b in %{SOURCE9} %{SOURCE10}; do
+	cp $b $RPM_BUILD_ROOT%{_prefix}/libexec/glibc-benchtests/
+	echo "%{_prefix}/libexec/glibc-benchtests/$(basename $b)" >> benchtests.filelist
+done
+
+# .. and finally, the comparison scripts.
+cp benchtests/scripts/benchout.schema.json $RPM_BUILD_ROOT%{_prefix}/libexec/glibc-benchtests/
+cp benchtests/scripts/compare_bench.py $RPM_BUILD_ROOT%{_prefix}/libexec/glibc-benchtests/
+cp benchtests/scripts/import_bench.py $RPM_BUILD_ROOT%{_prefix}/libexec/glibc-benchtests/
+cp benchtests/scripts/validate_benchout.py $RPM_BUILD_ROOT%{_prefix}/libexec/glibc-benchtests/
+
+echo "%{_prefix}/libexec/glibc-benchtests/benchout.schema.json" >> benchtests.filelist
+echo "%{_prefix}/libexec/glibc-benchtests/compare_bench.py*" >> benchtests.filelist
+echo "%{_prefix}/libexec/glibc-benchtests/import_bench.py*" >> benchtests.filelist
+echo "%{_prefix}/libexec/glibc-benchtests/validate_benchout.py*" >> benchtests.filelist
+%endif
+
 ###############################################################################
 # Rebuild libpthread.a using --whole-archive to ensure all of libpthread
 # is included in a static link. This prevents any problems when linking
@@ -1334,7 +1391,7 @@ find_debuginfo_args="$find_debuginfo_args \
 	-p '.*/(sbin|libexec)/.*' \
 	-o debuginfocommon.filelist \
 	-l rpm.filelist \
-	-l nosegneg.filelist"
+	-l nosegneg.filelist -l benchtests.filelist"
 %endif
 eval /usr/lib/rpm/find-debuginfo.sh \
 	"$find_debuginfo_args" \
@@ -1754,7 +1811,15 @@ rm -f *.filelist*
 %endif
 %endif
 
+%if %{build_benchtests}
+%files benchtests -f benchtests.filelist
+%defattr(-,root,root)
+%endif
+
 %changelog
+* Fri May 08 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-12
+- Add benchmark comparison scripts.
+
 * Thu May 07 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-11
 - Auto-sync with upstream master.
 - Revert arena threshold fix to work around #1209451.
