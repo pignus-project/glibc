@@ -251,6 +251,7 @@ Patch2031: %{name}-rh1070416.patch
 
 Patch2033: %{name}-aarch64-tls-fixes.patch
 Patch2034: %{name}-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
+Patch2035: %{name}-new-condvar.patch
 
 ##############################################################################
 #
@@ -605,6 +606,7 @@ microbenchmark tests on the system.
 %patch0055 -p1 -R
 %patch3001 -p1
 %patch3002 -p1
+%patch2035 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1819,6 +1821,7 @@ rm -f *.filelist*
 %changelog
 * Mon May 18 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-13
 - Sync with upstream master.
+- Install new condvar implementation.
 
 * Fri May 08 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-12
 - Add benchmark comparison scripts.
