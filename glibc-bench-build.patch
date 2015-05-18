@@ -30,7 +30,7 @@ index fd3036d..7cbceaa 100644
 +++ b/benchtests/Makefile
 @@ -103,6 +103,10 @@ bench-clean:
  
- bench: $(timing-type) bench-set bench-func bench-malloc
+ bench: $(timing-type) $(gen-locales) bench-set bench-func bench-malloc
  
 +bench-build: bench-set-build bench-func-build
 +bench-set-build: $(binaries-benchset)

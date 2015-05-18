@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.21-320-ga6d78c3
+%define glibcsrcdir  glibc-2.21-357-gb40a4e1
 %define glibcversion 2.21.90
-%define glibcrelease 12%{?dist}
+%define glibcrelease 13%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1817,6 +1817,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon May 18 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-13
+- Sync with upstream master.
+
 * Fri May 08 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-12
 - Add benchmark comparison scripts.
 
