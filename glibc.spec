@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.21-357-gb40a4e1
 %define glibcversion 2.21.90
-%define glibcrelease 13%{?dist}
+%define glibcrelease 14%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1819,6 +1819,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat May 30 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-14
+- Fix build failure on aarch64 (#1226459).
+
 * Mon May 18 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-13
 - Sync with upstream master.
 - Install new condvar implementation.
