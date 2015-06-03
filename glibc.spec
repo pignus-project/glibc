@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.21-357-gb40a4e1
 %define glibcversion 2.21.90
-%define glibcrelease 14%{?dist}
+%define glibcrelease 15%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -197,10 +197,6 @@ Patch0044: %{name}-rh1009145.patch
 Patch0046: %{name}-rh1013801.patch
 
 Patch0047: %{name}-nscd-sysconfig.patch
-
-# Allow up to 32 libraries to use static TLS. Should go upstream after
-# more testing.
-Patch0050: %{name}-rh1124987.patch
 
 # Disable rwlock elision if --enable-lock-elision is not used.
 Patch0052: %{name}-disable-rwlock-elision.patch
@@ -599,7 +595,6 @@ microbenchmark tests on the system.
 %patch0047 -p1
 %patch2033 -p1
 %patch2034 -p1
-%patch0050 -p1
 %patch0052 -p1
 %patch0053 -p1
 %patch0054 -p1
@@ -1819,6 +1814,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jun  3 2015 Carlos O'Donell <carlos@redhat.com> - 2.21.90-15
+- Remove patch to increase DTV surplus which is no longer needed after
+  upstream commit f8aeae347377f3dfa8cbadde057adf1827fb1d44.
+
 * Sat May 30 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-14
 - Fix build failure on aarch64 (#1226459).
 
