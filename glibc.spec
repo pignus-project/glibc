@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.21-357-gb40a4e1
 %define glibcversion 2.21.90
-%define glibcrelease 17%{?dist}
+%define glibcrelease 18%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -248,6 +248,13 @@ Patch2031: glibc-rh1070416.patch
 Patch2033: glibc-aarch64-tls-fixes.patch
 Patch2034: glibc-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
 Patch2035: glibc-new-condvar.patch
+
+# Upstream BZ 18568
+Patch2101: glibc-rh1238412-remove-duplicate-transliterations.patch
+Patch2102: glibc-rh1238412-addition-and-fixes-for-translit_neutral.patch
+Patch2103: glibc-rh1238412-update-the-translit-files-to-unicode-7.0.0.patch
+Patch2104: glibc-rh1238412-add-translit-rules-for-da-nb-nn-sv-locales.patch
+Patch2105: glibc-rh1238412-unicode-8.0.0-update.patch
 
 ##############################################################################
 #
@@ -609,6 +616,12 @@ microbenchmark tests on the system.
 %patch3001 -p1
 %patch3002 -p1
 %patch2035 -p1
+
+%patch2101 -p1
+%patch2102 -p1
+%patch2103 -p1
+%patch2104 -p1
+%patch2105 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1824,6 +1837,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jul 14 2015 Mike FABIAN <mfabian@redhat.com> - 2.21.90-18
+- Unicode 8.0.0 updates (including the transliteration files)
+- Resolves: rhbz#1238412
+
 * Sun Jun 21 2015 Carlos O'Donell <carlos@redhat.com> - 2.21.90-17
 - Remove all linuxthreads handling from glibc spec file.
 
