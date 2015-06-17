@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.21-357-gb40a4e1
 %define glibcversion 2.21.90
-%define glibcrelease 15%{?dist}
+%define glibcrelease 16%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -95,7 +95,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: %{glibcrelease}.1
+Release: %{glibcrelease}
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -419,6 +419,13 @@ which is highly discouraged.
 
 ##############################################################################
 # glibc "headers" sub-package
+# - The headers package includes all common headers that are shared amongst
+#   the multilib builds. It was created to reduce the download size, and
+#   thus avoid downloading one header package per multilib. The package is
+#   identical both in content and file list, any difference is an error.
+#   Files like gnu/stubs.h which have gnu/stubs-32.h (i686) and gnu/stubs-64.h
+#   are included in glibc-headers, but the -32 and -64 files are in their
+#   respective i686 and x86_64 devel packages.
 ##############################################################################
 %package headers
 Summary: Header files for development using standard C libraries.
@@ -1169,13 +1176,17 @@ done
 # Put the info files into the devel file list.
 grep '%{_infodir}' < rpm.filelist | grep -v '%{_infodir}/dir' > devel.filelist
 
-# Put the stub headers into the devel file list.
-grep '%{_prefix}/include/gnu/stubs-[^.]\+\.h' < rpm.filelist >> devel.filelist || :
-
+# The glibc-headers package includes only common files which are identical
+# across all multilib packages. We must keep gnu/stubs.h and gnu/lib-names.h
+# in the glibc-headers package, but the -32, -64, -64-v1, and -64-v2 versions
+# go into the development packages.
+grep '%{_prefix}/include/gnu/stubs-.*\.h$' < rpm.filelist >> devel.filelist || :
+grep '%{_prefix}/include/gnu/lib-names-.*\.h$' < rpm.filelist >> devel.filelist || :
 # Put the include files into headers file list.
-grep '%{_prefix}/include' < rpm.filelist |
-	egrep -v '%{_prefix}/include/(linuxthreads|gnu/stubs-[^.]+\.h)' \
-	> headers.filelist
+grep '%{_prefix}/include' < rpm.filelist \
+  | egrep -v '%{_prefix}/include/(linuxthreads|gnu/stubs-.*\.h$)' \
+  | egrep -v '%{_prefix}/include/(linuxthreads|gnu/lib-names-.*\.h$)' \
+  > headers.filelist
 
 # Remove partial (lib*_p.a) static libraries, include files, and info files from
 # the core glibc package.
@@ -1814,6 +1825,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jun 17 2015 Carlos O'Donell <carlos@redhat.com> - 2.21.90-16
+- Move split out architecture-dependent header files into devel package
+  and keep generic variant in headers package, thus keeping headers package
+  content and file list identical across multilib rpms.
+
 * Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.21.90-15.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
