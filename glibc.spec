@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.21-357-gb40a4e1
 %define glibcversion 2.21.90
-%define glibcrelease 16%{?dist}
+%define glibcrelease 17%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -719,7 +719,7 @@ EnableKernel="--enable-kernel=%{enablekernel}"
 # Save the used compiler and options into the file "Gcc" for use later
 # by %%install.
 echo "$GCC" > Gcc
-AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(linuxthreads\|nptl\|rtkaio\|powerpc-cpu\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
+AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(nptl\|rtkaio\|powerpc-cpu\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
 %ifarch %{rtkaioarches}
 AddOns=,rtkaio$AddOns
 %endif
@@ -1184,8 +1184,8 @@ grep '%{_prefix}/include/gnu/stubs-.*\.h$' < rpm.filelist >> devel.filelist || :
 grep '%{_prefix}/include/gnu/lib-names-.*\.h$' < rpm.filelist >> devel.filelist || :
 # Put the include files into headers file list.
 grep '%{_prefix}/include' < rpm.filelist \
-  | egrep -v '%{_prefix}/include/(linuxthreads|gnu/stubs-.*\.h$)' \
-  | egrep -v '%{_prefix}/include/(linuxthreads|gnu/lib-names-.*\.h$)' \
+  | egrep -v '%{_prefix}/include/gnu/stubs-.*\.h$' \
+  | egrep -v '%{_prefix}/include/gnu/lib-names-.*\.h$' \
   > headers.filelist
 
 # Remove partial (lib*_p.a) static libraries, include files, and info files from
@@ -1209,12 +1209,11 @@ grep '%{_libdir}/lib.*\.a' < rpm.filelist \
 grep '%{_libdir}/.*\.o' < rpm.filelist >> devel.filelist
 grep '%{_libdir}/lib.*\.so' < rpm.filelist >> devel.filelist
 
-# Remove all of the static, object, unversioned DSOs, old linuxthreads stuff,
-# and nscd from the core glibc package.
+# Remove all of the static, object, unversioned DSOs, and nscd from the core
+# glibc package.
 sed -i -e '\|%{_libdir}/lib.*\.a|d' \
        -e '\|%{_libdir}/.*\.o|d' \
        -e '\|%{_libdir}/lib.*\.so|d' \
-       -e '\|%{_libdir}/linuxthreads|d' \
        -e '\|nscd|d' rpm.filelist
 
 # All of the bin and certain sbin files go into the common package.
@@ -1825,6 +1824,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Jun 21 2015 Carlos O'Donell <carlos@redhat.com> - 2.21.90-17
+- Remove all linuxthreads handling from glibc spec file.
+
 * Wed Jun 17 2015 Carlos O'Donell <carlos@redhat.com> - 2.21.90-16
 - Move split out architecture-dependent header files into devel package
   and keep generic variant in headers package, thus keeping headers package
