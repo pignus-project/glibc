@@ -141,75 +141,75 @@ Source10: glibc-bench-compare
 
 # Configuration twiddle, not sure there's a good case to get upstream to
 # change this.
-Patch0001: %{name}-fedora-nscd.patch
+Patch0001: glibc-fedora-nscd.patch
 
-Patch0003: %{name}-fedora-ldd.patch
+Patch0003: glibc-fedora-ldd.patch
 
-Patch0004: %{name}-fedora-ppc-unwind.patch
+Patch0004: glibc-fedora-ppc-unwind.patch
 
 # Build info files in the source tree, then move to the build
 # tree so that they're identical for multilib builds
-Patch0005: %{name}-rh825061.patch
+Patch0005: glibc-rh825061.patch
 
 # Horrible hack, never to be upstreamed.  Can go away once the world
 # has been rebuilt to use the new ld.so path.
-Patch0006: %{name}-arm-hardfloat-3.patch
+Patch0006: glibc-arm-hardfloat-3.patch
 
 # Needs to be sent upstream
-Patch0009: %{name}-fedora-include-bits-ldbl.patch
+Patch0009: glibc-fedora-include-bits-ldbl.patch
 
 # All these were from the glibc-fedora.patch mega-patch and need another
 # round of reviewing.  Ideally they'll either be submitted upstream or
 # dropped.
-Patch0012: %{name}-fedora-linux-tcsetattr.patch
-Patch0014: %{name}-fedora-nptl-linklibc.patch
-Patch0015: %{name}-fedora-localedef.patch
-Patch0016: %{name}-fedora-i386-tls-direct-seg-refs.patch
-Patch0019: %{name}-fedora-nis-rh188246.patch
-Patch0020: %{name}-fedora-manual-dircategory.patch
-Patch0024: %{name}-fedora-locarchive.patch
-Patch0025: %{name}-fedora-streams-rh436349.patch
-Patch0028: %{name}-fedora-localedata-rh61908.patch
-Patch0030: %{name}-fedora-uname-getrlimit.patch
-Patch0031: %{name}-fedora-__libc_multiple_libcs.patch
-Patch0033: %{name}-fedora-elf-ORIGIN.patch
-Patch0034: %{name}-fedora-elf-init-hidden_undef.patch
+Patch0012: glibc-fedora-linux-tcsetattr.patch
+Patch0014: glibc-fedora-nptl-linklibc.patch
+Patch0015: glibc-fedora-localedef.patch
+Patch0016: glibc-fedora-i386-tls-direct-seg-refs.patch
+Patch0019: glibc-fedora-nis-rh188246.patch
+Patch0020: glibc-fedora-manual-dircategory.patch
+Patch0024: glibc-fedora-locarchive.patch
+Patch0025: glibc-fedora-streams-rh436349.patch
+Patch0028: glibc-fedora-localedata-rh61908.patch
+Patch0030: glibc-fedora-uname-getrlimit.patch
+Patch0031: glibc-fedora-__libc_multiple_libcs.patch
+Patch0033: glibc-fedora-elf-ORIGIN.patch
+Patch0034: glibc-fedora-elf-init-hidden_undef.patch
 
 # Needs to be sent upstream.
 # Support mangling and demangling null pointers.
-Patch0037: %{name}-rh952799.patch
+Patch0037: glibc-rh952799.patch
 
 # rtkaio and c_stubs.  Note that despite the numbering, these are always
 # applied first.
-Patch0038: %{name}-rtkaio.patch
-Patch0039: %{name}-c_stubs.patch
+Patch0038: glibc-rtkaio.patch
+Patch0039: glibc-c_stubs.patch
 
 # Remove non-ELF support in rtkaio
-Patch0040: %{name}-rh731833-rtkaio.patch
-Patch0041: %{name}-rh731833-rtkaio-2.patch
-Patch0042: %{name}-rh970865.patch
+Patch0040: glibc-rh731833-rtkaio.patch
+Patch0041: glibc-rh731833-rtkaio-2.patch
+Patch0042: glibc-rh970865.patch
 
 # ARM: Accept that some objects marked hard ABI are now not because of a
 #      binutils bug.
-Patch0044: %{name}-rh1009145.patch
+Patch0044: glibc-rh1009145.patch
 
 # Allow applications to call pthread_atfork without libpthread.so.
-Patch0046: %{name}-rh1013801.patch
+Patch0046: glibc-rh1013801.patch
 
-Patch0047: %{name}-nscd-sysconfig.patch
+Patch0047: glibc-nscd-sysconfig.patch
 
 # Disable rwlock elision if --enable-lock-elision is not used.
-Patch0052: %{name}-disable-rwlock-elision.patch
+Patch0052: glibc-disable-rwlock-elision.patch
 
 # confstr _CS_PATH should only return /usr/bin on Fedora since /bin is just a
 # symlink to it.
-Patch0053: %{name}-cs-path.patch
+Patch0053: glibc-cs-path.patch
 
 # Remove the clock_* functions and use the ones in libc like librt does.
-Patch0054: %{name}-rtkaio-clock.patch
+Patch0054: glibc-rtkaio-clock.patch
 
 # Temporarily revert a fix to work around bz #1209451.
-Patch0055: %{name}-revert-arena-threshold-fix.patch
+Patch0055: glibc-revert-arena-threshold-fix.patch
 
 ##############################################################################
 #
@@ -228,34 +228,34 @@ Patch0055: %{name}-revert-arena-threshold-fix.patch
 #
 
 # http://sourceware.org/ml/libc-alpha/2012-12/msg00103.html
-Patch2007: %{name}-rh697421.patch
+Patch2007: glibc-rh697421.patch
 
-Patch2011: %{name}-rh757881.patch
+Patch2011: glibc-rh757881.patch
 
-Patch2013: %{name}-rh741105.patch
+Patch2013: glibc-rh741105.patch
 
 # Upstream BZ 14247
-Patch2023: %{name}-rh827510.patch
+Patch2023: glibc-rh827510.patch
 
 # Upstream BZ 13028
-Patch2026: %{name}-rh841787.patch
+Patch2026: glibc-rh841787.patch
 
 # Upstream BZ 14185
-Patch2027: %{name}-rh819430.patch
+Patch2027: glibc-rh819430.patch
 
-Patch2031: %{name}-rh1070416.patch
+Patch2031: glibc-rh1070416.patch
 
-Patch2033: %{name}-aarch64-tls-fixes.patch
-Patch2034: %{name}-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
-Patch2035: %{name}-new-condvar.patch
+Patch2033: glibc-aarch64-tls-fixes.patch
+Patch2034: glibc-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
+Patch2035: glibc-new-condvar.patch
 
 ##############################################################################
 #
 # Benchmark comparison patches.
 #
 ##############################################################################
-Patch3001: %{name}-bench-compare.patch
-Patch3002: %{name}-bench-build.patch
+Patch3001: glibc-bench-compare.patch
+Patch3002: glibc-bench-build.patch
 
 ##############################################################################
 # End of glibc patches.
