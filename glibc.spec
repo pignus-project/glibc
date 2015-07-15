@@ -305,6 +305,9 @@ BuildRequires: /usr/bin/valgrind
 # We use systemd rpm macros for nscd
 BuildRequires: systemd
 
+# We use python for the microbenchmarks
+BuildRequires: python
+
 # This is to ensure that __frame_state_for is exported by glibc
 # will be compatible with egcs 1.x.y
 BuildRequires: gcc >= 3.2
@@ -1838,8 +1841,7 @@ rm -f *.filelist*
 
 %changelog
 * Tue Jul 14 2015 Mike FABIAN <mfabian@redhat.com> - 2.21.90-18
-- Unicode 8.0.0 updates (including the transliteration files)
-- Resolves: rhbz#1238412
+- Unicode 8.0.0 updates, including the transliteration files (#1238412).
 
 * Sun Jun 21 2015 Carlos O'Donell <carlos@redhat.com> - 2.21.90-17
 - Remove all linuxthreads handling from glibc spec file.
