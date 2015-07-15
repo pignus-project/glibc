@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.21-357-gb40a4e1
+%define glibcsrcdir  glibc-2.21-649-gae5eae7
 %define glibcversion 2.21.90
-%define glibcrelease 19%{?dist}
+%define glibcrelease 20%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -208,8 +208,7 @@ Patch0053: glibc-cs-path.patch
 # Remove the clock_* functions and use the ones in libc like librt does.
 Patch0054: glibc-rtkaio-clock.patch
 
-# Temporarily revert a fix to work around bz #1209451.
-Patch0055: glibc-revert-arena-threshold-fix.patch
+Patch0055: glibc-rtkaio-libof.patch
 
 ##############################################################################
 #
@@ -230,15 +229,10 @@ Patch0055: glibc-revert-arena-threshold-fix.patch
 # http://sourceware.org/ml/libc-alpha/2012-12/msg00103.html
 Patch2007: glibc-rh697421.patch
 
-Patch2011: glibc-rh757881.patch
-
 Patch2013: glibc-rh741105.patch
 
 # Upstream BZ 14247
 Patch2023: glibc-rh827510.patch
-
-# Upstream BZ 13028
-Patch2026: glibc-rh841787.patch
 
 # Upstream BZ 14185
 Patch2027: glibc-rh819430.patch
@@ -261,7 +255,6 @@ Patch2105: glibc-rh1238412-unicode-8.0.0-update.patch
 # Benchmark comparison patches.
 #
 ##############################################################################
-Patch3001: glibc-bench-compare.patch
 Patch3002: glibc-bench-build.patch
 
 ##############################################################################
@@ -584,7 +577,6 @@ microbenchmark tests on the system.
 %patch0006 -p1
 %patch2007 -p1
 %patch0009 -p1
-%patch2011 -p1
 %patch0012 -p1
 %patch2013 -p1
 %patch0014 -p1
@@ -595,7 +587,6 @@ microbenchmark tests on the system.
 %patch2023 -p1
 %patch0024 -p1
 %patch0025 -p1
-%patch2026 -p1
 %patch2027 -p1
 %patch0028 -p1
 %patch0030 -p1
@@ -615,8 +606,6 @@ microbenchmark tests on the system.
 %patch0052 -p1
 %patch0053 -p1
 %patch0054 -p1
-%patch0055 -p1 -R
-%patch3001 -p1
 %patch3002 -p1
 %patch2035 -p1
 
@@ -625,6 +614,7 @@ microbenchmark tests on the system.
 %patch2103 -p1
 %patch2104 -p1
 %patch2105 -p1
+%patch0055 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1840,6 +1830,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jul 28 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.21.90-20
+- Sync with upstream master.
+
 * Thu Jul 23 2015 Mike FABIAN <mfabian@redhat.com> - 2.21.90-19
 - some more additions to the translit_neutral file by Marko Myllynen
 
