@@ -1,4 +1,4 @@
-From e1663b8dc7ca04db26a37d745bfe043df83d3a64 Mon Sep 17 00:00:00 2001
+From ee7a6e89183bdc8453dd9a0dadf133e65deb9e0b Mon Sep 17 00:00:00 2001
 From: Mike FABIAN <mfabian@redhat.com>
 Date: Fri, 17 Apr 2015 09:12:05 +0200
 Subject: [PATCH 3/5] Update the translit files to Unicode 7.0.0
@@ -28,17 +28,17 @@ for localedata/ChangeLog
  localedata/locales/translit_font                  | 151 ++++-
  localedata/locales/translit_fraction              |  15 +-
  localedata/unicode-gen/Makefile                   |  42 +-
- localedata/unicode-gen/gen_translit_circle.py     | 149 +++++
- localedata/unicode-gen/gen_translit_cjk_compat.py | 219 ++++++++
- localedata/unicode-gen/gen_translit_combining.py  | 441 +++++++++++++++
- localedata/unicode-gen/gen_translit_compat.py     | 325 +++++++++++
- localedata/unicode-gen/gen_translit_font.py       | 155 ++++++
- localedata/unicode-gen/gen_translit_fraction.py   | 196 +++++++
+ localedata/unicode-gen/gen_translit_circle.py     | 150 +++++
+ localedata/unicode-gen/gen_translit_cjk_compat.py | 220 ++++++++
+ localedata/unicode-gen/gen_translit_combining.py  | 442 +++++++++++++++
+ localedata/unicode-gen/gen_translit_compat.py     | 326 +++++++++++
+ localedata/unicode-gen/gen_translit_font.py       | 156 ++++++
+ localedata/unicode-gen/gen_translit_fraction.py   | 197 +++++++
  localedata/unicode-gen/gen_unicode_ctype.py       | 497 +----------------
  localedata/unicode-gen/unicode_utils.py           | 502 +++++++++++++++++
  localedata/unicode-gen/utf8_compatibility.py      | 217 ++------
  localedata/unicode-gen/utf8_gen.py                |  28 +-
- 17 files changed, 3890 insertions(+), 713 deletions(-)
+ 17 files changed, 3896 insertions(+), 713 deletions(-)
  create mode 100755 localedata/unicode-gen/gen_translit_circle.py
  create mode 100755 localedata/unicode-gen/gen_translit_cjk_compat.py
  create mode 100755 localedata/unicode-gen/gen_translit_combining.py
@@ -2395,11 +2395,12 @@ index 166ee31..920bf0e 100644
  downloads: $(DOWNLOADS)
 diff --git a/localedata/unicode-gen/gen_translit_circle.py b/localedata/unicode-gen/gen_translit_circle.py
 new file mode 100755
-index 0000000..a146e7f
+index 0000000..6142859
 --- /dev/null
 +++ b/localedata/unicode-gen/gen_translit_circle.py
-@@ -0,0 +1,149 @@
+@@ -0,0 +1,150 @@
 +#!/usr/bin/python3
++# -*- coding: utf-8 -*-
 +#
 +# Generate a translit_circle file from a UnicodeData file.
 +# Copyright (C) 2015 Free Software Foundation, Inc.
@@ -2465,9 +2466,9 @@ index 0000000..a146e7f
 +        translit_file.write('\n')
 +        translit_file.write('% Transliterations of encircled characters.\n')
 +        translit_file.write('% Generated automatically from UnicodeData.txt '
-+                        + 'by gen_translit_circle.py '
-+                        + 'on {:s} '.format(time.strftime('%Y-%m-%d'))
-+                        + 'for Unicode {:s}.\n'.format(unicode_version))
++                            + 'by gen_translit_circle.py '
++                            + 'on {:s} '.format(time.strftime('%Y-%m-%d'))
++                            + 'for Unicode {:s}.\n'.format(unicode_version))
 +        translit_file.write('\n')
 +        translit_file.write('LC_CTYPE\n')
 +        translit_file.write('\n')
@@ -2550,11 +2551,12 @@ index 0000000..a146e7f
 +        output_tail(TRANSLIT_FILE, tail=TAIL)
 diff --git a/localedata/unicode-gen/gen_translit_cjk_compat.py b/localedata/unicode-gen/gen_translit_cjk_compat.py
 new file mode 100755
-index 0000000..a87d546
+index 0000000..627ff6b
 --- /dev/null
 +++ b/localedata/unicode-gen/gen_translit_cjk_compat.py
-@@ -0,0 +1,219 @@
+@@ -0,0 +1,220 @@
 +#!/usr/bin/python3
++# -*- coding: utf-8 -*-
 +#
 +# Generate a translit_cjk_compat file from a UnicodeData file.
 +# Copyright (C) 2015 Free Software Foundation, Inc.
@@ -2622,9 +2624,9 @@ index 0000000..a87d546
 +        translit_file.write('% Transliterations of CJK compatibility ')
 +        translit_file.write('characters.\n')
 +        translit_file.write('% Generated automatically from UnicodeData.txt '
-+                        + 'by gen_translit_cjk_compat.py '
-+                        + 'on {:s} '.format(time.strftime('%Y-%m-%d'))
-+                        + 'for Unicode {:s}.\n'.format(unicode_version))
++                            + 'by gen_translit_cjk_compat.py '
++                            + 'on {:s} '.format(time.strftime('%Y-%m-%d'))
++                            + 'for Unicode {:s}.\n'.format(unicode_version))
 +        translit_file.write('\n')
 +        translit_file.write('LC_CTYPE\n')
 +        translit_file.write('\n')
@@ -2652,7 +2654,7 @@ index 0000000..a87d546
 +        (0x00B2,): [0x005E, 0x0032], # ² → ^2
 +        (0x03BC,): [0x00B5], # μ → µ (GREEK SMALL LETTER MU → MICRO SIGN)
 +        (0x2113,): [0x006C], # ℓ → l
-+        (0x00B3,): [0x005E,  0x0033], # ³ → ^3
++        (0x00B3,): [0x005E, 0x0033], # ³ → ^3
 +        (0x00B5,): [0x0075], # µ → u
 +        (0x03BC, 0x2113): [0x03BC, 0x006C], # μℓ → μl
 +        (0x0072, 0x0061, 0x0064, 0x2215, 0x0073, 0x00B2): [
@@ -2680,7 +2682,7 @@ index 0000000..a87d546
 +                    special_decomposed_code_points = special_decompose(
 +                        decomposed_code_points[-1])
 +                    if (special_decomposed_code_points
-+                        != decomposed_code_points[-1]):
++                            != decomposed_code_points[-1]):
 +                        decomposed_code_points.append(
 +                            special_decomposed_code_points)
 +                        continue
@@ -2689,7 +2691,7 @@ index 0000000..a87d546
 +                        special_decomposed_code_points += special_decompose(
 +                            [decomposed_code_point])
 +                    if (special_decomposed_code_points
-+                        == decomposed_code_points[-1]):
++                            == decomposed_code_points[-1]):
 +                        break
 +                    decomposed_code_points.append(
 +                        special_decomposed_code_points)
@@ -2775,11 +2777,12 @@ index 0000000..a87d546
 +        output_tail(TRANSLIT_FILE, tail=TAIL)
 diff --git a/localedata/unicode-gen/gen_translit_combining.py b/localedata/unicode-gen/gen_translit_combining.py
 new file mode 100755
-index 0000000..07ed739
+index 0000000..2551ce1
 --- /dev/null
 +++ b/localedata/unicode-gen/gen_translit_combining.py
-@@ -0,0 +1,441 @@
+@@ -0,0 +1,442 @@
 +#!/usr/bin/python3
++# -*- coding: utf-8 -*-
 +#
 +# Generate a translit_combining file from a UnicodeData file.
 +# Copyright (C) 2015 Free Software Foundation, Inc.
@@ -2847,9 +2850,9 @@ index 0000000..07ed739
 +        translit_file.write('combining characters (accents,\n')
 +        translit_file.write('% pronounciation marks, etc.).\n')
 +        translit_file.write('% Generated automatically from UnicodeData.txt '
-+                        + 'by gen_translit_combining.py '
-+                        + 'on {:s} '.format(time.strftime('%Y-%m-%d'))
-+                        + 'for Unicode {:s}.\n'.format(unicode_version))
++                            + 'by gen_translit_combining.py '
++                            + 'on {:s} '.format(time.strftime('%Y-%m-%d'))
++                            + 'for Unicode {:s}.\n'.format(unicode_version))
 +        translit_file.write('\n')
 +        translit_file.write('LC_CTYPE\n')
 +        translit_file.write('\n')
@@ -3061,7 +3064,7 @@ index 0000000..07ed739
 +        (0x2226,): [0x0021, 0x2225], # ∦ → !∥
 +        (0x2241,): [0x0021, 0x007E], # ≁ → !~
 +        (0x2244,): [0x0021, 0x007E, 0x002D], # ≄ → !~-
-+        (0x2247,): [0x0021, 0x007E, 0x003D ], # ≇ → !~=
++        (0x2247,): [0x0021, 0x007E, 0x003D], # ≇ → !~=
 +        (0x2249,): [0x0021, 0x007E, 0x007E], # ≉ → !~~
 +        (0x2260,): [0x0021, 0x003D], # ≠ → !=
 +        (0x2262,): [0x0021, 0x003D, 0x003D], # ≢ → !==
@@ -3135,7 +3138,7 @@ index 0000000..07ed739
 +                special_decomposed_code_points = special_decompose(
 +                    decomposed_code_points[-1])
 +                if (special_decomposed_code_points
-+                    != decomposed_code_points[-1]):
++                        != decomposed_code_points[-1]):
 +                    decomposed_code_points.append(
 +                        special_decomposed_code_points)
 +                    continue
@@ -3144,7 +3147,7 @@ index 0000000..07ed739
 +                    special_decomposed_code_points += special_decompose(
 +                        [decomposed_code_point])
 +                if (special_decomposed_code_points
-+                    == decomposed_code_points[-1]):
++                        == decomposed_code_points[-1]):
 +                    break
 +                decomposed_code_points.append(
 +                    special_decomposed_code_points)
@@ -3222,11 +3225,12 @@ index 0000000..07ed739
 +        output_tail(TRANSLIT_FILE, tail=TAIL)
 diff --git a/localedata/unicode-gen/gen_translit_compat.py b/localedata/unicode-gen/gen_translit_compat.py
 new file mode 100755
-index 0000000..d99e56d
+index 0000000..0e824a8
 --- /dev/null
 +++ b/localedata/unicode-gen/gen_translit_compat.py
-@@ -0,0 +1,325 @@
+@@ -0,0 +1,326 @@
 +#!/usr/bin/python3
++# -*- coding: utf-8 -*-
 +#
 +# Generate a translit_compat file from a UnicodeData file.
 +# Copyright (C) 2015 Free Software Foundation, Inc.
@@ -3293,9 +3297,9 @@ index 0000000..d99e56d
 +        translit_file.write('% Transliterations of compatibility characters ')
 +        translit_file.write('and ligatures.\n')
 +        translit_file.write('% Generated automatically from UnicodeData.txt '
-+                        + 'by gen_translit_compat.py '
-+                        + 'on {:s} '.format(time.strftime('%Y-%m-%d'))
-+                        + 'for Unicode {:s}.\n'.format(unicode_version))
++                            + 'by gen_translit_compat.py '
++                            + 'on {:s} '.format(time.strftime('%Y-%m-%d'))
++                            + 'for Unicode {:s}.\n'.format(unicode_version))
 +        translit_file.write('\n')
 +        translit_file.write('LC_CTYPE\n')
 +        translit_file.write('\n')
@@ -3347,9 +3351,9 @@ index 0000000..d99e56d
 +            decomposed_code_points = [int(x, 16)
 +                                      for x in decomposition.split(' ')]
 +            if (len(decomposed_code_points) > 1
-+                and decomposed_code_points[0] == 0x0020
-+                and decomposed_code_points[1] >= 0x0300
-+                and decomposed_code_points[1] <= 0x03FF):
++                    and decomposed_code_points[0] == 0x0020
++                    and decomposed_code_points[1] >= 0x0300
++                    and decomposed_code_points[1] <= 0x03FF):
 +                # Decomposes into a space followed by a combining character.
 +                # This is not useful fo transliteration.
 +                return []
@@ -3463,7 +3467,7 @@ index 0000000..d99e56d
 +                special_decomposed_code_points = special_decompose(
 +                    decomposed_code_points[-1])
 +                if (special_decomposed_code_points
-+                    != decomposed_code_points[-1]):
++                        != decomposed_code_points[-1]):
 +                    decomposed_code_points.append(
 +                        special_decomposed_code_points)
 +                    continue
@@ -3472,7 +3476,7 @@ index 0000000..d99e56d
 +                    special_decomposed_code_points += special_decompose(
 +                        [decomposed_code_point])
 +                if (special_decomposed_code_points
-+                    == decomposed_code_points[-1]):
++                        == decomposed_code_points[-1]):
 +                    break
 +                decomposed_code_points.append(
 +                    special_decomposed_code_points)
@@ -3553,11 +3557,12 @@ index 0000000..d99e56d
 +        output_tail(TRANSLIT_FILE, tail=TAIL)
 diff --git a/localedata/unicode-gen/gen_translit_font.py b/localedata/unicode-gen/gen_translit_font.py
 new file mode 100755
-index 0000000..c7ec509
+index 0000000..0723622
 --- /dev/null
 +++ b/localedata/unicode-gen/gen_translit_font.py
-@@ -0,0 +1,155 @@
+@@ -0,0 +1,156 @@
 +#!/usr/bin/python3
++# -*- coding: utf-8 -*-
 +#
 +# Generate a translit_font file from a UnicodeData file.
 +# Copyright (C) 2015 Free Software Foundation, Inc.
@@ -3623,9 +3628,9 @@ index 0000000..c7ec509
 +        translit_file.write('\n')
 +        translit_file.write('% Transliterations of font equivalents.\n')
 +        translit_file.write('% Generated automatically from UnicodeData.txt '
-+                        + 'by gen_translit_font.py '
-+                        + 'on {:s} '.format(time.strftime('%Y-%m-%d'))
-+                        + 'for Unicode {:s}.\n'.format(unicode_version))
++                            + 'by gen_translit_font.py '
++                            + 'on {:s} '.format(time.strftime('%Y-%m-%d'))
++                            + 'for Unicode {:s}.\n'.format(unicode_version))
 +        translit_file.write('\n')
 +        translit_file.write('LC_CTYPE\n')
 +        translit_file.write('\n')
@@ -3714,11 +3719,12 @@ index 0000000..c7ec509
 +        output_tail(TRANSLIT_FILE, tail=TAIL)
 diff --git a/localedata/unicode-gen/gen_translit_fraction.py b/localedata/unicode-gen/gen_translit_fraction.py
 new file mode 100755
-index 0000000..bf460f2
+index 0000000..5bf63ea
 --- /dev/null
 +++ b/localedata/unicode-gen/gen_translit_fraction.py
-@@ -0,0 +1,196 @@
+@@ -0,0 +1,197 @@
 +#!/usr/bin/python3
++# -*- coding: utf-8 -*-
 +#
 +# Generate a translit_fraction file from a UnicodeData file.
 +# Copyright (C) 2015 Free Software Foundation, Inc.
@@ -3784,9 +3790,9 @@ index 0000000..bf460f2
 +        translit_file.write('\n')
 +        translit_file.write('% Transliterations of fractions.\n')
 +        translit_file.write('% Generated automatically from UnicodeData.txt '
-+                        + 'by gen_translit_fraction.py '
-+                        + 'on {:s} '.format(time.strftime('%Y-%m-%d'))
-+                        + 'for Unicode {:s}.\n'.format(unicode_version))
++                            + 'by gen_translit_fraction.py '
++                            + 'on {:s} '.format(time.strftime('%Y-%m-%d'))
++                            + 'for Unicode {:s}.\n'.format(unicode_version))
 +        translit_file.write('% The replacements have been surrounded ')
 +        translit_file.write('with spaces, because fractions are\n')
 +        translit_file.write('% often preceded by a decimal number and ')
@@ -3840,7 +3846,7 @@ index 0000000..bf460f2
 +                    special_decomposed_code_points = special_decompose(
 +                        decomposed_code_points[-1])
 +                    if (special_decomposed_code_points
-+                        != decomposed_code_points[-1]):
++                            != decomposed_code_points[-1]):
 +                        decomposed_code_points.append(
 +                            special_decomposed_code_points)
 +                        continue
@@ -3849,7 +3855,7 @@ index 0000000..bf460f2
 +                        special_decomposed_code_points += special_decompose(
 +                            [decomposed_code_point])
 +                    if (special_decomposed_code_points
-+                        == decomposed_code_points[-1]):
++                            == decomposed_code_points[-1]):
 +                        break
 +                    decomposed_code_points.append(
 +                        special_decomposed_code_points)

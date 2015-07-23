@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.21-357-gb40a4e1
 %define glibcversion 2.21.90
-%define glibcrelease 18%{?dist}
+%define glibcrelease 19%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1840,6 +1840,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jul 23 2015 Mike FABIAN <mfabian@redhat.com> - 2.21.90-19
+- some more additions to the translit_neutral file by Marko Myllynen
+
 * Tue Jul 14 2015 Mike FABIAN <mfabian@redhat.com> - 2.21.90-18
 - Unicode 8.0.0 updates, including the transliteration files (#1238412).
 

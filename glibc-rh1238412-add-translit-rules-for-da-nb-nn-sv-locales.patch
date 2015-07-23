@@ -1,4 +1,4 @@
-From e857f3e60cfb440cdaa7f933e9989d7b0a06e0e2 Mon Sep 17 00:00:00 2001
+From 46f5006361350be7eb076c8c968e1cdfc4eaad26 Mon Sep 17 00:00:00 2001
 From: Mike FABIAN <mfabian@redhat.com>
 Date: Wed, 20 May 2015 11:16:30 +0200
 Subject: [PATCH 4/5] Add transliteration rules for da, nb, nn, and sv locales.
@@ -16,10 +16,10 @@ for localedata/Changelog
  3 files changed, 62 insertions(+), 3 deletions(-)
 
 diff --git a/localedata/locales/da_DK b/localedata/locales/da_DK
-index c5024a4..d1d4087 100644
+index a3c5561..3248e3c 100644
 --- a/localedata/locales/da_DK
 +++ b/localedata/locales/da_DK
-@@ -137,11 +137,26 @@ translit_start
+@@ -136,11 +136,26 @@ translit_start
  
  include "translit_combining";""
  

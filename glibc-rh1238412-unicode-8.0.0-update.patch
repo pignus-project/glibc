@@ -1,4 +1,4 @@
-From 207b5d41e812f523e9dfd971a1d40e02eae84fed Mon Sep 17 00:00:00 2001
+From ceebbb1989d33ca7a5a6827dbdbcc6579f275ecc Mon Sep 17 00:00:00 2001
 From: Mike FABIAN <mfabian@redhat.com>
 Date: Mon, 22 Jun 2015 13:00:44 +0200
 Subject: [PATCH 5/5] Unicode 8.0.0 update.
@@ -9912,10 +9912,10 @@ index 31c8a7e..aa0e914 100644
  2F801;CJK COMPATIBILITY IDEOGRAPH-2F801;Lo;0;L;4E38;;;;N;;;;;
  2F802;CJK COMPATIBILITY IDEOGRAPH-2F802;Lo;0;L;4E41;;;;N;;;;;
 diff --git a/localedata/unicode-gen/gen_translit_combining.py b/localedata/unicode-gen/gen_translit_combining.py
-index 07ed739..11250c6 100755
+index 2551ce1..abcfeef 100755
 --- a/localedata/unicode-gen/gen_translit_combining.py
 +++ b/localedata/unicode-gen/gen_translit_combining.py
-@@ -168,7 +168,9 @@ def is_combining_remove(code_point):
+@@ -169,7 +169,9 @@ def is_combining_remove(code_point):
                        'PAHAWH HMONG',
                        'MIAO',
                        'DUPLOYAN',

@@ -1,4 +1,4 @@
-From 0df7fd67146848ce3d61ddeffdd59f58bb408312 Mon Sep 17 00:00:00 2001
+From 18f1d53b474ce60dbb943e08478e712e72ece02e Mon Sep 17 00:00:00 2001
 From: Mike FABIAN <mfabian@redhat.com>
 Date: Thu, 30 Apr 2015 16:44:03 +0200
 Subject: [PATCH 2/5] Addition and fixes for translit_neutral
@@ -15,14 +15,14 @@ Content-Transfer-Encoding: 8bit
 - Add some more currency signs suggested by Marko Myllynen
 - Add another patch with more characters by Marko Myllynen
 ---
- localedata/locales/translit_neutral | 462 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 457 insertions(+), 5 deletions(-)
+ localedata/locales/translit_neutral | 470 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 465 insertions(+), 5 deletions(-)
 
 diff --git a/localedata/locales/translit_neutral b/localedata/locales/translit_neutral
-index b5cc079..a1a7472 100644
+index b5cc079..c16d6f0 100644
 --- a/localedata/locales/translit_neutral
 +++ b/localedata/locales/translit_neutral
-@@ -18,6 +18,16 @@ include "translit_wide";""
+@@ -18,30 +18,306 @@ include "translit_wide";""
  
  % NO-BREAK SPACE
  <U00A0> <U0020>
@@ -39,7 +39,10 @@ index b5cc079..a1a7472 100644
  % COPYRIGHT SIGN
  <U00A9> "<U0028><U0043><U0029>"
  % LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
-@@ -26,22 +36,284 @@ include "translit_wide";""
+ <U00AB> "<U003C><U003C>"
++% NOT SIGN
++<U00AC> <U0021>
+ % SOFT HYPHEN
  <U00AD> <U002D>
  % REGISTERED SIGN
  <U00AE> "<U0028><U0052><U0029>"
@@ -72,6 +75,8 @@ index b5cc079..a1a7472 100644
  <U00E6> "<U0061><U0065>"
 +% LATIN SMALL LETTER ETH
 +<U00F0> <U0064>
++% DIVISION SIGN
++<U00F7> <U002F>
  % LATIN SMALL LETTER O WITH STROKE
 -<U00F8> "<U006F><U0065>"
 +<U00F8> <U006F>
@@ -326,7 +331,7 @@ index b5cc079..a1a7472 100644
  % MODIFIER LETTER PRIME
  <U02B9> <U2032>;<U00B4>
  % MODIFIER LETTER DOUBLE PRIME
-@@ -68,6 +340,136 @@ include "translit_wide";""
+@@ -68,6 +344,138 @@ include "translit_wide";""
  <U02D0> <U003A>
  % SMALL TILDE
  <U02DC> <U007E>
@@ -442,6 +447,8 @@ index b5cc079..a1a7472 100644
 +<U1D99> <U0075>
 +% LATIN SMALL LETTER A WITH RIGHT HALF RING
 +<U1E9A> <U0061>
++% LATIN SMALL LETTER LONG S WITH DOT ABOVE
++<U1E9B> <U0073>
 +% LATIN SMALL LETTER LONG S WITH DIAGONAL STROKE
 +<U1E9C> <U0073>
 +% LATIN SMALL LETTER LONG S WITH HIGH STROKE
@@ -463,7 +470,16 @@ index b5cc079..a1a7472 100644
  % ZERO WIDTH SPACE
  <U200B> ""
  % HYPHEN
-@@ -130,12 +532,36 @@ include "translit_wide";""
+@@ -120,6 +528,8 @@ include "translit_wide";""
+ <U2039> <U003C>
+ % SINGLE RIGHT-POINTING ANGLE QUOTATION MARK
+ <U203A> <U003E>
++% TIRONIAN SIGN ET
++<U204A> <U0026>
+ % FRACTION SLASH
+ <U2044> <U002F>
+ % WORD JOINER
+@@ -130,12 +540,36 @@ include "translit_wide";""
  <U2062> ""
  % INVISIBLE SEPARATOR
  <U2063> ""
@@ -501,7 +517,7 @@ index b5cc079..a1a7472 100644
  % TRADE MARK SIGN
  <U2122> "<U0028><U0054><U004D><U0029>"
  % OHM SIGN
-@@ -150,10 +576,10 @@ include "translit_wide";""
+@@ -150,10 +584,10 @@ include "translit_wide";""
  <U2194> "<U003C><U002D><U003E>"
  % LEFTWARDS DOUBLE ARROW
  <U21D0> "<U003C><U003D>"
@@ -514,7 +530,7 @@ index b5cc079..a1a7472 100644
  % MINUS SIGN
  <U2212> <U2013>;<U002D>
  % DIVISION SLASH
-@@ -166,6 +592,8 @@ include "translit_wide";""
+@@ -166,6 +600,8 @@ include "translit_wide";""
  <U2219> <U2022>;<U00B7>
  % DIVIDES
  <U2223> <U007C>
@@ -523,7 +539,7 @@ index b5cc079..a1a7472 100644
  % RATIO
  <U2236> <U003A>
  % TILDE OPERATOR
-@@ -280,8 +708,32 @@ include "translit_wide";""
+@@ -280,8 +716,32 @@ include "translit_wide";""
  <U2534> <U002B>
  % BOX DRAWINGS LIGHT VERTICAL AND HORIZONTAL
  <U253C> <U002B>
