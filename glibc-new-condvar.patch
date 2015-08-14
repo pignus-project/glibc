@@ -1903,7 +1903,7 @@ index 845629d..fcd45c9 100644
         start of the 4-word lock structure, the next four words
         are set all to 1 by the Linuxthreads
         PTHREAD_COND_INITIALIZER.  */
--    int __lock __attribute__ ((aligned(16)));
+-    int __lock __attribute__ ((__aligned__(16)));
 +    unsigned int __wseq __attribute__ ((aligned(16)));
      /* Tracks the initialization of this structure:
         0  initialized with NPTL PTHREAD_COND_INITIALIZER.
