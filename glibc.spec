@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.22-63-g37d83a0
+%define glibcsrcdir  glibc-2.22-70-gd5dff79
 %define glibcversion 2.22.90
-%define glibcrelease 2%{?dist}
+%define glibcrelease 3%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1830,6 +1830,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Aug 16 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.22.90-3
+- Auto-sync with upstream master.
+
 * Fri Aug 14 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.22.90-2
 - Remove initgroups from the default nsswitch.conf (#751450).
 
