@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.22-70-gd5dff79
+%define glibcsrcdir  glibc-2.22-193-g315267a
 %define glibcversion 2.22.90
-%define glibcrelease 4%{?dist}
+%define glibcrelease 5%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1823,6 +1823,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Aug 28 2015 Carlos O'Donell <carlos@systemhalted.org> - 2.22.90-5
+- Auto-sync with upstream master.
+
 * Thu Aug 27 2015 Carlos O'Donell <carlos@redhat.com> - 2.22.90-4
 - Build require gcc-c++ for the C++ tests.
 - Support --without testsuite option to disable testing after build.
