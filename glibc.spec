@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-70-gd5dff79
 %define glibcversion 2.22.90
-%define glibcrelease 3%{?dist}
+%define glibcrelease 4%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -11,21 +11,50 @@
 # glibc_release_url is only defined when we have a release tarball.
 # % define glibc_release_url http://ftp.gnu.org/gnu/glibc/
 ##############################################################################
-# If run_glibc_tests is zero then tests are not run for the build.
-# You must always set run_glibc_tests to one for production builds.
-%define run_glibc_tests 1
-%define build_benchtests 1
-# Run valgrind test to ensure compatibility.
-%ifarch %{ix86} x86_64 ppc ppc64le s390x armv7hl aarch64
-%define run_valgrind_tests 1
-%endif
-# Disable -Werror in builds for these architectures
-%ifarch s390x
-%define disable_werror 1
-%endif
-# Disable -Werror if we're bootstrapping
-%{!?_with_bootstrap: %global disable_werror 1}
+# We support hte following options:
+# --with/--without,
+# * testsuite - Running the testsuite.
+# * benchtests - Running and building benchmark subpackage.
+# * bootstrap - Bootstrapping the package.
+# * werror - Build with -Werror
+# * docs - Build with documentation and the required dependencies.
+# * valgrind - Run smoke tests with valgrind to verify dynamic loader.
+#
+# You must always run the testsuite for production builds.
+# Default: Always run the testsuite.
+%bcond_without testsuite
+# Default: Always build the benchtests.
+%bcond_without benchtests
+# Default: Not bootstrapping.
+%bcond_with bootstrap
+# Default: Enable using -Werror
+%bcond_without werror
+# Default: Always build documentation.
+%bcond_without docs
+# Default: Always run valgrind tests
+%bcond_without valgrind
 
+# Run a valgrind smoke test to ensure that the release is compatible and
+# doesn't any new feature that might cause valgrind to abort.
+%if %{with valgrind}
+%ifarch s390
+# There is no valgrind support for 31-bit s390.
+%undefine with_valgrind
+%endif
+%endif
+%if %{with werror}
+%ifarch s390x
+# The 64-bit s390x builds are not -Werror clean yet.
+%undefine with_werror
+%endif
+%endif
+%if %{with bootstrap}
+# Disable benchtests, -Werror, docs, and valgrind if we're bootstrapping
+%undefine with_benchtests
+%undefine with_werror
+%undefine with_docs
+%undefine with_valgrind
+%endif
 ##############################################################################
 # Auxiliary arches are those arches that can be built in addition
 # to the core supported arches. You either install an auxarch or
@@ -62,12 +91,6 @@
 %else
 %define buildpower6 0
 %endif
-##############################################################################
-# We build librtkaio for all rtkaioarches. The library is installed into
-# a distinct subdirectory in the lib dir. This define enables the rtkaio
-# add-on during the build. Upstream does not have rtkaio and it is provided
-# strictly as part of our builds.
-%define rtkaioarches %{ix86} x86_64 ppc %{power64} s390 s390x
 ##############################################################################
 # Any architecture/kernel combination that supports running 32-bit and 64-bit
 # code in userspace is considered a biarch arch.
@@ -179,16 +202,6 @@ Patch0034: glibc-fedora-elf-init-hidden_undef.patch
 # Support mangling and demangling null pointers.
 Patch0037: glibc-rh952799.patch
 
-# rtkaio and c_stubs.  Note that despite the numbering, these are always
-# applied first.
-Patch0038: glibc-rtkaio.patch
-Patch0039: glibc-c_stubs.patch
-
-# Remove non-ELF support in rtkaio
-Patch0040: glibc-rh731833-rtkaio.patch
-Patch0041: glibc-rh731833-rtkaio-2.patch
-Patch0042: glibc-rh970865.patch
-
 # ARM: Accept that some objects marked hard ABI are now not because of a
 #      binutils bug.
 Patch0044: glibc-rh1009145.patch
@@ -204,11 +217,6 @@ Patch0052: glibc-disable-rwlock-elision.patch
 # confstr _CS_PATH should only return /usr/bin on Fedora since /bin is just a
 # symlink to it.
 Patch0053: glibc-cs-path.patch
-
-# Remove the clock_* functions and use the ones in libc like librt does.
-Patch0054: glibc-rtkaio-clock.patch
-
-Patch0055: glibc-rtkaio-libof.patch
 
 ##############################################################################
 #
@@ -286,12 +294,23 @@ Requires(pre): basesystem, libgcc
 
 # This is for building auxiliary programs like memusage, nscd
 # For initial glibc bootstraps it can be commented out
-BuildRequires: gd-devel libpng-devel zlib-devel texinfo, libselinux-devel >= 1.33.4-3
-BuildRequires: audit-libs-devel >= 1.1.3, sed >= 3.95, libcap-devel, gettext, nss-devel
+BuildRequires: gd-devel libpng-devel zlib-devel
+%if %{with docs}
+# Removing texinfo will cause check-safety.sh test to fail because it seems to
+# trigger documentation generation based on dependencies.  We need to fix this
+# upstream in some way that doesn't depend on generating docs to validate the
+# texinfo.  I expect it's simply the wrong dependency for that target.
+BuildRequires: texinfo
+%endif
+%if %{without bootstrap}
+BuildRequires: libselinux-devel >= 1.33.4-3
+BuildRequires: nss-devel
+%endif
+BuildRequires: audit-libs-devel >= 1.1.3, sed >= 3.95, libcap-devel, gettext
 BuildRequires: /bin/ps, /bin/kill, /bin/awk
 BuildRequires: systemtap-sdt-devel
 
-%if 0%{?run_valgrind_tests}
+%if %{with valgrind}
 BuildRequires: /usr/bin/valgrind
 %endif
 
@@ -351,8 +370,9 @@ BuildRequires: elfutils >= 0.72
 BuildRequires: rpm >= 4.2-0.56
 %endif
 
-# The testsuite builds static C++ binaries that require a static
-# C++ runtime from libstdc++-static.
+# The testsuite builds static C++ binaries that require a C++ compiler
+# and static C++ runtime from libstdc++-static.
+BuildRequires: gcc-c++
 BuildRequires: libstdc++-static
 
 # Filter out all GLIBC_PRIVATE symbols since they are internal to
@@ -475,7 +495,10 @@ libraries, as well as national language (locale) support.
 Summary: A Name Service Caching Daemon (nscd).
 Group: System Environment/Daemons
 Requires: %{name} = %{version}-%{release}
-Requires: libselinux >= 1.17.10-1, audit-libs >= 1.1.3
+%if %{with bootstrap}
+Requires: libselinux >= 1.17.10-1
+%endif
+Requires: audit-libs >= 1.1.3
 Requires(pre): /usr/sbin/useradd, coreutils
 Requires(post): systemd
 Requires(preun): systemd
@@ -550,7 +573,7 @@ package or when debugging this package.
 %endif # %{debuginfocommonarches}
 %endif # 0%{?_enable_debug_packages}
 
-%if %{build_benchtests}
+%if %{with benchtests}
 %package benchtests
 Summary: Benchmarking binaries and scripts for %{name}
 Group: Development/Debug
@@ -565,11 +588,7 @@ microbenchmark tests on the system.
 %prep
 %setup -q -n %{glibcsrcdir}
 
-# Patch order is important as some patches depend on other patches and
-# therefore the order must not be changed.  First two are rtkaio and c_stubs;
-# we maintain this only in Fedora.
-%patch0038 -p1
-%patch0039 -p1
+# Patch order matters.
 %patch0001 -p1
 %patch0003 -p1
 %patch0004 -p1
@@ -594,9 +613,6 @@ microbenchmark tests on the system.
 %patch0033 -p1
 %patch0034 -p1
 %patch0037 -p1
-%patch0040 -p1
-%patch0041 -p1
-%patch0042 -p1
 %patch0044 -p1
 %patch0046 -p1
 %patch2031 -p1
@@ -605,7 +621,6 @@ microbenchmark tests on the system.
 %patch2034 -p1
 %patch0052 -p1
 %patch0053 -p1
-%patch0054 -p1
 %patch3002 -p1
 %patch2035 -p1
 
@@ -614,7 +629,6 @@ microbenchmark tests on the system.
 %patch2103 -p1
 %patch2104 -p1
 %patch2105 -p1
-%patch0055 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -725,10 +739,7 @@ EnableKernel="--enable-kernel=%{enablekernel}"
 # Save the used compiler and options into the file "Gcc" for use later
 # by %%install.
 echo "$GCC" > Gcc
-AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(nptl\|rtkaio\|powerpc-cpu\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
-%ifarch %{rtkaioarches}
-AddOns=,rtkaio$AddOns
-%endif
+AddOns=`echo */configure | sed -e 's!/configure!!g;s!\(nptl\|powerpc-cpu\)\( \|$\)!!g;s! \+$!!;s! !,!g;s!^!,!;/^,\*$/d'`
 
 ##############################################################################
 # build()
@@ -764,10 +775,16 @@ build()
 %ifarch %{lock_elision_arches}
 		--enable-lock-elision \
 %endif
-%if 0%{?disable_werror}
-               --disable-werror \
+%if %{without werror}
+		--disable-werror \
 %endif
-		--disable-profile --enable-nss-crypt ||
+		--disable-profile \
+%if %{with bootstrap}
+		--without-selinux \
+		--disable-nss-crypt ||
+%else
+		--enable-nss-crypt ||
+%endif
 		{ cat config.log; false; }
 
 	make %{?_smp_mflags} -r CFLAGS="$build_CFLAGS" %{silentrules}
@@ -860,20 +877,6 @@ make %{?_smp_mflags} install_root=$RPM_BUILD_ROOT \
 popd
 %endif
 
-##############################################################################
-# Install rtkaio libraries.
-##############################################################################
-%ifarch %{rtkaioarches}
-librtso=`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
-rm -f $RPM_BUILD_ROOT{,%{_prefix}}/%{_lib}/librtkaio.*
-rm -f $RPM_BUILD_ROOT%{_libdir}/librt.so.*
-mkdir -p $RPM_BUILD_ROOT/%{_lib}/rtkaio
-mv $RPM_BUILD_ROOT/%{_lib}/librtkaio-*.so $RPM_BUILD_ROOT/%{_lib}/rtkaio/
-rm -f $RPM_BUILD_ROOT/%{_lib}/$librtso
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so` $RPM_BUILD_ROOT/%{_lib}/$librtso
-ln -sf `basename $RPM_BUILD_ROOT/%{_lib}/rtkaio/librtkaio-*.so` $RPM_BUILD_ROOT/%{_lib}/rtkaio/$librtso
-%endif
-
 # install_different:
 #	Install all core libraries into DESTDIR/SUBDIR. Either the file is
 #	installed as a copy or a symlink to the default install (if it is the
@@ -919,18 +922,6 @@ install_different()
 		dlib=$libdestdir/$(basename $RPM_BUILD_ROOT/%{_lib}/${libbase}.so.*)
 		ln -sf $libbaseso $dlib
 	done
-%ifarch %{rtkaioarches}
-	local rtkdestdir="$RPM_BUILD_ROOT/%{_lib}/rtkaio/$subdir"
-	local librtso=`basename $RPM_BUILD_ROOT/%{_lib}/librt.so.*`
-	mkdir -p $rtkdestdir
-	librtkaioso=$(basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so | sed s/librt-/librtkaio-/)
-	if cmp -s rtkaio/librtkaio.so ../build-%{target}/rtkaio/librtkaio.so; then
-		ln -s %{nosegneg_subdir_up}/$librtkaioso $rtkdestdir/$librtkaioso
-	else
-		cp -a rtkaio/librtkaio.so $rtkdestdir/$librtkaioso
-	fi
-	ln -sf $librtkaioso $rtkdestdir/$librtso
-%endif
 }
 
 ##############################################################################
@@ -965,14 +956,6 @@ pushd ${destdir}/%{power6_legacy}
 ln -sf %{power6_legacy_up}/%{power6_subdir}/*.so .
 cp -a %{power6_legacy_up}/%{power6_subdir}/*.so.* .
 popd
-%ifarch %{rtkaioarches}
-destdir=${destdir}/rtkaio
-mkdir -p ${destdir}/%{power6_legacy}
-pushd ${destdir}/%{power6_legacy}
-ln -sf ../power6/*.so .
-cp -a ../power6/*.so.* .
-popd
-%endif
 popd
 %endif # %{buildpower6}
 
@@ -1000,6 +983,7 @@ rm -f ${RPM_BUILD_ROOT}/%{_lib}/libnss-*.so.1
 # Install info files
 ##############################################################################
 
+%if %{with docs}
 # Move the info files if glibc installed them into the wrong location.
 if [ -d $RPM_BUILD_ROOT%{_prefix}/info -a "%{_infodir}" != "%{_prefix}/info" ]; then
   mkdir -p $RPM_BUILD_ROOT%{_infodir}
@@ -1009,6 +993,7 @@ fi
 
 # Compress all of the info files.
 gzip -9nvf $RPM_BUILD_ROOT%{_infodir}/libc*
+%endif
 
 ##############################################################################
 # Install locale files
@@ -1143,7 +1128,10 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_libdir}/*_p.a
   # all directories in (and including) /usr/share/locale.
   find $RPM_BUILD_ROOT -type d \
        \( -path '*%{_prefix}/share/locale' -prune -o \
-       \( -path '*%{_prefix}/share/*' ! -path '*%{_infodir}' -o \
+       \( -path '*%{_prefix}/share/*' \
+%if %{with docs}
+	! -path '*%{_infodir}' -o \
+%endif
 	  -path "*%{_prefix}/include/*" \
        \) -printf "%%%%dir /%%P\n" \)
 } | {
@@ -1179,8 +1167,10 @@ for i in $RPM_BUILD_ROOT%{_prefix}/bin/{xtrace,memusage}; do
       -i $i
 done
 
+%if %{with docs}
 # Put the info files into the devel file list.
 grep '%{_infodir}' < rpm.filelist | grep -v '%{_infodir}/dir' > devel.filelist
+%endif
 
 # The glibc-headers package includes only common files which are identical
 # across all multilib packages. We must keep gnu/stubs.h and gnu/lib-names.h
@@ -1198,7 +1188,10 @@ grep '%{_prefix}/include' < rpm.filelist \
 # the core glibc package.
 sed -i -e '\|%{_libdir}/lib.*_p.a|d' \
        -e '\|%{_prefix}/include|d' \
-       -e '\|%{_infodir}|d' rpm.filelist
+%if %{with docs}
+       -e '\|%{_infodir}|d' \
+%endif
+	rpm.filelist
 
 # Put some static files into the devel package.
 grep '%{_libdir}/lib.*\.a' < rpm.filelist \
@@ -1327,12 +1320,12 @@ ln -sf /%{_lib}/ld64.so.1 $RPM_BUILD_ROOT/lib/ld64.so.1
 ln -sf /lib/ld-linux-armhf.so.3 $RPM_BUILD_ROOT/lib/ld-linux.so.3
 %endif
 
+%if %{with benchtests}
 # Build benchmark binaries.  Ignore the output of the benchmark runs.
 pushd build-%{target}
 make BENCH_DURATION=1 bench-build
 popd
 
-%if %{build_benchtests}
 # Copy over benchmark binaries.
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/libexec/glibc-benchtests
 cp $(find build-%{target}/benchtests -type f -executable) $RPM_BUILD_ROOT%{_prefix}/libexec/glibc-benchtests/
@@ -1404,7 +1397,11 @@ find_debuginfo_args="$find_debuginfo_args \
 	-p '.*/(sbin|libexec)/.*' \
 	-o debuginfocommon.filelist \
 	-l rpm.filelist \
+%if %{with benchtests}
 	-l nosegneg.filelist -l benchtests.filelist"
+%else
+	-l nosegneg.filelist"
+%endif
 %endif
 eval /usr/lib/rpm/find-debuginfo.sh \
 	"$find_debuginfo_args" \
@@ -1497,9 +1494,11 @@ exclude_common_dirs debuginfo.filelist
 
 %endif # 0%{?_enable_debug_packages}
 
+%if %{with docs}
 # Remove the `dir' info-heirarchy file which will be maintained
 # by the system as it adds info files to the install.
 rm -f $RPM_BUILD_ROOT%{_infodir}/dir
+%endif
 
 %ifarch %{auxarches}
 
@@ -1532,7 +1531,7 @@ truncate -s 0 $RPM_BUILD_ROOT/var/cache/ldconfig/aux-cache
 # Run the glibc testsuite
 ##############################################################################
 %check
-%if %{run_glibc_tests}
+%if %{with testsuite}
 
 # Run the glibc tests. If any tests fail to build we exit %check with an error
 # of 1, otherwise we print the test failure list and the failed test output
@@ -1627,7 +1626,7 @@ echo ====================PLT RELOCS LIBC.SO==============
 readelf -Wr $RPM_BUILD_ROOT/%{_lib}/libc-*.so | sed -n -e "$PLTCMD"
 echo ====================PLT RELOCS END==================
 
-%if 0%{?run_valgrind_tests}
+%if %{with valgrind}
 # Finally, check if valgrind runs with the new glibc.
 # We want to fail building if valgrind is not able to run with this glibc so
 # that we can then coordinate with valgrind to get it fixed before we update
@@ -1675,8 +1674,10 @@ if posix.access("/etc/ld.so.cache") then
   end
 end
 
+%if %{with docs}
 %post devel
 /sbin/install-info %{_infodir}/libc.info.gz %{_infodir}/dir > /dev/null 2>&1 || :
+%endif
 
 %pre headers
 # this used to be a link and it is causing nightmares now
@@ -1684,10 +1685,12 @@ if [ -L %{_prefix}/include/scsi ] ; then
   rm -f %{_prefix}/include/scsi
 fi
 
+%if %{with docs}
 %preun devel
 if [ "$1" = 0 ]; then
   /sbin/install-info --delete %{_infodir}/libc.info.gz %{_infodir}/dir > /dev/null 2>&1 || :
 fi
+%endif
 
 %post utils -p /sbin/ldconfig
 
@@ -1723,24 +1726,13 @@ rm -f *.filelist*
 %files -f rpm.filelist
 %defattr(-,root,root)
 %dir %{_prefix}/%{_lib}/audit
-%ifarch %{rtkaioarches}
-%dir /%{_lib}/rtkaio
-%endif
 %if %{buildxen} && !%{xenpackage}
 %dir /%{_lib}/%{nosegneg_subdir_base}
 %dir /%{_lib}/%{nosegneg_subdir}
-%ifarch %{rtkaioarches}
-%dir /%{_lib}/rtkaio/%{nosegneg_subdir_base}
-%dir /%{_lib}/rtkaio/%{nosegneg_subdir}
-%endif
 %endif
 %if %{buildpower6}
 %dir /%{_lib}/power6
 %dir /%{_lib}/power6x
-%ifarch %{rtkaioarches}
-%dir /%{_lib}/rtkaio/power6
-%dir /%{_lib}/rtkaio/power6x
-%endif
 %endif
 %ifarch s390x
 /lib/ld64.so.1
@@ -1759,6 +1751,7 @@ rm -f *.filelist*
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/ld.so.cache
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/gai.conf
 %doc README NEWS INSTALL BUGS PROJECTS CONFORMANCE elf/rtld-debugger-interface.txt
+# If rpm doesn't support %license, then use %doc instead.
 %{!?_licensedir:%global license %%doc}
 %license COPYING COPYING.LIB LICENSES
 %doc hesiod/README.hesiod
@@ -1824,12 +1817,24 @@ rm -f *.filelist*
 %endif
 %endif
 
-%if %{build_benchtests}
+%if %{with benchtests}
 %files benchtests -f benchtests.filelist
 %defattr(-,root,root)
 %endif
 
 %changelog
+* Thu Aug 27 2015 Carlos O'Donell <carlos@redhat.com> - 2.22.90-4
+- Build require gcc-c++ for the C++ tests.
+- Support --without testsuite option to disable testing after build.
+- Support --without benchtests option to disable microbenchmarks.
+- Update --with bootstrap to disable benchtests, valgrind, documentation,
+  selinux, and nss-crypt during bootstrap.
+- Support --without werror to disable building with -Werror.
+- Support --without docs to disable build requirement on texinfo.
+- Support --without valgrind to disable testing with valgrind.
+- Remove c_stubs add-on and enable fuller support for static binaries.
+- Remove librtkaio support (#1227855).
+
 * Sun Aug 16 2015 Siddhesh Poyarekar <siddhesh@redhat.com> - 2.22.90-3
 - Auto-sync with upstream master.
 
