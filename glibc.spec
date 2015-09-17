@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-193-g315267a
 %define glibcversion 2.22.90
-%define glibcrelease 5%{?dist}
+%define glibcrelease 6%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -218,6 +218,17 @@ Patch0052: glibc-disable-rwlock-elision.patch
 # symlink to it.
 Patch0053: glibc-cs-path.patch
 
+# Fix -Warray-bounds warning for GCC5, likely PR/59124 or PR/66422.
+# See Fedora bug #1263817.
+Patch0054: glibc-res-hconf-gcc5.patch
+Patch0055: glibc-ld-ctype-gcc5.patch
+Patch0056: glibc-gethnamaddr-gcc5.patch
+Patch0057: glibc-dns-host-gcc5.patch
+Patch0058: glibc-bug-regex-gcc5.patch
+
+# Add C.UTF-8 locale into /usr/lib/locale/
+Patch0059: glibc-c-utf8-locale.patch
+
 ##############################################################################
 #
 # Patches from upstream
@@ -307,10 +318,18 @@ BuildRequires: libselinux-devel >= 1.33.4-3
 BuildRequires: nss-devel
 %endif
 BuildRequires: audit-libs-devel >= 1.1.3, sed >= 3.95, libcap-devel, gettext
-BuildRequires: /bin/ps, /bin/kill, /bin/awk
+# We need procps-ng (/bin/ps), util-linux (/bin/kill), and gawk (/bin/awk),
+# but it is more flexible to require the actual programs and let rpm infer
+# the packages. However, until bug 1259054 is widely fixed we avoid the
+# following:
+# BuildRequires: /bin/ps, /bin/kill, /bin/awk
+# And use instead (which should be reverted some time in the future):
+BuildRequires: procps-ng, util-linux, gawk
 BuildRequires: systemtap-sdt-devel
 
 %if %{with valgrind}
+# Require valgrind for smoke testing the dynamic loader to make sure we
+# have not broken valgrind.
 BuildRequires: /usr/bin/valgrind
 %endif
 
@@ -623,12 +642,17 @@ microbenchmark tests on the system.
 %patch0053 -p1
 %patch3002 -p1
 %patch2035 -p1
-
 %patch2101 -p1
 %patch2102 -p1
 %patch2103 -p1
 %patch2104 -p1
 %patch2105 -p1
+%patch0054 -p1
+%patch0055 -p1
+%patch0056 -p1
+%patch0057 -p1
+%patch0058 -p1
+%patch0059 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1010,7 +1034,9 @@ $olddir/build-%{target}/elf/ld.so \
 	--library-path $olddir/build-%{target}/ \
 	$olddir/build-%{target}/locale/localedef \
 	--prefix ${RPM_BUILD_ROOT} --add-to-archive \
-	*_*
+	C.utf8 *_*
+# Removes all locales except C.utf8 which remains as fallback in
+# the event the user cleans the locale-archive using localedef.
 rm -rf *_*
 mv locale-archive{,.tmpl}
 popd
@@ -1767,6 +1793,8 @@ rm -f *.filelist*
 %files -f common.filelist common
 %defattr(-,root,root)
 %dir %{_prefix}/lib/locale
+%dir %{_prefix}/lib/locale/C.utf8
+%{_prefix}/lib/locale/C.utf8/*
 %attr(0644,root,root) %verify(not md5 size mtime) %{_prefix}/lib/locale/locale-archive.tmpl
 %attr(0644,root,root) %verify(not md5 size mtime mode) %ghost %config(missingok,noreplace) %{_prefix}/lib/locale/locale-archive
 %dir %attr(755,root,root) /etc/default
@@ -1823,6 +1851,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Sep 16 2015 Mike FABIAN <mfabian@redhat.com> - 2.22.90-7
+- Add the C.UTF-8 locale (#902094).
+
+* Wed Sep 16 2015 Carlos O'Donell <carlos@systemhalted.org> - 2.22.90-6
+- Fix GCC 5 and -Werror related build failures.
+- Fix --install-langs bug which causes SIGABRT (#1262040).
+
 * Fri Aug 28 2015 Carlos O'Donell <carlos@systemhalted.org> - 2.22.90-5
 - Auto-sync with upstream master.
 

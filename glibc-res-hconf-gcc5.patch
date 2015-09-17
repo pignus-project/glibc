@@ -1,0 +1,29 @@
+Index: glibc-2.22-193-g315267a/resolv/res_hconf.c
+===================================================================
+--- glibc-2.22-193-g315267a.orig/resolv/res_hconf.c
++++ glibc-2.22-193-g315267a/resolv/res_hconf.c
+@@ -45,6 +45,7 @@
+ #include "ifreq.h"
+ #include "res_hconf.h"
+ #include <wchar.h>
++#include <libc-internal.h>
+ 
+ #if IS_IN (libc)
+ # define fgets_unlocked __fgets_unlocked
+@@ -523,7 +524,16 @@ _res_hconf_trim_domain (char *hostname)
+ 
+   for (i = 0; i < _res_hconf.num_trimdomains; ++i)
+     {
++      DIAG_PUSH_NEEDS_COMMENT
++#if __GNUC_PREREQ (5, 0)
++      /* GCC 5.0 warns about array subscript being above array bounds,
++	 but that's not entirely possible since i is limited to
++	 num_trimdomains which is limited to <= TRIMDOMAINS_MAX. This
++	 is likely PR/59124 which is still not fixed.  */
++      DIAG_IGNORE_NEEDS_COMMENT (5.0, "-Warray-bounds")
++#endif
+       const char *trim = _res_hconf.trimdomain[i];
++      DIAG_POP_NEEDS_COMMENT
+ 
+       trim_len = strlen (trim);
+       if (hostname_len > trim_len

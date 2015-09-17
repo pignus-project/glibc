@@ -37,3 +37,9 @@ glibc-rh1238412-addition-and-fixes-for-translit_neutral.patch -p1
 glibc-rh1238412-update-the-translit-files-to-unicode-7.0.0.patch -p1
 glibc-rh1238412-add-translit-rules-for-da-nb-nn-sv-locales.patch -p1
 glibc-rh1238412-unicode-8.0.0-update.patch -p1
+glibc-res-hconf-gcc5.patch -p1
+glibc-ld-ctype-gcc5.patch -p1
+glibc-gethnamaddr-gcc5.patch -p1
+glibc-dns-host-gcc5.patch -p1
+glibc-bug-regex-gcc5.patch -p1
+glibc-c-utf8-locale.patch -p1

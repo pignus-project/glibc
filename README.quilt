@@ -7,7 +7,11 @@ Setup environment:
 export QUILT_PATCHES=$PWD
 
 Setup the source:
-./quilt-patch.sh
+./quilt-patch.sh [-f]
+
+Use `-f` if you want to have quilt-patch always remove the existing
+source directory before starting. Otherwise you'll be patching on top of
+an already patched tree generated perhaps by `*pkg prep`.
 
 Create a new patch:
 cd glibc-2.17-c758a686/
