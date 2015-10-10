@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-193-g315267a
 %define glibcversion 2.22.90
-%define glibcrelease 6%{?dist}
+%define glibcrelease 8%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1085,9 +1085,6 @@ cp -a bits/stdio-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/stdio-lock.h
 # And <bits/libc-lock.h> needs sanitizing as well.
 cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_prefix}/include/bits/libc-lock.h
 
-# XXX: What is this for?
-ln -sf libbsd-compat.a $RPM_BUILD_ROOT%{_libdir}/libbsd.a
-
 # Install the upgrade program
 install -m 700 build-%{target}/glibc_post_upgrade.%{_target_cpu} \
   $RPM_BUILD_ROOT%{_prefix}/sbin/glibc_post_upgrade.%{_target_cpu}
@@ -1221,12 +1218,12 @@ sed -i -e '\|%{_libdir}/lib.*_p.a|d' \
 
 # Put some static files into the devel package.
 grep '%{_libdir}/lib.*\.a' < rpm.filelist \
-  | grep '/lib\(\(c\|pthread\|nldbl\)_nonshared\|bsd\(\|-compat\)\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
+  | grep '/lib\(\(c\|pthread\|nldbl\)_nonshared\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
   >> devel.filelist
 
 # Put the rest of the static files into the static package.
 grep '%{_libdir}/lib.*\.a' < rpm.filelist \
-  | grep -v '/lib\(\(c\|pthread\|nldbl\)_nonshared\|bsd\(\|-compat\)\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
+  | grep -v '/lib\(\(c\|pthread\|nldbl\)_nonshared\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
   > static.filelist
 
 # Put all of the object files and *.so (not the versioned ones) into the
@@ -1851,6 +1848,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Oct  9 2015 Carlos O'Donell <carlos@redhat.com> - 2.22.90-8
+- Remove libbsd.a (#1193168).
+
 * Wed Sep 16 2015 Mike FABIAN <mfabian@redhat.com> - 2.22.90-7
 - Add the C.UTF-8 locale (#902094).
 
