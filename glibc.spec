@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.22-193-g315267a
+%define glibcsrcdir  glibc-2.22-386-g95e8397
 %define glibcversion 2.22.90
-%define glibcrelease 8%{?dist}
+%define glibcrelease 9%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1080,8 +1080,11 @@ chmod 644 $RPM_BUILD_ROOT%{_libdir}/gconv/gconv-modules.cache
 ##############################################################################
 
 # NPTL <bits/stdio-lock.h> is not usable outside of glibc, so include
-# the generic one (#162634)
-cp -a bits/stdio-lock.h $RPM_BUILD_ROOT%{_prefix}/include/bits/stdio-lock.h
+# the generic one (#162634). This header is required by older gcc builds
+# which shared libio. Once we stop supporting building old compilers which
+# need shared libio we can remove this.
+cp -a sysdeps/generic/stdio-lock.h \
+	$RPM_BUILD_ROOT%{_prefix}/include/bits/stdio-lock.h
 # And <bits/libc-lock.h> needs sanitizing as well.
 cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_prefix}/include/bits/libc-lock.h
 
@@ -1848,6 +1851,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Oct 21 2015 Carlos O'Donell <carlos@redhat.com> - 2.22.90-9
+- Auto-sync with upstream master.
+- Update new condvar implementation.
+
 * Fri Oct  9 2015 Carlos O'Donell <carlos@redhat.com> - 2.22.90-8
 - Remove libbsd.a (#1193168).
 

@@ -2,6 +2,7 @@
 # Autogeneries the quilt `series` from the patch order in the spec file.
 # We don't use `quilt setup` because it makes a huge mess and doesn't work.
 rm -f series.new
+extra_args="--fuzz=0"
 count=0
 # Filter out the patches, and use `_` as our pseudo-IFS to prevent expansion.
 for i in `grep '^%patch' glibc.spec | sed -e 's,%patch,,g' -e 's, ,_,g'`; do
@@ -14,7 +15,9 @@ for i in `grep '^%patch' glibc.spec | sed -e 's,%patch,,g' -e 's, ,_,g'`; do
     args=${elements[@]:1}
     # Find the next patch that applies in order and write it out.
     # This way we transform the patch # list into a patch file list in order.
-    grep "Patch${num}: " glibc.spec | sed -e 's,Patch.*: ,,g' -e "s,\$, ${args[@]},g" >> series.new
+    grep "Patch${num}: " glibc.spec \
+	| sed -e 's,Patch.*: ,,g' -e "s,\$, ${args[@]} ${extra_args},g" \
+	>> series.new
     ((count++))
 done
 # Double check we processed the correct number of patches.

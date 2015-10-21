@@ -1,16 +1,16 @@
-Index: glibc-2.22-193-g315267a/resolv/res_hconf.c
+Index: glibc-2.22-386-g95e8397/resolv/res_hconf.c
 ===================================================================
---- glibc-2.22-193-g315267a.orig/resolv/res_hconf.c
-+++ glibc-2.22-193-g315267a/resolv/res_hconf.c
-@@ -45,6 +45,7 @@
- #include "ifreq.h"
+--- glibc-2.22-386-g95e8397.orig/resolv/res_hconf.c
++++ glibc-2.22-386-g95e8397/resolv/res_hconf.c
+@@ -46,6 +46,7 @@
  #include "res_hconf.h"
  #include <wchar.h>
+ #include <atomic.h>
 +#include <libc-internal.h>
  
  #if IS_IN (libc)
  # define fgets_unlocked __fgets_unlocked
-@@ -523,7 +524,16 @@ _res_hconf_trim_domain (char *hostname)
+@@ -577,7 +578,16 @@ _res_hconf_trim_domain (char *hostname)
  
    for (i = 0; i < _res_hconf.num_trimdomains; ++i)
      {
