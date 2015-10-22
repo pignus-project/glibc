@@ -4,10 +4,9 @@ Date:   Sun Nov 10 15:43:14 2013 +0100
 
     New condvar implementation that provides stronger ordering guarantees.
 
-diff --git a/nptl/DESIGN-condvar.txt b/nptl/DESIGN-condvar.txt
-deleted file mode 100644
-index 4845251..0000000
---- a/nptl/DESIGN-condvar.txt
+Index: glibc-2.22-448-g95b0977/nptl/DESIGN-condvar.txt
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/DESIGN-condvar.txt
 +++ /dev/null
 @@ -1,134 +0,0 @@
 -Conditional Variable pseudocode.
@@ -144,11 +143,11 @@ index 4845251..0000000
 -
 -   lll_unlock(cv->lock);
 -}
-diff --git a/nptl/Makefile b/nptl/Makefile
-index 89fdc8b..50a85a6 100644
---- a/nptl/Makefile
-+++ b/nptl/Makefile
-@@ -71,7 +71,7 @@ libpthread-routines = nptl-init vars events version \
+Index: glibc-2.22-448-g95b0977/nptl/Makefile
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/Makefile
++++ glibc-2.22-448-g95b0977/nptl/Makefile
+@@ -73,7 +73,7 @@ libpthread-routines = nptl-init vars eve
  		      pthread_rwlockattr_getkind_np \
  		      pthread_rwlockattr_setkind_np \
  		      pthread_cond_init pthread_cond_destroy \
@@ -157,7 +156,7 @@ index 89fdc8b..50a85a6 100644
  		      pthread_cond_signal pthread_cond_broadcast \
  		      old_pthread_cond_init old_pthread_cond_destroy \
  		      old_pthread_cond_wait old_pthread_cond_timedwait \
-@@ -178,7 +178,6 @@ CFLAGS-pthread_timedjoin.c = -fexceptions -fasynchronous-unwind-tables
+@@ -182,7 +182,6 @@ CFLAGS-pthread_timedjoin.c = -fexception
  CFLAGS-pthread_once.c = $(uses-callbacks) -fexceptions \
  			-fasynchronous-unwind-tables
  CFLAGS-pthread_cond_wait.c = -fexceptions -fasynchronous-unwind-tables
@@ -165,7 +164,7 @@ index 89fdc8b..50a85a6 100644
  CFLAGS-sem_wait.c = -fexceptions -fasynchronous-unwind-tables
  CFLAGS-sem_timedwait.c = -fexceptions -fasynchronous-unwind-tables
  
-@@ -216,7 +215,7 @@ tests = tst-typesizes \
+@@ -229,7 +228,7 @@ tests = tst-typesizes \
  	tst-cond8 tst-cond9 tst-cond10 tst-cond11 tst-cond12 tst-cond13 \
  	tst-cond14 tst-cond15 tst-cond16 tst-cond17 tst-cond18 tst-cond19 \
  	tst-cond20 tst-cond21 tst-cond22 tst-cond23 tst-cond24 tst-cond25 \
@@ -174,7 +173,7 @@ index 89fdc8b..50a85a6 100644
  	tst-robust1 tst-robust2 tst-robust3 tst-robust4 tst-robust5 \
  	tst-robust6 tst-robust7 tst-robust8 tst-robust9 \
  	tst-robustpi1 tst-robustpi2 tst-robustpi3 tst-robustpi4 tst-robustpi5 \
-@@ -280,8 +279,7 @@ test-srcs = tst-oddstacklimit
+@@ -301,8 +300,7 @@ test-xfail-tst-once5 = yes
  # Files which must not be linked with libpthread.
  tests-nolibpthread = tst-unload
  
@@ -184,10 +183,9 @@ index 89fdc8b..50a85a6 100644
  		       lowlevelbarrier.sym unwindbuf.sym \
  		       lowlevelrobustlock.sym pthread-pi-defines.sym
  
-diff --git a/nptl/lowlevelcond.sym b/nptl/lowlevelcond.sym
-deleted file mode 100644
-index 18e1ada..0000000
---- a/nptl/lowlevelcond.sym
+Index: glibc-2.22-448-g95b0977/nptl/lowlevelcond.sym
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/lowlevelcond.sym
 +++ /dev/null
 @@ -1,16 +0,0 @@
 -#include <stddef.h>
@@ -206,11 +204,11 @@ index 18e1ada..0000000
 -dep_mutex	offsetof (pthread_cond_t, __data.__mutex)
 -broadcast_seq	offsetof (pthread_cond_t, __data.__broadcast_seq)
 -nwaiters_shift	COND_NWAITERS_SHIFT
-diff --git a/nptl/pthread_cond_broadcast.c b/nptl/pthread_cond_broadcast.c
-index 881d098..6848d61 100644
---- a/nptl/pthread_cond_broadcast.c
-+++ b/nptl/pthread_cond_broadcast.c
-@@ -23,69 +23,74 @@
+Index: glibc-2.22-448-g95b0977/nptl/pthread_cond_broadcast.c
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/pthread_cond_broadcast.c
++++ glibc-2.22-448-g95b0977/nptl/pthread_cond_broadcast.c
+@@ -23,68 +23,74 @@
  #include <pthread.h>
  #include <pthreadP.h>
  #include <stap-probe.h>
@@ -222,9 +220,7 @@ index 881d098..6848d61 100644
  
 +/* See __pthread_cond_wait for a high-level description of the algorithm.  */
  int
--__pthread_cond_broadcast (cond)
--     pthread_cond_t *cond;
-+__pthread_cond_broadcast (pthread_cond_t *cond)
+ __pthread_cond_broadcast (pthread_cond_t *cond)
  {
 -  LIBC_PROBE (cond_broadcast, 1, cond);
 +  unsigned int gen, wseq, ssent;
@@ -235,47 +231,11 @@ index 881d098..6848d61 100644
  		? LLL_SHARED : LLL_PRIVATE;
 -  /* Make sure we are alone.  */
 -  lll_lock (cond->__data.__lock, pshared);
--
+ 
 -  /* Are there any waiters to be woken?  */
 -  if (cond->__data.__total_seq > cond->__data.__wakeup_seq)
--    {
--      /* Yes.  Mark them all as woken.  */
--      cond->__data.__wakeup_seq = cond->__data.__total_seq;
--      cond->__data.__woken_seq = cond->__data.__total_seq;
--      cond->__data.__futex = (unsigned int) cond->__data.__total_seq * 2;
--      int futex_val = cond->__data.__futex;
--      /* Signal that a broadcast happened.  */
--      ++cond->__data.__broadcast_seq;
--
--      /* We are done.  */
--      lll_unlock (cond->__data.__lock, pshared);
- 
--      /* Wake everybody.  */
--      pthread_mutex_t *mut = (pthread_mutex_t *) cond->__data.__mutex;
--
--      /* Do not use requeue for pshared condvars.  */
--      if (mut == (void *) ~0l
--	  || PTHREAD_MUTEX_PSHARED (mut) & PTHREAD_MUTEX_PSHARED_BIT)
--	goto wake_all;
 +  LIBC_PROBE (cond_broadcast, 1, cond);
- 
--#if (defined lll_futex_cmp_requeue_pi \
--     && defined __ASSUME_REQUEUE_PI)
--      if (USE_REQUEUE_PI (mut))
--	{
--	  if (lll_futex_cmp_requeue_pi (&cond->__data.__futex, 1, INT_MAX,
--					&mut->__data.__lock, futex_val,
--					LLL_PRIVATE) == 0)
--	    return 0;
--	}
--      else
--#endif
--	/* lll_futex_requeue returns 0 for success and non-zero
--	   for errors.  */
--	if (!__builtin_expect (lll_futex_requeue (&cond->__data.__futex, 1,
--						  INT_MAX, &mut->__data.__lock,
--						  futex_val, LLL_PRIVATE), 0))
--	  return 0;
++
 +  /* We use the same approach for broadcasts as for normal signals but wake
 +     all waiters (i.e., we try to set SIGNALS_SENT to WSEQ).  However, to
 +     prevent an excessive number of spurious wake-ups, we need to check
@@ -295,11 +255,48 @@ index 881d098..6848d61 100644
 +  wseq = atomic_load_relaxed (&cond->__data.__wseq);
 +  ssent = atomic_load_relaxed (&cond->__data.__signals_sent);
 +  do
-+    {
- 
+     {
+-      /* Yes.  Mark them all as woken.  */
+-      cond->__data.__wakeup_seq = cond->__data.__total_seq;
+-      cond->__data.__woken_seq = cond->__data.__total_seq;
+-      cond->__data.__futex = (unsigned int) cond->__data.__total_seq * 2;
+-      int futex_val = cond->__data.__futex;
+-      /* Signal that a broadcast happened.  */
+-      ++cond->__data.__broadcast_seq;
+-
+-      /* We are done.  */
+-      lll_unlock (cond->__data.__lock, pshared);
+-
+-      /* Wake everybody.  */
+-      pthread_mutex_t *mut = (pthread_mutex_t *) cond->__data.__mutex;
+-
+-      /* Do not use requeue for pshared condvars.  */
+-      if (mut == (void *) ~0l
+-	  || PTHREAD_MUTEX_PSHARED (mut) & PTHREAD_MUTEX_PSHARED_BIT)
+-	goto wake_all;
+-
+-#if (defined lll_futex_cmp_requeue_pi \
+-     && defined __ASSUME_REQUEUE_PI)
+-      if (USE_REQUEUE_PI (mut))
+-	{
+-	  if (lll_futex_cmp_requeue_pi (&cond->__data.__futex, 1, INT_MAX,
+-					&mut->__data.__lock, futex_val,
+-					LLL_PRIVATE) == 0)
+-	    return 0;
+-	}
+-      else
+-#endif
+-	/* lll_futex_requeue returns 0 for success and non-zero
+-	   for errors.  */
+-	if (!__builtin_expect (lll_futex_requeue (&cond->__data.__futex, 1,
+-						  INT_MAX, &mut->__data.__lock,
+-						  futex_val, LLL_PRIVATE), 0))
+-	  return 0;
+-
 -wake_all:
 -      lll_futex_wake (&cond->__data.__futex, INT_MAX, pshared);
 -      return 0;
++
 +      /* If the generation changed concurrently, then we could have been
 +         positioned in the earlier generation; thus, all waiters we must wake
 +         have been or will be woken during the quiescence period.  The other
@@ -314,12 +311,11 @@ index 881d098..6848d61 100644
 +	  || ssent >= wseq || wseq >= __PTHREAD_COND_WSEQ_THRESHOLD)
 +	return 0;
      }
--
--  /* We are done.  */
--  lll_unlock (cond->__data.__lock, pshared);
 +  while (!atomic_compare_exchange_weak_relaxed (&cond->__data.__signals_sent,
 +						&ssent, wseq));
-+
+ 
+-  /* We are done.  */
+-  lll_unlock (cond->__data.__lock, pshared);
 +  /* XXX Could we skip the futex_wake if not necessary (eg, if there are just
 +     spinning waiters)?  This would need additional communication but could it
 +     be more efficient than the kernel-side communication?  Should we spin for
@@ -335,19 +331,17 @@ index 881d098..6848d61 100644
  
    return 0;
  }
-diff --git a/nptl/pthread_cond_destroy.c b/nptl/pthread_cond_destroy.c
-index 410e52d..7c9cf13 100644
---- a/nptl/pthread_cond_destroy.c
-+++ b/nptl/pthread_cond_destroy.c
-@@ -20,67 +20,94 @@
+Index: glibc-2.22-448-g95b0977/nptl/pthread_cond_destroy.c
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/pthread_cond_destroy.c
++++ glibc-2.22-448-g95b0977/nptl/pthread_cond_destroy.c
+@@ -20,66 +20,94 @@
  #include <shlib-compat.h>
  #include "pthreadP.h"
  #include <stap-probe.h>
--
--
 +#include <atomic.h>
-+
-+
+ 
+ 
 +/* See __pthread_cond_wait for a high-level description of the algorithm.
 +
 +   A correct program must make sure that no waiters are blocked on the condvar
@@ -369,9 +363,7 @@ index 410e52d..7c9cf13 100644
 +   us; then we wait for QUIESCENCE_WAITERS to finish waiting for the end of
 +   the quiescence state.  */
  int
--__pthread_cond_destroy (cond)
--     pthread_cond_t *cond;
-+__pthread_cond_destroy (pthread_cond_t *cond)
+ __pthread_cond_destroy (pthread_cond_t *cond)
  {
 -  int pshared = (cond->__data.__mutex == (void *) ~0l)
 +  unsigned int wseq, val;
@@ -483,11 +475,11 @@ index 410e52d..7c9cf13 100644
    return 0;
  }
  versioned_symbol (libpthread, __pthread_cond_destroy,
-diff --git a/nptl/pthread_cond_init.c b/nptl/pthread_cond_init.c
-index ce954c7..b3aa779 100644
---- a/nptl/pthread_cond_init.c
-+++ b/nptl/pthread_cond_init.c
-@@ -28,18 +28,17 @@ __pthread_cond_init (cond, cond_attr)
+Index: glibc-2.22-448-g95b0977/nptl/pthread_cond_init.c
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/pthread_cond_init.c
++++ glibc-2.22-448-g95b0977/nptl/pthread_cond_init.c
+@@ -26,18 +26,17 @@ __pthread_cond_init (pthread_cond_t *con
  {
    struct pthread_condattr *icond_attr = (struct pthread_condattr *) cond_attr;
  
@@ -515,11 +507,11 @@ index ce954c7..b3aa779 100644
  
    LIBC_PROBE (cond_init, 2, cond, cond_attr);
  
-diff --git a/nptl/pthread_cond_signal.c b/nptl/pthread_cond_signal.c
-index ba32f40..86968e9 100644
---- a/nptl/pthread_cond_signal.c
-+++ b/nptl/pthread_cond_signal.c
-@@ -22,60 +22,88 @@
+Index: glibc-2.22-448-g95b0977/nptl/pthread_cond_signal.c
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/pthread_cond_signal.c
++++ glibc-2.22-448-g95b0977/nptl/pthread_cond_signal.c
+@@ -22,59 +22,89 @@
  #include <lowlevellock.h>
  #include <pthread.h>
  #include <pthreadP.h>
@@ -532,9 +524,7 @@ index ba32f40..86968e9 100644
  
 +/* See __pthread_cond_wait for a high-level description of the algorithm.  */
  int
--__pthread_cond_signal (cond)
--     pthread_cond_t *cond;
-+__pthread_cond_signal (pthread_cond_t *cond)
+ __pthread_cond_signal (pthread_cond_t *cond)
  {
 -  int pshared = (cond->__data.__mutex == (void *) ~0l)
 +  unsigned int wseq, ssent;
@@ -627,7 +617,7 @@ index ba32f40..86968e9 100644
 +      if (ssent >= wseq || wseq >= __PTHREAD_COND_WSEQ_THRESHOLD)
 +	return 0;
      }
--
+ 
 -  /* We are done.  */
 -  lll_unlock (cond->__data.__lock, pshared);
 +  /* Using a CAS loop here instead of a fetch-and-increment avoids one source
@@ -648,10 +638,9 @@ index ba32f40..86968e9 100644
  
    return 0;
  }
-diff --git a/nptl/pthread_cond_timedwait.c b/nptl/pthread_cond_timedwait.c
-deleted file mode 100644
-index bf80467..0000000
---- a/nptl/pthread_cond_timedwait.c
+Index: glibc-2.22-448-g95b0977/nptl/pthread_cond_timedwait.c
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/pthread_cond_timedwait.c
 +++ /dev/null
 @@ -1,268 +0,0 @@
 -/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
@@ -922,10 +911,10 @@ index bf80467..0000000
 -
 -versioned_symbol (libpthread, __pthread_cond_timedwait, pthread_cond_timedwait,
 -		  GLIBC_2_3_2);
-diff --git a/nptl/pthread_cond_wait.c b/nptl/pthread_cond_wait.c
-index 0d6558b..2106bf6 100644
---- a/nptl/pthread_cond_wait.c
-+++ b/nptl/pthread_cond_wait.c
+Index: glibc-2.22-448-g95b0977/nptl/pthread_cond_wait.c
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/pthread_cond_wait.c
++++ glibc-2.22-448-g95b0977/nptl/pthread_cond_wait.c
 @@ -22,216 +22,555 @@
  #include <lowlevellock.h>
  #include <pthread.h>
@@ -1001,7 +990,13 @@ index 0d6558b..2106bf6 100644
  
 -  cbuffer->cond->__data.__nwaiters -= 1 << COND_NWAITERS_SHIFT;
 +}
-+
+ 
+-  /* If pthread_cond_destroy was called on this variable already,
+-     notify the pthread_cond_destroy caller all waiters have left
+-     and it can be successfully destroyed.  */
+-  destroying = 0;
+-  if (cbuffer->cond->__data.__total_seq == -1ULL
+-      && cbuffer->cond->__data.__nwaiters < (1 << COND_NWAITERS_SHIFT))
 +/* Cancel waiting after having registered as a waiter already.
 +   We must not consume another waiter's signal, so we must add an artificial
 +   signal.  If we are the first blocked waiter (i.e., SEQ == SIGNALS_SENT,
@@ -1018,13 +1013,7 @@ index 0d6558b..2106bf6 100644
 +__condvar_cancel_waiting (pthread_cond_t *cond, int pshared)
 +{
 +  unsigned int wseq, ssent;
- 
--  /* If pthread_cond_destroy was called on this variable already,
--     notify the pthread_cond_destroy caller all waiters have left
--     and it can be successfully destroyed.  */
--  destroying = 0;
--  if (cbuffer->cond->__data.__total_seq == -1ULL
--      && cbuffer->cond->__data.__nwaiters < (1 << COND_NWAITERS_SHIFT))
++
 +  /* Add an artificial signal.  See __pthread_cond_signal.  */
 +  wseq = atomic_load_relaxed (&cond->__data.__wseq);
 +  ssent = atomic_load_relaxed (&cond->__data.__signals_sent);
@@ -1041,7 +1030,19 @@ index 0d6558b..2106bf6 100644
  
 -  /* We are done.  */
 -  lll_unlock (cbuffer->cond->__data.__lock, pshared);
--
++/* Clean-up for cancellation of waiters waiting for normal signals.  We cancel
++   our registration as a waiter, confirm we have woken up, and re-acquire the
++   mutex.  */
++static void
++__condvar_cleanup_waiting (void *arg)
++{
++  struct _condvar_cleanup_buffer *cbuffer =
++    (struct _condvar_cleanup_buffer *) arg;
++  pthread_cond_t *cond = cbuffer->cond;
++  /* See comment in __pthread_cond_signal.  */
++  int pshared = (atomic_load_relaxed (&cond->__data.__mutex) == (void *) ~0l)
++		? LLL_SHARED : LLL_PRIVATE;
+ 
 -  /* Wake everybody to make sure no condvar signal gets lost.  */
 -  if (! destroying)
 -    lll_futex_wake (&cbuffer->cond->__data.__futex, INT_MAX, pshared);
@@ -1056,19 +1057,6 @@ index 0d6558b..2106bf6 100644
 -  }
 -  else
 -    __pthread_mutex_cond_lock_adjust (cbuffer->mutex);
-+/* Clean-up for cancellation of waiters waiting for normal signals.  We cancel
-+   our registration as a waiter, confirm we have woken up, and re-acquire the
-+   mutex.  */
-+static void
-+__condvar_cleanup_waiting (void *arg)
-+{
-+  struct _condvar_cleanup_buffer *cbuffer =
-+    (struct _condvar_cleanup_buffer *) arg;
-+  pthread_cond_t *cond = cbuffer->cond;
-+  /* See comment in __pthread_cond_signal.  */
-+  int pshared = (atomic_load_relaxed (&cond->__data.__mutex) == (void *) ~0l)
-+		? LLL_SHARED : LLL_PRIVATE;
-+
 +  __condvar_cancel_waiting (cond, pshared);
 +  __condvar_confirm_wakeup (cond, pshared);
 +
@@ -1246,7 +1234,8 @@ index 0d6558b..2106bf6 100644
 +  seq = atomic_load_relaxed (&cond->__data.__wseq);
 +  if (__glibc_likely (seq < __PTHREAD_COND_WSEQ_THRESHOLD))
 +    atomic_store_relaxed (&cond->__data.__wseq, seq + 1);
-+
+ 
+-  /* Now we can release the mutex.  */
 +  /* If we reached WSEQ_THRESHOLD, we need to quiesce the condvar.  */
 +  if (seq >= __PTHREAD_COND_WSEQ_THRESHOLD - 1)
 +    {
@@ -1365,8 +1354,7 @@ index 0d6558b..2106bf6 100644
 +	  return __pthread_mutex_cond_lock (mutex);
 +	}
 +    }
- 
--  /* Now we can release the mutex.  */
++
 +  /* Now that we are registered as a waiter, we can release the mutex.
 +     Waiting on the condvar must be atomic with releasing the mutex, so if
 +     the mutex is used to establish a happens-before relation with any
@@ -1399,7 +1387,8 @@ index 0d6558b..2106bf6 100644
 +  /* We might block on a futex, so push the cancellation handler.  */
    cbuffer.cond = cond;
    cbuffer.mutex = mutex;
--
++  __pthread_cleanup_push (&buffer, __condvar_cleanup_waiting, &cbuffer);
+ 
 -  /* Before we block we enable cancellation.  Therefore we have to
 -     install a cancellation handler.  */
 -  __pthread_cleanup_push (&buffer, __condvar_cleanup, &cbuffer);
@@ -1413,8 +1402,6 @@ index 0d6558b..2106bf6 100644
 -  cbuffer.bc_seq = cond->__data.__broadcast_seq;
 -
 -  do
-+  __pthread_cleanup_push (&buffer, __condvar_cleanup_waiting, &cbuffer);
-+
 +  /* Loop until we might have been woken, which is the case if either (1) more
 +     signals have been sent than what is our position in the waiter sequence
 +     or (2) the kernel woke us after we blocked in a futex_wait operation.  We
@@ -1546,16 +1533,11 @@ index 0d6558b..2106bf6 100644
 -
 -      /* Disable asynchronous cancellation.  */
 -      __pthread_disable_asynccancel (cbuffer.oldtype);
--
--      /* We are going to look at shared data again, so get the lock.  */
--      lll_lock (cond->__data.__lock, pshared);
--
--      /* If a broadcast happened, we are done.  */
--      if (cbuffer.bc_seq != cond->__data.__broadcast_seq)
--	goto bc_out;
 +	      /* Stopped blocking; disable cancellation.  */
 +	      __pthread_disable_asynccancel (cbuffer.oldtype);
-+
+ 
+-      /* We are going to look at shared data again, so get the lock.  */
+-      lll_lock (cond->__data.__lock, pshared);
 +	      if (err == 0)
 +		break;
 +	      else if (__glibc_unlikely (err == -ETIMEDOUT))
@@ -1567,7 +1549,10 @@ index 0d6558b..2106bf6 100644
 +		  break;
 +		}
 +	    }
-+
+ 
+-      /* If a broadcast happened, we are done.  */
+-      if (cbuffer.bc_seq != cond->__data.__broadcast_seq)
+-	goto bc_out;
 +	  spin = maxspin;
 +	}
  
@@ -1582,9 +1567,9 @@ index 0d6558b..2106bf6 100644
 -  ++cond->__data.__woken_seq;
 -
 - bc_out:
--
--  cond->__data.__nwaiters -= 1 << COND_NWAITERS_SHIFT;
  
+-  cond->__data.__nwaiters -= 1 << COND_NWAITERS_SHIFT;
+-
 -  /* If pthread_cond_destroy was called on this varaible already,
 -     notify the pthread_cond_destroy caller all waiters have left
 -     and it can be successfully destroyed.  */
@@ -1644,23 +1629,23 @@ index 0d6558b..2106bf6 100644
  		  GLIBC_2_3_2);
 +versioned_symbol (libpthread, __pthread_cond_timedwait, pthread_cond_timedwait,
 +		  GLIBC_2_3_2);
-diff --git a/nptl/pthread_condattr_getclock.c b/nptl/pthread_condattr_getclock.c
-index 020d21a..2ad585b 100644
---- a/nptl/pthread_condattr_getclock.c
-+++ b/nptl/pthread_condattr_getclock.c
-@@ -25,6 +25,6 @@ pthread_condattr_getclock (attr, clock_id)
-      clockid_t *clock_id;
+Index: glibc-2.22-448-g95b0977/nptl/pthread_condattr_getclock.c
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/pthread_condattr_getclock.c
++++ glibc-2.22-448-g95b0977/nptl/pthread_condattr_getclock.c
+@@ -23,6 +23,6 @@ int
+ pthread_condattr_getclock (const pthread_condattr_t *attr, clockid_t *clock_id)
  {
    *clock_id = (((((const struct pthread_condattr *) attr)->value) >> 1)
 -	       & ((1 << COND_NWAITERS_SHIFT) - 1));
 +	       & ((1 << COND_CLOCK_BITS) - 1));
    return 0;
  }
-diff --git a/nptl/pthread_condattr_setclock.c b/nptl/pthread_condattr_setclock.c
-index 0748d78..cb8d8dd 100644
---- a/nptl/pthread_condattr_setclock.c
-+++ b/nptl/pthread_condattr_setclock.c
-@@ -36,11 +36,11 @@ pthread_condattr_setclock (attr, clock_id)
+Index: glibc-2.22-448-g95b0977/nptl/pthread_condattr_setclock.c
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/pthread_condattr_setclock.c
++++ glibc-2.22-448-g95b0977/nptl/pthread_condattr_setclock.c
+@@ -34,11 +34,11 @@ pthread_condattr_setclock (pthread_conda
      return EINVAL;
  
    /* Make sure the value fits in the bits we reserved.  */
@@ -1674,10 +1659,10 @@ index 0748d78..cb8d8dd 100644
  	     | (clock_id << 1));
  
    return 0;
-diff --git a/nptl/tst-cond1.c b/nptl/tst-cond1.c
-index 64f90e0..fab2b19 100644
---- a/nptl/tst-cond1.c
-+++ b/nptl/tst-cond1.c
+Index: glibc-2.22-448-g95b0977/nptl/tst-cond1.c
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/tst-cond1.c
++++ glibc-2.22-448-g95b0977/nptl/tst-cond1.c
 @@ -73,6 +73,9 @@ do_test (void)
  
    puts ("parent: wait for condition");
@@ -1688,10 +1673,10 @@ index 64f90e0..fab2b19 100644
    err = pthread_cond_wait (&cond, &mut);
    if (err != 0)
      error (EXIT_FAILURE, err, "parent: cannot wait fir signal");
-diff --git a/nptl/tst-cond18.c b/nptl/tst-cond18.c
-index ceeb1aa..b14ed79 100644
---- a/nptl/tst-cond18.c
-+++ b/nptl/tst-cond18.c
+Index: glibc-2.22-448-g95b0977/nptl/tst-cond18.c
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/tst-cond18.c
++++ glibc-2.22-448-g95b0977/nptl/tst-cond18.c
 @@ -23,6 +23,7 @@
  #include <stdlib.h>
  #include <stdio.h>
@@ -1727,10 +1712,10 @@ index ceeb1aa..b14ed79 100644
  	  int njobs = rand () % (count + 1);
  	  nn = njobs;
  	  if ((rand () % 30) == 0)
-diff --git a/nptl/tst-cond20.c b/nptl/tst-cond20.c
-index 9de062a..5122370 100644
---- a/nptl/tst-cond20.c
-+++ b/nptl/tst-cond20.c
+Index: glibc-2.22-448-g95b0977/nptl/tst-cond20.c
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/tst-cond20.c
++++ glibc-2.22-448-g95b0977/nptl/tst-cond20.c
 @@ -82,6 +82,7 @@ do_test (void)
        puts ("barrier_init failed");
        return 1;
@@ -1766,10 +1751,10 @@ index 9de062a..5122370 100644
      }
  
    for (i = 0; i < N; ++i)
-diff --git a/nptl/tst-cond22.c b/nptl/tst-cond22.c
-index bd978e5..1ee5188 100644
---- a/nptl/tst-cond22.c
-+++ b/nptl/tst-cond22.c
+Index: glibc-2.22-448-g95b0977/nptl/tst-cond22.c
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/tst-cond22.c
++++ glibc-2.22-448-g95b0977/nptl/tst-cond22.c
 @@ -106,10 +106,10 @@ do_test (void)
        status = 1;
      }
@@ -1800,10 +1785,10 @@ index bd978e5..1ee5188 100644
  
    return status;
  }
-diff --git a/nptl/tst-cond25.c b/nptl/tst-cond25.c
-index be0bec4..ddc37a0 100644
---- a/nptl/tst-cond25.c
-+++ b/nptl/tst-cond25.c
+Index: glibc-2.22-448-g95b0977/nptl/tst-cond25.c
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/nptl/tst-cond25.c
++++ glibc-2.22-448-g95b0977/nptl/tst-cond25.c
 @@ -216,6 +216,14 @@ do_test_wait (thr_func f)
  	  printf ("cond_init failed: %s\n", strerror (ret));
  	  goto out;
@@ -1819,34 +1804,31 @@ index be0bec4..ddc37a0 100644
  
        if ((ret = pthread_mutex_init (&mutex, &attr)) != 0)
          {
-diff --git a/nptl/tst-cond26.c b/nptl/tst-cond26.c
-new file mode 100644
-index 0000000..b611d62
+Index: glibc-2.22-448-g95b0977/nptl/tst-cond26.c
+===================================================================
 --- /dev/null
-+++ b/nptl/tst-cond26.c
++++ glibc-2.22-448-g95b0977/nptl/tst-cond26.c
 @@ -0,0 +1,2 @@
 +#define TEST_QUIESCENCE 1
 +#include "tst-cond20.c"
-diff --git a/nptl/tst-cond27.c b/nptl/tst-cond27.c
-new file mode 100644
-index 0000000..8668a24
+Index: glibc-2.22-448-g95b0977/nptl/tst-cond27.c
+===================================================================
 --- /dev/null
-+++ b/nptl/tst-cond27.c
++++ glibc-2.22-448-g95b0977/nptl/tst-cond27.c
 @@ -0,0 +1,2 @@
 +#define TEST_QUIESCENCE 1
 +#include "tst-cond25.c"
-diff --git a/nptl/tst-cond28.c b/nptl/tst-cond28.c
-new file mode 100644
-index 0000000..7fc3b6b
+Index: glibc-2.22-448-g95b0977/nptl/tst-cond28.c
+===================================================================
 --- /dev/null
-+++ b/nptl/tst-cond28.c
++++ glibc-2.22-448-g95b0977/nptl/tst-cond28.c
 @@ -0,0 +1,2 @@
 +#define TEST_QUIESCENCE 1
 +#include "tst-cond18.c"
-diff --git a/sysdeps/aarch64/nptl/bits/pthreadtypes.h b/sysdeps/aarch64/nptl/bits/pthreadtypes.h
-index 0e4795e..c9ae0d6 100644
---- a/sysdeps/aarch64/nptl/bits/pthreadtypes.h
-+++ b/sysdeps/aarch64/nptl/bits/pthreadtypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/aarch64/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/aarch64/nptl/bits/pthreadtypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/aarch64/nptl/bits/pthreadtypes.h
 @@ -90,14 +90,14 @@ typedef union
  {
    struct
@@ -1869,10 +1851,10 @@ index 0e4795e..c9ae0d6 100644
    } __data;
    char __size[__SIZEOF_PTHREAD_COND_T];
    long int __align;
-diff --git a/sysdeps/arm/nptl/bits/pthreadtypes.h b/sysdeps/arm/nptl/bits/pthreadtypes.h
-index 9f2efc2..f84c272 100644
---- a/sysdeps/arm/nptl/bits/pthreadtypes.h
-+++ b/sysdeps/arm/nptl/bits/pthreadtypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/arm/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/arm/nptl/bits/pthreadtypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/arm/nptl/bits/pthreadtypes.h
 @@ -93,14 +93,14 @@ typedef union
  {
    struct
@@ -1895,10 +1877,10 @@ index 9f2efc2..f84c272 100644
    } __data;
    char __size[__SIZEOF_PTHREAD_COND_T];
    __extension__ long long int __align;
-diff --git a/sysdeps/hppa/nptl/bits/pthreadtypes.h b/sysdeps/hppa/nptl/bits/pthreadtypes.h
-index 845629d..fcd45c9 100644
---- a/sysdeps/hppa/nptl/bits/pthreadtypes.h
-+++ b/sysdeps/hppa/nptl/bits/pthreadtypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/hppa/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/hppa/nptl/bits/pthreadtypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/hppa/nptl/bits/pthreadtypes.h
 @@ -119,23 +119,19 @@ typedef union
         start of the 4-word lock structure, the next four words
         are set all to 1 by the Linuxthreads
@@ -1930,10 +1912,10 @@ index 845629d..fcd45c9 100644
    } __data;
    char __size[__SIZEOF_PTHREAD_COND_T];
    __extension__ long long int __align;
-diff --git a/sysdeps/ia64/nptl/bits/pthreadtypes.h b/sysdeps/ia64/nptl/bits/pthreadtypes.h
-index e9762f5..9477f9a 100644
---- a/sysdeps/ia64/nptl/bits/pthreadtypes.h
-+++ b/sysdeps/ia64/nptl/bits/pthreadtypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/ia64/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/ia64/nptl/bits/pthreadtypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/ia64/nptl/bits/pthreadtypes.h
 @@ -90,14 +90,14 @@ typedef union
  {
    struct
@@ -1956,10 +1938,10 @@ index e9762f5..9477f9a 100644
    } __data;
    char __size[__SIZEOF_PTHREAD_COND_T];
    long int __align;
-diff --git a/sysdeps/m68k/nptl/bits/pthreadtypes.h b/sysdeps/m68k/nptl/bits/pthreadtypes.h
-index 0e2bcdd..40fdec1 100644
---- a/sysdeps/m68k/nptl/bits/pthreadtypes.h
-+++ b/sysdeps/m68k/nptl/bits/pthreadtypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/m68k/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/m68k/nptl/bits/pthreadtypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/m68k/nptl/bits/pthreadtypes.h
 @@ -93,14 +93,14 @@ typedef union
  {
    struct
@@ -1982,10 +1964,10 @@ index 0e2bcdd..40fdec1 100644
    } __data;
    char __size[__SIZEOF_PTHREAD_COND_T];
    __extension__ long long int __align;
-diff --git a/sysdeps/microblaze/nptl/bits/pthreadtypes.h b/sysdeps/microblaze/nptl/bits/pthreadtypes.h
-index b8bd828..58a0daa 100644
---- a/sysdeps/microblaze/nptl/bits/pthreadtypes.h
-+++ b/sysdeps/microblaze/nptl/bits/pthreadtypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/microblaze/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/microblaze/nptl/bits/pthreadtypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/microblaze/nptl/bits/pthreadtypes.h
 @@ -91,14 +91,14 @@ typedef union
  {
    struct
@@ -2008,10 +1990,10 @@ index b8bd828..58a0daa 100644
    } __data;
    char __size[__SIZEOF_PTHREAD_COND_T];
    __extension__ long long int __align;
-diff --git a/sysdeps/mips/nptl/bits/pthreadtypes.h b/sysdeps/mips/nptl/bits/pthreadtypes.h
-index 8cf4547..4267568 100644
---- a/sysdeps/mips/nptl/bits/pthreadtypes.h
-+++ b/sysdeps/mips/nptl/bits/pthreadtypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/mips/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/mips/nptl/bits/pthreadtypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/mips/nptl/bits/pthreadtypes.h
 @@ -122,14 +122,14 @@ typedef union
  {
    struct
@@ -2034,10 +2016,10 @@ index 8cf4547..4267568 100644
    } __data;
    char __size[__SIZEOF_PTHREAD_COND_T];
    __extension__ long long int __align;
-diff --git a/sysdeps/nios2/nptl/bits/pthreadtypes.h b/sysdeps/nios2/nptl/bits/pthreadtypes.h
-index 4a20803..d35bd01 100644
---- a/sysdeps/nios2/nptl/bits/pthreadtypes.h
-+++ b/sysdeps/nios2/nptl/bits/pthreadtypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/nios2/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/nios2/nptl/bits/pthreadtypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/nios2/nptl/bits/pthreadtypes.h
 @@ -93,14 +93,14 @@ typedef union
  {
    struct
@@ -2060,10 +2042,10 @@ index 4a20803..d35bd01 100644
    } __data;
    char __size[__SIZEOF_PTHREAD_COND_T];
    __extension__ long long int __align;
-diff --git a/sysdeps/nptl/internaltypes.h b/sysdeps/nptl/internaltypes.h
-index 8f5cfa4..726a760 100644
---- a/sysdeps/nptl/internaltypes.h
-+++ b/sysdeps/nptl/internaltypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/nptl/internaltypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/nptl/internaltypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/nptl/internaltypes.h
 @@ -68,20 +68,13 @@ struct pthread_condattr
  {
    /* Combination of values:
@@ -2090,11 +2072,11 @@ index 8f5cfa4..726a760 100644
  
  
  /* Read-write lock variable attribute data structure.  */
-diff --git a/sysdeps/nptl/pthread.h b/sysdeps/nptl/pthread.h
-index 70ff250..3749f08 100644
---- a/sysdeps/nptl/pthread.h
-+++ b/sysdeps/nptl/pthread.h
-@@ -185,7 +185,7 @@ enum
+Index: glibc-2.22-448-g95b0977/sysdeps/nptl/pthread.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/nptl/pthread.h
++++ glibc-2.22-448-g95b0977/sysdeps/nptl/pthread.h
+@@ -183,7 +183,7 @@ enum
  
  
  /* Conditional variable handling.  */
@@ -2103,10 +2085,10 @@ index 70ff250..3749f08 100644
  
  
  /* Cleanup buffers */
-diff --git a/sysdeps/s390/nptl/bits/pthreadtypes.h b/sysdeps/s390/nptl/bits/pthreadtypes.h
-index 1f3bb14..d96dbbe 100644
---- a/sysdeps/s390/nptl/bits/pthreadtypes.h
-+++ b/sysdeps/s390/nptl/bits/pthreadtypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/s390/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/s390/nptl/bits/pthreadtypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/s390/nptl/bits/pthreadtypes.h
 @@ -142,14 +142,14 @@ typedef union
  {
    struct
@@ -2129,10 +2111,10 @@ index 1f3bb14..d96dbbe 100644
    } __data;
    char __size[__SIZEOF_PTHREAD_COND_T];
    __extension__ long long int __align;
-diff --git a/sysdeps/sh/nptl/bits/pthreadtypes.h b/sysdeps/sh/nptl/bits/pthreadtypes.h
-index 5940232..412e831 100644
---- a/sysdeps/sh/nptl/bits/pthreadtypes.h
-+++ b/sysdeps/sh/nptl/bits/pthreadtypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/sh/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/sh/nptl/bits/pthreadtypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/sh/nptl/bits/pthreadtypes.h
 @@ -93,14 +93,14 @@ typedef union
  {
    struct
@@ -2155,10 +2137,10 @@ index 5940232..412e831 100644
    } __data;
    char __size[__SIZEOF_PTHREAD_COND_T];
    __extension__ long long int __align;
-diff --git a/sysdeps/sparc/nptl/bits/pthreadtypes.h b/sysdeps/sparc/nptl/bits/pthreadtypes.h
-index 6faf8b2..5e72d77 100644
---- a/sysdeps/sparc/nptl/bits/pthreadtypes.h
-+++ b/sysdeps/sparc/nptl/bits/pthreadtypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/sparc/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/sparc/nptl/bits/pthreadtypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/sparc/nptl/bits/pthreadtypes.h
 @@ -122,14 +122,14 @@ typedef union
  {
    struct
@@ -2181,10 +2163,10 @@ index 6faf8b2..5e72d77 100644
    } __data;
    char __size[__SIZEOF_PTHREAD_COND_T];
    __extension__ long long int __align;
-diff --git a/sysdeps/tile/nptl/bits/pthreadtypes.h b/sysdeps/tile/nptl/bits/pthreadtypes.h
-index 1f6553d..bb521b7 100644
---- a/sysdeps/tile/nptl/bits/pthreadtypes.h
-+++ b/sysdeps/tile/nptl/bits/pthreadtypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/tile/nptl/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/tile/nptl/bits/pthreadtypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/tile/nptl/bits/pthreadtypes.h
 @@ -122,14 +122,14 @@ typedef union
  {
    struct
@@ -2207,10 +2189,10 @@ index 1f6553d..bb521b7 100644
    } __data;
    char __size[__SIZEOF_PTHREAD_COND_T];
    __extension__ long long int __align;
-diff --git a/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h b/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
-index 7121d0b..5d42d70 100644
---- a/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
-+++ b/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
 @@ -89,14 +89,14 @@ typedef union
  {
    struct
@@ -2233,11 +2215,11 @@ index 7121d0b..5d42d70 100644
    } __data;
    char __size[__SIZEOF_PTHREAD_COND_T];
    __extension__ long long int __align;
-diff --git a/sysdeps/unix/sysv/linux/hppa/internaltypes.h b/sysdeps/unix/sysv/linux/hppa/internaltypes.h
-index 651ce2e..d649657 100644
---- a/sysdeps/unix/sysv/linux/hppa/internaltypes.h
-+++ b/sysdeps/unix/sysv/linux/hppa/internaltypes.h
-@@ -46,32 +46,38 @@ fails because __initializer is zero, and the structure will be used as
+Index: glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/hppa/internaltypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/unix/sysv/linux/hppa/internaltypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/hppa/internaltypes.h
+@@ -46,32 +46,38 @@ fails because __initializer is zero, and
  is correctly.  */
  
  #define cond_compat_clear(var) \
@@ -2293,60 +2275,11 @@ index 651ce2e..d649657 100644
      }								\
  })
  
-diff --git a/sysdeps/unix/sysv/linux/hppa/pthread_cond_timedwait.c b/sysdeps/unix/sysv/linux/hppa/pthread_cond_timedwait.c
-deleted file mode 100644
-index 6199013..0000000
---- a/sysdeps/unix/sysv/linux/hppa/pthread_cond_timedwait.c
-+++ /dev/null
-@@ -1,43 +0,0 @@
--/* Copyright (C) 2009-2015 Free Software Foundation, Inc.
--   This file is part of the GNU C Library.
--   Contributed by Carlos O'Donell <carlos@codesourcery.com>, 2009.
--
--   The GNU C Library is free software; you can redistribute it and/or
--   modify it under the terms of the GNU Lesser General Public
--   License as published by the Free Software Foundation; either
--   version 2.1 of the License, or (at your option) any later version.
--
--   The GNU C Library is distributed in the hope that it will be useful,
--   but WITHOUT ANY WARRANTY; without even the implied warranty of
--   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
--   Lesser General Public License for more details.
--
--   You should have received a copy of the GNU Lesser General Public
--   License along with the GNU C Library.  If not, see
--   <http://www.gnu.org/licenses/>.  */
--
--#ifndef INCLUDED_SELF
--# define INCLUDED_SELF
--# include <pthread_cond_timedwait.c>
--#else
--# include <pthread.h>
--# include <pthreadP.h>
--# include <internaltypes.h>
--# include <shlib-compat.h>
--int
--__pthread_cond_timedwait (cond, mutex, abstime)
--     pthread_cond_t *cond;
--     pthread_mutex_t *mutex;
--     const struct timespec *abstime;
--{
--  cond_compat_check_and_clear (cond);
--  return __pthread_cond_timedwait_internal (cond, mutex, abstime);
--}
--versioned_symbol (libpthread, __pthread_cond_timedwait, pthread_cond_timedwait,
--                  GLIBC_2_3_2);
--# undef versioned_symbol
--# define versioned_symbol(lib, local, symbol, version)
--# undef __pthread_cond_timedwait
--# define __pthread_cond_timedwait __pthread_cond_timedwait_internal
--# include_next <pthread_cond_timedwait.c>
--#endif
-diff --git a/sysdeps/unix/sysv/linux/hppa/pthread_cond_wait.c b/sysdeps/unix/sysv/linux/hppa/pthread_cond_wait.c
-index 5e1506f..1496730 100644
---- a/sysdeps/unix/sysv/linux/hppa/pthread_cond_wait.c
-+++ b/sysdeps/unix/sysv/linux/hppa/pthread_cond_wait.c
-@@ -34,9 +34,22 @@ __pthread_cond_wait (cond, mutex)
+Index: glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/hppa/pthread_cond_wait.c
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/unix/sysv/linux/hppa/pthread_cond_wait.c
++++ glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/hppa/pthread_cond_wait.c
+@@ -32,9 +32,22 @@ __pthread_cond_wait (pthread_cond_t *con
  }
  versioned_symbol (libpthread, __pthread_cond_wait, pthread_cond_wait,
                    GLIBC_2_3_2);
@@ -2369,10 +2302,9 @@ index 5e1506f..1496730 100644
 +# define __pthread_cond_timedwait __pthread_cond_timedwait_internal
  # include_next <pthread_cond_wait.c>
  #endif
-diff --git a/sysdeps/unix/sysv/linux/i386/pthread_cond_broadcast.S b/sysdeps/unix/sysv/linux/i386/pthread_cond_broadcast.S
-deleted file mode 100644
-index 5ddd5ac..0000000
---- a/sysdeps/unix/sysv/linux/i386/pthread_cond_broadcast.S
+Index: glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/i386/pthread_cond_broadcast.S
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/unix/sysv/linux/i386/pthread_cond_broadcast.S
 +++ /dev/null
 @@ -1,241 +0,0 @@
 -/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
@@ -2616,10 +2548,9 @@ index 5ddd5ac..0000000
 -	.size	__pthread_cond_broadcast, .-__pthread_cond_broadcast
 -versioned_symbol (libpthread, __pthread_cond_broadcast, pthread_cond_broadcast,
 -		  GLIBC_2_3_2)
-diff --git a/sysdeps/unix/sysv/linux/i386/pthread_cond_signal.S b/sysdeps/unix/sysv/linux/i386/pthread_cond_signal.S
-deleted file mode 100644
-index 8f4d937..0000000
---- a/sysdeps/unix/sysv/linux/i386/pthread_cond_signal.S
+Index: glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/i386/pthread_cond_signal.S
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/unix/sysv/linux/i386/pthread_cond_signal.S
 +++ /dev/null
 @@ -1,216 +0,0 @@
 -/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
@@ -2838,10 +2769,9 @@ index 8f4d937..0000000
 -	.size	__pthread_cond_signal, .-__pthread_cond_signal
 -versioned_symbol (libpthread, __pthread_cond_signal, pthread_cond_signal,
 -		  GLIBC_2_3_2)
-diff --git a/sysdeps/unix/sysv/linux/i386/pthread_cond_timedwait.S b/sysdeps/unix/sysv/linux/i386/pthread_cond_timedwait.S
-deleted file mode 100644
-index 130c090..0000000
---- a/sysdeps/unix/sysv/linux/i386/pthread_cond_timedwait.S
+Index: glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/i386/pthread_cond_timedwait.S
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/unix/sysv/linux/i386/pthread_cond_timedwait.S
 +++ /dev/null
 @@ -1,973 +0,0 @@
 -/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
@@ -3817,10 +3747,9 @@ index 130c090..0000000
 -DW.ref.__gcc_personality_v0:
 -	.long   __gcc_personality_v0
 -#endif
-diff --git a/sysdeps/unix/sysv/linux/i386/pthread_cond_wait.S b/sysdeps/unix/sysv/linux/i386/pthread_cond_wait.S
-deleted file mode 100644
-index ec3538f..0000000
---- a/sysdeps/unix/sysv/linux/i386/pthread_cond_wait.S
+Index: glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/i386/pthread_cond_wait.S
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/unix/sysv/linux/i386/pthread_cond_wait.S
 +++ /dev/null
 @@ -1,641 +0,0 @@
 -/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
@@ -4464,10 +4393,10 @@ index ec3538f..0000000
 -DW.ref.__gcc_personality_v0:
 -	.long   __gcc_personality_v0
 -#endif
-diff --git a/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h b/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
-index 7cbdb2c..70b65d3 100644
---- a/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
-+++ b/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
 @@ -128,14 +128,14 @@ typedef union
  {
    struct
@@ -4490,10 +4419,9 @@ index 7cbdb2c..70b65d3 100644
    } __data;
    char __size[__SIZEOF_PTHREAD_COND_T];
    __extension__ long long int __align;
-diff --git a/sysdeps/unix/sysv/linux/x86_64/pthread_cond_broadcast.S b/sysdeps/unix/sysv/linux/x86_64/pthread_cond_broadcast.S
-deleted file mode 100644
-index df635af..0000000
---- a/sysdeps/unix/sysv/linux/x86_64/pthread_cond_broadcast.S
+Index: glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/x86_64/pthread_cond_broadcast.S
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/unix/sysv/linux/x86_64/pthread_cond_broadcast.S
 +++ /dev/null
 @@ -1,179 +0,0 @@
 -/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
@@ -4675,10 +4603,9 @@ index df635af..0000000
 -	.size	__pthread_cond_broadcast, .-__pthread_cond_broadcast
 -versioned_symbol (libpthread, __pthread_cond_broadcast, pthread_cond_broadcast,
 -		  GLIBC_2_3_2)
-diff --git a/sysdeps/unix/sysv/linux/x86_64/pthread_cond_signal.S b/sysdeps/unix/sysv/linux/x86_64/pthread_cond_signal.S
-deleted file mode 100644
-index 0e8fe0c..0000000
---- a/sysdeps/unix/sysv/linux/x86_64/pthread_cond_signal.S
+Index: glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/x86_64/pthread_cond_signal.S
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/unix/sysv/linux/x86_64/pthread_cond_signal.S
 +++ /dev/null
 @@ -1,164 +0,0 @@
 -/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
@@ -4845,10 +4772,9 @@ index 0e8fe0c..0000000
 -	.size	__pthread_cond_signal, .-__pthread_cond_signal
 -versioned_symbol (libpthread, __pthread_cond_signal, pthread_cond_signal,
 -		  GLIBC_2_3_2)
-diff --git a/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S b/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S
-deleted file mode 100644
-index 15b872d..0000000
---- a/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S
+Index: glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S
 +++ /dev/null
 @@ -1,623 +0,0 @@
 -/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
@@ -5474,10 +5400,9 @@ index 15b872d..0000000
 -DW.ref.__gcc_personality_v0:
 -	ASM_ADDR __gcc_personality_v0
 -#endif
-diff --git a/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S b/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
-deleted file mode 100644
-index 2e564a7..0000000
---- a/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
+Index: glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S
 +++ /dev/null
 @@ -1,555 +0,0 @@
 -/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
@@ -6035,10 +5960,10 @@ index 2e564a7..0000000
 -DW.ref.__gcc_personality_v0:
 -	ASM_ADDR __gcc_personality_v0
 -#endif
-diff --git a/sysdeps/x86/bits/pthreadtypes.h b/sysdeps/x86/bits/pthreadtypes.h
-index 4460615..0898455 100644
---- a/sysdeps/x86/bits/pthreadtypes.h
-+++ b/sysdeps/x86/bits/pthreadtypes.h
+Index: glibc-2.22-448-g95b0977/sysdeps/x86/bits/pthreadtypes.h
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/x86/bits/pthreadtypes.h
++++ glibc-2.22-448-g95b0977/sysdeps/x86/bits/pthreadtypes.h
 @@ -140,14 +140,14 @@ typedef union
  {
    struct
@@ -6061,3 +5986,49 @@ index 4460615..0898455 100644
    } __data;
    char __size[__SIZEOF_PTHREAD_COND_T];
    __extension__ long long int __align;
+Index: glibc-2.22-448-g95b0977/sysdeps/unix/sysv/linux/hppa/pthread_cond_timedwait.c
+===================================================================
+--- glibc-2.22-448-g95b0977.orig/sysdeps/unix/sysv/linux/hppa/pthread_cond_timedwait.c
++++ /dev/null
+@@ -1,41 +0,0 @@
+-/* Copyright (C) 2009-2015 Free Software Foundation, Inc.
+-   This file is part of the GNU C Library.
+-   Contributed by Carlos O'Donell <carlos@codesourcery.com>, 2009.
+-
+-   The GNU C Library is free software; you can redistribute it and/or
+-   modify it under the terms of the GNU Lesser General Public
+-   License as published by the Free Software Foundation; either
+-   version 2.1 of the License, or (at your option) any later version.
+-
+-   The GNU C Library is distributed in the hope that it will be useful,
+-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-   Lesser General Public License for more details.
+-
+-   You should have received a copy of the GNU Lesser General Public
+-   License along with the GNU C Library.  If not, see
+-   <http://www.gnu.org/licenses/>.  */
+-
+-#ifndef INCLUDED_SELF
+-# define INCLUDED_SELF
+-# include <pthread_cond_timedwait.c>
+-#else
+-# include <pthread.h>
+-# include <pthreadP.h>
+-# include <internaltypes.h>
+-# include <shlib-compat.h>
+-int
+-__pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
+-			  const struct timespec *abstime)
+-{
+-  cond_compat_check_and_clear (cond);
+-  return __pthread_cond_timedwait_internal (cond, mutex, abstime);
+-}
+-versioned_symbol (libpthread, __pthread_cond_timedwait, pthread_cond_timedwait,
+-                  GLIBC_2_3_2);
+-# undef versioned_symbol
+-# define versioned_symbol(lib, local, symbol, version)
+-# undef __pthread_cond_timedwait
+-# define __pthread_cond_timedwait __pthread_cond_timedwait_internal
+-# include_next <pthread_cond_timedwait.c>
+-#endif

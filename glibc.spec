@@ -1,4 +1,4 @@
-%define glibcsrcdir  glibc-2.22-386-g95e8397
+%define glibcsrcdir  glibc-2.22-448-g95b0977
 %define glibcversion 2.22.90
 %define glibcrelease 9%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
@@ -1852,7 +1852,7 @@ rm -f *.filelist*
 
 %changelog
 * Wed Oct 21 2015 Carlos O'Donell <carlos@redhat.com> - 2.22.90-9
-- Auto-sync with upstream master.
+- Sync with upstream master.
 - Update new condvar implementation.
 
 * Fri Oct  9 2015 Carlos O'Donell <carlos@redhat.com> - 2.22.90-8
