@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-448-g95b0977
 %define glibcversion 2.22.90
-%define glibcrelease 9%{?dist}
+%define glibcrelease 10%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -37,8 +37,9 @@
 # Run a valgrind smoke test to ensure that the release is compatible and
 # doesn't any new feature that might cause valgrind to abort.
 %if %{with valgrind}
-%ifarch s390
+%ifarch s390 ppc64
 # There is no valgrind support for 31-bit s390.
+# The valgrind test does not work on ppc64 (bug 1273103).
 %undefine with_valgrind
 %endif
 %endif
@@ -1851,6 +1852,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Oct 26 2015 Carlos O'Donell <carlos@redhat.com> - 2.22.90-10
+- Disable valgrind test for ppc64.
+
 * Wed Oct 21 2015 Carlos O'Donell <carlos@redhat.com> - 2.22.90-9
 - Sync with upstream master.
 - Update new condvar implementation.
