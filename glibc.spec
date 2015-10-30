@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.22-448-g95b0977
+%define glibcsrcdir  glibc-2.22-491-gaf1b2fd
 %define glibcversion 2.22.90
-%define glibcrelease 12%{?dist}
+%define glibcrelease 13%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1850,6 +1850,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Oct 30 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-13
+- Auto-sync with upstream master.
+
 * Fri Oct 30 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-12
 - Revert to upstream implementation of condition variables (#1229659)
 
