@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-448-g95b0977
 %define glibcversion 2.22.90
-%define glibcrelease 11%{?dist}
+%define glibcrelease 12%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -261,7 +261,6 @@ Patch2031: glibc-rh1070416.patch
 
 Patch2033: glibc-aarch64-tls-fixes.patch
 Patch2034: glibc-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
-Patch2035: glibc-new-condvar.patch
 
 # Upstream BZ 18568
 Patch2101: glibc-rh1238412-remove-duplicate-transliterations.patch
@@ -642,7 +641,6 @@ microbenchmark tests on the system.
 %patch0052 -p1
 %patch0053 -p1
 %patch3002 -p1
-%patch2035 -p1
 %patch2101 -p1
 %patch2102 -p1
 %patch2103 -p1
@@ -1852,6 +1850,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Oct 30 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-12
+- Revert to upstream implementation of condition variables (#1229659)
+
 * Wed Oct 28 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-11
 - Disable valgrind test on ppc64p7, too.
 
