@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-491-gaf1b2fd
 %define glibcversion 2.22.90
-%define glibcrelease 13%{?dist}
+%define glibcrelease 14%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -605,6 +605,11 @@ microbenchmark tests on the system.
 # Prepare for the build.
 ##############################################################################
 %prep
+# Log system information
+uname -a
+cat /proc/cpuinfo
+cat /proc/meminfo
+
 %setup -q -n %{glibcsrcdir}
 
 # Patch order matters.
@@ -1850,6 +1855,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Nov  3 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-14
+- Log uname, cpuinfo, meminfo during build (#1276636)
+
 * Fri Oct 30 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-13
 - Auto-sync with upstream master.
 
