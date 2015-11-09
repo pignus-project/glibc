@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.22-491-gaf1b2fd
+%define glibcsrcdir  glibc-2.22-517-g2eecc8a
 %define glibcversion 2.22.90
-%define glibcrelease 14%{?dist}
+%define glibcrelease 15%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1855,6 +1855,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Nov 09 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-15
+- Auto-sync with upstream master.
+
 * Tue Nov  3 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-14
 - Log uname, cpuinfo, meminfo during build (#1276636)
 
