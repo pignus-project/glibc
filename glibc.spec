@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-517-g2eecc8a
 %define glibcversion 2.22.90
-%define glibcrelease 15%{?dist}
+%define glibcrelease 16%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -229,6 +229,9 @@ Patch0058: glibc-bug-regex-gcc5.patch
 
 # Add C.UTF-8 locale into /usr/lib/locale/
 Patch0059: glibc-c-utf8-locale.patch
+
+# Temporary workaround for armhfp build problem.
+Patch0060: glibc-fedora-armhfp-long-double-hotfix.patch
 
 ##############################################################################
 #
@@ -657,6 +660,7 @@ cat /proc/meminfo
 %patch0057 -p1
 %patch0058 -p1
 %patch0059 -p1
+%patch0060 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1855,6 +1859,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Nov  9 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-16
+- Apply temporary fix for armhfp build issue.
+
 * Mon Nov 09 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-15
 - Auto-sync with upstream master.
 
