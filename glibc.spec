@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.22-517-g2eecc8a
+%define glibcsrcdir  glibc-2.22-533-gb43e857
 %define glibcversion 2.22.90
-%define glibcrelease 17%{?dist}
+%define glibcrelease 18%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1855,6 +1855,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Nov 16 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-18
+- Auto-sync with upstream master.
+
 * Mon Nov 16 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-17
 - Revert temporary armhfp build fix.
 
