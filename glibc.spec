@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-533-gb43e857
 %define glibcversion 2.22.90
-%define glibcrelease 18%{?dist}
+%define glibcrelease 19%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -44,8 +44,10 @@
 %endif
 %endif
 %if %{with werror}
-%ifarch s390x
-# The 64-bit s390x builds are not -Werror clean yet.
+%ifarch s390 s390x
+# The s390 and s390x builds are not -Werror clean yet.  For s390, the
+# latest problem may be due to questionable code in test-string.h
+# (upstream bug 19261, rhbz#1283184).
 %undefine with_werror
 %endif
 %endif
@@ -1855,6 +1857,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov 18 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-19
+- Disable -Werror on s390 (#1283184).
+
 * Mon Nov 16 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-18
 - Auto-sync with upstream master.
 
