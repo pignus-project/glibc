@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-540-g31cf394
 %define glibcversion 2.22.90
-%define glibcrelease 21%{?dist}
+%define glibcrelease 22%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -199,7 +199,6 @@ Patch0028: glibc-fedora-localedata-rh61908.patch
 Patch0030: glibc-fedora-uname-getrlimit.patch
 Patch0031: glibc-fedora-__libc_multiple_libcs.patch
 Patch0033: glibc-fedora-elf-ORIGIN.patch
-Patch0034: glibc-fedora-elf-init-hidden_undef.patch
 
 # Needs to be sent upstream.
 # Support mangling and demangling null pointers.
@@ -391,10 +390,19 @@ BuildRequires: elfutils >= 0.72
 BuildRequires: rpm >= 4.2-0.56
 %endif
 
-# The testsuite builds static C++ binaries that require a C++ compiler
-# and static C++ runtime from libstdc++-static.
+%if %{without boostrap}
+%if %{with testsuite}
+# The testsuite builds static C++ binaries that require a C++ compiler,
+# static C++ runtime from libstdc++-static, and lastly static glibc.
 BuildRequires: gcc-c++
 BuildRequires: libstdc++-static
+# A configure check tests for the ability to create static C++ binaries
+# before glibc is built and therefore we need a glibc-static for that
+# check to pass even if we aren't going to use any of those objects to
+# build the tests.
+BuildRequires: glibc-static
+%endif
+%endif
 
 # Filter out all GLIBC_PRIVATE symbols since they are internal to
 # the package and should not be examined by any other tool.
@@ -637,7 +645,6 @@ cat /proc/meminfo
 %patch0030 -p1
 %patch0031 -p1
 %patch0033 -p1
-%patch0034 -p1
 %patch0037 -p1
 %patch0044 -p1
 %patch0046 -p1
@@ -1023,6 +1030,10 @@ fi
 
 # Compress all of the info files.
 gzip -9nvf $RPM_BUILD_ROOT%{_infodir}/libc*
+
+%else
+rm -f $RPM_BUILD_ROOT%{_infodir}/dir
+rm -f $RPM_BUILD_ROOT%{_infodir}/libc.info*
 %endif
 
 ##############################################################################
@@ -1220,9 +1231,7 @@ grep '%{_prefix}/include' < rpm.filelist \
 # the core glibc package.
 sed -i -e '\|%{_libdir}/lib.*_p.a|d' \
        -e '\|%{_prefix}/include|d' \
-%if %{with docs}
        -e '\|%{_infodir}|d' \
-%endif
 	rpm.filelist
 
 # Put some static files into the devel package.
@@ -1857,6 +1866,17 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Nov 26 2015 Carlos O'Donell <carlos@redhat.com> - 2.22.90-22
+- The generic hidden directive support is already used for
+  preinit/init/fini-array symbols so we drop the Fedora-specific
+  patch that does the same thing.
+  Reported by Dmitry V. Levin <ldv@altlinux.org>
+
+* Thu Nov 26 2015 DJ Delorie <dj@redhat.com> - 2.22.90-22
+- Require glibc-static for C++ tests.
+- Require gcc-c++, libstdc++-static, and glibc-static only when needed.
+- Fix --without docs to not leave info files.
+
 * Fri Nov 20 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-21
 - Auto-sync with upstream master.
 
