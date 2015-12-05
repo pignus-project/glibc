@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-580-g5d1d491
 %define glibcversion 2.22.90
-%define glibcrelease 23%{?dist}
+%define glibcrelease 24%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1236,12 +1236,12 @@ sed -i -e '\|%{_libdir}/lib.*_p.a|d' \
 
 # Put some static files into the devel package.
 grep '%{_libdir}/lib.*\.a' < rpm.filelist \
-  | grep '/lib\(\(c\|pthread\|nldbl\)_nonshared\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
+  | grep '/lib\(\(c\|pthread\|nldbl\|mvec\)_nonshared\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
   >> devel.filelist
 
 # Put the rest of the static files into the static package.
 grep '%{_libdir}/lib.*\.a' < rpm.filelist \
-  | grep -v '/lib\(\(c\|pthread\|nldbl\)_nonshared\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
+  | grep -v '/lib\(\(c\|pthread\|nldbl\|mvec\)_nonshared\|g\|ieee\|mcheck\|rpcsvc\)\.a$' \
   > static.filelist
 
 # Put all of the object files and *.so (not the versioned ones) into the
@@ -1866,6 +1866,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Dec  5 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-24
+- Put libmvec_nonshared.a into the -devel package.  (#1288738)
+
 * Sat Dec 05 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-23
 - Auto-sync with upstream master.
 
