@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.22-540-g31cf394
+%define glibcsrcdir  glibc-2.22-580-g5d1d491
 %define glibcversion 2.22.90
-%define glibcrelease 22%{?dist}
+%define glibcrelease 23%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1866,6 +1866,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Dec 05 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-23
+- Auto-sync with upstream master.
+
 * Thu Nov 26 2015 Carlos O'Donell <carlos@redhat.com> - 2.22.90-22
 - The generic hidden directive support is already used for
   preinit/init/fini-array symbols so we drop the Fedora-specific
