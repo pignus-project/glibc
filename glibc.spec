@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.22-580-g5d1d491
+%define glibcsrcdir  glibc-2.22-609-g3da825c
 %define glibcversion 2.22.90
-%define glibcrelease 24%{?dist}
+%define glibcrelease 25%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -262,13 +262,6 @@ Patch2031: glibc-rh1070416.patch
 
 Patch2033: glibc-aarch64-tls-fixes.patch
 Patch2034: glibc-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
-
-# Upstream BZ 18568
-Patch2101: glibc-rh1238412-remove-duplicate-transliterations.patch
-Patch2102: glibc-rh1238412-addition-and-fixes-for-translit_neutral.patch
-Patch2103: glibc-rh1238412-update-the-translit-files-to-unicode-7.0.0.patch
-Patch2104: glibc-rh1238412-add-translit-rules-for-da-nb-nn-sv-locales.patch
-Patch2105: glibc-rh1238412-unicode-8.0.0-update.patch
 
 ##############################################################################
 #
@@ -655,11 +648,6 @@ cat /proc/meminfo
 %patch0052 -p1
 %patch0053 -p1
 %patch3002 -p1
-%patch2101 -p1
-%patch2102 -p1
-%patch2103 -p1
-%patch2104 -p1
-%patch2105 -p1
 %patch0054 -p1
 %patch0055 -p1
 %patch0056 -p1
@@ -1866,6 +1854,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Dec 16 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-25
+- Auto-sync with upstream master.
+- Includes fix for malloc assertion failure in get_free_list.  (#1281714)
+- Drop Unicode 8.0 patches (now merged upstream).
+
 * Sat Dec  5 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-24
 - Put libmvec_nonshared.a into the -devel package.  (#1288738)
 
