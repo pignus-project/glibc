@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.22-609-g3da825c
+%define glibcsrcdir  glibc-2.22-621-g90c400b
 %define glibcversion 2.22.90
-%define glibcrelease 25%{?dist}
+%define glibcrelease 26%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1854,6 +1854,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Dec 21 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-26
+- Auto-sync with upstream master.
+
 * Wed Dec 16 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-25
 - Auto-sync with upstream master.
 - Includes fix for malloc assertion failure in get_free_list.  (#1281714)
