@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-621-g90c400b
 %define glibcversion 2.22.90
-%define glibcrelease 26%{?dist}
+%define glibcrelease 27%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -86,18 +86,43 @@
 %define xenpackage 0
 %endif
 ##############################################################################
-# For Power we actually support alternate runtimes in the same base package.
-# If we build for Power or Power64 we additionally build a power6 runtime that
-# is enabled by AT_HWCAPS selection and an alternate runtime directory.
-%ifarch ppc ppc64
+# We support only 64-bit POWER with the following runtimes:
+# 64-bit BE:
+# - Power 620 / 970 ISA (default runtime, compatile with POWER4 and newer)
+#	- Provided for the large number of PowerPC G5 users.
+#	- IFUNC support provides optimized core routines for POWER6,
+#	  POWER7, and POWER8 transparently (if not using specific runtimes
+#	  below)
+# - POWER6 (has power6x symlink to power6, enabled via AT_PLATFORM)
+#	- Legacy for old systems. Should be deprecated at some point soon.
+# - POWER7 (enabled via AT_PLATFORM)
+#	- Existing deployments.
+# - POWER8 (enabled via AT_PLATFORM)
+#	- Latest generation.
+# 64-bit LE:
+# - POWER8 LE (default)
+#	- Latest generation.
+#
+# No 32-bit POWER support is provided.
+#
+# There are currently no plans for POWER9 enablement, but as hardware and
+# upstream support become available this will be reviewed.
+#
+%ifarch ppc64
+# Build the additional runtimes for 64-bit BE POWER.
 %define buildpower6 1
+%define buildpower7 1
+%define buildpower8 1
 %else
+# No additional runtimes for ppc64le or ppc64p7, just the default.
 %define buildpower6 0
+%define buildpower7 0
+%define buildpower8 0
 %endif
 ##############################################################################
 # Any architecture/kernel combination that supports running 32-bit and 64-bit
 # code in userspace is considered a biarch arch.
-%define biarcharches %{ix86} x86_64 ppc %{power64} s390 s390x
+%define biarcharches %{ix86} x86_64 %{power64} s390 s390x
 ##############################################################################
 # If the debug information is split into two packages, the core debuginfo
 # pacakge and the common debuginfo package then the arch should be listed
@@ -111,7 +136,7 @@
 # most optimal function is selected at runtime based on the hardware that is
 # detected by glibc. The underlying support for function selection and
 # execution is provided by STT_GNU_IFUNC.
-%define multiarcharches ppc %{power64} %{ix86} x86_64 %{sparc}
+%define multiarcharches %{power64} %{ix86} x86_64 %{sparc}
 ##############################################################################
 # Add -s for a less verbose build output.
 %define silentrules PARALLELMFLAGS=
@@ -352,7 +377,7 @@ Conflicts: kernel < %{enablekernel}
 
 %ifarch %{multiarcharches}
 # Need STT_IFUNC support
-%ifarch ppc %{power64}
+%ifarch %{power64}
 BuildRequires: binutils >= 2.20.51.0.2
 Conflicts: binutils < 2.20.51.0.2
 %else
@@ -375,7 +400,7 @@ BuildRequires: binutils >= 2.17.50.0.2-5
 %endif
 
 BuildRequires: gcc >= 3.2.1-5
-%ifarch ppc s390 s390x
+%ifarch s390 s390x
 BuildRequires: gcc >= 4.1.0-0.17
 %endif
 %if 0%{?_enable_debug_packages}
@@ -658,20 +683,6 @@ cat /proc/meminfo
 ##############################################################################
 # %%prep - Additional prep required...
 ##############################################################################
-
-# XXX: This sounds entirely out of date, particularly in light of the fact
-#      that we want to be building newer Power support. We should review this
-#      and potentially remove this workaround. However it will require
-#      determining which arches we support building for on our distributions.
-# ~~~
-# On powerpc32, hp timing is only available in power4/power6
-# libs, not in base, so pre-power4 dynamic linker is incompatible
-# with power6 libs.
-# ~~~
-%if %{buildpower6}
-rm -f sysdeps/powerpc/powerpc32/power4/hp-timing.[ch]
-%endif
-
 # Make benchmark scripts executable
 chmod +x benchtests/scripts/*.py scripts/pylint
 
@@ -747,6 +758,10 @@ GXX="g++ -m64"
 BuildFlags=""
 GCC="gcc -m64"
 GXX="g++ -m64"
+%ifarch ppc64p7
+GCC="$GCC -mcpu=power7 -mtune=power7"
+GXX="$GXX -mcpu=power7 -mtune=power7"
+%endif
 %endif
 
 ##############################################################################
@@ -841,9 +856,6 @@ build nosegneg -mno-tls-direct-seg-refs
 	if [ "$platform" != power6 ]; then
 		mkdir -p power6emul/{lib,lib64}
 		$GCC -shared -O2 -fpic -o power6emul/%{_lib}/power6emul.so %{SOURCE8} -Wl,-z,initfirst
-%ifarch ppc
-		gcc -shared -nostdlib -O2 -fpic -m64 -o power6emul/lib64/power6emul.so -xc - </dev/null
-%endif
 %ifarch ppc64
 		gcc -shared -nostdlib -O2 -fpic -m32 -o power6emul/lib/power6emul.so -xc - < /dev/null
 %endif
@@ -855,6 +867,24 @@ build nosegneg -mno-tls-direct-seg-refs
 	build power6
 )
 %endif # %{buildpower6}
+
+%if %{buildpower7}
+(
+  AddOns="$AddOns --with-cpu=power7"
+  GCC="$GCC -mcpu=power7 -mtune=power7"
+  GXX="$GXX -mcpu=power7 -mtune=power7"
+  build power7
+)
+%endif
+
+%if %{buildpower8}
+(
+  AddOns="$AddOns --with-cpu=power8"
+  GCC="$GCC -mcpu=power8 -mtune=power8"
+  GXX="$GXX -mcpu=power8 -mtune=power8"
+  build power8
+)
+%endif
 
 ##############################################################################
 # Build the glibc post-upgrade program:
@@ -983,6 +1013,24 @@ cp -a %{power6_legacy_up}/%{power6_subdir}/*.so.* .
 popd
 popd
 %endif # %{buildpower6}
+
+%if %{buildpower7}
+%define power7_subdir power7
+%define power7_subdir_up ..
+pushd build-%{target}-power7
+destdir=$RPM_BUILD_ROOT/%{_lib}
+install_different "$destdir" "%{power7_subdir}" "%{power7_subdir_up}"
+popd
+%endif
+
+%if %{buildpower8}
+%define power8_subdir power8
+%define power8_subdir_up ..
+pushd build-%{target}-power8
+destdir=$RPM_BUILD_ROOT/%{_lib}
+install_different "$destdir" "%{power8_subdir}" "%{power8_subdir_up}"
+popd
+%endif
 
 ##############################################################################
 # Remove the files we don't want to distribute
@@ -1614,26 +1662,34 @@ parent=$$
 echo ====================TESTING=========================
 ##############################################################################
 # - Test the default runtime.
+# 	- Power 620 / 970 ISA for 64-bit POWER BE.
+#	- POWER8 for 64-bit POWER LE.
+#	- ??? for 64-bit x86_64
+#	- ??? for 32-bit x86
+#	- ??? for 64-bit AArch64
+#	- ??? for 32-bit ARM
+#	- ??? for 64-bit s390x
+#	- ??? for 32-bit s390
 ##############################################################################
 pushd build-%{target}
 run_tests
 popd
 
+%if %{buildxen}
+echo ====================TESTING -mno-tls-direct-seg-refs=============
 ##############################################################################
 # - Test the xen runtimes (nosegneg).
 ##############################################################################
-%if %{buildxen}
-echo ====================TESTING -mno-tls-direct-seg-refs=============
 pushd build-%{target}-nosegneg
 run_tests
 popd
 %endif
 
-##############################################################################
-# - Test the power6 runtimes.
-##############################################################################
 %if %{buildpower6}
 echo ====================TESTING -mcpu=power6=============
+##############################################################################
+# - Test the 64-bit POWER6 BE runtimes.
+##############################################################################
 pushd build-%{target}-power6
 if [ -d ../power6emul ]; then
     export LD_PRELOAD=`cd ../power6emul; pwd`/\$LIB/power6emul.so
@@ -1641,6 +1697,27 @@ fi
 run_tests
 popd
 %endif
+
+%if %{buildpower7}
+echo ====================TESTING -mcpu=power7=============
+##############################################################################
+# - Test the 64-bit POWER7 BE runtimes.
+##############################################################################
+pushd build-%{target}-power7
+run_tests
+popd
+%endif
+
+%if %{buildpower8}
+echo ====================TESTING -mcpu=power8=============
+##############################################################################
+# - Test the 64-bit POWER8 BE runtimes.
+##############################################################################
+pushd build-%{target}-power8
+run_tests
+popd
+%endif
+
 echo ====================TESTING DETAILS=================
 for i in `sed -n 's|^.*\*\*\* \[\([^]]*\.out\)\].*$|\1|p' build-*-linux*/check.log`; do
   echo =====$i=====
@@ -1763,6 +1840,12 @@ rm -f *.filelist*
 %dir /%{_lib}/power6
 %dir /%{_lib}/power6x
 %endif
+%if %{buildpower7}
+%dir /%{_lib}/power7
+%endif
+%if %{buildpower8}
+%dir /%{_lib}/power8
+%endif
 %ifarch s390x
 /lib/ld64.so.1
 %endif
@@ -1854,6 +1937,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jan 12 2016 Carlos O'Donell <carlos@redhat.com> - 2.22.90-27
+- Remove 32-bit POWER support.
+- Add 64-bit POWER7 BE and 64-bit POWER8 BE optimized libraries.
+
 * Mon Dec 21 2015 Florian Weimer <fweimer@redhat.com> - 2.22.90-26
 - Auto-sync with upstream master.
 
