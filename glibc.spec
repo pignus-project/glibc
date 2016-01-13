@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-621-g90c400b
 %define glibcversion 2.22.90
-%define glibcrelease 27%{?dist}
+%define glibcrelease 28%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -287,6 +287,9 @@ Patch2031: glibc-rh1070416.patch
 
 Patch2033: glibc-aarch64-tls-fixes.patch
 Patch2034: glibc-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
+
+# Group Merge Patch:
+Patch2035: glibc-nsswitch-Add-group-merging-support.patch
 
 ##############################################################################
 #
@@ -679,6 +682,7 @@ cat /proc/meminfo
 %patch0057 -p1
 %patch0058 -p1
 %patch0059 -p1
+%patch2035 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1937,6 +1941,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jan 13 2016 Carlos O'Donell <carlos@redhat.com> - 2.22.90-28
+- Add group merging support for distributed management (#1146822).
+
 * Tue Jan 12 2016 Carlos O'Donell <carlos@redhat.com> - 2.22.90-27
 - Remove 32-bit POWER support.
 - Add 64-bit POWER7 BE and 64-bit POWER8 BE optimized libraries.
