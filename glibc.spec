@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-621-g90c400b
 %define glibcversion 2.22.90
-%define glibcrelease 28%{?dist}
+%define glibcrelease 29%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -290,6 +290,9 @@ Patch2034: glibc-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
 
 # Group Merge Patch:
 Patch2035: glibc-nsswitch-Add-group-merging-support.patch
+
+# New pthread_barrier algorithm:
+Patch2036: glibc-pthread-barrier.patch
 
 ##############################################################################
 #
@@ -683,6 +686,7 @@ cat /proc/meminfo
 %patch0058 -p1
 %patch0059 -p1
 %patch2035 -p1
+%patch2036 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1941,6 +1945,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jan 13 2016 Carlos O'Donell <carlos@redhat.com> - 2.22.90-29
+- New pthread_barrier algorithm with improved standards compliance.
+
 * Wed Jan 13 2016 Carlos O'Donell <carlos@redhat.com> - 2.22.90-28
 - Add group merging support for distributed management (#1146822).
 

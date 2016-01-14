@@ -1,0 +1,987 @@
+Short description: New pthread_barrier algorithm to fulfill barrier destruction requirements.
+Author(s): Torvald Riegel <triegel@redhat.com>
+Origin: PATCH
+Bug-RHEL: NA
+Bug-Fedora: NA
+Bug-Upstream: #13065
+Upstream status: http://patchwork.sourceware.org/patch/10062/
+# commit d6533b39f004789e0de4b7d58a29f8282ee95f7b
+# Author: Torvald Riegel <triegel@redhat.com>
+# Date:   Wed Jun 24 14:37:32 2015 +0200
+# 
+#     New pthread_barrier algorithm to fulfill barrier destruction requirements.
+#     
+#     The previous barrier implementation did not fulfill the POSIX requirements
+#     for when a barrier can be destroyed.  Specifically, it was possible that
+#     threads that haven't noticed yet that their round is complete still access
+#     the barrier's memory, and that those accesses can happen after the barrier
+#     has been legally destroyed.
+#     The new algorithm does not have this issue, and it avoids using a lock
+#     internally.
+# 
+Index: glibc-2.22-621-g90c400b/nptl/Makefile
+===================================================================
+--- glibc-2.22-621-g90c400b.orig/nptl/Makefile
++++ glibc-2.22-621-g90c400b/nptl/Makefile
+@@ -243,7 +243,7 @@ tests = tst-typesizes \
+ 	tst-sem1 tst-sem2 tst-sem3 tst-sem4 tst-sem5 tst-sem6 tst-sem7 \
+ 	tst-sem8 tst-sem9 tst-sem10 tst-sem11 tst-sem12 tst-sem13 tst-sem14 \
+ 	tst-sem15 \
+-	tst-barrier1 tst-barrier2 tst-barrier3 tst-barrier4 \
++	tst-barrier1 tst-barrier2 tst-barrier3 tst-barrier4 tst-barrier5 \
+ 	tst-align tst-align3 \
+ 	tst-basic1 tst-basic2 tst-basic3 tst-basic4 tst-basic5 tst-basic6 \
+ 	tst-basic7 \
+@@ -304,7 +304,7 @@ tests-nolibpthread = tst-unload
+ 
+ gen-as-const-headers = pthread-errnos.sym \
+ 		       lowlevelcond.sym lowlevelrwlock.sym \
+-		       lowlevelbarrier.sym unwindbuf.sym \
++		       unwindbuf.sym \
+ 		       lowlevelrobustlock.sym pthread-pi-defines.sym
+ 
+ 
+Index: glibc-2.22-621-g90c400b/nptl/lowlevelbarrier.sym
+===================================================================
+--- glibc-2.22-621-g90c400b.orig/nptl/lowlevelbarrier.sym
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include <stddef.h>
+-#include <sched.h>
+-#include <bits/pthreadtypes.h>
+-#include "internaltypes.h"
+-
+---
+-
+-CURR_EVENT		offsetof (struct pthread_barrier, curr_event)
+-MUTEX			offsetof (struct pthread_barrier, lock)
+-LEFT			offsetof (struct pthread_barrier, left)
+-INIT_COUNT		offsetof (struct pthread_barrier, init_count)
+-PRIVATE			offsetof (struct pthread_barrier, private)
+Index: glibc-2.22-621-g90c400b/nptl/pthread_barrier_destroy.c
+===================================================================
+--- glibc-2.22-621-g90c400b.orig/nptl/pthread_barrier_destroy.c
++++ glibc-2.22-621-g90c400b/nptl/pthread_barrier_destroy.c
+@@ -18,25 +18,44 @@
+ 
+ #include <errno.h>
+ #include "pthreadP.h"
+-#include <lowlevellock.h>
++#include <atomic.h>
++#include <futex-internal.h>
+ 
+ 
+ int
+ pthread_barrier_destroy (pthread_barrier_t *barrier)
+ {
+-  struct pthread_barrier *ibarrier;
+-  int result = EBUSY;
++  struct pthread_barrier *bar = (struct pthread_barrier *) barrier;
+ 
+-  ibarrier = (struct pthread_barrier *) barrier;
++  /* Destroying a barrier is only allowed if no thread is blocked on it.
++     Thus, there is no unfinished round, and all modifications to IN will
++     have happened before us (either because the calling thread took part
++     in the most recent round and thus synchronized-with all other threads
++     entering, or the program ensured this through other synchronization).
++     We must wait until all threads that entered so far have confirmed that
++     they have exited as well.  To get the notification, pretend that we have
++     reached the reset threshold.  */
++  unsigned int count = bar->count;
++  unsigned int max_in_before_reset = BARRIER_IN_THRESHOLD
++				   - BARRIER_IN_THRESHOLD % count;
++  /* Relaxed MO sufficient because the program must have ensured that all
++     modifications happen-before this load (see above).  */
++  unsigned int in = atomic_load_relaxed (&bar->in);
++  /* Trigger reset.  The required acquire MO is below.  */
++  if (atomic_fetch_add_relaxed (&bar->out, max_in_before_reset - in) < in)
++    {
++      /* Not all threads confirmed yet that they have exited, so another
++	 thread will perform a reset.  Wait until that has happened.  */
++      while (in != 0)
++	{
++	  futex_wait_simple (&bar->in, in, bar->shared);
++	  in = atomic_load_relaxed (&bar->in);
++	}
++    }
++  /* We must ensure that memory reuse happens after all prior use of the
++     barrier (specifically, synchronize-with the reset of the barrier or the
++     confirmation of threads leaving the barrier).  */
++  atomic_thread_fence_acquire ();
+ 
+-  lll_lock (ibarrier->lock, ibarrier->private ^ FUTEX_PRIVATE_FLAG);
+-
+-  if (__glibc_likely (ibarrier->left == ibarrier->init_count))
+-    /* The barrier is not used anymore.  */
+-    result = 0;
+-  else
+-    /* Still used, return with an error.  */
+-    lll_unlock (ibarrier->lock, ibarrier->private ^ FUTEX_PRIVATE_FLAG);
+-
+-  return result;
++  return 0;
+ }
+Index: glibc-2.22-621-g90c400b/nptl/pthread_barrier_init.c
+===================================================================
+--- glibc-2.22-621-g90c400b.orig/nptl/pthread_barrier_init.c
++++ glibc-2.22-621-g90c400b/nptl/pthread_barrier_init.c
+@@ -18,7 +18,7 @@
+ 
+ #include <errno.h>
+ #include "pthreadP.h"
+-#include <lowlevellock.h>
++#include <futex-internal.h>
+ #include <kernel-features.h>
+ 
+ 
+@@ -34,8 +34,10 @@ __pthread_barrier_init (pthread_barrier_
+ {
+   struct pthread_barrier *ibarrier;
+ 
+-  /* XXX EINVAL is not specified by POSIX as a possible error code.  */
+-  if (__glibc_unlikely (count == 0))
++  /* XXX EINVAL is not specified by POSIX as a possible error code.  See
++     pthread_barrier_wait for the reason for the comparison with
++     BARRIER_IN_THRESHOLD.  */
++  if (__glibc_unlikely (count == 0 || count >= BARRIER_IN_THRESHOLD))
+     return EINVAL;
+ 
+   const struct pthread_barrierattr *iattr
+@@ -46,15 +48,12 @@ __pthread_barrier_init (pthread_barrier_
+   ibarrier = (struct pthread_barrier *) barrier;
+ 
+   /* Initialize the individual fields.  */
+-  ibarrier->lock = LLL_LOCK_INITIALIZER;
+-  ibarrier->left = count;
+-  ibarrier->init_count = count;
+-  ibarrier->curr_event = 0;
+-
+-  /* XXX Don't use FUTEX_SHARED or FUTEX_PRIVATE as long as there are still
+-     assembly implementations that expect the value determined below.  */
+-  ibarrier->private = (iattr->pshared != PTHREAD_PROCESS_PRIVATE
+-		       ? 0 : FUTEX_PRIVATE_FLAG);
++  ibarrier->in = 0;
++  ibarrier->out = 0;
++  ibarrier->count = count;
++  ibarrier->current_round = 0;
++  ibarrier->shared = (iattr->pshared == PTHREAD_PROCESS_PRIVATE
++		      ? FUTEX_PRIVATE : FUTEX_SHARED);
+ 
+   return 0;
+ }
+Index: glibc-2.22-621-g90c400b/nptl/pthread_barrier_wait.c
+===================================================================
+--- glibc-2.22-621-g90c400b.orig/nptl/pthread_barrier_wait.c
++++ glibc-2.22-621-g90c400b/nptl/pthread_barrier_wait.c
+@@ -18,63 +18,206 @@
+ 
+ #include <errno.h>
+ #include <sysdep.h>
+-#include <lowlevellock.h>
+ #include <futex-internal.h>
+ #include <pthreadP.h>
+ 
+ 
+-/* Wait on barrier.  */
++/* Wait on the barrier.
++
++   In each round, we wait for a fixed number of threads to enter the barrier
++   (COUNT).  Once that has happened, exactly these threads are allowed to
++   leave the barrier.  Note that POSIX does not require that only COUNT
++   threads can attempt to block using the barrier concurrently.
++
++   We count the number of threads that have entered (IN).  Each thread
++   increments IN when entering, thus getting a position in the sequence of
++   threads that are or have been waiting (starting with 1, so the position
++   is the number of threads that have entered so far including the current
++   thread).
++   CURRENT_ROUND designates the most recent thread whose round has been
++   detected as complete.  When a thread detects that enough threads have
++   entered to make a round complete, it finishes this round by effectively
++   adding COUNT to CURRENT_ROUND atomically.  Threads that believe that their
++   round is not complete yet wait until CURRENT_ROUND is not smaller than
++   their position anymore.
++
++   A barrier can be destroyed as soon as no threads are blocked on the
++   barrier.  This is already the case if just one thread from the last round
++   has stopped waiting and returned to the caller; the assumption is that
++   all threads from the round are unblocked atomically, even though they may
++   return at different times from the respective calls to
++   pthread_barrier_wait).  Thus, a valid call to pthread_barrier_destroy can
++   be concurrent with other threads still figuring out that their round has
++   been completed.  Therefore, threads need to confirm that they have left
++   the barrier by incrementing OUT, and pthread_barrier_destroy needs to wait
++   until OUT equals IN.
++
++   To avoid an ABA issue for futex_wait on CURRENT_ROUND and for archs with
++   32b-only atomics, we additionally reset the barrier when IN reaches
++   a threshold to avoid overflow.  We assume that the total number of threads
++   is less than INT_MAX/2, and set the threshold accordingly so that we can
++   use a simple atomic_fetch_add on IN instead of a CAS when entering.  The
++   threshold is always set to the end of a round, so all threads that have
++   entered are either pre-reset threads or post-reset threads (i.e., have a
++   position larger than the threshold).
++   Pre-reset threads just run the algorithm explained above.  Post-reset
++   threads wait until IN is reset to a pre-threshold value.
++   When the last pre-reset thread leaves the barrier (i.e., OUT equals the
++   threshold), it resets the barrier to its initial state.  Other (post-reset)
++   threads wait for the reset to have finished by waiting until IN is less
++   than the threshold and then restart by trying to enter the barrier again.
++
++   We reuse the reset mechanism in pthread_barrier_destroy to get notified
++   when all threads have left the barrier: We trigger an artificial reset and
++   wait for the last pre-reset thread to finish reset, thus notifying the
++   thread that is about to destroy the barrier.
++
++   Blocking using futexes is straightforward: pre-reset threads wait for
++   completion of their round using CURRENT_ROUND as futex word, and post-reset
++   threads and pthread_barrier_destroy use IN as futex word.
++
++   Further notes:
++   * It is not simple to let some of the post-reset threads help with the
++     reset because of the ABA issues that arise; therefore, we simply make
++     the last thread to leave responsible for the reset.
++   * POSIX leaves it unspecified whether a signal handler running in a thread
++     that has been unblocked (because its round is complete) can stall all
++     other threads and prevent them from returning from the barrier.  In this
++     implementation, other threads will return.  However,
++     pthread_barrier_destroy will of course wait for the signal handler thread
++     to confirm that it left the barrier.
++
++   TODO We should add spinning with back-off.  Once we do that, we could also
++   try to avoid the futex_wake syscall when a round is detected as finished.
++   If we do not spin, it is quite likely that at least some other threads will
++   have called futex_wait already.  */
+ int
+ __pthread_barrier_wait (pthread_barrier_t *barrier)
+ {
+-  struct pthread_barrier *ibarrier = (struct pthread_barrier *) barrier;
+-  int result = 0;
+-  int lll_private = ibarrier->private ^ FUTEX_PRIVATE_FLAG;
+-  int futex_private = (lll_private == LLL_PRIVATE
+-		       ? FUTEX_PRIVATE : FUTEX_SHARED);
++  struct pthread_barrier *bar = (struct pthread_barrier *) barrier;
+ 
+-  /* Make sure we are alone.  */
+-  lll_lock (ibarrier->lock, lll_private);
++  /* How many threads entered so far, including ourself.  */
++  unsigned int i;
+ 
+-  /* One more arrival.  */
+-  --ibarrier->left;
++ reset_restart:
++  /* Try to enter the barrier.  We need acquire MO to (1) ensure that if we
++     observe that our round can be completed (see below for our attempt to do
++     so), all pre-barrier-entry effects of all threads in our round happen
++     before us completing the round, and (2) to make our use of the barrier
++     happen after a potential reset.  We need release MO to make sure that our
++     pre-barrier-entry effects happen before threads in this round leaving the
++     barrier.  */
++  i = atomic_fetch_add_acq_rel (&bar->in, 1) + 1;
++  /* These loads are after the fetch_add so that we're less likely to first
++     pull in the cache line as shared.  */
++  unsigned int count = bar->count;
++  /* This is the number of threads that can enter before we need to reset.
++     Always at the end of a round.  */
++  unsigned int max_in_before_reset = BARRIER_IN_THRESHOLD
++				   - BARRIER_IN_THRESHOLD % count;
+ 
+-  /* Are these all?  */
+-  if (ibarrier->left == 0)
++  if (i > max_in_before_reset)
+     {
+-      /* Yes. Increment the event counter to avoid invalid wake-ups and
+-	 tell the current waiters that it is their turn.  */
+-      ++ibarrier->curr_event;
+-
+-      /* Wake up everybody.  */
+-      futex_wake (&ibarrier->curr_event, INT_MAX, futex_private);
++      /* We're in a reset round.  Just wait for a reset to finish; do not
++	 help finishing previous rounds because this could happen
++	 concurrently with a reset.  */
++      while (i > max_in_before_reset)
++	{
++	  futex_wait_simple (&bar->in, i, bar->shared);
++	  /* Relaxed MO is fine here because we just need an indication for
++	     when we should retry to enter (which will use acquire MO, see
++	     above).  */
++	  i = atomic_load_relaxed (&bar->in);
++	}
++      goto reset_restart;
++    }
+ 
+-      /* This is the thread which finished the serialization.  */
+-      result = PTHREAD_BARRIER_SERIAL_THREAD;
++  /* Look at the current round.  At this point, we are just interested in
++     whether we can complete rounds, based on the information we obtained
++     through our acquire-MO load of IN.  Nonetheless, if we notice that
++     our round has been completed using this load, we use the acquire-MO
++     fence below to make sure that all pre-barrier-entry effects of all
++     threads in our round happen before us leaving the barrier.  Therefore,
++     relaxed MO is sufficient.  */
++  unsigned cr = atomic_load_relaxed (&bar->current_round);
++
++  /* Try to finish previous rounds and/or the current round.  We simply
++     consider just our position here and do not try to do the work of threads
++     that entered more recently.  */
++  while (cr + count <= i)
++    {
++      /* Calculate the new current round based on how many threads entered.
++	 NEWCR must be larger than CR because CR+COUNT ends a round.  */
++      unsigned int newcr = i - i % count;
++      /* Try to complete previous and/or the current round.  We need release
++	 MO to propagate the happens-before that we observed through reading
++	 with acquire MO from IN to other threads.  If the CAS fails, it
++	 is like the relaxed-MO load of CURRENT_ROUND above.  */
++      if (atomic_compare_exchange_weak_release (&bar->current_round, &cr,
++						newcr))
++	{
++	  /* Update CR with the modification we just did.  */
++	  cr = newcr;
++	  /* Wake threads belonging to the rounds we just finished.  We may
++	     wake more threads than necessary if more than COUNT threads try
++	     to block concurrently on the barrier, but this is not a typical
++	     use of barriers.
++	     Note that we can still access SHARED because we haven't yet
++	     confirmed to have left the barrier.  */
++	  futex_wake (&bar->current_round, INT_MAX, bar->shared);
++	  /* We did as much as we could based on our position.  If we advanced
++	     the current round to a round sufficient for us, do not wait for
++	     that to happen and skip the acquire fence (we already
++	     synchronize-with all other threads in our round through the
++	     initial acquire MO fetch_add of IN.  */
++	  if (i <= cr)
++	    goto ready_to_leave;
++	  else
++	    break;
++	}
+     }
+-  else
++
++  /* Wait until the current round is more recent than the round we are in.  */
++  while (i > cr)
+     {
+-      /* The number of the event we are waiting for.  The barrier's event
+-	 number must be bumped before we continue.  */
+-      unsigned int event = ibarrier->curr_event;
+-
+-      /* Before suspending, make the barrier available to others.  */
+-      lll_unlock (ibarrier->lock, lll_private);
+-
+-      /* Wait for the event counter of the barrier to change.  */
+-      do
+-	futex_wait_simple (&ibarrier->curr_event, event, futex_private);
+-      while (event == ibarrier->curr_event);
++      /* Wait for the current round to finish.  */
++      futex_wait_simple (&bar->current_round, cr, bar->shared);
++      /* See the fence below.  */
++      cr = atomic_load_relaxed (&bar->current_round);
+     }
+ 
+-  /* Make sure the init_count is stored locally or in a register.  */
+-  unsigned int init_count = ibarrier->init_count;
++  /* Our round finished.  Use the acquire MO fence to synchronize-with the
++     thread that finished the round, either through the initial load of
++     CURRENT_ROUND above or a failed CAS in the loop above.  */
++  atomic_thread_fence_acquire ();
++
++  /* Now signal that we left.  */
++  unsigned int o;
++ ready_to_leave:
++  /* We need release MO here so that our use of the barrier happens before
++     reset or memory reuse after pthread_barrier_destroy.  */
++  o = atomic_fetch_add_release (&bar->out, 1) + 1;
++  if (o == max_in_before_reset)
++    {
++      /* Perform a reset if we are the last pre-reset thread leaving.   All
++	 other threads accessing the barrier are post-reset threads and are
++	 incrementing or spinning on IN.  Thus, resetting IN as the last step
++	 of reset ensures that the reset is not concurrent with actual use of
++	 the barrier.  We need the acquire MO fence so that the reset happens
++	 after use of the barrier by all earlier pre-reset threads.  */
++      atomic_thread_fence_acquire ();
++      atomic_store_relaxed (&bar->current_round, 0);
++      atomic_store_relaxed (&bar->out, 0);
++      /* When destroying the barrier, we wait for a reset to happen.  Thus,
++	 we must load SHARED now so that this happens before the barrier is
++	 destroyed.  */
++      int shared = bar->shared;
++      atomic_store_release (&bar->in, 0);
++      futex_wake (&bar->in, INT_MAX, shared);
+ 
+-  /* If this was the last woken thread, unlock.  */
+-  if (atomic_increment_val (&ibarrier->left) == init_count)
+-    /* We are done.  */
+-    lll_unlock (ibarrier->lock, lll_private);
++    }
+ 
+-  return result;
++  /* Return a special value for exactly one thread per round.  */
++  return i % count == 0 ?  PTHREAD_BARRIER_SERIAL_THREAD : 0;
+ }
+ weak_alias (__pthread_barrier_wait, pthread_barrier_wait)
+Index: glibc-2.22-621-g90c400b/nptl/pthread_barrierattr_setpshared.c
+===================================================================
+--- glibc-2.22-621-g90c400b.orig/nptl/pthread_barrierattr_setpshared.c
++++ glibc-2.22-621-g90c400b/nptl/pthread_barrierattr_setpshared.c
+@@ -24,15 +24,11 @@
+ int
+ pthread_barrierattr_setpshared (pthread_barrierattr_t *attr, int pshared)
+ {
+-  struct pthread_barrierattr *iattr;
+-
+   int err = futex_supports_pshared (pshared);
+   if (err != 0)
+     return err;
+ 
+-  iattr = (struct pthread_barrierattr *) attr;
+-
+-  iattr->pshared = pshared;
++  ((struct pthread_barrierattr *) attr)->pshared = pshared;
+ 
+   return 0;
+ }
+Index: glibc-2.22-621-g90c400b/nptl/tst-barrier4.c
+===================================================================
+--- glibc-2.22-621-g90c400b.orig/nptl/tst-barrier4.c
++++ glibc-2.22-621-g90c400b/nptl/tst-barrier4.c
+@@ -16,7 +16,7 @@
+    License along with the GNU C Library; if not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
+-/* This is a test for behavior not guaranteed by POSIX.  */
++/* This tests destruction of a barrier right after waiting on it.  */
+ #include <errno.h>
+ #include <pthread.h>
+ #include <stdio.h>
+Index: glibc-2.22-621-g90c400b/nptl/tst-barrier5.c
+===================================================================
+--- /dev/null
++++ glibc-2.22-621-g90c400b/nptl/tst-barrier5.c
+@@ -0,0 +1,145 @@
++/* Copyright (C) 2004-2015 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>.  */
++
++/* This tests the barrier reset mechanism.  */
++#include <errno.h>
++#include <pthread.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <internaltypes.h>
++
++
++static pthread_barrier_t b1;
++static pthread_barrier_t b2;
++
++
++#define N 20
++#define ROUNDS_PER_RUN 20
++#define START ((BARRIER_IN_THRESHOLD / N - ROUNDS_PER_RUN / 2) * N)
++
++static void *
++tf (void *arg)
++{
++  int runs = 0;
++
++  while (runs++ < 30)
++    {
++      /* In each run, we execute a number of rounds and initialize the barrier
++	 so that we will go over the reset threshold with those rounds.  */
++      for (int rounds = 0; rounds < ROUNDS_PER_RUN; rounds++)
++	pthread_barrier_wait (&b1);
++
++      if (pthread_barrier_wait (&b1) == PTHREAD_BARRIER_SERIAL_THREAD)
++	{
++	  pthread_barrier_destroy (&b1);
++	  if (pthread_barrier_init (&b1, NULL, N) != 0)
++	    {
++	      puts ("tf: 1st barrier_init failed");
++	      exit (1);
++	    }
++	  puts ("b1 reinitialized");
++	  /* Trigger a reset.  */
++	  struct pthread_barrier *bar = (struct pthread_barrier *) &b1;
++	  bar->in = START;
++	  bar->out = START;
++	  /* We deliberately don't set bar->current_round so that we also
++	     test whether the helping for the updates of current_round
++	     works correctly.  */
++	}
++
++      /* Same as above, just for b2.  */
++      for (int rounds = 0; rounds < ROUNDS_PER_RUN; rounds++)
++	pthread_barrier_wait (&b2);
++
++      if (pthread_barrier_wait (&b2) == PTHREAD_BARRIER_SERIAL_THREAD)
++	{
++	  pthread_barrier_destroy (&b2);
++	  if (pthread_barrier_init (&b2, NULL, N) != 0)
++	    {
++	      puts ("tf: 2nd barrier_init failed");
++	      exit (1);
++	    }
++	  puts ("b2 reinitialized");
++	  /* Trigger a reset.  See above.  */
++	  struct pthread_barrier *bar = (struct pthread_barrier *) &b2;
++	  bar->in = START;
++	  bar->out = START;
++	}
++    }
++
++  return NULL;
++}
++
++
++static int
++do_test (void)
++{
++  pthread_attr_t at;
++  int cnt;
++
++  if (pthread_attr_init (&at) != 0)
++    {
++      puts ("attr_init failed");
++      return 1;
++    }
++
++  if (pthread_attr_setstacksize (&at, 1 * 1024 * 1024) != 0)
++    {
++      puts ("attr_setstacksize failed");
++      return 1;
++    }
++
++  if (pthread_barrier_init (&b1, NULL, N) != 0)
++    {
++      puts ("1st barrier_init failed");
++      return 1;
++    }
++
++  if (pthread_barrier_init (&b2, NULL, N) != 0)
++    {
++      puts ("2nd barrier_init failed");
++      return 1;
++    }
++
++  pthread_t th[N - 1];
++  for (cnt = 0; cnt < N - 1; ++cnt)
++    if (pthread_create (&th[cnt], &at, tf, NULL) != 0)
++      {
++	puts ("pthread_create failed");
++	return 1;
++      }
++
++  if (pthread_attr_destroy (&at) != 0)
++    {
++      puts ("attr_destroy failed");
++      return 1;
++    }
++
++  tf (NULL);
++
++  for (cnt = 0; cnt < N - 1; ++cnt)
++    if (pthread_join (th[cnt], NULL) != 0)
++      {
++	puts ("pthread_join failed");
++	return 1;
++      }
++
++  return 0;
++}
++
++#define TEST_FUNCTION do_test ()
++#include "../test-skeleton.c"
+Index: glibc-2.22-621-g90c400b/sysdeps/nptl/internaltypes.h
+===================================================================
+--- glibc-2.22-621-g90c400b.orig/sysdeps/nptl/internaltypes.h
++++ glibc-2.22-621-g90c400b/sysdeps/nptl/internaltypes.h
+@@ -95,12 +95,13 @@ struct pthread_rwlockattr
+ /* Barrier data structure.  */
+ struct pthread_barrier
+ {
+-  unsigned int curr_event;
+-  int lock;
+-  unsigned int left;
+-  unsigned int init_count;
+-  int private;
++  unsigned int in;
++  unsigned int current_round;
++  unsigned int count;
++  int shared;
++  unsigned int out;
+ };
++#define BARRIER_IN_THRESHOLD (UINT_MAX/2)
+ 
+ 
+ /* Barrier variable attribute data structure.  */
+Index: glibc-2.22-621-g90c400b/sysdeps/unix/sysv/linux/i386/pthread_barrier_wait.S
+===================================================================
+--- glibc-2.22-621-g90c400b.orig/sysdeps/unix/sysv/linux/i386/pthread_barrier_wait.S
++++ /dev/null
+@@ -1,187 +0,0 @@
+-/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
+-   This file is part of the GNU C Library.
+-   Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
+-
+-   The GNU C Library is free software; you can redistribute it and/or
+-   modify it under the terms of the GNU Lesser General Public
+-   License as published by the Free Software Foundation; either
+-   version 2.1 of the License, or (at your option) any later version.
+-
+-   The GNU C Library is distributed in the hope that it will be useful,
+-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-   Lesser General Public License for more details.
+-
+-   You should have received a copy of the GNU Lesser General Public
+-   License along with the GNU C Library; if not, see
+-   <http://www.gnu.org/licenses/>.  */
+-
+-#include <sysdep.h>
+-#include <lowlevellock.h>
+-#include <lowlevelbarrier.h>
+-
+-	.text
+-
+-	.globl	__pthread_barrier_wait
+-	.type	__pthread_barrier_wait,@function
+-	.align	16
+-__pthread_barrier_wait:
+-	cfi_startproc
+-	pushl	%ebx
+-	cfi_adjust_cfa_offset(4)
+-	cfi_offset(%ebx, -8)
+-
+-	movl	8(%esp), %ebx
+-
+-	/* Get the mutex.  */
+-	movl	$1, %edx
+-	xorl	%eax, %eax
+-	LOCK
+-	cmpxchgl %edx, MUTEX(%ebx)
+-	jnz	1f
+-
+-	/* One less waiter.  If this was the last one needed wake
+-	   everybody.  */
+-2:	subl	$1, LEFT(%ebx)
+-	je	3f
+-
+-	/* There are more threads to come.  */
+-	pushl	%esi
+-	cfi_adjust_cfa_offset(4)
+-	cfi_offset(%esi, -12)
+-
+-#if CURR_EVENT == 0
+-	movl	(%ebx), %edx
+-#else
+-	movl	CURR_EVENT(%ebx), %edx
+-#endif
+-
+-	/* Release the mutex.  */
+-	LOCK
+-	subl	$1, MUTEX(%ebx)
+-	jne	6f
+-
+-	/* Wait for the remaining threads.  The call will return immediately
+-	   if the CURR_EVENT memory has meanwhile been changed.  */
+-7:
+-#if FUTEX_WAIT == 0
+-	movl	PRIVATE(%ebx), %ecx
+-#else
+-	movl	$FUTEX_WAIT, %ecx
+-	orl	PRIVATE(%ebx), %ecx
+-#endif
+-	xorl	%esi, %esi
+-8:	movl	$SYS_futex, %eax
+-	ENTER_KERNEL
+-
+-	/* Don't return on spurious wakeups.  The syscall does not change
+-	   any register except %eax so there is no need to reload any of
+-	   them.  */
+-#if CURR_EVENT == 0
+-	cmpl	%edx, (%ebx)
+-#else
+-	cmpl	%edx, CURR_EVENT(%ebx)
+-#endif
+-	je	8b
+-
+-	/* Increment LEFT.  If this brings the count back to the
+-	   initial count unlock the object.  */
+-	movl	$1, %edx
+-	movl	INIT_COUNT(%ebx), %ecx
+-	LOCK
+-	xaddl	%edx, LEFT(%ebx)
+-	subl	$1, %ecx
+-	cmpl	%ecx, %edx
+-	jne	10f
+-
+-	/* Release the mutex.  We cannot release the lock before
+-	   waking the waiting threads since otherwise a new thread might
+-	   arrive and gets waken up, too.  */
+-	LOCK
+-	subl	$1, MUTEX(%ebx)
+-	jne	9f
+-
+-	/* Note: %esi is still zero.  */
+-10:	movl	%esi, %eax		/* != PTHREAD_BARRIER_SERIAL_THREAD */
+-
+-	popl	%esi
+-	cfi_adjust_cfa_offset(-4)
+-	cfi_restore(%esi)
+-	popl	%ebx
+-	cfi_adjust_cfa_offset(-4)
+-	cfi_restore(%ebx)
+-	ret
+-
+-	cfi_adjust_cfa_offset(4)
+-	cfi_offset(%ebx, -8)
+-
+-	/* The necessary number of threads arrived.  */
+-3:
+-#if CURR_EVENT == 0
+-	addl	$1, (%ebx)
+-#else
+-	addl	$1, CURR_EVENT(%ebx)
+-#endif
+-
+-	/* Wake up all waiters.  The count is a signed number in the kernel
+-	   so 0x7fffffff is the highest value.  */
+-	movl	$0x7fffffff, %edx
+-	movl	$FUTEX_WAKE, %ecx
+-	orl	PRIVATE(%ebx), %ecx
+-	movl	$SYS_futex, %eax
+-	ENTER_KERNEL
+-
+-	/* Increment LEFT.  If this brings the count back to the
+-	   initial count unlock the object.  */
+-	movl	$1, %edx
+-	movl	INIT_COUNT(%ebx), %ecx
+-	LOCK
+-	xaddl	%edx, LEFT(%ebx)
+-	subl	$1, %ecx
+-	cmpl	%ecx, %edx
+-	jne	5f
+-
+-	/* Release the mutex.  We cannot release the lock before
+-	   waking the waiting threads since otherwise a new thread might
+-	   arrive and gets waken up, too.  */
+-	LOCK
+-	subl	$1, MUTEX(%ebx)
+-	jne	4f
+-
+-5:	orl	$-1, %eax		/* == PTHREAD_BARRIER_SERIAL_THREAD */
+-
+-	popl	%ebx
+-	cfi_adjust_cfa_offset(-4)
+-	cfi_restore(%ebx)
+-	ret
+-
+-	cfi_adjust_cfa_offset(4)
+-	cfi_offset(%ebx, -8)
+-1:	movl	PRIVATE(%ebx), %ecx
+-	leal	MUTEX(%ebx), %edx
+-	xorl	$LLL_SHARED, %ecx
+-	call	__lll_lock_wait
+-	jmp	2b
+-
+-4:	movl	PRIVATE(%ebx), %ecx
+-	leal	MUTEX(%ebx), %eax
+-	xorl	$LLL_SHARED, %ecx
+-	call	__lll_unlock_wake
+-	jmp	5b
+-
+-	cfi_adjust_cfa_offset(4)
+-	cfi_offset(%esi, -12)
+-6:	movl	PRIVATE(%ebx), %ecx
+-	leal	MUTEX(%ebx), %eax
+-	xorl	$LLL_SHARED, %ecx
+-	call	__lll_unlock_wake
+-	jmp	7b
+-
+-9:	movl	PRIVATE(%ebx), %ecx
+-	leal	MUTEX(%ebx), %eax
+-	xorl	$LLL_SHARED, %ecx
+-	call	__lll_unlock_wake
+-	jmp	10b
+-	cfi_endproc
+-	.size	__pthread_barrier_wait,.-__pthread_barrier_wait
+-weak_alias (__pthread_barrier_wait, pthread_barrier_wait)
+Index: glibc-2.22-621-g90c400b/sysdeps/unix/sysv/linux/x86_64/pthread_barrier_wait.S
+===================================================================
+--- glibc-2.22-621-g90c400b.orig/sysdeps/unix/sysv/linux/x86_64/pthread_barrier_wait.S
++++ /dev/null
+@@ -1,161 +0,0 @@
+-/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
+-   This file is part of the GNU C Library.
+-   Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
+-
+-   The GNU C Library is free software; you can redistribute it and/or
+-   modify it under the terms of the GNU Lesser General Public
+-   License as published by the Free Software Foundation; either
+-   version 2.1 of the License, or (at your option) any later version.
+-
+-   The GNU C Library is distributed in the hope that it will be useful,
+-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-   Lesser General Public License for more details.
+-
+-   You should have received a copy of the GNU Lesser General Public
+-   License along with the GNU C Library; if not, see
+-   <http://www.gnu.org/licenses/>.  */
+-
+-#include <sysdep.h>
+-#include <lowlevellock.h>
+-#include <lowlevelbarrier.h>
+-
+-
+-	.text
+-
+-	.globl	__pthread_barrier_wait
+-	.type	__pthread_barrier_wait,@function
+-	.align	16
+-__pthread_barrier_wait:
+-	/* Get the mutex.  */
+-	xorl	%eax, %eax
+-	movl	$1, %esi
+-	LOCK
+-	cmpxchgl %esi, MUTEX(%rdi)
+-	jnz	1f
+-
+-	/* One less waiter.  If this was the last one needed wake
+-	   everybody.  */
+-2:	decl	LEFT(%rdi)
+-	je	3f
+-
+-	/* There are more threads to come.  */
+-#if CURR_EVENT == 0
+-	movl	(%rdi), %edx
+-#else
+-	movl	CURR_EVENT(%rdi), %edx
+-#endif
+-
+-	/* Release the mutex.  */
+-	LOCK
+-	decl	MUTEX(%rdi)
+-	jne	6f
+-
+-	/* Wait for the remaining threads.  The call will return immediately
+-	   if the CURR_EVENT memory has meanwhile been changed.  */
+-7:
+-#if FUTEX_WAIT == 0
+-	movl	PRIVATE(%rdi), %esi
+-#else
+-	movl	$FUTEX_WAIT, %esi
+-	orl	PRIVATE(%rdi), %esi
+-#endif
+-	xorq	%r10, %r10
+-8:	movl	$SYS_futex, %eax
+-	syscall
+-
+-	/* Don't return on spurious wakeups.  The syscall does not change
+-	   any register except %eax so there is no need to reload any of
+-	   them.  */
+-#if CURR_EVENT == 0
+-	cmpl	%edx, (%rdi)
+-#else
+-	cmpl	%edx, CURR_EVENT(%rdi)
+-#endif
+-	je	8b
+-
+-	/* Increment LEFT.  If this brings the count back to the
+-	   initial count unlock the object.  */
+-	movl	$1, %edx
+-	movl	INIT_COUNT(%rdi), %eax
+-	LOCK
+-	xaddl	%edx, LEFT(%rdi)
+-	subl	$1, %eax
+-	cmpl	%eax, %edx
+-	jne,pt	10f
+-
+-	/* Release the mutex.  We cannot release the lock before
+-	   waking the waiting threads since otherwise a new thread might
+-	   arrive and gets waken up, too.  */
+-	LOCK
+-	decl	MUTEX(%rdi)
+-	jne	9f
+-
+-10:	xorl	%eax, %eax		/* != PTHREAD_BARRIER_SERIAL_THREAD */
+-
+-	retq
+-
+-	/* The necessary number of threads arrived.  */
+-3:
+-#if CURR_EVENT == 0
+-	incl	(%rdi)
+-#else
+-	incl	CURR_EVENT(%rdi)
+-#endif
+-
+-	/* Wake up all waiters.  The count is a signed number in the kernel
+-	   so 0x7fffffff is the highest value.  */
+-	movl	$0x7fffffff, %edx
+-	movl	$FUTEX_WAKE, %esi
+-	orl	PRIVATE(%rdi), %esi
+-	movl	$SYS_futex, %eax
+-	syscall
+-
+-	/* Increment LEFT.  If this brings the count back to the
+-	   initial count unlock the object.  */
+-	movl	$1, %edx
+-	movl	INIT_COUNT(%rdi), %eax
+-	LOCK
+-	xaddl	%edx, LEFT(%rdi)
+-	subl	$1, %eax
+-	cmpl	%eax, %edx
+-	jne,pt	5f
+-
+-	/* Release the mutex.  We cannot release the lock before
+-	   waking the waiting threads since otherwise a new thread might
+-	   arrive and gets waken up, too.  */
+-	LOCK
+-	decl	MUTEX(%rdi)
+-	jne	4f
+-
+-5:	orl	$-1, %eax		/* == PTHREAD_BARRIER_SERIAL_THREAD */
+-
+-	retq
+-
+-1:	movl	PRIVATE(%rdi), %esi
+-	addq	$MUTEX, %rdi
+-	xorl	$LLL_SHARED, %esi
+-	callq	__lll_lock_wait
+-	subq	$MUTEX, %rdi
+-	jmp	2b
+-
+-4:	movl	PRIVATE(%rdi), %esi
+-	addq	$MUTEX, %rdi
+-	xorl	$LLL_SHARED, %esi
+-	callq	__lll_unlock_wake
+-	jmp	5b
+-
+-6:	movl	PRIVATE(%rdi), %esi
+-	addq	$MUTEX, %rdi
+-	xorl	$LLL_SHARED, %esi
+-	callq	__lll_unlock_wake
+-	subq	$MUTEX, %rdi
+-	jmp	7b
+-
+-9:	movl	PRIVATE(%rdi), %esi
+-	addq	$MUTEX, %rdi
+-	xorl	$LLL_SHARED, %esi
+-	callq	__lll_unlock_wake
+-	jmp	10b
+-	.size	__pthread_barrier_wait,.-__pthread_barrier_wait
+-weak_alias (__pthread_barrier_wait, pthread_barrier_wait)
