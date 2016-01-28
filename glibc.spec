@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-709-g8a71d2e
 %define glibcversion 2.22.90
-%define glibcrelease 30%{?dist}
+%define glibcrelease 31%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -290,6 +290,7 @@ Patch2034: glibc-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
 
 # Group Merge Patch:
 Patch2035: glibc-nsswitch-Add-group-merging-support.patch
+Patch2036: glibc-gcc-PR69537.patch
 
 ##############################################################################
 #
@@ -683,6 +684,7 @@ cat /proc/meminfo
 %patch0058 -p1
 %patch0059 -p1
 %patch2035 -p1
+%patch2036 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1941,6 +1943,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jan 28 2016 Florian Weimer <fweimer@redhat.com> - 2.22.90-31
+- Add workaround for GCC PR69537.
+
 * Thu Jan 28 2016 Florian Weimer <fweimer@redhat.com> - 2.22.90-30
 - Auto-sync with upstream master.
 
