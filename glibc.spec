@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.22-621-g90c400b
+%define glibcsrcdir  glibc-2.22-709-g8a71d2e
 %define glibcversion 2.22.90
-%define glibcrelease 29%{?dist}
+%define glibcrelease 30%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1941,6 +1941,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jan 28 2016 Florian Weimer <fweimer@redhat.com> - 2.22.90-30
+- Auto-sync with upstream master.
+
 * Wed Jan 13 2016 Carlos O'Donell <carlos@redhat.com> - 2.22.90-29
 - New pthread_barrier algorithm with improved standards compliance.
 
