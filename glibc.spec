@@ -291,9 +291,6 @@ Patch2034: glibc-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
 # Group Merge Patch:
 Patch2035: glibc-nsswitch-Add-group-merging-support.patch
 
-# New pthread_barrier algorithm:
-Patch2036: glibc-pthread-barrier.patch
-
 ##############################################################################
 #
 # Benchmark comparison patches.
@@ -686,7 +683,6 @@ cat /proc/meminfo
 %patch0058 -p1
 %patch0059 -p1
 %patch2035 -p1
-%patch2036 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
