@@ -290,7 +290,9 @@ Patch2034: glibc-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
 
 # Group Merge Patch:
 Patch2035: glibc-nsswitch-Add-group-merging-support.patch
+
 Patch2036: glibc-gcc-PR69537.patch
+Patch2037: glibc-isinf-cxx11.patch
 
 ##############################################################################
 #
@@ -685,6 +687,7 @@ cat /proc/meminfo
 %patch0059 -p1
 %patch2035 -p1
 %patch2036 -p1
+%patch2037 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1945,6 +1948,7 @@ rm -f *.filelist*
 %changelog
 * Tue Feb 02 2016 Florian Weimer <fweimer@redhat.com> - 2.22.90-32
 - Auto-sync with upstream master.
+- Add glibc-isinf-cxx11.patch to improve C++11 compatibility.
 
 * Thu Jan 28 2016 Florian Weimer <fweimer@redhat.com> - 2.22.90-31
 - Add workaround for GCC PR69537.
