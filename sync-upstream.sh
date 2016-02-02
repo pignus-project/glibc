@@ -92,6 +92,7 @@ rm -rf "$srcdir"
 echo "+ Source prep is clean, so we're good to go."
 fedpkg new-sources "$srcdir.tar.gz"
 git commit -a -m "Auto-sync with upstream $branch."
+exit 0
 fedpkg push
 fedpkg build
 echo "+ Done!"

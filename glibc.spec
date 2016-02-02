@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.22-709-g8a71d2e
+%define glibcsrcdir  glibc-2.22-713-g5163b4b
 %define glibcversion 2.22.90
-%define glibcrelease 31%{?dist}
+%define glibcrelease 32%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1943,6 +1943,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Feb 02 2016 Florian Weimer <fweimer@redhat.com> - 2.22.90-32
+- Auto-sync with upstream master.
+
 * Thu Jan 28 2016 Florian Weimer <fweimer@redhat.com> - 2.22.90-31
 - Add workaround for GCC PR69537.
 
