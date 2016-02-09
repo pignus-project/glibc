@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-713-g5163b4b
 %define glibcversion 2.22.90
-%define glibcrelease 32%{?dist}
+%define glibcrelease 33%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -119,6 +119,7 @@
 %define buildpower7 0
 %define buildpower8 0
 %endif
+
 ##############################################################################
 # Any architecture/kernel combination that supports running 32-bit and 64-bit
 # code in userspace is considered a biarch arch.
@@ -740,36 +741,46 @@ BuildFlags="-mtune=generic"
 ##############################################################################
 %ifarch sparc
 BuildFlags="-fcall-used-g6"
-GCC="gcc -m32"
-GXX="g++ -m32"
+GCC="$GCC -m32"
+GXX="$GXX -m32"
 %endif
 %ifarch sparcv9
 BuildFlags="-mcpu=ultrasparc -fcall-used-g6"
-GCC="gcc -m32"
-GXX="g++ -m32"
+GCC="$GCC -m32"
+GXX="$GXX -m32"
 %endif
 %ifarch sparcv9v
 BuildFlags="-mcpu=niagara -fcall-used-g6"
-GCC="gcc -m32"
-GXX="g++ -m32"
+GCC="$GCC -m32"
+GXX="$GXX -m32"
 %endif
 %ifarch sparc64
 BuildFlags="-mcpu=ultrasparc -mvis -fcall-used-g6"
-GCC="gcc -m64"
-GXX="g++ -m64"
+GCC="$GCC -m64"
+GXX="$GXX -m64"
 %endif
 %ifarch sparc64v
 BuildFlags="-mcpu=niagara -mvis -fcall-used-g6"
-GCC="gcc -m64"
-GXX="g++ -m64"
+GCC="$GCC -m64"
+GXX="$GXX -m64"
 %endif
+
+##############################################################################
+# %%build - POWER options.
+##############################################################################
 %ifarch %{power64}
 BuildFlags=""
-GCC="gcc -m64"
-GXX="g++ -m64"
+GCC="$GCC -m64"
+GXX="$GXX -m64"
 %ifarch ppc64p7
 GCC="$GCC -mcpu=power7 -mtune=power7"
 GXX="$GXX -mcpu=power7 -mtune=power7"
+core_with_options="--with-cpu=power7"
+%endif
+%ifarch ppc64le
+GCC="$GCC -mcpu=power8 -mtune=power8"
+GXX="$GXX -mcpu=power8 -mtune=power8"
+core_with_options="--with-cpu=power8"
 %endif
 %endif
 
@@ -818,9 +829,7 @@ build()
 %endif
 		--enable-obsolete-rpc \
 		--enable-systemtap \
-%ifarch ppc64p7
-		--with-cpu=power7 \
-%endif
+		${core_with_options} \
 %ifarch %{lock_elision_arches}
 		--enable-lock-elision \
 %endif
@@ -870,27 +879,27 @@ build nosegneg -mno-tls-direct-seg-refs
 %endif
 		export LD_PRELOAD=`pwd`/power6emul/\$LIB/power6emul.so
 	fi
-	AddOns="$AddOns --with-cpu=power6"
 	GCC="$GCC -mcpu=power6"
 	GXX="$GXX -mcpu=power6"
+	core_with_options="--with-cpu=power6"
 	build power6
 )
 %endif # %{buildpower6}
 
 %if %{buildpower7}
 (
-  AddOns="$AddOns --with-cpu=power7"
   GCC="$GCC -mcpu=power7 -mtune=power7"
   GXX="$GXX -mcpu=power7 -mtune=power7"
+  core_with_options="--with-cpu=power7"
   build power7
 )
 %endif
 
 %if %{buildpower8}
 (
-  AddOns="$AddOns --with-cpu=power8"
   GCC="$GCC -mcpu=power8 -mtune=power8"
   GXX="$GXX -mcpu=power8 -mtune=power8"
+  core_with_options="--with-cpu=power8"
   build power8
 )
 %endif
@@ -1946,6 +1955,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Feb 09 2016 Carlos O'Donell <carlos@redhat.com> - 2.22.90-33
+- Use --with-cpu=power8 for ppc64le default runtime (#1227361).
+
 * Tue Feb 02 2016 Florian Weimer <fweimer@redhat.com> - 2.22.90-32
 - Auto-sync with upstream master.
 - Add glibc-isinf-cxx11.patch to improve C++11 compatibility.
