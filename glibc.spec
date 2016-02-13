@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.22-713-g5163b4b
+%define glibcsrcdir  glibc-2.22-719-g1233be7
 %define glibcversion 2.22.90
-%define glibcrelease 33%{?dist}
+%define glibcrelease 34%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1955,6 +1955,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Feb 13 2016 Florian Weimer <fweimer@redhat.com> - 2.22.90-34
+- Auto-sync with upstream master.
+
 * Tue Feb 09 2016 Carlos O'Donell <carlos@redhat.com> - 2.22.90-33
 - Use --with-cpu=power8 for ppc64le default runtime (#1227361).
 
