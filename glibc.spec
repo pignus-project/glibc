@@ -294,6 +294,7 @@ Patch2035: glibc-nsswitch-Add-group-merging-support.patch
 
 Patch2036: glibc-gcc-PR69537.patch
 Patch2037: glibc-isinf-cxx11.patch
+Patch2038: glibc-rh1306511.patch
 
 ##############################################################################
 #
@@ -689,6 +690,7 @@ cat /proc/meminfo
 %patch2035 -p1
 %patch2036 -p1
 %patch2037 -p1
+%patch2038 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1957,6 +1959,7 @@ rm -f *.filelist*
 %changelog
 * Sat Feb 13 2016 Florian Weimer <fweimer@redhat.com> - 2.22.90-34
 - Auto-sync with upstream master.
+- Support aliasing with struct sockaddr pointers (#1306511).
 
 * Tue Feb 09 2016 Carlos O'Donell <carlos@redhat.com> - 2.22.90-33
 - Use --with-cpu=power8 for ppc64le default runtime (#1227361).

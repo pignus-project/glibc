@@ -1,0 +1,67 @@
+commit 520dcf39f7b78a3b1db93c9be6a1c120eda699cd
+Author: Florian Weimer <fweimer@redhat.com>
+Date:   Fri Feb 12 17:04:34 2016 +0100
+
+    bits/socket.h: Define struct sockaddr with may_alias attribute [BZ #19622]
+    
+    As suggested by Marek Polacek.
+    
+    Using struct sockaddr with aliasing violations is quite common, and the
+    POSIX interfaces more or less encourage it.
+
+diff --git a/bits/socket.h b/bits/socket.h
+index ab9f242..666842b 100644
+--- a/bits/socket.h
++++ b/bits/socket.h
+@@ -144,7 +144,7 @@ enum __socket_type
+ #include <bits/sockaddr.h>
+ 
+ /* Structure describing a generic socket address.  */
+-struct sockaddr
++struct __attribute_may_alias__ sockaddr
+   {
+     __SOCKADDR_COMMON (sa_);	/* Common data: address family and length.  */
+     char sa_data[14];		/* Address data.  */
+diff --git a/misc/sys/cdefs.h b/misc/sys/cdefs.h
+index 7fd4154..aee6ae3 100644
+--- a/misc/sys/cdefs.h
++++ b/misc/sys/cdefs.h
+@@ -407,6 +407,12 @@
+       [!!sizeof (struct { int __error_if_negative: (expr) ? 2 : -1; })]
+ #endif
+ 
++#if __GNUC_PREREQ (4,0)
++# define __attribute_may_alias__ __attribute__ ((__may_alias__))
++#else
++# define __attribute_may_alias__
++#endif
++
+ #include <bits/wordsize.h>
+ 
+ #if defined __LONG_DOUBLE_MATH_OPTIONAL && defined __NO_LONG_DOUBLE_MATH
+diff --git a/sysdeps/mach/hurd/bits/socket.h b/sysdeps/mach/hurd/bits/socket.h
+index 02c5dac..bc26a28 100644
+--- a/sysdeps/mach/hurd/bits/socket.h
++++ b/sysdeps/mach/hurd/bits/socket.h
+@@ -148,7 +148,7 @@ enum __socket_type
+ #include <bits/sockaddr.h>
+ 
+ /* Structure describing a generic socket address.  */
+-struct sockaddr
++struct __attribute_may_alias__ sockaddr
+   {
+     __SOCKADDR_COMMON (sa_);	/* Common data: address family and length.  */
+     char sa_data[14];		/* Address data.  */
+diff --git a/sysdeps/unix/sysv/linux/bits/socket.h b/sysdeps/unix/sysv/linux/bits/socket.h
+index 0581c79..a1fc921 100644
+--- a/sysdeps/unix/sysv/linux/bits/socket.h
++++ b/sysdeps/unix/sysv/linux/bits/socket.h
+@@ -150,7 +150,7 @@ typedef __socklen_t socklen_t;
+ #include <bits/sockaddr.h>
+ 
+ /* Structure describing a generic socket address.  */
+-struct sockaddr
++struct __attribute_may_alias__ sockaddr
+   {
+     __SOCKADDR_COMMON (sa_);	/* Common data: address family and length.  */
+     char sa_data[14];		/* Address data.  */
