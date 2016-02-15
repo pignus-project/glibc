@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-719-g1233be7
 %define glibcversion 2.22.90
-%define glibcrelease 34%{?dist}
+%define glibcrelease 35%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -294,7 +294,6 @@ Patch2035: glibc-nsswitch-Add-group-merging-support.patch
 
 Patch2036: glibc-gcc-PR69537.patch
 Patch2037: glibc-isinf-cxx11.patch
-Patch2038: glibc-rh1306511.patch
 
 ##############################################################################
 #
@@ -690,7 +689,6 @@ cat /proc/meminfo
 %patch2035 -p1
 %patch2036 -p1
 %patch2037 -p1
-%patch2038 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1957,6 +1955,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Feb 15 2016 Florian Weimer <fweimer@redhat.com> - 2.22.90-35
+- Revert may_alias attribute for struct sockaddr (#1306511).
+
 * Sat Feb 13 2016 Florian Weimer <fweimer@redhat.com> - 2.22.90-34
 - Auto-sync with upstream master.
 - Support aliasing with struct sockaddr pointers (#1306511).
