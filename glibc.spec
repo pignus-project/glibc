@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-719-g1233be7
 %define glibcversion 2.22.90
-%define glibcrelease 35%{?dist}
+%define glibcrelease 36%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -297,6 +297,9 @@ Patch2037: glibc-isinf-cxx11.patch
 
 # Upstream BZ 19573, patch reverts problematic commit
 Patch2099: glibc-rh1252570.patch
+
+# CVE-2015-7547
+Patch2100: glibc-CVE-2015-7547.patch
 
 ##############################################################################
 #
@@ -692,8 +695,8 @@ cat /proc/meminfo
 %patch2035 -p1
 %patch2036 -p1
 %patch2037 -p1
-
 %patch2099 -p1
+%patch2100 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1960,6 +1963,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Feb 16 2016 CArlos O'Donell <carlos@redhat.com> - 2.22.90-36
+- Fix CVE-2015-7547: getaddrinfo() stack-based buffer overflow (#1308943).
+
 * Mon Feb 15 2016 Florian Weimer <fweimer@redhat.com> - 2.22.90-35
 - Revert may_alias attribute for struct sockaddr (#1306511).
 - Revert upstream commit 2212c1420c92a33b0e0bd9a34938c9814a56c0f7 (#1252570).
