@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.22-719-g1233be7
 %define glibcversion 2.22.90
-%define glibcrelease 36%{?dist}
+%define glibcrelease 37%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -300,6 +300,9 @@ Patch2099: glibc-rh1252570.patch
 
 # CVE-2015-7547
 Patch2100: glibc-CVE-2015-7547.patch
+
+# Upstream BZ 19581
+Patch2101: glibc-rh1114591.patch
 
 ##############################################################################
 #
@@ -697,6 +700,7 @@ cat /proc/meminfo
 %patch2037 -p1
 %patch2099 -p1
 %patch2100 -p1
+%patch2101 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1963,6 +1967,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb 19 2016 Florian Weimer <fweimer@redhat.com> - 2.22.90-37
+- Remove stray newline from Serbian locales (#1114591).
+
 * Tue Feb 16 2016 CArlos O'Donell <carlos@redhat.com> - 2.22.90-36
 - Fix CVE-2015-7547: getaddrinfo() stack-based buffer overflow (#1308943).
 
