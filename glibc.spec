@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.22-719-g1233be7
-%define glibcversion 2.22.90
-%define glibcrelease 37%{?dist}
+%define glibcsrcdir  glibc-2.23-5-gf0029f1
+%define glibcversion 2.23.1
+%define glibcrelease 1%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -257,6 +257,9 @@ Patch0058: glibc-bug-regex-gcc5.patch
 # Add C.UTF-8 locale into /usr/lib/locale/
 Patch0059: glibc-c-utf8-locale.patch
 
+# Add unused markers to fid -DNDEBUG build issues.
+Patch0060: glibc-ndebug-unused.patch
+
 ##############################################################################
 #
 # Patches from upstream
@@ -293,13 +296,9 @@ Patch2034: glibc-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
 Patch2035: glibc-nsswitch-Add-group-merging-support.patch
 
 Patch2036: glibc-gcc-PR69537.patch
-Patch2037: glibc-isinf-cxx11.patch
 
 # Upstream BZ 19573, patch reverts problematic commit
 Patch2099: glibc-rh1252570.patch
-
-# CVE-2015-7547
-Patch2100: glibc-CVE-2015-7547.patch
 
 # Upstream BZ 19581
 Patch2101: glibc-rh1114591.patch
@@ -697,10 +696,9 @@ cat /proc/meminfo
 %patch0059 -p1
 %patch2035 -p1
 %patch2036 -p1
-%patch2037 -p1
 %patch2099 -p1
-%patch2100 -p1
 %patch2101 -p1
+%patch0060 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1967,6 +1965,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Feb 24 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.23.1-1
+- Update to glibc 2.23.1 release.
+
 * Fri Feb 19 2016 Florian Weimer <fweimer@redhat.com> - 2.22.90-37
 - Remove stray newline from Serbian locales (#1114591).
 
