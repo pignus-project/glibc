@@ -22,7 +22,9 @@ set -e
 
 # We want to sync from master by default.  Change this if you want to sync from
 # another branch.
-branch=master
+branch=release/2.23/master
+# Avoid slashes in branch name.
+branch_name=2.23
 
 # We can't do anything without an upstream repo
 if [ $# -ne 1 ]; then
@@ -61,7 +63,7 @@ nv=$(perl -ne 's/^%define glibcversion (.+)/printf("%s-", $1)/e;' \
 	  glibc.spec)
 
 # Our changelog entry.
-changelog="* $cldate $clname <$clemail> - $nv\n- Auto-sync with upstream $branch.\n"
+changelog="* $cldate $clname <$clemail> - $nv\n- Auto-sync with upstream $branch_name.\n"
 
 # Change the glibcsrcdir variable, bump up the release number and add an extra
 # entry to the changelog.
@@ -91,8 +93,10 @@ rm -f "$tmpfile"
 rm -rf "$srcdir"
 echo "+ Source prep is clean, so we're good to go."
 fedpkg new-sources "$srcdir.tar.gz"
-git commit -a -m "Auto-sync with upstream $branch."
+echo "+ You need to commit, push, and build. "
 exit 0
-fedpkg push
-fedpkg build
-echo "+ Done!"
+
+# git commit -a -m "Auto-sync with upstream $branch."
+# fedpkg push
+# fedpkg build
+# echo "+ Done!"

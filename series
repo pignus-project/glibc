@@ -40,4 +40,4 @@ glibc-nsswitch-Add-group-merging-support.patch -p1 --fuzz=0
 glibc-gcc-PR69537.patch -p1 --fuzz=0
 glibc-rh1252570.patch -p1 --fuzz=0
 glibc-rh1114591.patch -p1 --fuzz=0
-glibc-ndebug-unused.patch --fuzz=0
+glibc-ndebug-unused.patch -p1 --fuzz=0

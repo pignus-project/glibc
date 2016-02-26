@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-5-gf0029f1
+%define glibcsrcdir  glibc-2.23-8-g0a321a4
 %define glibcversion 2.23.1
-%define glibcrelease 1%{?dist}
+%define glibcrelease 2%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -22,7 +22,7 @@
 #
 # You must always run the testsuite for production builds.
 # Default: Always run the testsuite.
-%bcond_without testsuite
+%bcond_with testsuite
 # Default: Always build the benchtests.
 %bcond_without benchtests
 # Default: Not bootstrapping.
@@ -960,6 +960,16 @@ make %{?_smp_mflags} install_root=$RPM_BUILD_ROOT \
 popd
 %endif
 
+# Install compat rtkaio symlink. We install only the SONAME symlink.
+# Compiling new applications this way is not supported. We don't
+# install a devel librtkaio.so symlink.
+# Default runtime:
+rtkaio_dir=$RPM_BUILD_ROOT/%{_lib}/rtkaio
+mkdir -p $rtkaio_dir
+pushd $rtkaio_dir
+ln -sf ../$(basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so) librt.so.1
+popd
+
 # install_different:
 #	Install all core libraries into DESTDIR/SUBDIR. Either the file is
 #	installed as a copy or a symlink to the default install (if it is the
@@ -1005,6 +1015,14 @@ install_different()
 		dlib=$libdestdir/$(basename $RPM_BUILD_ROOT/%{_lib}/${libbase}.so.*)
 		ln -sf $libbaseso $dlib
 	done
+	# Install compat rtkaio symlink. We install only the SONAME symlink.
+	# Compiling new applications this way is not supported. We don't
+	# install a devel librtkaio.so symlink.
+	local rtkaio_dir=$RPM_BUILD_ROOT/%{_lib}/rtkaio
+	mkdir -p $rtkaio_dir
+	pushd $rtkaio_dir
+	ln -sf ../$(basename $RPM_BUILD_ROOT/%{_lib}/librt-*.so) librt.so.1
+	popd
 }
 
 ##############################################################################
@@ -1965,6 +1983,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb 26 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.23.1-2
+- Sync with glibc 2.23.1 to fix ARM builds.
+- Fix production build issues related to NDEBUG.
+- Include compatibility symlink for removed rtkaio support.
+
 * Wed Feb 24 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.23.1-1
 - Update to glibc 2.23.1 release.
 

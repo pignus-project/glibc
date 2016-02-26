@@ -73,3 +73,16 @@ Index: glibc-2.23-5-gf0029f1/math/atest-exp2.c
     mp1 tol;
  
     memset (xp, 0, sizeof (mp1));
+Index: glibc-2.23-5-gf0029f1/sysdeps/arm/dl-machine.h
+===================================================================
+--- glibc-2.23-5-gf0029f1.orig/sysdeps/arm/dl-machine.h
++++ glibc-2.23-5-gf0029f1/sysdeps/arm/dl-machine.h
+@@ -581,7 +581,7 @@ elf_machine_rela (struct link_map *map,
+ #  ifdef RESOLVE_CONFLICT_FIND_MAP
+ 	case R_ARM_TLS_DESC:
+ 	  {
+-	    struct tlsdesc volatile *td =
++	    struct tlsdesc volatile *td __attribute__ ((__unused__)) =
+ 	      (struct tlsdesc volatile *) reloc_addr;
+ 
+ 	    RESOLVE_CONFLICT_FIND_MAP (map, reloc_addr);
