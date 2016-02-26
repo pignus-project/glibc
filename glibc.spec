@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.23-8-g0a321a4
 %define glibcversion 2.23.1
-%define glibcrelease 3%{?dist}
+%define glibcrelease 4%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2045,6 +2045,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb 26 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.1-4
+- Add pap_AN locale to expected set of locales.
+
 * Fri Feb 26 2016 Mike FABIAN <mfabian@redhat.com> - 2.23.1-3
 - Create new language packages for all supported languages.
   Locales, translations, and locale sources are split into
