@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.23-40-gde51ff8
-%define glibcversion 2.22.90
-%define glibcrelease 38%{?dist}
+%define glibcversion 2.23.90
+%define glibcrelease 1%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1957,6 +1957,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Feb 26 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.23.90-1
+- Upstream development version is now 2.23.90.
+
 * Thu Feb 25 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.22.90-38
 - Auto-sync with upstream master.
 
