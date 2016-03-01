@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.23-40-gde51ff8
 %define glibcversion 2.23.90
-%define glibcrelease 2%{?dist}
+%define glibcrelease 3%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -436,6 +436,18 @@ BuildRequires: glibc-static
 # the package and should not be examined by any other tool.
 %global __filter_GLIBC_PRIVATE 1
 
+# For language packs we have glibc require a virtual dependency
+# "glibc-langpack" wich gives us at least one installed langpack.
+# If no langpack providing 'glibc-langpack' was installed you'd
+# get all of them, and that would make the transition from a
+# system without langpacks smoother (you'd get all the locales
+# installed). You would then trim that list, and the trimmed list
+# is preserved. One problem is you can't have "no" locales installed,
+# in that case we offer a "glibc-minimal-langpack" sub-pakcage for
+# this purpose.
+Requires: glibc-langpack = %{version}-%{release}
+Suggests: glibc-all-langpacks = %{version}-%{release}
+
 %description
 The glibc package contains standard libraries which are used by
 multiple programs on the system. In order to save disk space and
@@ -559,9 +571,9 @@ these sources as the basis for your new locale.
 %define lang_package()\
 %package langpack-%{1}\
 Summary: Locale data for %{1}\
+Provides: glibc-langpack = %{version}-%{release}\
 Requires: %{name} = %{version}-%{release}\
 Requires: %{name}-common = %{version}-%{release}\
-Requires: tzdata >= 2003a\
 %define supplements_list %(cat %{SOURCE11} | grep ^%{1}_ | cut -d / -f 1 | cut -d @ -f 1 | cut -d . -f 1 | sort -u | tr "\\\\n" " " | sed 's/ $//' | sed 's/ / or langpacks-/g' | sed 's/^/ or langpacks-/')\
 Supplements: (glibc = %{version}-%{release} and (langpacks-%{1}%{supplements_list}))\
 Group: System Environment/Base\
@@ -598,14 +610,36 @@ string.gsub(languages, "(%a+)",\
 function(i) print(rpm.expand("Requires: %{name}-langpack-"..i.." = %{version}-%{release}\\n")) end)}\
 %{nil}
 
+# The glibc-all-langpacks provides the virtual glibc-langpack,
+# and thus satisfies glibc's requirement for installed locales.
+# Users can add one more other langauge packs and then eventually
+# uninstall all-langpacks to save space.
 %package all-langpacks
-Summary: Meta package to require all langpacks
+Summary: All language packs for %{name}.
 Group: System Environment/Base
-%require_langpacks %language_list
+Requires: %{name} = %{version}-%{release}
+Requires: %{name}-common = %{version}-%{release}
+Provides: %{name}-langpack = %{version}-%{release}
 %description all-langpacks
-Meta package that requires all language packs.
+
+# No %files, this is an empty pacakge. The C/POSIX and
+# C.UTF-8 files are already installed by glibc. We create
+# minimal-langpack because the virtual provide of
+# glibc-langpack needs at least one package installed
+# to satisfy it. Given that no-locales installed is a valid
+# use case we support it here with this package.
+%package minimal-langpack
+Summary: Minimal language packs for %{name}.
+Group: System Environment/Base
+Provides: glibc-langpack = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
+Requires: %{name}-common = %{version}-%{release}
+%description minimal-langpack
+This is a Meta package that is used to install minimal language packs.
+This package ensures you can use C, POSIX, or C.UTF-8 locales, but
+nothing else. It is designed for assembling a minimal system.
 %ifnarch %{auxarches}
-%files all-langpacks
+%files minimal-langpack
 %endif
 
 ##############################################################################
@@ -1171,6 +1205,15 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/libc.info*
 olddir=`pwd`
 pushd ${RPM_BUILD_ROOT}%{_prefix}/lib/locale
 rm -f locale-archive
+# Intentionally we do not pass --alias-file=, aliases will be added
+# by build-locale-archive.
+$olddir/build-%{target}/elf/ld.so \
+        --library-path $olddir/build-%{target}/ \
+        $olddir/build-%{target}/locale/localedef \
+        --prefix ${RPM_BUILD_ROOT} --add-to-archive \
+        *_*
+# Setup the locale-archive template for use by glibc-all-langpacks.
+mv locale-archive{,.tmpl}
 # Create the file lists for the language specific sub-packages:
 for i in *_*
 do
@@ -1697,6 +1740,10 @@ touch $RPM_BUILD_ROOT/var/run/nscd/{socket,nscd.pid}
 
 %endif # %{auxarches}
 
+%ifnarch %{auxarches}
+truncate -s 0 $RPM_BUILD_ROOT/%{_prefix}/lib/locale/locale-archive
+%endif
+
 mkdir -p $RPM_BUILD_ROOT/var/cache/ldconfig
 truncate -s 0 $RPM_BUILD_ROOT/var/cache/ldconfig/aux-cache
 
@@ -1854,7 +1901,25 @@ end
 
 %postun -p /sbin/ldconfig
 
-%post common -p <lua>
+%posttrans all-langpacks -p <lua>
+-- If at the end of the transaction we are still installed
+-- (have a template of non-zero size), then we rebuild the
+-- locale cache (locale-archive) from the pre-populated
+-- locale cache (locale-archive.tmpl) i.e. template.
+if posix.stat("%{_prefix}/lib/locale/locale-archive.tmpl", "size") > 0 then
+  pid = posix.fork()
+  if pid == 0 then
+    posix.exec("%{_prefix}/sbin/build-locale-archive", "--install-langs", rpm.expand("%%{_install_langs}"))
+  elseif pid > 0 then
+    posix.wait(pid)
+  end
+end
+
+%postun all-langpacks -p <lua>
+-- In the postun we always remove the locale cache.
+-- We are being uninstalled and if this is an upgrade
+-- then the new packages template will be used to
+-- recreate a new copy of the cache.
 os.remove("%{_prefix}/lib/locale/locale-archive")
 
 %if %{with docs}
@@ -1962,6 +2027,10 @@ rm -f *.filelist*
 %verify(not md5 size mtime) %config(noreplace) /etc/default/nss
 %doc documentation/*
 
+%files all-langpacks
+%attr(0644,root,root) %verify(not md5 size mtime) %{_prefix}/lib/locale/locale-archive.tmpl
+%attr(0644,root,root) %verify(not md5 size mtime mode) %ghost %config(missingok,noreplace) %{_prefix}/lib/locale/locale-archive
+
 %files locale-source
 %defattr(-,root,root)
 %dir %{_prefix}/share/i18n/locales
@@ -2019,6 +2088,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Feb 29 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.90-3
+- Enhance support for upgrading from a non-language-pack system.
+
 * Fri Feb 26 2016 Mike FABIAN <mfabian@redhat.com> - 2.23.90-2
 - Create new language packages for all supported languages.
   Locales, translations, and locale sources are split into
