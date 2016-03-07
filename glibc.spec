@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.23-40-gde51ff8
 %define glibcversion 2.23.90
-%define glibcrelease 3%{?dist}
+%define glibcrelease 4%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -294,6 +294,9 @@ Patch2034: glibc-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
 Patch2035: glibc-nsswitch-Add-group-merging-support.patch
 
 Patch2036: glibc-gcc-PR69537.patch
+
+# extend_alloca removal, BZ 18023
+Patch2037: glibc-rh1315108.patch
 
 # Upstream BZ 19573, patch reverts problematic commit
 Patch2099: glibc-rh1252570.patch
@@ -788,6 +791,7 @@ cat /proc/meminfo
 %patch0059 -p1
 %patch2035 -p1
 %patch2036 -p1
+%patch2037 -p1
 %patch2099 -p1
 
 ##############################################################################
@@ -2088,6 +2092,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Mar  6 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-4
+- Remove extend_alloca (#1315108)
+
 * Mon Feb 29 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.90-3
 - Enhance support for upgrading from a non-language-pack system.
 
