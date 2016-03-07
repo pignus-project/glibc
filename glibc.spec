@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-40-gde51ff8
+%define glibcsrcdir  glibc-2.23-69-gf5e753c8
 %define glibcversion 2.23.90
-%define glibcrelease 4%{?dist}
+%define glibcrelease 5%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2092,6 +2092,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Mar 07 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.23.90-5
+- Auto-sync with upstream master.
+
 * Sun Mar  6 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-4
 - Remove extend_alloca (#1315108)
 

@@ -23,6 +23,8 @@ set -e
 # We want to sync from master by default.  Change this if you want to sync from
 # another branch.
 branch=master
+# Avoid slashes in branch name.
+branch_name=master
 
 # We can't do anything without an upstream repo
 if [ $# -ne 1 ]; then
@@ -91,8 +93,13 @@ rm -f "$tmpfile"
 rm -rf "$srcdir"
 echo "+ Source prep is clean, so we're good to go."
 fedpkg new-sources "$srcdir.tar.gz"
-git commit -a -m "Auto-sync with upstream $branch."
-exit 0
-fedpkg push
-fedpkg build
-echo "+ Done!"
+if [ $branch == "master" ]; then
+    git commit -a -m "Auto-sync with upstream $branch."
+    fedpkg push
+    fedpkg build
+    echo "+ Done!"
+else
+    echo "+ This is a non-development branch."
+    echo "+ Please review the results of the sync."
+    echo "+ Once reviewed you need to commit, push, and build."
+fi
