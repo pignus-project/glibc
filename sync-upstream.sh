@@ -17,6 +17,24 @@
 #       the output of the script) then manual intervention is required to
 #       complete the sync.  This will typically happen when a patch fails
 #       to apply on the new sources.
+#
+# Development branch:
+#
+# * As long as the branch is "master" the repository is treated as
+#   development and synchronization updates are fully automatic.
+#
+# Stable branches:
+#
+# * Once you branch to a stable Fedora release adjust branch.
+#   e.g. release/2.23/master
+#
+# * Set branch_name to the name of the relase
+#   e.g. 2.23
+#
+# * The sync script will automatically stop before commit, push, build
+#   for production branches, so you have to review the results and then
+#   do those steps yourself.
+#
 
 set -e
 
@@ -83,6 +101,15 @@ function prep_failed {
 	fi
 }
 
+function build_failed {
+	# fedpkg build failed.
+	if [ $? -ne 0 ]; then
+		echo "+ Building the package failed (or was interrupted)."
+		echo "+ Check the koji logs for final status."
+		false
+	fi
+}
+
 echo "+ Testing if fedpkg prep works."
 tmpfile=$(mktemp fedpkg-prep.out-XXXX)
 
@@ -94,12 +121,13 @@ rm -rf "$srcdir"
 echo "+ Source prep is clean, so we're good to go."
 fedpkg new-sources "$srcdir.tar.gz"
 if [ $branch == "master" ]; then
-    git commit -a -m "Auto-sync with upstream $branch."
-    fedpkg push
-    fedpkg build
-    echo "+ Done!"
+	git commit -a -m "Auto-sync with upstream $branch."
+	fedpkg push
+	trap build_failed EXIT
+	fedpkg build
+	echo "+ Done!"
 else
-    echo "+ This is a non-development branch."
-    echo "+ Please review the results of the sync."
-    echo "+ Once reviewed you need to commit, push, and build."
+	echo "+ This is a non-development branch."
+	echo "+ Please review the results of the sync."
+	echo "+ Once reviewed you need to commit, push, and build."
 fi
