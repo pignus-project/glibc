@@ -12,10 +12,10 @@ Date:   Thu Feb 19 15:52:08 2015 +0100
     setting nsaddr_list[].sin_family to zero.
 
 reverted:
-Index: glibc-2.23-39-g314f6de/resolv/res_init.c
+Index: glibc-2.23-131-ga603305/resolv/res_init.c
 ===================================================================
---- glibc-2.23-39-g314f6de.orig/resolv/res_init.c
-+++ glibc-2.23-39-g314f6de/resolv/res_init.c
+--- glibc-2.23-131-ga603305.orig/resolv/res_init.c
++++ glibc-2.23-131-ga603305/resolv/res_init.c
 @@ -139,8 +139,10 @@ __res_vinit(res_state statp, int preinit
  	char *cp, **pp;
  	int n;
@@ -105,19 +105,7 @@ Index: glibc-2.23-39-g314f6de/resolv/res_init.c
  		/* We try IPv6 servers again.  */
  		statp->ipv6_unavail = false;
  	    }
-@@ -580,7 +593,11 @@ __res_iclose(res_state statp, bool free_
- 		statp->_vcsock = -1;
- 		statp->_flags &= ~(RES_F_VC | RES_F_CONN);
- 	}
-+#ifdef _LIBC
-+	for (ns = 0; ns < MAXNS; ns++)
-+#else
- 	for (ns = 0; ns < statp->_u._ext.nscount; ns++)
-+#endif
- 		if (statp->_u._ext.nsaddrs[ns]) {
- 			if (statp->_u._ext.nssocks[ns] != -1) {
- 				close_not_cancel_no_status(statp->_u._ext.nssocks[ns]);
-@@ -591,6 +608,8 @@ __res_iclose(res_state statp, bool free_
+@@ -591,6 +604,8 @@ __res_iclose(res_state statp, bool free_
  				statp->_u._ext.nsaddrs[ns] = NULL;
  			}
  		}
@@ -126,10 +114,10 @@ Index: glibc-2.23-39-g314f6de/resolv/res_init.c
  }
  libc_hidden_def (__res_iclose)
  
-Index: glibc-2.23-39-g314f6de/resolv/res_send.c
+Index: glibc-2.23-131-ga603305/resolv/res_send.c
 ===================================================================
---- glibc-2.23-39-g314f6de.orig/resolv/res_send.c
-+++ glibc-2.23-39-g314f6de/resolv/res_send.c
+--- glibc-2.23-131-ga603305.orig/resolv/res_send.c
++++ glibc-2.23-131-ga603305/resolv/res_send.c
 @@ -193,7 +193,6 @@ evNowTime(struct timespec *res) {
  
  /* Forward. */
@@ -348,10 +336,10 @@ Index: glibc-2.23-39-g314f6de/resolv/res_send.c
 -    return (struct sockaddr *) (void *) &statp->nsaddr_list[n];
 -}
 -
- /* The send_vc function is responsible for sending a DNS query over TCP
-    to the nameserver numbered NS from the res_state STATP i.e.
-    EXT(statp).nssocks[ns].  The function supports sending both IPv4 and
-@@ -730,7 +752,7 @@ send_vc(res_state statp,
+ /* Close the resolver structure, assign zero to *RESPLEN2 if RESPLEN2
+    is not NULL, and return zero.  */
+ static int
+@@ -742,7 +764,7 @@ send_vc(res_state statp,
  	const HEADER *hp = (HEADER *) buf;
  	const HEADER *hp2 = (HEADER *) buf2;
  	HEADER *anhp = (HEADER *) *ansp;
@@ -360,7 +348,7 @@ Index: glibc-2.23-39-g314f6de/resolv/res_send.c
  	int truncating, connreset, n;
  	/* On some architectures compiler might emit a warning indicating
  	   'resplen' may be used uninitialized.  However if buf2 == NULL
-@@ -763,8 +785,8 @@ send_vc(res_state statp,
+@@ -775,8 +797,8 @@ send_vc(res_state statp,
  
  		if (getpeername(statp->_vcsock,
  				(struct sockaddr *)&peer, &size) < 0 ||
@@ -371,7 +359,7 @@ Index: glibc-2.23-39-g314f6de/resolv/res_send.c
  			statp->_flags &= ~RES_F_VC;
  		}
  	}
-@@ -773,19 +795,20 @@ send_vc(res_state statp,
+@@ -785,19 +807,20 @@ send_vc(res_state statp,
  		if (statp->_vcsock >= 0)
  		  __res_iclose(statp, false);
  
@@ -396,7 +384,7 @@ Index: glibc-2.23-39-g314f6de/resolv/res_send.c
  			__res_iclose(statp, false);
  			return (0);
  		}
-@@ -979,7 +1002,8 @@ static int
+@@ -991,7 +1014,8 @@ static int
  reopen (res_state statp, int *terrno, int ns)
  {
  	if (EXT(statp).nssocks[ns] == -1) {

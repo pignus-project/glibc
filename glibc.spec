@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-69-gf5e753c8
+%define glibcsrcdir  glibc-2.23-131-ga603305
 %define glibcversion 2.23.90
-%define glibcrelease 6%{?dist}
+%define glibcrelease 7%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -257,9 +257,6 @@ Patch0058: glibc-bug-regex-gcc5.patch
 
 # Add C.UTF-8 locale into /usr/lib/locale/
 Patch0059: glibc-c-utf8-locale.patch
-
-# Use "an" as language code.
-Patch0060: glibc-fix-an_ES.patch
 
 ##############################################################################
 #
@@ -796,7 +793,6 @@ cat /proc/meminfo
 %patch2036 -p1
 %patch2037 -p1
 %patch2099 -p1
-%patch0060 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -2096,6 +2092,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Mar 29 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-7
+- Auto-sync with upstream master.
+- Adjust glibc-rh1252570.patch to partial upstream fix.
+- Drop glibc-fix-an_ES.patch, now included upstream.
+
 * Wed Mar 16 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.90-6
 - Use 'an' as language abbreviation for an_ES.
 
