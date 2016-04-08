@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-131-ga603305
+%define glibcsrcdir  glibc-2.23-162-g25dba0a
 %define glibcversion 2.23.90
-%define glibcrelease 7%{?dist}
+%define glibcrelease 8%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2092,6 +2092,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Apr 08 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-8
+- Auto-sync with upstream master.
+
 * Tue Mar 29 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-7
 - Auto-sync with upstream master.
 - Adjust glibc-rh1252570.patch to partial upstream fix.
