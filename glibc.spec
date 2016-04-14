@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-162-g25dba0a
+%define glibcsrcdir  glibc-2.23-190-g8a727af
 %define glibcversion 2.23.90
-%define glibcrelease 8%{?dist}
+%define glibcrelease 9%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2092,6 +2092,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Apr 14 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-9
+- Auto-sync with upstream master.  Removes type union wait.
+- Update SUPPORTED locales file.
+
 * Fri Apr 08 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-8
 - Auto-sync with upstream master.
 
