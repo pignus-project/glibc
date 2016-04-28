@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.23-193-g41e77f3
 %define glibcversion 2.23.90
-%define glibcrelease 11%{?dist}
+%define glibcrelease 12%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -743,11 +743,6 @@ microbenchmark tests on the system.
 # Prepare for the build.
 ##############################################################################
 %prep
-# Log system information
-uname -a
-cat /proc/cpuinfo
-cat /proc/meminfo
-
 %setup -q -n %{glibcsrcdir}
 
 # Patch order matters.
@@ -821,6 +816,10 @@ cmp %{SOURCE11} localedata/SUPPORTED
 # Build glibc...
 ##############################################################################
 %build
+# Log system information
+uname -a
+cat /proc/cpuinfo
+cat /proc/meminfo
 
 # We build using the native system compilers.
 GCC=gcc
@@ -2092,6 +2091,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Apr 28 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.90-12
+- Move spec file system information logging to the build stage.
+
 * Thu Apr 14 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-11
 - Auto-sync with upstream master.
 - Unbreak pread/pread64 on armhfp (#1327277)
