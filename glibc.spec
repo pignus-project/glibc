@@ -744,11 +744,6 @@ microbenchmark tests on the system.
 # Prepare for the build.
 ##############################################################################
 %prep
-# Log system information
-uname -a
-cat /proc/cpuinfo
-cat /proc/meminfo
-
 %setup -q -n %{glibcsrcdir}
 
 # Patch order matters.
@@ -823,6 +818,10 @@ cmp %{SOURCE11} localedata/SUPPORTED
 # Build glibc...
 ##############################################################################
 %build
+# Log system information
+uname -a
+cat /proc/cpuinfo
+cat /proc/meminfo
 
 # We build using the native system compilers.
 GCC=gcc
@@ -2111,11 +2110,11 @@ rm -f *.filelist*
 %defattr(-,root,root)
 %endif
 
-%changelog
 * Mon May  9 2016 Florian Weimer <fweimer@redhat.com> - 2.23.1-6
 - Drop the revert in glibc-rh1252570.patch.  There is now a series
   of upstream fixes for the Hesiod crash and the IPv6 address
   memory leak.
+- Move spec file system information logging to the build stage.
 - Change first day of the week for es_CL to Monday (#1321372)
 - Sync with the upstream 2.23 release branch
   (commit a824d609581d5ee7544aabcbbc70e8da44b2b5b6),
