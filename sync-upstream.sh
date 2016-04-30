@@ -92,11 +92,20 @@ perl -pi \
 	    s/^(%changelog)$/\$1\n$changelog/" \
 	glibc.spec
 
+function print_steps {
+	echo "+ (a) Updating sources e.g. fedpkg new-sources $srcdir.tar.gz"
+	echo "+ (b) Committing changes e.g. git commit -a"
+	echo "+ (c) Pushing to fedora e.g. fedpkg push"
+	echo "+ (d) Building fedora branch e.g. fedpkg build"
+}
+
 function prep_failed {
 	# fedpkg prep failed.
 	if [ $? -ne 0 ]; then
 		echo "+ Source prep failed."
-		echo "+ Check the output in $tmpfile and fix things before committing."
+		echo "+ The 'sources' file is unmodified. Manually use $srcdir.tar.gz."
+		echo "+ Check the output in $tmpfile and fix things before:"
+		print_steps
 		false
 	fi
 }
@@ -129,5 +138,6 @@ if [ $branch == "master" ]; then
 else
 	echo "+ This is a non-development branch."
 	echo "+ Please review the results of the sync."
-	echo "+ Once reviewed you need to commit, push, and build."
+	echo "+ Once reviewed you need to:"
+	print_steps
 fi

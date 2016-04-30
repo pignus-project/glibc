@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-193-g41e77f3
+%define glibcsrcdir  glibc-2.23-276-gb65b205
 %define glibcversion 2.23.90
-%define glibcrelease 12%{?dist}
+%define glibcrelease 13%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -300,13 +300,6 @@ Patch2037: glibc-rh1315108.patch
 
 # Upstream BZ 19573, patch reverts problematic commit
 Patch2099: glibc-rh1252570.patch
-
-##############################################################################
-#
-# Benchmark comparison patches.
-#
-##############################################################################
-Patch3002: glibc-bench-build.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -777,7 +770,6 @@ microbenchmark tests on the system.
 %patch2034 -p1
 %patch0052 -p1
 %patch0053 -p1
-%patch3002 -p1
 %patch0054 -p1
 %patch0055 -p1
 %patch0056 -p1
@@ -2091,6 +2083,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Apr 29 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.23.90-13
+- Auto-sync with upstream master.
+
 * Thu Apr 28 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.90-12
 - Move spec file system information logging to the build stage.
 
