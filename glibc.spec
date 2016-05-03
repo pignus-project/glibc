@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.23-276-gb65b205
 %define glibcversion 2.23.90
-%define glibcrelease 13%{?dist}
+%define glibcrelease 14%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -645,7 +645,7 @@ nothing else. It is designed for assembling a minimal system.
 Summary: A Name Service Caching Daemon (nscd).
 Group: System Environment/Daemons
 Requires: %{name} = %{version}-%{release}
-%if %{with bootstrap}
+%if %{without bootstrap}
 Requires: libselinux >= 1.17.10-1
 %endif
 Requires: audit-libs >= 1.1.3
@@ -2083,6 +2083,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue May 03 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.23.90-14
+- Require libselinux for nscd in non-bootstrap configuration.
+
 * Fri Apr 29 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.23.90-13
 - Auto-sync with upstream master.
 
