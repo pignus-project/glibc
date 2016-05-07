@@ -300,6 +300,7 @@ Patch2036: glibc-gcc-PR69537.patch
 
 # Upstream BZ 19581
 Patch2101: glibc-rh1114591.patch
+Patch2102: glibc-rh1321372.patch
 
 ##############################################################################
 #
@@ -792,6 +793,7 @@ cat /proc/meminfo
 %patch2035 -p1
 %patch2036 -p1
 %patch2101 -p1
+%patch2102 -p1
 %patch0060 -p1
 
 ##############################################################################
@@ -2114,6 +2116,7 @@ rm -f *.filelist*
 - Drop the revert in glibc-rh1252570.patch.  There is now a series
   of upstream fixes for the Hesiod crash and the IPv6 address
   memory leak.
+- Change first day of the week for es_CL to Monday (#1321372)
 - Sync with the upstream 2.23 release branch
   (commit a824d609581d5ee7544aabcbbc70e8da44b2b5b6),
   resolving the bugs listed below.
