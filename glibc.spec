@@ -2110,6 +2110,7 @@ rm -f *.filelist*
 %defattr(-,root,root)
 %endif
 
+%changelog
 * Mon May  9 2016 Florian Weimer <fweimer@redhat.com> - 2.23.1-6
 - Drop the revert in glibc-rh1252570.patch.  There is now a series
   of upstream fixes for the Hesiod crash and the IPv6 address
