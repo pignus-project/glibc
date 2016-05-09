@@ -264,8 +264,8 @@ Date:   Sun Mar 1 23:22:45 2015 +0100
     	[BZ #18023]
     	* include/alloca.h (stackinfo_alloca_round, extend_alloca,
     	extend_alloca_account): Remove.
-diff --git a/elf/dl-deps.c b/elf/dl-deps.c
-index 6a82987..1458545 100644
+Index: b/elf/dl-deps.c
+===================================================================
 --- a/elf/dl-deps.c
 +++ b/elf/dl-deps.c
 @@ -27,6 +27,7 @@
@@ -276,7 +276,7 @@ index 6a82987..1458545 100644
  
  #include <dl-dst.h>
  
-@@ -184,9 +185,8 @@ _dl_map_object_deps (struct link_map *map,
+@@ -184,9 +185,8 @@ _dl_map_object_deps (struct link_map *ma
    /* Pointer to last unique object.  */
    tail = &known[nlist - 1];
  
@@ -288,7 +288,7 @@ index 6a82987..1458545 100644
  
    /* Process each element of the search list, loading each of its
       auxiliary objects and immediate dependencies.  Auxiliary objects
-@@ -217,13 +217,12 @@ _dl_map_object_deps (struct link_map *map,
+@@ -217,13 +217,12 @@ _dl_map_object_deps (struct link_map *ma
        if (l->l_searchlist.r_list == NULL && l->l_initfini == NULL
  	  && l != map && l->l_ldnum > 0)
  	{
@@ -308,7 +308,7 @@ index 6a82987..1458545 100644
  	}
  
        if (l->l_info[DT_NEEDED] || l->l_info[AUXTAG] || l->l_info[FILTERTAG])
-@@ -463,8 +462,11 @@ _dl_map_object_deps (struct link_map *map,
+@@ -463,8 +462,11 @@ _dl_map_object_deps (struct link_map *ma
  	  struct link_map **l_initfini = (struct link_map **)
  	    malloc ((2 * nneeded + 1) * sizeof needed[0]);
  	  if (l_initfini == NULL)
@@ -322,7 +322,7 @@ index 6a82987..1458545 100644
  	  l_initfini[0] = l;
  	  memcpy (&l_initfini[1], needed, nneeded * sizeof needed[0]);
  	  memcpy (&l_initfini[nneeded + 1], l_initfini,
-@@ -482,6 +484,8 @@ _dl_map_object_deps (struct link_map *map,
+@@ -482,6 +484,8 @@ _dl_map_object_deps (struct link_map *ma
      }
  
   out:
@@ -331,8 +331,8 @@ index 6a82987..1458545 100644
    if (errno == 0 && errno_saved != 0)
      __set_errno (errno_saved);
  
-diff --git a/include/alloca.h b/include/alloca.h
-index 0150025..f190b87 100644
+Index: b/include/alloca.h
+===================================================================
 --- a/include/alloca.h
 +++ b/include/alloca.h
 @@ -20,57 +20,17 @@ libc_hidden_proto (__libc_alloca_cutoff)
@@ -393,11 +393,11 @@ index 0150025..f190b87 100644
  #endif
  
  #endif
-diff --git a/nis/nss_compat/compat-initgroups.c b/nis/nss_compat/compat-initgroups.c
-index e65b10f..4843e5c 100644
+Index: b/nis/nss_compat/compat-initgroups.c
+===================================================================
 --- a/nis/nss_compat/compat-initgroups.c
 +++ b/nis/nss_compat/compat-initgroups.c
-@@ -310,7 +310,6 @@ getgrent_next_nss (ent_t *ent, char *buffer, size_t buflen, const char *user,
+@@ -310,7 +310,6 @@ getgrent_next_nss (ent_t *ent, char *buf
  		 overwrite the pointer with one to a bigger buffer.  */
  	      char *tmpbuf = buffer;
  	      size_t tmplen = buflen;
@@ -405,7 +405,7 @@ index e65b10f..4843e5c 100644
  
  	      for (int i = 0; i < mystart; i++)
  		{
-@@ -319,29 +318,26 @@ getgrent_next_nss (ent_t *ent, char *buffer, size_t buflen, const char *user,
+@@ -319,29 +318,26 @@ getgrent_next_nss (ent_t *ent, char *buf
  			 == NSS_STATUS_TRYAGAIN
  			 && *errnop == ERANGE)
                      {
@@ -455,7 +455,7 @@ index e65b10f..4843e5c 100644
                      }
  
  		  if (__builtin_expect  (status != NSS_STATUS_NOTFOUND, 1))
-@@ -369,7 +365,7 @@ getgrent_next_nss (ent_t *ent, char *buffer, size_t buflen, const char *user,
+@@ -369,7 +365,7 @@ getgrent_next_nss (ent_t *ent, char *buf
  	      status = NSS_STATUS_NOTFOUND;
  
   done:
@@ -464,8 +464,8 @@ index e65b10f..4843e5c 100644
  	        free (tmpbuf);
  	    }
  
-diff --git a/nis/nss_nis/nis-initgroups.c b/nis/nss_nis/nis-initgroups.c
-index dec385c..9a3ac36 100644
+Index: b/nis/nss_nis/nis-initgroups.c
+===================================================================
 --- a/nis/nss_nis/nis-initgroups.c
 +++ b/nis/nss_nis/nis-initgroups.c
 @@ -16,7 +16,6 @@
@@ -484,7 +484,7 @@ index dec385c..9a3ac36 100644
  
  #include "nss-nis.h"
  #include <libnsl.h>
-@@ -120,27 +120,30 @@ internal_getgrent_r (struct group *grp, char *buffer, size_t buflen,
+@@ -120,27 +120,30 @@ internal_getgrent_r (struct group *grp,
  static int
  get_uid (const char *user, uid_t *uidp)
  {
@@ -519,7 +519,7 @@ index dec385c..9a3ac36 100644
    return 1;
  }
  
-@@ -254,8 +257,6 @@ _nss_nis_initgroups_dyn (const char *user, gid_t group, long int *start,
+@@ -254,8 +257,6 @@ _nss_nis_initgroups_dyn (const char *use
      }
  
    struct group grpbuf, *g;
@@ -528,7 +528,7 @@ index dec385c..9a3ac36 100644
    enum nss_status status;
    intern_t intern = { NULL, NULL, 0 };
    gid_t *groups = *groupsp;
-@@ -264,15 +265,20 @@ _nss_nis_initgroups_dyn (const char *user, gid_t group, long int *start,
+@@ -264,15 +265,20 @@ _nss_nis_initgroups_dyn (const char *use
    if (status != NSS_STATUS_SUCCESS)
      return status;
  
@@ -560,8 +560,8 @@ index dec385c..9a3ac36 100644
  
    return status;
  }
-diff --git a/nscd/aicache.c b/nscd/aicache.c
-index a2e6cf8..e181fdc 100644
+Index: b/nscd/aicache.c
+===================================================================
 --- a/nscd/aicache.c
 +++ b/nscd/aicache.c
 @@ -26,6 +26,7 @@
@@ -572,7 +572,7 @@ index a2e6cf8..e181fdc 100644
  
  #include "dbg_log.h"
  #include "nscd.h"
-@@ -113,10 +114,13 @@ addhstaiX (struct database_dyn *db, int fd, request_header *req,
+@@ -113,10 +114,13 @@ addhstaiX (struct database_dyn *db, int
    int old_res_options = _res.options;
    _res.options &= ~RES_USE_INET6;
  
@@ -590,7 +590,7 @@ index a2e6cf8..e181fdc 100644
    int32_t ttl = INT32_MAX;
    ssize_t total = 0;
    char *key_copy = NULL;
-@@ -129,6 +133,7 @@ addhstaiX (struct database_dyn *db, int fd, request_header *req,
+@@ -129,6 +133,7 @@ addhstaiX (struct database_dyn *db, int
        int status[2] = { NSS_STATUS_UNAVAIL, NSS_STATUS_UNAVAIL };
        int naddrs = 0;
        size_t addrslen = 0;
@@ -598,7 +598,7 @@ index a2e6cf8..e181fdc 100644
        char *canon = NULL;
        size_t canonlen;
  
-@@ -143,12 +148,17 @@ addhstaiX (struct database_dyn *db, int fd, request_header *req,
+@@ -143,12 +148,17 @@ addhstaiX (struct database_dyn *db, int
  	      at = &atmem;
  	      rc6 = 0;
  	      herrno = 0;
@@ -618,7 +618,7 @@ index a2e6cf8..e181fdc 100644
  	    }
  
  	  if (rc6 != 0 && herrno == NETDB_INTERNAL)
-@@ -226,41 +236,38 @@ addhstaiX (struct database_dyn *db, int fd, request_header *req,
+@@ -226,41 +236,38 @@ addhstaiX (struct database_dyn *db, int
  	  while (1)
  	    {
  	      rc6 = 0;
@@ -676,7 +676,7 @@ index a2e6cf8..e181fdc 100644
  	    }
  
  	  if (rc4 != 0 && herrno == NETDB_INTERNAL)
-@@ -286,13 +293,11 @@ addhstaiX (struct database_dyn *db, int fd, request_header *req,
+@@ -286,13 +293,11 @@ addhstaiX (struct database_dyn *db, int
  	      cfct = __nss_lookup_function (nip, "getcanonname_r");
  	      if (cfct != NULL)
  		{
@@ -692,7 +692,7 @@ index a2e6cf8..e181fdc 100644
  		      == NSS_STATUS_SUCCESS)
  		    canon = s;
  		  else
-@@ -321,18 +326,20 @@ addhstaiX (struct database_dyn *db, int fd, request_header *req,
+@@ -321,18 +326,20 @@ addhstaiX (struct database_dyn *db, int
  		      addrfamily = AF_INET6;
  		    }
  
@@ -729,11 +729,11 @@ index a2e6cf8..e181fdc 100644
    return timeout;
  }
  
-diff --git a/nscd/connections.c b/nscd/connections.c
-index f3b16f7..4e96e49 100644
+Index: b/nscd/connections.c
+===================================================================
 --- a/nscd/connections.c
 +++ b/nscd/connections.c
-@@ -1353,64 +1353,83 @@ request from '%s' [%ld] not handled due to missing permission"),
+@@ -1353,64 +1353,83 @@ request from '%s' [%ld] not handled due
      }
  }
  
@@ -753,19 +753,20 @@ index f3b16f7..4e96e49 100644
 -  size_t readlen = 0;
    int fd = open ("/proc/self/cmdline", O_RDONLY);
 -  if (fd == -1)
-+  if (fd < 0)
-+    return NULL;
-+  size_t current = 0;
-+  size_t limit = 1024;
-+  char *buffer = malloc (limit);
-+  if (buffer == NULL)
-     {
+-    {
 -      dbg_log (_("\
 -cannot open /proc/self/cmdline: %s; disabling paranoia mode"),
 -	       strerror (errno));
 -
 -      paranoia = 0;
 -      return;
++  if (fd < 0)
++    return NULL;
++  size_t current = 0;
++  size_t limit = 1024;
++  char *buffer = malloc (limit);
++  if (buffer == NULL)
++    {
 +      close (fd);
 +      errno = ENOMEM;
 +      return NULL;
@@ -855,7 +856,7 @@ index f3b16f7..4e96e49 100644
      {
        argv[argc++] = cp;
        cp = (char *) rawmemchr (cp, '\0') + 1;
-@@ -1427,6 +1446,7 @@ cannot change to old UID: %s; disabling paranoia mode"),
+@@ -1427,6 +1446,7 @@ cannot change to old UID: %s; disabling
  		   strerror (errno));
  
  	  paranoia = 0;
@@ -863,7 +864,7 @@ index f3b16f7..4e96e49 100644
  	  return;
  	}
  
-@@ -1438,6 +1458,7 @@ cannot change to old GID: %s; disabling paranoia mode"),
+@@ -1438,6 +1458,7 @@ cannot change to old GID: %s; disabling
  
  	  ignore_value (setuid (server_uid));
  	  paranoia = 0;
@@ -871,7 +872,7 @@ index f3b16f7..4e96e49 100644
  	  return;
  	}
      }
-@@ -1455,6 +1476,7 @@ cannot change to old working directory: %s; disabling paranoia mode"),
+@@ -1455,6 +1476,7 @@ cannot change to old working directory:
  	  ignore_value (setgid (server_gid));
  	}
        paranoia = 0;
@@ -879,7 +880,7 @@ index f3b16f7..4e96e49 100644
        return;
      }
  
-@@ -1503,6 +1525,7 @@ cannot change to old working directory: %s; disabling paranoia mode"),
+@@ -1503,6 +1525,7 @@ cannot change to old working directory:
      dbg_log (_("cannot change current working directory to \"/\": %s"),
  	     strerror (errno));
    paranoia = 0;
@@ -887,8 +888,8 @@ index f3b16f7..4e96e49 100644
  
    /* Reenable the databases.  */
    time_t now = time (NULL);
-diff --git a/nscd/grpcache.c b/nscd/grpcache.c
-index 3831170..53a912b 100644
+Index: b/nscd/grpcache.c
+===================================================================
 --- a/nscd/grpcache.c
 +++ b/nscd/grpcache.c
 @@ -16,7 +16,6 @@
@@ -907,7 +908,7 @@ index 3831170..53a912b 100644
  
  #include "nscd.h"
  #include "dbg_log.h"
-@@ -437,12 +437,12 @@ addgrbyX (struct database_dyn *db, int fd, request_header *req,
+@@ -437,12 +437,12 @@ addgrbyX (struct database_dyn *db, int f
       look again in the table whether the dataset is now available.  We
       simply insert it.  It does not matter if it is in there twice.  The
       pruning function only will look at the timestamp.  */
@@ -923,7 +924,7 @@ index 3831170..53a912b 100644
  
    if (__glibc_unlikely (debug_level > 0))
      {
-@@ -452,43 +452,24 @@ addgrbyX (struct database_dyn *db, int fd, request_header *req,
+@@ -452,43 +452,24 @@ addgrbyX (struct database_dyn *db, int f
  	dbg_log (_("Reloading \"%s\" in group cache!"), keystr);
      }
  
@@ -982,8 +983,8 @@ index 3831170..53a912b 100644
    return timeout;
  }
  
-diff --git a/nscd/hstcache.c b/nscd/hstcache.c
-index 04708ed..4ad4e87 100644
+Index: b/nscd/hstcache.c
+===================================================================
 --- a/nscd/hstcache.c
 +++ b/nscd/hstcache.c
 @@ -34,6 +34,7 @@
@@ -994,7 +995,7 @@ index 04708ed..4ad4e87 100644
  
  #include "nscd.h"
  #include "dbg_log.h"
-@@ -463,11 +464,8 @@ addhstbyX (struct database_dyn *db, int fd, request_header *req,
+@@ -463,11 +464,8 @@ addhstbyX (struct database_dyn *db, int
       look again in the table whether the dataset is now available.  We
       simply insert it.  It does not matter if it is in there twice.  The
       pruning function only will look at the timestamp.  */
@@ -1006,7 +1007,7 @@ index 04708ed..4ad4e87 100644
    int errval = 0;
    int32_t ttl = INT32_MAX;
  
-@@ -487,46 +485,30 @@ addhstbyX (struct database_dyn *db, int fd, request_header *req,
+@@ -487,46 +485,30 @@ addhstbyX (struct database_dyn *db, int
  	dbg_log (_("Reloading \"%s\" in hosts cache!"), (char *) str);
      }
  
@@ -1072,8 +1073,8 @@ index 04708ed..4ad4e87 100644
    return timeout;
  }
  
-diff --git a/nscd/pwdcache.c b/nscd/pwdcache.c
-index 6dd6746..0b0f52e 100644
+Index: b/nscd/pwdcache.c
+===================================================================
 --- a/nscd/pwdcache.c
 +++ b/nscd/pwdcache.c
 @@ -16,7 +16,6 @@
@@ -1092,7 +1093,7 @@ index 6dd6746..0b0f52e 100644
  
  #include "nscd.h"
  #include "dbg_log.h"
-@@ -415,12 +415,11 @@ addpwbyX (struct database_dyn *db, int fd, request_header *req,
+@@ -415,12 +415,11 @@ addpwbyX (struct database_dyn *db, int f
       look again in the table whether the dataset is now available.  We
       simply insert it.  It does not matter if it is in there twice.  The
       pruning function only will look at the timestamp.  */
@@ -1107,7 +1108,7 @@ index 6dd6746..0b0f52e 100644
  
    if (__glibc_unlikely (debug_level > 0))
      {
-@@ -430,45 +429,26 @@ addpwbyX (struct database_dyn *db, int fd, request_header *req,
+@@ -430,45 +429,26 @@ addpwbyX (struct database_dyn *db, int f
  	dbg_log (_("Reloading \"%s\" in password cache!"), keystr);
      }
  
@@ -1168,8 +1169,8 @@ index 6dd6746..0b0f52e 100644
    return timeout;
  }
  
-diff --git a/nscd/servicescache.c b/nscd/servicescache.c
-index 00a2353..f90312d 100644
+Index: b/nscd/servicescache.c
+===================================================================
 --- a/nscd/servicescache.c
 +++ b/nscd/servicescache.c
 @@ -16,7 +16,6 @@
@@ -1188,7 +1189,7 @@ index 00a2353..f90312d 100644
  
  #include "nscd.h"
  #include "dbg_log.h"
-@@ -374,12 +374,11 @@ addservbyX (struct database_dyn *db, int fd, request_header *req,
+@@ -374,12 +374,11 @@ addservbyX (struct database_dyn *db, int
       look again in the table whether the dataset is now available.  We
       simply insert it.  It does not matter if it is in there twice.  The
       pruning function only will look at the timestamp.  */
@@ -1203,7 +1204,7 @@ index 00a2353..f90312d 100644
  
    if (__glibc_unlikely (debug_level > 0))
      {
-@@ -389,43 +388,24 @@ addservbyX (struct database_dyn *db, int fd, request_header *req,
+@@ -389,43 +388,24 @@ addservbyX (struct database_dyn *db, int
  	dbg_log (_("Reloading \"%s\" in services cache!"), key);
      }
  
@@ -1262,8 +1263,8 @@ index 00a2353..f90312d 100644
    return timeout;
  }
  
-diff --git a/nss/getent.c b/nss/getent.c
-index de7b83f..e85d761 100644
+Index: b/nss/getent.c
+===================================================================
 --- a/nss/getent.c
 +++ b/nss/getent.c
 @@ -39,6 +39,7 @@
@@ -1316,7 +1317,7 @@ index de7b83f..e85d761 100644
        printf ("%-21s", key[i]);
        for (int j = 0; j < n; ++j)
  	if (grps[j] != -1)
-@@ -508,6 +513,8 @@ initgroups_keys (int number, char *key[])
+@@ -508,6 +513,8 @@ initgroups_keys (int number, char *key[]
        putchar_unlocked ('\n');
      }
  
@@ -1325,8 +1326,8 @@ index de7b83f..e85d761 100644
    return 0;
  }
  
-diff --git a/nss/nss_files/files-hosts.c b/nss/nss_files/files-hosts.c
-index 2a4a665..8eda308 100644
+Index: b/nss/nss_files/files-hosts.c
+===================================================================
 --- a/nss/nss_files/files-hosts.c
 +++ b/nss/nss_files/files-hosts.c
 @@ -22,7 +22,7 @@
@@ -1338,7 +1339,7 @@ index 2a4a665..8eda308 100644
  
  /* Get implementation for some internal functions.  */
  #include "../resolv/mapv4v6addr.h"
-@@ -145,15 +145,12 @@ _nss_files_gethostbyname3_r (const char *name, int af, struct hostent *result,
+@@ -145,15 +145,12 @@ _nss_files_gethostbyname3_r (const char
  	  && _res_hconf.flags & HCONF_FLAG_MULTI)
  	{
  	  /* We have to get all host entries from the file.  */
@@ -1356,7 +1357,7 @@ index 2a4a665..8eda308 100644
  
  	  while (result->h_aliases[naliases] != NULL)
  	    ++naliases;
-@@ -161,9 +158,9 @@ _nss_files_gethostbyname3_r (const char *name, int af, struct hostent *result,
+@@ -161,9 +158,9 @@ _nss_files_gethostbyname3_r (const char
  	  bufferend = (char *) &result->h_aliases[naliases + 1];
  
  	again:
@@ -1369,7 +1370,7 @@ index 2a4a665..8eda308 100644
  		 == NSS_STATUS_SUCCESS)
  	    {
  	      int matches = 1;
-@@ -287,54 +284,13 @@ _nss_files_gethostbyname3_r (const char *name, int af, struct hostent *result,
+@@ -287,54 +284,13 @@ _nss_files_gethostbyname3_r (const char
  		}
  	    }
  
@@ -1428,8 +1429,8 @@ index 2a4a665..8eda308 100644
  	}
  
        internal_endent (&stream);
-diff --git a/nss/nss_files/files-initgroups.c b/nss/nss_files/files-initgroups.c
-index 6e0d825..13d45cc 100644
+Index: b/nss/nss_files/files-initgroups.c
+===================================================================
 --- a/nss/nss_files/files-initgroups.c
 +++ b/nss/nss_files/files-initgroups.c
 @@ -16,7 +16,6 @@
@@ -1448,7 +1449,7 @@ index 6e0d825..13d45cc 100644
  
  enum nss_status
  _nss_files_initgroups_dyn (const char *user, gid_t group, long int *start,
-@@ -46,9 +46,8 @@ _nss_files_initgroups_dyn (const char *user, gid_t group, long int *start,
+@@ -46,9 +46,8 @@ _nss_files_initgroups_dyn (const char *u
    enum nss_status status = NSS_STATUS_SUCCESS;
    bool any = false;
  
@@ -1460,7 +1461,7 @@ index 6e0d825..13d45cc 100644
  
    gid_t *groups = *groupsp;
  
-@@ -67,26 +66,16 @@ _nss_files_initgroups_dyn (const char *user, gid_t group, long int *start,
+@@ -67,26 +66,16 @@ _nss_files_initgroups_dyn (const char *u
  	}
  
        struct group grp;
@@ -1493,7 +1494,7 @@ index 6e0d825..13d45cc 100644
  	  /* Reread current line, the parser has clobbered it.  */
  	  fsetpos (stream, &pos);
  	  continue;
-@@ -132,8 +121,7 @@ _nss_files_initgroups_dyn (const char *user, gid_t group, long int *start,
+@@ -132,8 +121,7 @@ _nss_files_initgroups_dyn (const char *u
  
   out:
    /* Free memory.  */
@@ -1503,19 +1504,19 @@ index 6e0d825..13d45cc 100644
    free (line);
  
    fclose (stream);
-diff --git a/posix/glob.c b/posix/glob.c
-index 0c04c3c..0914eec 100644
+Index: b/posix/glob.c
+===================================================================
 --- a/posix/glob.c
 +++ b/posix/glob.c
-@@ -25,6 +25,7 @@
- #include <sys/types.h>
- #include <sys/stat.h>
+@@ -27,6 +27,7 @@
+ #include <stdbool.h>
  #include <stddef.h>
+ #include <stdint.h>
 +#include <scratch_buffer.h>
  
  /* Outcomment the following line for production quality code.  */
  /* #define NDEBUG 1 */
-@@ -264,7 +265,7 @@ glob (const char *pattern, int flags, int (*errfunc) (const char *, int),
+@@ -293,7 +294,7 @@ glob (const char *pattern, int flags, in
    glob_t dirs;
    int retval = 0;
  #ifdef _LIBC
@@ -1524,7 +1525,7 @@ index 0c04c3c..0914eec 100644
  #endif
  
    if (pattern == NULL || pglob == NULL || (flags & ~__GLOB_FLAGS) != 0)
-@@ -621,33 +622,13 @@ glob (const char *pattern, int flags, int (*errfunc) (const char *, int),
+@@ -650,33 +651,13 @@ glob (const char *pattern, int flags, in
  		{
  		  struct passwd *p;
  #   if defined HAVE_GETPWNAM_R || defined _LIBC
@@ -1562,7 +1563,7 @@ index 0c04c3c..0914eec 100644
  		    {
  		      if (errno != ERANGE)
  			{
-@@ -655,67 +636,37 @@ glob (const char *pattern, int flags, int (*errfunc) (const char *, int),
+@@ -684,67 +665,37 @@ glob (const char *pattern, int flags, in
  			  break;
  			}
  
@@ -1644,7 +1645,7 @@ index 0c04c3c..0914eec 100644
  		  retval = GLOB_NOMATCH;
  		  goto out;
  		}
-@@ -836,57 +787,24 @@ glob (const char *pattern, int flags, int (*errfunc) (const char *, int),
+@@ -865,57 +816,24 @@ glob (const char *pattern, int flags, in
  	  {
  	    struct passwd *p;
  #  if defined HAVE_GETPWNAM_R || defined _LIBC
@@ -1710,7 +1711,7 @@ index 0c04c3c..0914eec 100644
  		  }
  		__set_errno (save);
  	      }
-@@ -915,8 +833,7 @@ glob (const char *pattern, int flags, int (*errfunc) (const char *, int),
+@@ -944,8 +862,7 @@ glob (const char *pattern, int flags, in
  		    dirname = malloc (home_len + rest_len + 1);
  		    if (dirname == NULL)
  		      {
@@ -1720,7 +1721,7 @@ index 0c04c3c..0914eec 100644
  			retval = GLOB_NOSPACE;
  			goto out;
  		      }
-@@ -928,13 +845,11 @@ glob (const char *pattern, int flags, int (*errfunc) (const char *, int),
+@@ -957,13 +874,11 @@ glob (const char *pattern, int flags, in
  		dirlen = home_len + rest_len;
  		dirname_modified = 1;
  
@@ -1736,8 +1737,8 @@ index 0c04c3c..0914eec 100644
  
  		if (flags & GLOB_TILDE_CHECK)
  		  /* We have to regard it as an error if we cannot find the
-diff --git a/posix/wordexp.c b/posix/wordexp.c
-index ecc7615..1f5e7d9 100644
+Index: b/posix/wordexp.c
+===================================================================
 --- a/posix/wordexp.c
 +++ b/posix/wordexp.c
 @@ -17,7 +17,6 @@
@@ -1756,7 +1757,7 @@ index ecc7615..1f5e7d9 100644
  
  #include <libc-lock.h>
  #include <_itoa.h>
-@@ -308,12 +308,7 @@ parse_tilde (char **word, size_t *word_length, size_t *max_length,
+@@ -308,12 +308,7 @@ parse_tilde (char **word, size_t *word_l
    if (i == 1 + *offset)
      {
        /* Tilde appears on its own */
@@ -1769,7 +1770,7 @@ index ecc7615..1f5e7d9 100644
  
        /* POSIX.2 says ~ expands to $HOME and if HOME is unset the
  	 results are unspecified.  We do a lookup on the uid if
-@@ -328,25 +323,38 @@ parse_tilde (char **word, size_t *word_length, size_t *max_length,
+@@ -328,25 +323,38 @@ parse_tilde (char **word, size_t *word_l
  	}
        else
  	{
@@ -1815,7 +1816,7 @@ index ecc7615..1f5e7d9 100644
  	}
      }
    else
-@@ -354,13 +362,15 @@ parse_tilde (char **word, size_t *word_length, size_t *max_length,
+@@ -354,13 +362,15 @@ parse_tilde (char **word, size_t *word_l
        /* Look up user name in database to get home directory */
        char *user = strndupa (&words[1 + *offset], i - (1 + *offset));
        struct passwd pwd, *tpwd;
@@ -1835,7 +1836,7 @@ index ecc7615..1f5e7d9 100644
  
        if (result == 0 && tpwd != NULL && pwd.pw_dir)
  	*word = w_addstr (*word, word_length, max_length, pwd.pw_dir);
-@@ -372,6 +382,8 @@ parse_tilde (char **word, size_t *word_length, size_t *max_length,
+@@ -372,6 +382,8 @@ parse_tilde (char **word, size_t *word_l
  	    *word = w_addstr (*word, word_length, max_length, user);
  	}
  
@@ -1844,11 +1845,11 @@ index ecc7615..1f5e7d9 100644
        *offset = i - 1;
      }
    return *word ? 0 : WRDE_NOSPACE;
-diff --git a/sysdeps/posix/getaddrinfo.c b/sysdeps/posix/getaddrinfo.c
-index 1ef3f20..1d712af 100644
+Index: b/sysdeps/posix/getaddrinfo.c
+===================================================================
 --- a/sysdeps/posix/getaddrinfo.c
 +++ b/sysdeps/posix/getaddrinfo.c
-@@ -63,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+@@ -63,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBI
  #include <nscd/nscd-client.h>
  #include <nscd/nscd_proto.h>
  #include <resolv/res_hconf.h>
@@ -1856,7 +1857,7 @@ index 1ef3f20..1d712af 100644
  
  #ifdef HAVE_LIBIDN
  extern int __idna_to_ascii_lz (const char *input, char **output, int flags);
-@@ -138,21 +139,22 @@ gaih_inet_serv (const char *servicename, const struct gaih_typeproto *tp,
+@@ -138,21 +139,22 @@ gaih_inet_serv (const char *servicename,
  		const struct addrinfo *req, struct gaih_servtuple *st)
  {
    struct servent *s;
@@ -1886,7 +1887,7 @@ index 1ef3f20..1d712af 100644
  	  else
  	    return -EAI_SERVICE;
  	}
-@@ -164,7 +166,7 @@ gaih_inet_serv (const char *servicename, const struct gaih_typeproto *tp,
+@@ -164,7 +166,7 @@ gaih_inet_serv (const char *servicename,
    st->protocol = ((tp->protoflag & GAI_PROTO_PROTOANY)
  		  ? req->ai_protocol : tp->protocol);
    st->port = s->s_port;
@@ -1895,7 +1896,7 @@ index 1ef3f20..1d712af 100644
    return 0;
  }
  
-@@ -178,25 +180,15 @@ gaih_inet_serv (const char *servicename, const struct gaih_typeproto *tp,
+@@ -227,25 +229,15 @@ convert_hostent_to_gaih_addrtuple (const
    no_data = 0;								      \
    while (1) {								      \
      rc = 0;								      \
@@ -1926,7 +1927,7 @@ index 1ef3f20..1d712af 100644
        }									      \
    }									      \
    if (status == NSS_STATUS_SUCCESS && rc == 0)				      \
-@@ -280,7 +272,10 @@ gaih_inet (const char *name, const struct gaih_service *service,
+@@ -316,7 +308,10 @@ gaih_inet (const char *name, const struc
    bool got_ipv6 = false;
    const char *canon = NULL;
    const char *orig_name = name;
@@ -1938,7 +1939,7 @@ index 1ef3f20..1d712af 100644
  
    if (req->ai_protocol || req->ai_socktype)
      {
-@@ -401,9 +396,10 @@ gaih_inet (const char *name, const struct gaih_service *service,
+@@ -437,9 +432,10 @@ gaih_inet (const char *name, const struc
    struct gaih_addrtuple *addrmem = NULL;
    bool malloc_canonbuf = false;
    char *canonbuf = NULL;
@@ -1951,7 +1952,7 @@ index 1ef3f20..1d712af 100644
    if (name != NULL)
      {
        at = alloca_account (sizeof (struct gaih_addrtuple), alloca_used);
-@@ -571,11 +567,8 @@ gaih_inet (const char *name, const struct gaih_service *service,
+@@ -607,11 +603,8 @@ gaih_inet (const char *name, const struc
  	  if (req->ai_family == AF_INET
  	      && (req->ai_flags & AI_CANONNAME) == 0)
  	    {
@@ -1965,7 +1966,7 @@ index 1ef3f20..1d712af 100644
  	      int rc;
  	      struct hostent th;
  	      struct hostent *h;
-@@ -583,28 +576,15 @@ gaih_inet (const char *name, const struct gaih_service *service,
+@@ -619,28 +612,15 @@ gaih_inet (const char *name, const struc
  
  	      while (1)
  		{
@@ -2000,7 +2001,7 @@ index 1ef3f20..1d712af 100644
  		    }
  		}
  
-@@ -826,21 +806,8 @@ gaih_inet (const char *name, const struct gaih_service *service,
+@@ -834,21 +814,8 @@ gaih_inet (const char *name, const struc
  	  old_res_options = _res.options;
  	  _res.options &= ~RES_USE_INET6;
  
@@ -2024,7 +2025,7 @@ index 1ef3f20..1d712af 100644
  
  	  while (!no_more)
  	    {
-@@ -859,8 +826,9 @@ gaih_inet (const char *name, const struct gaih_service *service,
+@@ -867,8 +834,9 @@ gaih_inet (const char *name, const struc
  		  while (1)
  		    {
  		      rc = 0;
@@ -2036,7 +2037,7 @@ index 1ef3f20..1d712af 100644
  						   NULL));
  		      if (status == NSS_STATUS_SUCCESS)
  			break;
-@@ -874,24 +842,11 @@ gaih_inet (const char *name, const struct gaih_service *service,
+@@ -882,24 +850,11 @@ gaih_inet (const char *name, const struc
  			  break;
  			}
  
@@ -2065,7 +2066,7 @@ index 1ef3f20..1d712af 100644
  			}
  		    }
  
-@@ -1278,8 +1233,7 @@ gaih_inet (const char *name, const struct gaih_service *service,
+@@ -1286,8 +1241,7 @@ gaih_inet (const char *name, const struc
      free (addrmem);
    if (malloc_canonbuf)
      free (canonbuf);
@@ -2075,8 +2076,8 @@ index 1ef3f20..1d712af 100644
  
    return result;
  }
-diff --git a/sysdeps/unix/sysv/linux/gethostid.c b/sysdeps/unix/sysv/linux/gethostid.c
-index 73e5c76..41c9b46 100644
+Index: b/sysdeps/unix/sysv/linux/gethostid.c
+===================================================================
 --- a/sysdeps/unix/sysv/linux/gethostid.c
 +++ b/sysdeps/unix/sysv/linux/gethostid.c
 @@ -63,13 +63,12 @@ sethostid (long int id)
@@ -2129,8 +2130,8 @@ index 73e5c76..41c9b46 100644
    /* For the return value to be not exactly the IP address we do some
       bit fiddling.  */
    return (int32_t) (in.s_addr << 16 | in.s_addr >> 16);
-diff --git a/sysdeps/unix/sysv/linux/getlogin_r.c b/sysdeps/unix/sysv/linux/getlogin_r.c
-index 408907f..6e4c499 100644
+Index: b/sysdeps/unix/sysv/linux/getlogin_r.c
+===================================================================
 --- a/sysdeps/unix/sysv/linux/getlogin_r.c
 +++ b/sysdeps/unix/sysv/linux/getlogin_r.c
 @@ -18,6 +18,7 @@
@@ -2141,7 +2142,7 @@ index 408907f..6e4c499 100644
  
  #define STATIC static
  static int getlogin_r_fd0 (char *name, size_t namesize);
-@@ -54,28 +55,19 @@ __getlogin_r_loginuid (char *name, size_t namesize)
+@@ -54,28 +55,19 @@ __getlogin_r_loginuid (char *name, size_
  	  endp == uidbuf || *endp != '\0'))
      return -1;
  
@@ -2177,7 +2178,7 @@ index 408907f..6e4c499 100644
        }
  
    if (res != 0 || tpwd == NULL)
-@@ -95,9 +87,7 @@ __getlogin_r_loginuid (char *name, size_t namesize)
+@@ -95,9 +87,7 @@ __getlogin_r_loginuid (char *name, size_
    memcpy (name, pwd.pw_name, needed);
  
   out:

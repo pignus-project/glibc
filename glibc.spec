@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-276-gb65b205
+%define glibcsrcdir  glibc-2.23-300-gb91a333
 %define glibcversion 2.23.90
-%define glibcrelease 14%{?dist}
+%define glibcrelease 15%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -290,16 +290,10 @@ Patch2031: glibc-rh1070416.patch
 Patch2033: glibc-aarch64-tls-fixes.patch
 Patch2034: glibc-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
 
-# Group Merge Patch:
-Patch2035: glibc-nsswitch-Add-group-merging-support.patch
-
 Patch2036: glibc-gcc-PR69537.patch
 
 # extend_alloca removal, BZ 18023
 Patch2037: glibc-rh1315108.patch
-
-# Upstream BZ 19573, patch reverts problematic commit
-Patch2099: glibc-rh1252570.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -776,10 +770,8 @@ microbenchmark tests on the system.
 %patch0057 -p1
 %patch0058 -p1
 %patch0059 -p1
-%patch2035 -p1
 %patch2036 -p1
 %patch2037 -p1
-%patch2099 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -2083,6 +2075,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon May 09 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-15
+- Auto-sync with upstream master.
+- Drop glibc-nsswitch-Add-group-merging-support.patch, applied upstream.
+- Drop glibc-rh1252570.patch, alternative fixes applied upstream.
+- Adjust glibc-rh1315108.patch to minor upstream change.
+- Update SUPPORTED file.
+
 * Tue May 03 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.23.90-14
 - Require libselinux for nscd in non-bootstrap configuration.
 
