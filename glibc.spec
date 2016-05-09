@@ -165,6 +165,9 @@ Source7: nsswitch.conf
 Source8: power6emul.c
 Source9: bench.mk
 Source10: glibc-bench-compare
+# A copt of localedata/SUPPORTED in the Source0 tarball.  The
+# SUPPORTED file is used below to generate the list of locale
+# packages.  See the language_list macro definition.
 Source11: SUPPORTED
 
 ##############################################################################
@@ -789,11 +792,16 @@ touch `find . -name configure`
 # Ensure *-kw.h files are current to prevent regenerating them.
 touch locale/programs/*-kw.h
 
-# Verify that the supported set of locales matches the lang packs.
-# Generally you'll be updating the source tarball which will bring
-# in new langpacks we might have to build. Verify the differences
-# then update the copy of SUPPORTED. We do it this way to avoid
-# accidentally creating new langpacks.
+# Verify that our copy of localedata/SUPPORTED matches the glibc
+# version.
+#
+# The separate file copy is used by the language_list macro above.
+# Patches or new upstream versions may change the list of locales,
+# which changes the set of langpacks we need to build.  Verify the
+# differences then update the copy of SUPPORTED.  This approach has
+# two purposes: (a) avoid spurious changes to the set of langpacks,
+# and (b) the language_list macro can use a fully patched-up version
+# of the localedata/SUPPORTED file.
 diff -u %{SOURCE11} localedata/SUPPORTED
 
 ##############################################################################
