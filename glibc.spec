@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.23-300-gb91a333
 %define glibcversion 2.23.90
-%define glibcrelease 15%{?dist}
+%define glibcrelease 16%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -294,7 +294,6 @@ Patch2036: glibc-gcc-PR69537.patch
 
 # extend_alloca removal, BZ 18023
 Patch2037: glibc-rh1315108.patch
-Patch2038: glibc-rh1326903.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -773,7 +772,6 @@ microbenchmark tests on the system.
 %patch0059 -p1
 %patch2036 -p1
 %patch2037 -p1
-%patch2038 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -2077,6 +2075,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon May  9 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-16
+- Drop the “fix” for fork/vfork NULL symbols in libpthread.  It does
+  not work because ld.so apparently supports some variant of direct
+  binding.
+
 * Mon May 09 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-15
 - Auto-sync with upstream master.
 - Drop glibc-nsswitch-Add-group-merging-support.patch, applied upstream.
