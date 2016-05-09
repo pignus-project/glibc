@@ -794,7 +794,7 @@ touch locale/programs/*-kw.h
 # in new langpacks we might have to build. Verify the differences
 # then update the copy of SUPPORTED. We do it this way to avoid
 # accidentally creating new langpacks.
-cmp %{SOURCE11} localedata/SUPPORTED
+diff -u %{SOURCE11} localedata/SUPPORTED
 
 ##############################################################################
 # Build glibc...
