@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-8-g0a321a4
+%define glibcsrcdir  glibc-2.23-52-ga824d60
 %define glibcversion 2.23.1
-%define glibcrelease 5%{?dist}
+%define glibcrelease 6%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -297,9 +297,6 @@ Patch2034: glibc-aarch64-workaround-nzcv-clobber-in-tlsdesc.patch
 Patch2035: glibc-nsswitch-Add-group-merging-support.patch
 
 Patch2036: glibc-gcc-PR69537.patch
-
-# Upstream BZ 19573, patch reverts problematic commit
-Patch2099: glibc-rh1252570.patch
 
 # Upstream BZ 19581
 Patch2101: glibc-rh1114591.patch
@@ -794,7 +791,6 @@ cat /proc/meminfo
 %patch0059 -p1
 %patch2035 -p1
 %patch2036 -p1
-%patch2099 -p1
 %patch2101 -p1
 %patch0060 -p1
 
@@ -2114,6 +2110,26 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon May  9 2016 Florian Weimer <fweimer@redhat.com> - 2.23.1-6
+- Drop the revert in glibc-rh1252570.patch.  There is now a series
+  of upstream fixes for the Hesiod crash and the IPv6 address
+  memory leak.
+- Sync with the upstream 2.23 release branch
+  (commit a824d609581d5ee7544aabcbbc70e8da44b2b5b6),
+  resolving the bugs listed below.
+- nss_db: Fix handling of long entries (#1321861)
+- Fix getnameinfo memory leak and incorrect truncation (#1333901)
+- nss_hesiod: Fix heap overflow in TXT record parsing (#1332912)
+- Fix deadlock between between fflush, getdelim, and fork (#1332917)
+- CVE-2016-3075: Stack overflow in _nss_dns_getnetbyname_r (#1321954)
+- resolv: Fix NULL pointer dereference with unconnectable address (#1316972)
+- April 2016 nss_dns hardening (#1332914)
+- Fix elf/tst-audit10 and elf/tst-audit4 failures (#1313404)
+- Fix strfmon_l to use the locale object for grouping (#1307234)
+- CVE-2016-1234: buffer overflow in glob with GLOB_ALTDIRFUNC (#1315648)
+- ldconfig -X should not remove stale symbolic links (#1334289)
+- Set dlerror after dlsym (RTLD_NEXT) failure (#1333945)
+
 * Mon Feb 29 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.1-5
 - Enhance support for upgrading from a non-language-pack system.
 

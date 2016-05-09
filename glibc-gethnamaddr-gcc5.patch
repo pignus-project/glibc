@@ -1,16 +1,16 @@
-Index: glibc-2.22-193-g315267a/resolv/gethnamaddr.c
+Index: b/resolv/gethnamaddr.c
 ===================================================================
---- glibc-2.22-193-g315267a.orig/resolv/gethnamaddr.c
-+++ glibc-2.22-193-g315267a/resolv/gethnamaddr.c
-@@ -71,6 +71,7 @@ static char sccsid[] = "@(#)gethostnamad
+--- a/resolv/gethnamaddr.c
++++ b/resolv/gethnamaddr.c
+@@ -70,6 +70,7 @@ static char sccsid[] = "@(#)gethostnamad
+ #include <resolv.h>
  #include <ctype.h>
  #include <errno.h>
- #include <syslog.h>
 +#include <libc-internal.h>
  
  #define RESOLVSORT
  
-@@ -986,10 +987,19 @@ addrsort(ap, num)
+@@ -944,10 +945,19 @@ addrsort (char **ap, int num)
  
  	p = ap;
  	for (i = 0; i < num; i++, p++) {
