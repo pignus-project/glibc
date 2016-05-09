@@ -294,6 +294,7 @@ Patch2036: glibc-gcc-PR69537.patch
 
 # extend_alloca removal, BZ 18023
 Patch2037: glibc-rh1315108.patch
+Patch2038: glibc-rh1326903.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -772,6 +773,7 @@ microbenchmark tests on the system.
 %patch0059 -p1
 %patch2036 -p1
 %patch2037 -p1
+%patch2038 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -2081,6 +2083,7 @@ rm -f *.filelist*
 - Drop glibc-rh1252570.patch, alternative fixes applied upstream.
 - Adjust glibc-rh1315108.patch to minor upstream change.
 - Update SUPPORTED file.
+- Experimental fix for NULL fork/vfork symbols in libpthread (#1326903)
 
 * Tue May 03 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.23.90-14
 - Require libselinux for nscd in non-bootstrap configuration.
