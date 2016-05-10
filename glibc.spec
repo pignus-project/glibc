@@ -37,7 +37,7 @@
 # Run a valgrind smoke test to ensure that the release is compatible and
 # doesn't any new feature that might cause valgrind to abort.
 %if %{with valgrind}
-%ifarch s390 ppc64 ppc64p7 %{mips}
+%ifarch s390 ppc64 ppc64p7 %{mips} armv6hl
 # There is no valgrind support for 31-bit s390, nor for MIPS.
 # The valgrind test does not work on ppc64, ppc64p7 (bug 1273103).
 %undefine with_valgrind
@@ -147,7 +147,7 @@
 Summary: The GNU libc libraries
 Name: glibc
 Version: %{glibcversion}
-Release: %{glibcrelease}
+Release: %{glibcrelease}.pi1
 # GPLv2+ is used in a bunch of programs, LGPLv2+ is used for libraries.
 # Things that are linked directly into dynamically linked programs
 # and shared libraries (e.g. crt files, lib*_nonshared.a) have an additional
@@ -2270,6 +2270,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Apr 08 2017 Lubomir Rintel <lkundrak@v3.sk> - 2.25-4.pi1
+- Drop valgrind dependency for armv6hl
+
 * Thu Mar 02 2017 Florian Weimer <fweimer@redhat.com> - 2.25-4
 - Auto-sync with upstream release/2.25/master,
   commit 69e0a87cc4c570e3b7218392fc3e743b5bddcce2, fixing:
