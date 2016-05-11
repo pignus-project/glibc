@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.23-300-gb91a333
 %define glibcversion 2.23.90
-%define glibcrelease 17%{?dist}
+%define glibcrelease 18%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -159,7 +159,6 @@ URL: http://www.gnu.org/software/glibc/
 Source0: %{?glibc_release_url}%{glibcsrcdir}.tar.gz
 Source1: build-locale-archive.c
 Source2: glibc_post_upgrade.c
-Source3: libc-lock.h
 Source4: nscd.conf
 Source7: nsswitch.conf
 Source8: power6emul.c
@@ -1271,15 +1270,6 @@ chmod 644 $RPM_BUILD_ROOT%{_libdir}/gconv/gconv-modules.cache
 # Misc...
 ##############################################################################
 
-# NPTL <bits/stdio-lock.h> is not usable outside of glibc, so include
-# the generic one (#162634). This header is required by older gcc builds
-# which shared libio. Once we stop supporting building old compilers which
-# need shared libio we can remove this.
-cp -a sysdeps/generic/stdio-lock.h \
-	$RPM_BUILD_ROOT%{_prefix}/include/bits/stdio-lock.h
-# And <bits/libc-lock.h> needs sanitizing as well.
-cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_prefix}/include/bits/libc-lock.h
-
 # Install the upgrade program
 install -m 700 build-%{target}/glibc_post_upgrade.%{_target_cpu} \
   $RPM_BUILD_ROOT%{_prefix}/sbin/glibc_post_upgrade.%{_target_cpu}
@@ -2085,6 +2075,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed May 11 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.90-18
+- Move support for building GCC 2.96 into compat-gcc-296.
+
 * Wed May 11 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-17
 - Temporily revert dlsym (RTLD_NEXT)/dlerror change, to unbreak
   ASAN until it is fixed (#1335011)
