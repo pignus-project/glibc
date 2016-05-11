@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-52-ga824d60
+%define glibcsrcdir  glibc-2.23-55-g1a8a7c1
 %define glibcversion 2.23.1
-%define glibcrelease 6%{?dist}
+%define glibcrelease 7%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -301,8 +301,6 @@ Patch2035: glibc-nsswitch-Add-group-merging-support.patch
 
 Patch2036: glibc-gcc-PR69537.patch
 
-# Upstream BZ 19581
-Patch2101: glibc-rh1114591.patch
 Patch2102: glibc-rh1321372.patch
 
 ##############################################################################
@@ -790,7 +788,6 @@ microbenchmark tests on the system.
 %patch0059 -p1
 %patch2035 -p1
 %patch2036 -p1
-%patch2101 -p1
 %patch2102 -p1
 %patch0060 -p1
 
@@ -2119,6 +2116,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed May 11 2016 Florian Weimer <fweimer@redhat.com> - 2.23.1-7
+- Drop glibc-rh1114591.patch, now included upstream.
+- Sync with the upstream 2.23 release branch
+  (commit 1a8a7c12950a0026a3c406a7cb1608f96aa1460e),
+  resolving the bugs listed below.
+- CVE-2016-3706: stack overflow in getaddrinfo hostent conversion (#1330888)
+- Back out dlsym (RTLD_NEXT)/dlerror change (#1333945)
+  because it reveals an ASAN bug (#1335011)
+
 * Mon May  9 2016 Florian Weimer <fweimer@redhat.com> - 2.23.1-6
 - Drop the revert in glibc-rh1252570.patch.  There is now a series
   of upstream fixes for the Hesiod crash and the IPv6 address
