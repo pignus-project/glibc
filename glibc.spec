@@ -303,6 +303,7 @@ Patch2036: glibc-gcc-PR69537.patch
 
 Patch2102: glibc-rh1321372.patch
 Patch2103: glibc-rh1204521.patch
+Patch2104: glibc-rh1282011.patch
 
 ##############################################################################
 #
@@ -791,6 +792,7 @@ microbenchmark tests on the system.
 %patch2036 -p1
 %patch2102 -p1
 %patch2103 -p1
+%patch2104 -p1
 %patch0060 -p1
 
 ##############################################################################
@@ -2120,6 +2122,7 @@ rm -f *.filelist*
 %changelog
 * Wed May 11 2016 Florian Weimer <fweimer@redhat.com> - 2.23.1-7
 - Fix first day of week of the fr_CH, it_CH locales (#1204521)
+- Fix first day of week of the hr_HR locale (#1282011)
 - Drop glibc-rh1114591.patch, now included upstream.
 - Sync with the upstream 2.23 release branch
   (commit 1a8a7c12950a0026a3c406a7cb1608f96aa1460e),
