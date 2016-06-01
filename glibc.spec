@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-300-gb91a333
+%define glibcsrcdir  glibc-2.23-411-gf06f3f0
 %define glibcversion 2.23.90
-%define glibcrelease 18%{?dist}
+%define glibcrelease 19%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2075,6 +2075,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jun 01 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-19
+- Auto-sync with upstream master.
+- Adjust glibc-rh1315108.patch accordingly.
+- Fix fork redirection in libpthread (#1326903)
+- CVE-2016-4429: stack overflow in Sun RPC clntudp_call (#1337140)
+
 * Wed May 11 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.90-18
 - Move support for building GCC 2.96 into compat-gcc-296.
 
