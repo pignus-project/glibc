@@ -813,6 +813,7 @@ diff -u %{SOURCE11} localedata/SUPPORTED
 uname -a
 cat /proc/cpuinfo
 cat /proc/meminfo
+df
 
 # We build using the native system compilers.
 GCC=gcc
