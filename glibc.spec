@@ -891,13 +891,6 @@ core_with_options="--with-cpu=power8"
 # %%build - Generic options.
 ##############################################################################
 BuildFlags="$BuildFlags -fasynchronous-unwind-tables"
-# Add -DNDEBUG unless using a prerelease
-case %{version} in
-  *.*.9[0-9]*) ;;
-  *)
-     BuildFlags="$BuildFlags -DNDEBUG"
-     ;;
-esac
 EnableKernel="--enable-kernel=%{enablekernel}"
 # Save the used compiler and options into the file "Gcc" for use later
 # by %%install.
@@ -2080,6 +2073,7 @@ rm -f *.filelist*
 - Adjust glibc-rh1315108.patch accordingly.
 - Fix fork redirection in libpthread (#1326903)
 - CVE-2016-4429: stack overflow in Sun RPC clntudp_call (#1337140)
+- Do not disable assertions in release builds (#1338887)
 
 * Wed May 11 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.90-18
 - Move support for building GCC 2.96 into compat-gcc-296.
