@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-55-g1a8a7c1
+%define glibcsrcdir  glibc-2.23-62-g1915d6d
 %define glibcversion 2.23.1
-%define glibcrelease 7%{?dist}
+%define glibcrelease 8%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2120,6 +2120,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jun 02 2016 Florian Weimer <fweimer@redhat.com> - 2.23.1-8
+- Auto-sync with upstream 2.23
+  (commit 1915d6d182a55d1eb852643a78ac24bc17783fb0),
+  resolving the bugs listed below.
+- CVE-2016-4429: stack overflow in Sun RPC clntudp_call (#1337140)
+- Fix fork redirection in libpthread (#1326903)
+- struct sockaddr_storage GCC 6 enablement (#1337291)
+- Increase fork signal safety for single-threaded processes (swbz#19703)
+
 * Wed May 11 2016 Florian Weimer <fweimer@redhat.com> - 2.23.1-7
 - Fix first day of week of the fr_CH, it_CH locales (#1204521)
 - Fix first day of week of the hr_HR locale (#1282011)
