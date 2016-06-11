@@ -2070,7 +2070,8 @@ rm -f *.filelist*
 
 %changelog
 * Thu Jun 09 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-20
-- Auto-sync with upstream master.
+- Auto-sync with upstream master, fixing this bug:
+- Emacs crashes on startup (#1342976)
 
 * Wed Jun 01 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-19
 - Auto-sync with upstream master.
