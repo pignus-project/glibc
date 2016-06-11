@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-447-g2df1b98
+%define glibcsrcdir  glibc-2.23-465-g31d0a4f
 %define glibcversion 2.23.90
-%define glibcrelease 20%{?dist}
+%define glibcrelease 21%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1205,7 +1205,7 @@ $olddir/build-%{target}/elf/ld.so \
 # Setup the locale-archive template for use by glibc-all-langpacks.
 mv locale-archive{,.tmpl}
 # Create the file lists for the language specific sub-packages:
-for i in *_*
+for i in eo *_*
 do
     lang=${i%%_*}
     if [ ! -e langpack-${lang}.filelist ]; then
@@ -2069,6 +2069,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Jun 11 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-21
+- Auto-sync with upstream master
+  (commit 31d0a4fa646db8b8c97ce24e0ec0a7b73de4fca1),
+  fixing the following bugs:
+- Add eo locale
+- Crash in the nss_db NSS service module during iteration (#1344480)
+
 * Thu Jun 09 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-20
 - Auto-sync with upstream master, fixing this bug:
 - Emacs crashes on startup (#1342976)
