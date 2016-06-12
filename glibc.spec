@@ -297,6 +297,7 @@ Patch2036: glibc-gcc-PR69537.patch
 # extend_alloca removal, BZ 18023
 Patch2037: glibc-rh1315108.patch
 Patch2038: glibc-rh1335011.patch
+Patch2039: glibc-rh1344830.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -776,6 +777,7 @@ microbenchmark tests on the system.
 %patch2036 -p1
 %patch2037 -p1
 %patch2038 -p1
+%patch2039 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -2070,6 +2072,8 @@ rm -f *.filelist*
 
 %changelog
 * Sat Jun 11 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-21
+- First phase of sendmsg/recvmsg/sendmmsg/recvmmsg ABI revert:
+  GLIBC_2.24 compatibility symbols (#1344830)
 - Auto-sync with upstream master
   (commit 31d0a4fa646db8b8c97ce24e0ec0a7b73de4fca1),
   fixing the following bugs:
