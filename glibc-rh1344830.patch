@@ -1,4 +1,4 @@
-commit 8e03c512202576ddabbf352fd1413f8bff749e76
+commit 2efbd3ae03af46d2888321322320513dd08cb5c9
 Author: Florian Weimer <fweimer@redhat.com>
 Date:   Sun Jun 12 20:58:50 2016 +0200
 
@@ -317,10 +317,10 @@ index 0741301..445db92 100644
  GLIBC_2.3 __ctype_tolower_loc F
 diff --git a/sysdeps/unix/sysv/linux/msgcompat.c b/sysdeps/unix/sysv/linux/msgcompat.c
 new file mode 100644
-index 0000000..a9e4f6c
+index 0000000..d45020a
 --- /dev/null
 +++ b/sysdeps/unix/sysv/linux/msgcompat.c
-@@ -0,0 +1,254 @@
+@@ -0,0 +1,196 @@
 +/* Temporary compatibility to bridge 2.24 ABI revert.
 +   Copyright (C) 2015-2016 Free Software Foundation, Inc.
 +   This file is part of the GNU C Library.
@@ -339,12 +339,12 @@ index 0000000..a9e4f6c
 +   License along with the GNU C Library; if not, see
 +   <http://www.gnu.org/licenses/>.  */
 +
-+#ifdef SHARED
-+
 +#include <sys/socket.h>
 +#include <socketcall.h>
 +#include <sysdep-cancel.h>
 +#include <shlib-compat.h>
++
++#ifdef SHARED
 +
 +ssize_t
 +__libc_recvmsg_224 (int fd, struct msghdr *msg, int flags)
@@ -401,18 +401,10 @@ index 0000000..a9e4f6c
 +}
 +compat_symbol (libc, __sendmsg_224, sendmsg, GLIBC_2_24);
 +
++#endif /* SHARED */
 +
++#if defined (SHARED) && __WORDSIZE == 64
 +
-+/* Do not use the sendmmsg syscall on socketcall architectures unless
-+   it was added at the same time as the socketcall support or can be
-+   assumed to be present.  */
-+# if defined __ASSUME_SOCKETCALL \
-+    && !defined __ASSUME_SENDMMSG_SYSCALL_WITH_SOCKETCALL \
-+    && !defined __ASSUME_SENDMMSG_SYSCALL
-+#  undef __NR_sendmmsg
-+# endif
-+
-+# if __WORDSIZE == 64
 +static inline int
 +send_mmsghdr (int fd, struct mmsghdr *vmessages, unsigned int vlen, int flags)
 +{
@@ -438,59 +430,11 @@ index 0000000..a9e4f6c
 +    }
 +  return 1;
 +}
-+# endif
 +
 +int
 +__sendmmsg_224 (int fd, struct mmsghdr *vmessages, unsigned int vlen, int flags)
 +{
-+# if __WORDSIZE == 64
 +  return send_mmsghdr (fd, vmessages, vlen, flags);
-+# elif defined __NR_sendmmsg
-+  return SYSCALL_CANCEL (sendmmsg, fd, vmessages, vlen, flags);
-+# elif defined __NR_socketcall
-+#  ifdef __ASSUME_SENDMMSG_SOCKETCALL
-+  return SOCKETCALL_CANCEL (sendmmsg, fd, vmessages, vlen, flags);
-+#  else
-+  static int have_sendmmsg;
-+  if (__glibc_likely (have_sendmmsg >= 0))
-+    {
-+#   if __WORDSIZE == 64
-+      int ret = send_mmsghdr (fd, vmessages, vlen, flags);
-+#   else
-+      int ret = SOCKETCALL_CANCEL (sendmmsg, fd, vmessages, vlen, flags);
-+#   endif
-+      /* The kernel returns -EINVAL for unknown socket operations.
-+         We need to convert that error to an ENOSYS error.  */
-+      if (__builtin_expect (ret < 0, 0)
-+          && have_sendmmsg == 0
-+          && errno == EINVAL)
-+        {
-+          /* Try another call, this time with an invalid file
-+             descriptor and all other parameters cleared.  This call
-+             will not cause any harm and it will return
-+             immediately.  */
-+          ret = SOCKETCALL_CANCEL (invalid, -1);
-+          if (errno == EINVAL)
-+            {
-+              have_sendmmsg = -1;
-+              __set_errno (ENOSYS);
-+            }
-+          else
-+            {
-+              have_sendmmsg = 1;
-+              __set_errno (EINVAL);
-+            }
-+          return -1;
-+        }
-+      return ret;
-+    }
-+  __set_errno (ENOSYS);
-+  return -1;
-+#  endif /* __ASSUME_SENDMMSG_SOCKETCALL  */
-+# else /* defined __NR_socketcall  */
-+  __set_errno (ENOSYS);
-+  return -1;
-+# endif
 +}
 +compat_symbol (libc, __sendmmsg_224, sendmmsg, GLIBC_2_24);
 +
@@ -506,7 +450,6 @@ index 0000000..a9e4f6c
 +static inline void
 +adjust_mmsghdr (struct mmsghdr *vmessages, unsigned int vlen)
 +{
-+# if __WORDSIZE == 64
 +  /* POSIX specifies that both msghdr::msg_iovlen and msghdr::msg_controllen
 +     to be int and socklen_t respectively.  However Linux defines it as
 +     both size_t.  So for 64-bit it requires some adjustments by zeroing
@@ -518,7 +461,6 @@ index 0000000..a9e4f6c
 +      vmhdr->msg_hdr.msg_controllen
 +        = (socklen_t) vmhdr->msg_hdr.msg_controllen;
 +    }
-+# endif
 +}
 +
 +int
@@ -574,7 +516,7 @@ index 0000000..a9e4f6c
 +}
 +compat_symbol (libc, __recvmmsg_224, recvmmsg, GLIBC_2_24);
 +
-+#endif  /* SHARED */
++#endif  /* SHARED && __WORDSIZE == 64 */
 diff --git a/sysdeps/unix/sysv/linux/nios2/Versions b/sysdeps/unix/sysv/linux/nios2/Versions
 index e42c85f..93458f5 100644
 --- a/sysdeps/unix/sysv/linux/nios2/Versions

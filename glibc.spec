@@ -2074,6 +2074,7 @@ rm -f *.filelist*
   introduced to fix bug rhbz#579086 (Preloading a replacement uname
   is causing environment to be cleaned if libpthread is loaded).
   UTS namespaces should now offer a cleaner way yo do this.
+- Drop sendmmsg/recvmmsg compat symbols on 32-bit architectures (#1344830)
 * Sat Jun 11 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-21
 - First phase of sendmsg/recvmsg/sendmmsg/recvmmsg ABI revert:
   GLIBC_2.24 compatibility symbols (#1344830)
