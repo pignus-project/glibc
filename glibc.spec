@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.23-465-g31d0a4f
 %define glibcversion 2.23.90
-%define glibcrelease 21%{?dist}
+%define glibcrelease 22%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -225,7 +225,6 @@ Patch0020: glibc-fedora-manual-dircategory.patch
 Patch0024: glibc-fedora-locarchive.patch
 Patch0025: glibc-fedora-streams-rh436349.patch
 Patch0028: glibc-fedora-localedata-rh61908.patch
-Patch0030: glibc-fedora-uname-getrlimit.patch
 Patch0031: glibc-fedora-__libc_multiple_libcs.patch
 Patch0033: glibc-fedora-elf-ORIGIN.patch
 
@@ -756,7 +755,6 @@ microbenchmark tests on the system.
 %patch0025 -p1
 %patch2027 -p1
 %patch0028 -p1
-%patch0030 -p1
 %patch0031 -p1
 %patch0033 -p1
 %patch0037 -p1
@@ -2071,6 +2069,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jun 13 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-22
+- Remove glibc-fedora-uname-getrlimit.patch.  This patch was
+  introduced to fix bug rhbz#579086 (Preloading a replacement uname
+  is causing environment to be cleaned if libpthread is loaded).
+  UTS namespaces should now offer a cleaner way yo do this.
 * Sat Jun 11 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-21
 - First phase of sendmsg/recvmsg/sendmmsg/recvmmsg ABI revert:
   GLIBC_2.24 compatibility symbols (#1344830)

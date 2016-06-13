@@ -12,8 +12,8 @@ Date:   Sun Jun 12 20:58:50 2016 +0200
     bits of the affected struct members, using the old struct definitions
     without padding.
 
-Index: b/sysdeps/unix/sysv/linux/Makefile
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/Makefile b/sysdeps/unix/sysv/linux/Makefile
+index 35e1ed4..7c3b452 100644
 --- a/sysdeps/unix/sysv/linux/Makefile
 +++ b/sysdeps/unix/sysv/linux/Makefile
 @@ -124,9 +124,10 @@ ifeq ($(subdir),socket)
@@ -28,8 +28,8 @@ Index: b/sysdeps/unix/sysv/linux/Makefile
  endif
  
  ifeq ($(subdir),sunrpc)
-Index: b/sysdeps/unix/sysv/linux/aarch64/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/aarch64/Versions b/sysdeps/unix/sysv/linux/aarch64/Versions
+index 9bd87fe..ae3742c 100644
 --- a/sysdeps/unix/sysv/linux/aarch64/Versions
 +++ b/sysdeps/unix/sysv/linux/aarch64/Versions
 @@ -5,6 +5,10 @@ ld {
@@ -43,8 +43,8 @@ Index: b/sysdeps/unix/sysv/linux/aarch64/Versions
    GLIBC_PRIVATE {
      __vdso_clock_gettime;
      __vdso_clock_getres;
-Index: b/sysdeps/unix/sysv/linux/aarch64/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/aarch64/libc.abilist b/sysdeps/unix/sysv/linux/aarch64/libc.abilist
+index 9cdb623..3878891 100644
 --- a/sysdeps/unix/sysv/linux/aarch64/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/aarch64/libc.abilist
 @@ -2089,3 +2089,7 @@ GLIBC_2.23 fts64_read F
@@ -55,8 +55,8 @@ Index: b/sysdeps/unix/sysv/linux/aarch64/libc.abilist
 +GLIBC_2.24 recvmsg F
 +GLIBC_2.24 sendmmsg F
 +GLIBC_2.24 sendmsg F
-Index: b/sysdeps/unix/sysv/linux/alpha/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/alpha/Versions b/sysdeps/unix/sysv/linux/alpha/Versions
+index 29b82f9..31abb22 100644
 --- a/sysdeps/unix/sysv/linux/alpha/Versions
 +++ b/sysdeps/unix/sysv/linux/alpha/Versions
 @@ -85,6 +85,9 @@ libc {
@@ -69,8 +69,8 @@ Index: b/sysdeps/unix/sysv/linux/alpha/Versions
    GLIBC_PRIVATE {
      __libc_alpha_cache_shape;
    }
-Index: b/sysdeps/unix/sysv/linux/alpha/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/alpha/libc.abilist b/sysdeps/unix/sysv/linux/alpha/libc.abilist
+index f3f3c70..5ce7e10 100644
 --- a/sysdeps/unix/sysv/linux/alpha/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/alpha/libc.abilist
 @@ -2000,6 +2000,10 @@ GLIBC_2.23 fts64_read F
@@ -84,8 +84,8 @@ Index: b/sysdeps/unix/sysv/linux/alpha/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/arm/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/arm/libc.abilist b/sysdeps/unix/sysv/linux/arm/libc.abilist
+index a93803d..9f8eecc 100644
 --- a/sysdeps/unix/sysv/linux/arm/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/arm/libc.abilist
 @@ -90,6 +90,8 @@ GLIBC_2.23 fts64_read F
@@ -97,8 +97,8 @@ Index: b/sysdeps/unix/sysv/linux/arm/libc.abilist
  GLIBC_2.4 GLIBC_2.4 A
  GLIBC_2.4 _Exit F
  GLIBC_2.4 _IO_2_1_stderr_ D 0xa0
-Index: b/sysdeps/unix/sysv/linux/hppa/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/hppa/Versions b/sysdeps/unix/sysv/linux/hppa/Versions
+index b5098b2..f0af95e 100644
 --- a/sysdeps/unix/sysv/linux/hppa/Versions
 +++ b/sysdeps/unix/sysv/linux/hppa/Versions
 @@ -35,4 +35,7 @@ libc {
@@ -109,8 +109,8 @@ Index: b/sysdeps/unix/sysv/linux/hppa/Versions
 +    recvmsg; sendmsg;
 +  }
  }
-Index: b/sysdeps/unix/sysv/linux/hppa/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/hppa/libc.abilist b/sysdeps/unix/sysv/linux/hppa/libc.abilist
+index 58ed133..421b6fe 100644
 --- a/sysdeps/unix/sysv/linux/hppa/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/hppa/libc.abilist
 @@ -1854,6 +1854,8 @@ GLIBC_2.23 fts64_read F
@@ -122,8 +122,8 @@ Index: b/sysdeps/unix/sysv/linux/hppa/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/i386/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/i386/Versions b/sysdeps/unix/sysv/linux/i386/Versions
+index f3544ac..64d503b 100644
 --- a/sysdeps/unix/sysv/linux/i386/Versions
 +++ b/sysdeps/unix/sysv/linux/i386/Versions
 @@ -45,6 +45,9 @@ libc {
@@ -135,9 +135,9 @@ Index: b/sysdeps/unix/sysv/linux/i386/Versions
 +  }
    GLIBC_PRIVATE {
      __modify_ldt;
-     __uname;
-Index: b/sysdeps/unix/sysv/linux/i386/libc.abilist
-===================================================================
+   }
+diff --git a/sysdeps/unix/sysv/linux/i386/libc.abilist b/sysdeps/unix/sysv/linux/i386/libc.abilist
+index 61cbae0..b7fc26c 100644
 --- a/sysdeps/unix/sysv/linux/i386/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/i386/libc.abilist
 @@ -2012,6 +2012,8 @@ GLIBC_2.23 fts64_read F
@@ -149,8 +149,8 @@ Index: b/sysdeps/unix/sysv/linux/i386/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/ia64/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/ia64/libc.abilist b/sysdeps/unix/sysv/linux/ia64/libc.abilist
+index d40d264..e0df2e3 100644
 --- a/sysdeps/unix/sysv/linux/ia64/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/ia64/libc.abilist
 @@ -1876,6 +1876,10 @@ GLIBC_2.23 fts64_read F
@@ -164,8 +164,8 @@ Index: b/sysdeps/unix/sysv/linux/ia64/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/m68k/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/m68k/Versions b/sysdeps/unix/sysv/linux/m68k/Versions
+index 7ecc96e..2dc2e83 100644
 --- a/sysdeps/unix/sysv/linux/m68k/Versions
 +++ b/sysdeps/unix/sysv/linux/m68k/Versions
 @@ -40,6 +40,9 @@ libc {
@@ -178,8 +178,8 @@ Index: b/sysdeps/unix/sysv/linux/m68k/Versions
    GLIBC_PRIVATE {
      __vdso_atomic_cmpxchg_32; __vdso_atomic_barrier;
    }
-Index: b/sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist b/sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist
+index 64432ae..f80cdfe 100644
 --- a/sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist
 @@ -91,6 +91,8 @@ GLIBC_2.23 fts64_read F
@@ -191,8 +191,8 @@ Index: b/sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist
  GLIBC_2.4 GLIBC_2.4 A
  GLIBC_2.4 _Exit F
  GLIBC_2.4 _IO_2_1_stderr_ D 0x98
-Index: b/sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist b/sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist
+index 8086c38..9132c26 100644
 --- a/sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist
 @@ -1968,6 +1968,8 @@ GLIBC_2.23 fts64_read F
@@ -204,8 +204,8 @@ Index: b/sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/microblaze/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/microblaze/Versions b/sysdeps/unix/sysv/linux/microblaze/Versions
+index aa48a3c..2e93b8a 100644
 --- a/sysdeps/unix/sysv/linux/microblaze/Versions
 +++ b/sysdeps/unix/sysv/linux/microblaze/Versions
 @@ -2,4 +2,7 @@ libc {
@@ -216,8 +216,8 @@ Index: b/sysdeps/unix/sysv/linux/microblaze/Versions
 +    recvmsg; sendmsg;
 +  }
  }
-Index: b/sysdeps/unix/sysv/linux/microblaze/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/microblaze/libc.abilist b/sysdeps/unix/sysv/linux/microblaze/libc.abilist
+index 8c4c3bb..9443927 100644
 --- a/sysdeps/unix/sysv/linux/microblaze/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/microblaze/libc.abilist
 @@ -2089,3 +2089,5 @@ GLIBC_2.23 fts64_read F
@@ -226,8 +226,8 @@ Index: b/sysdeps/unix/sysv/linux/microblaze/libc.abilist
  GLIBC_2.24 quick_exit F
 +GLIBC_2.24 recvmsg F
 +GLIBC_2.24 sendmsg F
-Index: b/sysdeps/unix/sysv/linux/mips/mips32/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/mips/mips32/Versions b/sysdeps/unix/sysv/linux/mips/mips32/Versions
+index 9621fb5..c4f38d8 100644
 --- a/sysdeps/unix/sysv/linux/mips/mips32/Versions
 +++ b/sysdeps/unix/sysv/linux/mips/mips32/Versions
 @@ -3,4 +3,7 @@ libc {
@@ -238,8 +238,8 @@ Index: b/sysdeps/unix/sysv/linux/mips/mips32/Versions
 +    recvmsg; sendmsg;
 +  }
  }
-Index: b/sysdeps/unix/sysv/linux/mips/mips32/fpu/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/mips/mips32/fpu/libc.abilist b/sysdeps/unix/sysv/linux/mips/mips32/fpu/libc.abilist
+index db014ed..69386b2 100644
 --- a/sysdeps/unix/sysv/linux/mips/mips32/fpu/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/mips/mips32/fpu/libc.abilist
 @@ -1943,6 +1943,8 @@ GLIBC_2.23 fts64_read F
@@ -251,8 +251,8 @@ Index: b/sysdeps/unix/sysv/linux/mips/mips32/fpu/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/mips/mips32/nofpu/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/mips/mips32/nofpu/libc.abilist b/sysdeps/unix/sysv/linux/mips/mips32/nofpu/libc.abilist
+index 33ac881..62ba3f9 100644
 --- a/sysdeps/unix/sysv/linux/mips/mips32/nofpu/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/mips/mips32/nofpu/libc.abilist
 @@ -1941,6 +1941,8 @@ GLIBC_2.23 fts64_read F
@@ -264,8 +264,8 @@ Index: b/sysdeps/unix/sysv/linux/mips/mips32/nofpu/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/mips/mips64/n32/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/mips/mips64/n32/Versions b/sysdeps/unix/sysv/linux/mips/mips64/n32/Versions
+index 9621fb5..c4f38d8 100644
 --- a/sysdeps/unix/sysv/linux/mips/mips64/n32/Versions
 +++ b/sysdeps/unix/sysv/linux/mips/mips64/n32/Versions
 @@ -3,4 +3,7 @@ libc {
@@ -276,8 +276,8 @@ Index: b/sysdeps/unix/sysv/linux/mips/mips64/n32/Versions
 +    recvmsg; sendmsg;
 +  }
  }
-Index: b/sysdeps/unix/sysv/linux/mips/mips64/n32/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/mips/mips64/n32/libc.abilist b/sysdeps/unix/sysv/linux/mips/mips64/n32/libc.abilist
+index b8b2c0e..49b2ad7 100644
 --- a/sysdeps/unix/sysv/linux/mips/mips64/n32/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/mips/mips64/n32/libc.abilist
 @@ -1939,6 +1939,8 @@ GLIBC_2.23 fts64_read F
@@ -289,8 +289,9 @@ Index: b/sysdeps/unix/sysv/linux/mips/mips64/n32/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/mips/mips64/n64/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/mips/mips64/n64/Versions b/sysdeps/unix/sysv/linux/mips/mips64/n64/Versions
+new file mode 100644
+index 0000000..517d79a
 --- /dev/null
 +++ b/sysdeps/unix/sysv/linux/mips/mips64/n64/Versions
 @@ -0,0 +1,5 @@
@@ -299,8 +300,8 @@ Index: b/sysdeps/unix/sysv/linux/mips/mips64/n64/Versions
 +    recvmsg; sendmsg;
 +  }
 +}
-Index: b/sysdeps/unix/sysv/linux/mips/mips64/n64/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/mips/mips64/n64/libc.abilist b/sysdeps/unix/sysv/linux/mips/mips64/n64/libc.abilist
+index 0741301..445db92 100644
 --- a/sysdeps/unix/sysv/linux/mips/mips64/n64/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/mips/mips64/n64/libc.abilist
 @@ -1934,6 +1934,10 @@ GLIBC_2.23 fts64_read F
@@ -314,8 +315,9 @@ Index: b/sysdeps/unix/sysv/linux/mips/mips64/n64/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/msgcompat.c
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/msgcompat.c b/sysdeps/unix/sysv/linux/msgcompat.c
+new file mode 100644
+index 0000000..a9e4f6c
 --- /dev/null
 +++ b/sysdeps/unix/sysv/linux/msgcompat.c
 @@ -0,0 +1,254 @@
@@ -573,8 +575,8 @@ Index: b/sysdeps/unix/sysv/linux/msgcompat.c
 +compat_symbol (libc, __recvmmsg_224, recvmmsg, GLIBC_2_24);
 +
 +#endif  /* SHARED */
-Index: b/sysdeps/unix/sysv/linux/nios2/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/nios2/Versions b/sysdeps/unix/sysv/linux/nios2/Versions
+index e42c85f..93458f5 100644
 --- a/sysdeps/unix/sysv/linux/nios2/Versions
 +++ b/sysdeps/unix/sysv/linux/nios2/Versions
 @@ -3,4 +3,7 @@ libc {
@@ -585,8 +587,8 @@ Index: b/sysdeps/unix/sysv/linux/nios2/Versions
 +    recvmsg; sendmsg;
 +  }
  }
-Index: b/sysdeps/unix/sysv/linux/nios2/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/nios2/libc.abilist b/sysdeps/unix/sysv/linux/nios2/libc.abilist
+index fa04825..d854b6d 100644
 --- a/sysdeps/unix/sysv/linux/nios2/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/nios2/libc.abilist
 @@ -2130,3 +2130,5 @@ GLIBC_2.23 fts64_read F
@@ -595,8 +597,8 @@ Index: b/sysdeps/unix/sysv/linux/nios2/libc.abilist
  GLIBC_2.24 quick_exit F
 +GLIBC_2.24 recvmsg F
 +GLIBC_2.24 sendmsg F
-Index: b/sysdeps/unix/sysv/linux/powerpc/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/powerpc/Versions b/sysdeps/unix/sysv/linux/powerpc/Versions
+index 8ebeea1..ab0db57 100644
 --- a/sysdeps/unix/sysv/linux/powerpc/Versions
 +++ b/sysdeps/unix/sysv/linux/powerpc/Versions
 @@ -5,6 +5,9 @@ ld {
@@ -609,8 +611,8 @@ Index: b/sysdeps/unix/sysv/linux/powerpc/Versions
    GLIBC_PRIVATE {
      __vdso_get_tbfreq;
      __vdso_clock_gettime;
-Index: b/sysdeps/unix/sysv/linux/powerpc/powerpc32/fpu/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc32/fpu/libc.abilist b/sysdeps/unix/sysv/linux/powerpc/powerpc32/fpu/libc.abilist
+index 3d633c0..bcb4bd1 100644
 --- a/sysdeps/unix/sysv/linux/powerpc/powerpc32/fpu/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc32/fpu/libc.abilist
 @@ -1972,6 +1972,8 @@ GLIBC_2.23 fts64_read F
@@ -622,8 +624,8 @@ Index: b/sysdeps/unix/sysv/linux/powerpc/powerpc32/fpu/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/powerpc/powerpc32/nofpu/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc32/nofpu/libc.abilist b/sysdeps/unix/sysv/linux/powerpc/powerpc32/nofpu/libc.abilist
+index a6b164b..01f4957 100644
 --- a/sysdeps/unix/sysv/linux/powerpc/powerpc32/nofpu/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc32/nofpu/libc.abilist
 @@ -1977,6 +1977,8 @@ GLIBC_2.23 fts64_read F
@@ -635,8 +637,8 @@ Index: b/sysdeps/unix/sysv/linux/powerpc/powerpc32/nofpu/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/powerpc/powerpc64/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc64/Versions b/sysdeps/unix/sysv/linux/powerpc/powerpc64/Versions
+index a8e88b8..53e5527 100644
 --- a/sysdeps/unix/sysv/linux/powerpc/powerpc64/Versions
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc64/Versions
 @@ -22,6 +22,9 @@ libc {
@@ -649,8 +651,8 @@ Index: b/sysdeps/unix/sysv/linux/powerpc/powerpc64/Versions
  }
  
  librt {
-Index: b/sysdeps/unix/sysv/linux/powerpc/powerpc64/libc-le.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc64/libc-le.abilist b/sysdeps/unix/sysv/linux/powerpc/powerpc64/libc-le.abilist
+index 7200b76..8348670 100644
 --- a/sysdeps/unix/sysv/linux/powerpc/powerpc64/libc-le.abilist
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc64/libc-le.abilist
 @@ -2177,3 +2177,7 @@ GLIBC_2.23 fts64_read F
@@ -661,8 +663,8 @@ Index: b/sysdeps/unix/sysv/linux/powerpc/powerpc64/libc-le.abilist
 +GLIBC_2.24 recvmsg F
 +GLIBC_2.24 sendmmsg F
 +GLIBC_2.24 sendmsg F
-Index: b/sysdeps/unix/sysv/linux/powerpc/powerpc64/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc64/libc.abilist b/sysdeps/unix/sysv/linux/powerpc/powerpc64/libc.abilist
+index de62ecb..3de5d61 100644
 --- a/sysdeps/unix/sysv/linux/powerpc/powerpc64/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc64/libc.abilist
 @@ -91,6 +91,10 @@ GLIBC_2.23 fts64_read F
@@ -676,8 +678,8 @@ Index: b/sysdeps/unix/sysv/linux/powerpc/powerpc64/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 _Exit F
  GLIBC_2.3 _IO_2_1_stderr_ D 0xe0
-Index: b/sysdeps/unix/sysv/linux/s390/s390-32/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/s390/s390-32/Versions b/sysdeps/unix/sysv/linux/s390/s390-32/Versions
+index 1c120e8..afcc3fe 100644
 --- a/sysdeps/unix/sysv/linux/s390/s390-32/Versions
 +++ b/sysdeps/unix/sysv/linux/s390/s390-32/Versions
 @@ -49,6 +49,9 @@ libc {
@@ -690,8 +692,8 @@ Index: b/sysdeps/unix/sysv/linux/s390/s390-32/Versions
  }
  
  libutil {
-Index: b/sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist b/sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist
+index 8da0bc0..761f340 100644
 --- a/sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist
 @@ -1972,6 +1972,8 @@ GLIBC_2.23 fts64_read F
@@ -703,8 +705,8 @@ Index: b/sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/s390/s390-64/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/s390/s390-64/Versions b/sysdeps/unix/sysv/linux/s390/s390-64/Versions
+index 3f4d960..fde5aee 100644
 --- a/sysdeps/unix/sysv/linux/s390/s390-64/Versions
 +++ b/sysdeps/unix/sysv/linux/s390/s390-64/Versions
 @@ -4,6 +4,9 @@ libc {
@@ -717,8 +719,8 @@ Index: b/sysdeps/unix/sysv/linux/s390/s390-64/Versions
  }
  
  librt {
-Index: b/sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist b/sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist
+index 59066a9..b7f5371 100644
 --- a/sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist
 @@ -1873,6 +1873,10 @@ GLIBC_2.23 fts64_read F
@@ -732,8 +734,8 @@ Index: b/sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/sh/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/sh/Versions b/sysdeps/unix/sysv/linux/sh/Versions
+index e0938c4..ae5a00e 100644
 --- a/sysdeps/unix/sysv/linux/sh/Versions
 +++ b/sysdeps/unix/sysv/linux/sh/Versions
 @@ -30,4 +30,7 @@ libc {
@@ -744,8 +746,8 @@ Index: b/sysdeps/unix/sysv/linux/sh/Versions
 +    recvmsg; sendmsg;
 +  }
  }
-Index: b/sysdeps/unix/sysv/linux/sh/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/sh/libc.abilist b/sysdeps/unix/sysv/linux/sh/libc.abilist
+index 01ca9e6..fb58c06 100644
 --- a/sysdeps/unix/sysv/linux/sh/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/sh/libc.abilist
 @@ -1858,6 +1858,8 @@ GLIBC_2.23 fts64_read F
@@ -757,8 +759,8 @@ Index: b/sysdeps/unix/sysv/linux/sh/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/sparc/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/sparc/Versions b/sysdeps/unix/sysv/linux/sparc/Versions
+index 4dc1cd7..adbdec5 100644
 --- a/sysdeps/unix/sysv/linux/sparc/Versions
 +++ b/sysdeps/unix/sysv/linux/sparc/Versions
 @@ -29,6 +29,9 @@ libc {
@@ -771,8 +773,8 @@ Index: b/sysdeps/unix/sysv/linux/sparc/Versions
  }
  
  libpthread {
-Index: b/sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist b/sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist
+index 245c1c6..01260e2 100644
 --- a/sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist
 @@ -1964,6 +1964,8 @@ GLIBC_2.23 fts64_read F
@@ -784,8 +786,8 @@ Index: b/sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/sparc/sparc64/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/sparc/sparc64/Versions b/sysdeps/unix/sysv/linux/sparc/sparc64/Versions
+index fbea1bb..f950070 100644
 --- a/sysdeps/unix/sysv/linux/sparc/sparc64/Versions
 +++ b/sysdeps/unix/sysv/linux/sparc/sparc64/Versions
 @@ -8,6 +8,9 @@ libc {
@@ -798,8 +800,8 @@ Index: b/sysdeps/unix/sysv/linux/sparc/sparc64/Versions
  }
  
  librt {
-Index: b/sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist b/sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist
+index 4478d13..8884d4e 100644
 --- a/sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist
 @@ -1902,6 +1902,10 @@ GLIBC_2.23 fts64_read F
@@ -813,8 +815,8 @@ Index: b/sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/tile/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/tile/Versions b/sysdeps/unix/sysv/linux/tile/Versions
+index 13da68f..a68e181 100644
 --- a/sysdeps/unix/sysv/linux/tile/Versions
 +++ b/sysdeps/unix/sysv/linux/tile/Versions
 @@ -11,6 +11,9 @@ libc {
@@ -827,8 +829,8 @@ Index: b/sysdeps/unix/sysv/linux/tile/Versions
    GLIBC_PRIVATE {
      __syscall_error;
      __vdso_clock_gettime;
-Index: b/sysdeps/unix/sysv/linux/tile/tilegx/tilegx32/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/tile/tilegx/tilegx32/libc.abilist b/sysdeps/unix/sysv/linux/tile/tilegx/tilegx32/libc.abilist
+index c1a2613..81eea08 100644
 --- a/sysdeps/unix/sysv/linux/tile/tilegx/tilegx32/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/tile/tilegx/tilegx32/libc.abilist
 @@ -2096,3 +2096,5 @@ GLIBC_2.23 fts64_read F
@@ -837,8 +839,9 @@ Index: b/sysdeps/unix/sysv/linux/tile/tilegx/tilegx32/libc.abilist
  GLIBC_2.24 quick_exit F
 +GLIBC_2.24 recvmsg F
 +GLIBC_2.24 sendmsg F
-Index: b/sysdeps/unix/sysv/linux/tile/tilegx/tilegx64/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/tile/tilegx/tilegx64/Versions b/sysdeps/unix/sysv/linux/tile/tilegx/tilegx64/Versions
+new file mode 100644
+index 0000000..517d79a
 --- /dev/null
 +++ b/sysdeps/unix/sysv/linux/tile/tilegx/tilegx64/Versions
 @@ -0,0 +1,5 @@
@@ -847,8 +850,8 @@ Index: b/sysdeps/unix/sysv/linux/tile/tilegx/tilegx64/Versions
 +    recvmsg; sendmsg;
 +  }
 +}
-Index: b/sysdeps/unix/sysv/linux/tile/tilegx/tilegx64/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/tile/tilegx/tilegx64/libc.abilist b/sysdeps/unix/sysv/linux/tile/tilegx/tilegx64/libc.abilist
+index 35fbf8a..9ce9b57 100644
 --- a/sysdeps/unix/sysv/linux/tile/tilegx/tilegx64/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/tile/tilegx/tilegx64/libc.abilist
 @@ -2096,3 +2096,7 @@ GLIBC_2.23 fts64_read F
@@ -859,8 +862,8 @@ Index: b/sysdeps/unix/sysv/linux/tile/tilegx/tilegx64/libc.abilist
 +GLIBC_2.24 recvmsg F
 +GLIBC_2.24 sendmmsg F
 +GLIBC_2.24 sendmsg F
-Index: b/sysdeps/unix/sysv/linux/tile/tilepro/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/tile/tilepro/libc.abilist b/sysdeps/unix/sysv/linux/tile/tilepro/libc.abilist
+index c1a2613..81eea08 100644
 --- a/sysdeps/unix/sysv/linux/tile/tilepro/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/tile/tilepro/libc.abilist
 @@ -2096,3 +2096,5 @@ GLIBC_2.23 fts64_read F
@@ -869,8 +872,9 @@ Index: b/sysdeps/unix/sysv/linux/tile/tilepro/libc.abilist
  GLIBC_2.24 quick_exit F
 +GLIBC_2.24 recvmsg F
 +GLIBC_2.24 sendmsg F
-Index: b/sysdeps/unix/sysv/linux/x86_64/64/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/x86_64/64/Versions b/sysdeps/unix/sysv/linux/x86_64/64/Versions
+new file mode 100644
+index 0000000..517d79a
 --- /dev/null
 +++ b/sysdeps/unix/sysv/linux/x86_64/64/Versions
 @@ -0,0 +1,5 @@
@@ -879,8 +883,8 @@ Index: b/sysdeps/unix/sysv/linux/x86_64/64/Versions
 +    recvmsg; sendmsg;
 +  }
 +}
-Index: b/sysdeps/unix/sysv/linux/x86_64/64/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/x86_64/64/libc.abilist b/sysdeps/unix/sysv/linux/x86_64/64/libc.abilist
+index c1054ce..03549b1 100644
 --- a/sysdeps/unix/sysv/linux/x86_64/64/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/x86_64/64/libc.abilist
 @@ -1853,6 +1853,10 @@ GLIBC_2.23 fts64_read F
@@ -894,8 +898,8 @@ Index: b/sysdeps/unix/sysv/linux/x86_64/64/libc.abilist
  GLIBC_2.3 GLIBC_2.3 A
  GLIBC_2.3 __ctype_b_loc F
  GLIBC_2.3 __ctype_tolower_loc F
-Index: b/sysdeps/unix/sysv/linux/x86_64/Versions
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/x86_64/Versions b/sysdeps/unix/sysv/linux/x86_64/Versions
+index 2a7ed28..bbef7e0 100644
 --- a/sysdeps/unix/sysv/linux/x86_64/Versions
 +++ b/sysdeps/unix/sysv/linux/x86_64/Versions
 @@ -6,6 +6,9 @@ libc {
@@ -908,8 +912,8 @@ Index: b/sysdeps/unix/sysv/linux/x86_64/Versions
  }
  
  librt {
-Index: b/sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist
-===================================================================
+diff --git a/sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist b/sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist
+index 2fd6d60..86dab3f 100644
 --- a/sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist
 @@ -2096,3 +2096,5 @@ GLIBC_2.23 fts64_read F
