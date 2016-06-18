@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.23-465-g31d0a4f
 %define glibcversion 2.23.90
-%define glibcrelease 22%{?dist}
+%define glibcrelease 23%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1882,7 +1882,7 @@ end
 
 %postun -p /sbin/ldconfig
 
-%posttrans all-langpacks -p <lua>
+%posttrans all-langpacks -e -p <lua>
 -- If at the end of the transaction we are still installed
 -- (have a template of non-zero size), then we rebuild the
 -- locale cache (locale-archive) from the pre-populated
@@ -1890,7 +1890,7 @@ end
 if posix.stat("%{_prefix}/lib/locale/locale-archive.tmpl", "size") > 0 then
   pid = posix.fork()
   if pid == 0 then
-    posix.exec("%{_prefix}/sbin/build-locale-archive", "--install-langs", rpm.expand("%%{_install_langs}"))
+    posix.exec("%{_prefix}/sbin/build-locale-archive", "--install-langs", "%%{_install_langs}")
   elseif pid > 0 then
     posix.wait(pid)
   end
@@ -2069,6 +2069,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Jun 18 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.90-23
+- Use scriptlet expansion in all-langpacks posttrans script to expand
+  _install_langes macro.
+
 * Mon Jun 13 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-22
 - Remove glibc-fedora-uname-getrlimit.patch.  This patch was
   introduced to fix bug rhbz#579086 (Preloading a replacement uname
