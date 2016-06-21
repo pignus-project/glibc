@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-465-g31d0a4f
+%define glibcsrcdir  glibc-2.23-499-ga3b4733
 %define glibcversion 2.23.90
-%define glibcrelease 23%{?dist}
+%define glibcrelease 24%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2069,6 +2069,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jun 21 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-24
+- Auto-sync with upstream master, commit
+  a3b473373ee43a292f5ec68a7fda6b9cfb26a9b0, fixing these bugs:
+- Unnecessary mmap fallback in malloc (#1348620)
+- nss_db: get*ent crasheswithout preceding set*ent (#1344480)
+- pwritev system call passes incorrect offset to kernel (#1346070)
+
 * Sat Jun 18 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.90-23
 - Use scriptlet expansion in all-langpacks posttrans script to expand
   _install_langes macro.
