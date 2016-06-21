@@ -2073,7 +2073,6 @@ rm -f *.filelist*
 - Auto-sync with upstream master, commit
   a3b473373ee43a292f5ec68a7fda6b9cfb26a9b0, fixing these bugs:
 - Unnecessary mmap fallback in malloc (#1348620)
-- nss_db: get*ent crasheswithout preceding set*ent (#1344480)
 - pwritev system call passes incorrect offset to kernel (#1346070)
 
 * Sat Jun 18 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.90-23
