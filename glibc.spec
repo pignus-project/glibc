@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.23-499-ga3b4733
 %define glibcversion 2.23.90
-%define glibcrelease 24%{?dist}
+%define glibcrelease 25%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2069,6 +2069,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jun 24 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.90-25
+- Properly handle more invalid --install-langs arguments (#1349906).
+
 * Tue Jun 21 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-24
 - Auto-sync with upstream master, commit
   a3b473373ee43a292f5ec68a7fda6b9cfb26a9b0, fixing these bugs:

@@ -642,7 +642,7 @@ int main (int argc, char *argv[])
   int install_langs_count = 0;
   int i;
   char *install_langs_arg, *ila_start;
-  char **install_langs_list;
+  char **install_langs_list = NULL;
   unsigned int cnt = 0;
   struct locarhandle tmpl_ah;
   char *new_locar_fname = NULL;
@@ -711,6 +711,11 @@ int main (int argc, char *argv[])
                   install_langs_arg = NULL;
                 }
 	      free (ila_start);
+
+	      /* Reject an entire string made up of delimiters.  */
+	      if (install_langs_count == 0)
+		break;
+
 	      /* Copy the list.  */
 	      install_langs_list = (char **)xmalloc (sizeof(char *) * install_langs_count);
 	      install_langs_arg = ila_start = strdup (optarg);
