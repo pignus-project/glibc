@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.23-538-g30e4cc5
 %define glibcversion 2.23.90
-%define glibcrelease 26%{?dist}
+%define glibcrelease 27%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -297,6 +297,9 @@ Patch2036: glibc-gcc-PR69537.patch
 Patch2037: glibc-rh1315108.patch
 Patch2038: glibc-rh1335011.patch
 Patch2039: glibc-rh1344830.patch
+
+# Upstream BZ 20313
+Patch2110: glibc-rh1351108-update-to-unicode-9.0.0.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -776,6 +779,7 @@ microbenchmark tests on the system.
 %patch2037 -p1
 %patch2038 -p1
 %patch2039 -p1
+%patch2110 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -2069,6 +2073,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Jul 08 2016 Mike FABIAN <mfabian@redhat.com> - 2.23.90-27
+- Unicode 9.0.0 updates (ctype, charmap, transliteration) (#1351108)
+
 * Tue Jul 05 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-26
 - Auto-sync with upstream master, up to commit
   30e4cc5413f72c2c728a544389da0c48500d9904, fixing these bug:
