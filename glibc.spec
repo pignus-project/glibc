@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-499-ga3b4733
+%define glibcsrcdir  glibc-2.23-538-g30e4cc5
 %define glibcversion 2.23.90
-%define glibcrelease 25%{?dist}
+%define glibcrelease 26%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2069,6 +2069,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Jul 05 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-26
+- Auto-sync with upstream master, up to commit
+  30e4cc5413f72c2c728a544389da0c48500d9904, fixing these bug:
+- glibc: strcasecmp failure on ppc64le (#1351737)
+
 * Fri Jun 24 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.90-25
 - Properly handle more invalid --install-langs arguments (#1349906).
 
