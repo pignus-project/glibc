@@ -513,7 +513,7 @@ Index: b/nis/nss_nis/nis-initgroups.c
    enum nss_status status;
    intern_t intern = { NULL, NULL, 0 };
    gid_t *groups = *groupsp;
-@@ -264,15 +265,20 @@ _nss_nis_initgroups_dyn (const char *use
+@@ -264,15 +265,21 @@ _nss_nis_initgroups_dyn (const char *use
    if (status != NSS_STATUS_SUCCESS)
      return status;
  
@@ -521,7 +521,7 @@ Index: b/nis/nss_nis/nis-initgroups.c
 +  struct scratch_buffer tmpbuf;
 +  scratch_buffer_init (&tmpbuf);
  
-   do
+   while (1)
      {
        while ((status =
 -	      internal_getgrent_r (&grpbuf, tmpbuf, buflen, errnop,
@@ -532,12 +532,13 @@ Index: b/nis/nss_nis/nis-initgroups.c
 +	if (!scratch_buffer_grow (&tmpbuf))
 +	  {
 +	    status = NSS_STATUS_TRYAGAIN;
++	    *errnop = errno;
 +	    goto done;
 +	  }
  
        if (status != NSS_STATUS_SUCCESS)
- 	goto done;
-@@ -325,6 +331,7 @@ done:
+ 	{
+@@ -331,6 +338,7 @@ done:
        intern.start = intern.start->next;
        free (intern.next);
      }
@@ -893,7 +894,7 @@ Index: b/nscd/grpcache.c
  
  #include "nscd.h"
  #include "dbg_log.h"
-@@ -437,12 +437,12 @@ addgrbyX (struct database_dyn *db, int f
+@@ -448,12 +448,12 @@ addgrbyX (struct database_dyn *db, int f
       look again in the table whether the dataset is now available.  We
       simply insert it.  It does not matter if it is in there twice.  The
       pruning function only will look at the timestamp.  */
@@ -909,7 +910,7 @@ Index: b/nscd/grpcache.c
  
    if (__glibc_unlikely (debug_level > 0))
      {
-@@ -452,43 +452,24 @@ addgrbyX (struct database_dyn *db, int f
+@@ -463,43 +463,24 @@ addgrbyX (struct database_dyn *db, int f
  	dbg_log (_("Reloading \"%s\" in group cache!"), keystr);
      }
  
@@ -1078,7 +1079,7 @@ Index: b/nscd/pwdcache.c
  
  #include "nscd.h"
  #include "dbg_log.h"
-@@ -415,12 +415,11 @@ addpwbyX (struct database_dyn *db, int f
+@@ -426,12 +426,11 @@ addpwbyX (struct database_dyn *db, int f
       look again in the table whether the dataset is now available.  We
       simply insert it.  It does not matter if it is in there twice.  The
       pruning function only will look at the timestamp.  */
@@ -1093,7 +1094,7 @@ Index: b/nscd/pwdcache.c
  
    if (__glibc_unlikely (debug_level > 0))
      {
-@@ -430,45 +429,26 @@ addpwbyX (struct database_dyn *db, int f
+@@ -441,45 +440,26 @@ addpwbyX (struct database_dyn *db, int f
  	dbg_log (_("Reloading \"%s\" in password cache!"), keystr);
      }
  

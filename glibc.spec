@@ -2072,7 +2072,7 @@ rm -f *.filelist*
 * Tue Jul 05 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-26
 - Auto-sync with upstream master, up to commit
   30e4cc5413f72c2c728a544389da0c48500d9904, fixing these bug:
-- glibc: strcasecmp failure on ppc64le (#1351737)
+- strcasecmp failure on ppc64le (#nscd breaks initgroups with nis (initgroups are empty) (#1294574)
 
 * Fri Jun 24 2016 Carlos O'Donell <carlos@redhat.com> - 2.23.90-25
 - Properly handle more invalid --install-langs arguments (#1349906).
