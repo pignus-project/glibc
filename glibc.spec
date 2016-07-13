@@ -301,6 +301,10 @@ Patch2039: glibc-rh1344830.patch
 # Upstream BZ 20313
 Patch2110: glibc-rh1351108-update-to-unicode-9.0.0.patch
 
+# sln implemented by ldconfig, to conserve disk space.
+Patch2111: glibc-rh1315476-1.patch
+Patch2112: glibc-rh1315476-2.patch
+
 ##############################################################################
 # End of glibc patches.
 ##############################################################################
@@ -780,6 +784,8 @@ microbenchmark tests on the system.
 %patch2038 -p1
 %patch2039 -p1
 %patch2110 -p1
+%patch2111 -p1
+%patch2112 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -2077,6 +2083,7 @@ rm -f *.filelist*
 - Auto-sync with upstream master, commit
   f531f93056b34800383c5154280e7ba5112563c7.
 - Add de_LI.UTF-8 locale.
+- Make ldconfig and sln the same binary.  (#1315476)
 
 * Fri Jul 08 2016 Mike FABIAN <mfabian@redhat.com> - 2.23.90-27
 - Unicode 9.0.0 updates (ctype, charmap, transliteration) (#1351108)
