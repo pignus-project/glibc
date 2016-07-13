@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-538-g30e4cc5
+%define glibcsrcdir  glibc-2.23-561-gf531f93
 %define glibcversion 2.23.90
-%define glibcrelease 27%{?dist}
+%define glibcrelease 28%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2073,6 +2073,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jul 13 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-28
+- Auto-sync with upstream master, commit
+  f531f93056b34800383c5154280e7ba5112563c7.
+- Add de_LI.UTF-8 locale.
+
 * Fri Jul 08 2016 Mike FABIAN <mfabian@redhat.com> - 2.23.90-27
 - Unicode 9.0.0 updates (ctype, charmap, transliteration) (#1351108)
 
