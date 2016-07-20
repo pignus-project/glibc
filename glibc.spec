@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.23-561-gf531f93
 %define glibcversion 2.23.90
-%define glibcrelease 28%{?dist}
+%define glibcrelease 29%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -314,7 +314,6 @@ Patch2112: glibc-rh1315476-2.patch
 ##############################################################################
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: glibc-profile < 2.4
-Obsoletes: nss_db
 Provides: ldconfig
 
 # The dynamic linker supports DT_GNU_HASH
@@ -661,6 +660,54 @@ Requires(postun): systemd, /usr/sbin/userdel
 %description -n nscd
 Nscd caches name service lookups and can dramatically improve
 performance with NIS+, and may help with DNS as well.
+
+##############################################################################
+# Subpackages for NSS modules except nss_files, nss_dns
+##############################################################################
+
+%package -n nss_db
+Summary: Name Service Switch (NSS) module using hash-indexed files
+Group: System Environment/Base
+Requires: %{name}%{_isa} = %{version}-%{release}
+
+%description -n nss_db
+The nss_db Name Service Switch module uses hash-indexed files in /var/db
+to speed up user, group, service, host name, and other NSS-based lookups.
+
+%package -n nss_nis
+Summary: Name Service Switch (NSS) module using NIS
+Group: System Environment/Base
+Requires: %{name}%{_isa} = %{version}-%{release}
+
+%description -n nss_nis
+The nss_nis, nss_nisplus, and nss_compat Name Service Switch modules
+uses the Network Information System (NIS) to obtain user, group, host
+name, and other data.
+
+%package -n nss_hesiod
+Summary: Name Service Switch (NSS) module using Hesiod
+Group: System Environment/Base
+Requires: %{name}%{_isa} = %{version}-%{release}
+
+%description -n nss_hesiod
+The nss_hesiod Name Service Switch module uses the Domain Name System
+(DNS) as a source for user, group, and service information, following
+the Hesiod convention of Project Athena.
+
+%package nss-devel
+Summary: Development files for directly linking NSS service modules
+Group: Development/Libraries
+Requires: nss_db%{_isa} = %{version}-%{release}
+Requires: nss_nis%{_isa} = %{version}-%{release}
+Requires: nss_hesiod%{_isa} = %{version}-%{release}
+
+%description nss-devel
+The glibc-nss-devel package contains the object files necessary to
+compile applications and libraries which directly link against NSS
+modules supplied by glibc.
+
+This is a rare and special use case; regular development has to use
+the glibc-devel package instead.
 
 ##############################################################################
 # glibc "utils" sub-package
@@ -1302,7 +1349,7 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_libdir}/*_p.a
 ##############################################################################
 # Build the file lists used for describing the package and subpackages.
 ##############################################################################
-# There are 11 main file lists (and many more for
+# There are several main file lists (and many more for
 # the langpack sub-packages (langpack-${lang}.filelist)):
 # * rpm.fileslist
 #	- Master file list. Eventually, after removing files from this list
@@ -1321,6 +1368,10 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_libdir}/*_p.a
 #	- Contains the list of files for the static subpackage.
 # * nosegneg.filelist
 #	- Contains the list of files for the xen subpackage.
+# * nss_db.filelist, nss_nis.filelist, nss_hesiod.filelist
+#       - File lists for nss_* NSS module subpackages.
+# * nss-devel.filelist
+#       - File list with the .so symbolic links for NSS packages.
 # * debuginfo.filelist
 #	- Contains the list of files for the glibc debuginfo package.
 # * debuginfocommon.filelist
@@ -1353,9 +1404,9 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/lib/debug%{_libdir}/*_p.a
 
   # Also remove the *.mo entries.  We will add them to the
   # language specific sub-packages.
-  # Also remove the locale sources (.*/share/i18n/locales/.*
+  # libnss_ files go into subpackages related to NSS modules.
   # and .*/share/i18n/charmaps/.*), they go into the sub-package
-  #"locale-source":
+  # "locale-source":
   sed -e '\,.*/share/locale/\([^/_]\+\).*/LC_MESSAGES/.*\.mo,d' \
       -e '\,.*/share/i18n/locales/.*,d' \
       -e '\,.*/share/i18n/charmaps/.*,d' \
@@ -1483,6 +1534,25 @@ cat > utils.filelist <<EOF
 %{_prefix}/bin/xtrace
 EOF
 
+# Move the NSS-related files to the NSS subpackages.  Be careful not
+# to pick up .debug files, and the -devel symbolic links.
+for module in db nis nisplus compat hesiod files dns; do
+  grep -E "/libnss_$module(\.so\.[0-9.]+|-[0-9.]+\.so)$" \
+    rpm.filelist > nss_$module.filelist
+done
+# nis includes nisplus and compat
+cat nss_nisplus.filelist nss_compat.filelist >> nss_nis.filelist
+# Symlinks go into the nss-devel package (instead of the main devel
+# package).
+grep '/libnss_[a-z]*\.so$' devel.filelist > nss-devel.filelist
+# /var/db/Makefile goes into nss_hesiod, remove the other files from
+# the main and devel file list.
+sed -i -e '\,/libnss_.*\.so[0-9.]*$,d' \
+    -e '\,/var/db/Makefile,d' \
+    rpm.filelist devel.filelist
+# Restore the built-in NSS modules.
+cat nss_files.filelist nss_dns.filelist >> rpm.filelist
+
 # Remove the zoneinfo files
 # XXX: Why isn't this don't earlier when we are removing files?
 #      Won't this impact what is shipped?
@@ -1607,6 +1677,7 @@ find_debuginfo_args="$find_debuginfo_args \
 	-l nscd.filelist \
 	-p '.*/(sbin|libexec)/.*' \
 	-o debuginfocommon.filelist \
+	-l nss_db.filelist -l nss_nis.filelist -l nss_hesiod.filelist \
 	-l rpm.filelist \
 %if %{with benchtests}
 	-l nosegneg.filelist -l benchtests.filelist"
@@ -1999,7 +2070,6 @@ rm -f *.filelist*
 # If rpm doesn't support %license, then use %doc instead.
 %{!?_licensedir:%global license %%doc}
 %license COPYING COPYING.LIB LICENSES
-%doc hesiod/README.hesiod
 
 %if %{xenpackage}
 %files -f nosegneg.filelist xen
@@ -2062,6 +2132,13 @@ rm -f *.filelist*
 %ghost %config(missingok,noreplace) /etc/sysconfig/nscd
 %endif
 
+%files -f nss_db.filelist -n nss_db
+%files -f nss_nis.filelist -n nss_nis
+%files -f nss_hesiod.filelist -n nss_hesiod
+/var/db/Makefile
+%doc hesiod/README.hesiod
+%files -f nss-devel.filelist nss-devel
+
 %if 0%{?_enable_debug_packages}
 %files debuginfo -f debuginfo.filelist
 %defattr(-,root,root)
@@ -2079,6 +2156,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jul 20 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-29
+- Move NSS modules to subpackages (#1338889)
+
 * Wed Jul 13 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-28
 - Auto-sync with upstream master, commit
   f531f93056b34800383c5154280e7ba5112563c7.
