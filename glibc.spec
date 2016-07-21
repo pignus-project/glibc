@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.23-561-gf531f93
 %define glibcversion 2.23.90
-%define glibcrelease 29%{?dist}
+%define glibcrelease 30%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -296,7 +296,6 @@ Patch2036: glibc-gcc-PR69537.patch
 # extend_alloca removal, BZ 18023
 Patch2037: glibc-rh1315108.patch
 Patch2038: glibc-rh1335011.patch
-Patch2039: glibc-rh1344830.patch
 
 # Upstream BZ 20313
 Patch2110: glibc-rh1351108-update-to-unicode-9.0.0.patch
@@ -829,7 +828,6 @@ microbenchmark tests on the system.
 %patch2036 -p1
 %patch2037 -p1
 %patch2038 -p1
-%patch2039 -p1
 %patch2110 -p1
 %patch2111 -p1
 %patch2112 -p1
@@ -2156,6 +2154,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jul 21 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-30
+- Drop sendmsg/recvmsg compatibility patch (#1344830)
+
 * Wed Jul 20 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-29
 - Move NSS modules to subpackages (#1338889)
 
