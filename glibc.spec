@@ -482,6 +482,7 @@ Requires(pre): /sbin/install-info
 Requires(pre): %{name}-headers
 Requires: %{name}-headers = %{version}-%{release}
 Requires: %{name} = %{version}-%{release}
+Requires: libgcc%{_isa}
 
 %description devel
 The glibc-devel package contains the object files necessary
@@ -2156,6 +2157,7 @@ rm -f *.filelist*
 %changelog
 * Thu Jul 21 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-30
 - Drop sendmsg/recvmsg compatibility patch (#1344830)
+- glibc-devel depends on libgcc%%{_isa} (#1289356)
 
 * Wed Jul 20 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-29
 - Move NSS modules to subpackages (#1338889)
