@@ -1612,7 +1612,9 @@ EOF
 cat > utils.filelist <<EOF
 %{_prefix}/bin/memusage
 %{_prefix}/bin/memusagestat
+%if %{without bootstrap}
 %{_prefix}/bin/mtrace
+%endif
 %{_prefix}/bin/pcprofiledump
 %{_prefix}/bin/xtrace
 EOF
@@ -2269,6 +2271,7 @@ rm -f *.filelist*
 - glibc-devel depends on libgcc%%{_isa} (#1289356)
 - Drop Requires(pre) on libgcc
 - Introduce libcrypt and libcrypt-nss (#1324623)
+- Do not try to install mtrace when bootstrapping
 
 * Wed Jul 20 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-29
 - Move NSS modules to subpackages (#1338889)
