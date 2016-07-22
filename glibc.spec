@@ -327,8 +327,7 @@ Provides: ld-linux.so.3(GLIBC_2.4)
 
 Requires: glibc-common = %{version}-%{release}
 
-# Require libgcc in case some program calls pthread_cancel in its %%post
-Requires(pre): basesystem, libgcc
+Requires(pre): basesystem
 
 # This is for building auxiliary programs like memusage, nscd
 # For initial glibc bootstraps it can be commented out
@@ -2158,6 +2157,7 @@ rm -f *.filelist*
 * Thu Jul 21 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-30
 - Drop sendmsg/recvmsg compatibility patch (#1344830)
 - glibc-devel depends on libgcc%%{_isa} (#1289356)
+- Drop Requires(pre) on libgcc
 
 * Wed Jul 20 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-29
 - Move NSS modules to subpackages (#1338889)
