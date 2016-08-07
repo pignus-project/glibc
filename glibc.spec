@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-561-gf531f93
-%define glibcversion 2.23.90
-%define glibcrelease 30%{?dist}
+%define glibcsrcdir  glibc-2.24
+%define glibcversion 2.24
+%define glibcrelease 1%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -9,7 +9,7 @@
 # gzip -9 $(git describe --match 'glibc-*').tar
 #
 # glibc_release_url is only defined when we have a release tarball.
-# % define glibc_release_url http://ftp.gnu.org/gnu/glibc/
+%define glibc_release_url http://ftp.gnu.org/gnu/glibc/
 ##############################################################################
 # We support hte following options:
 # --with/--without,
@@ -2266,6 +2266,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Aug 02 2016 Carlos O'Donell <carlos@redhat.com> - 2.24-1
+- Update to final released glibc 2.24.
+
 * Thu Jul 21 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-30
 - Drop sendmsg/recvmsg compatibility patch (#1344830)
 - glibc-devel depends on libgcc%%{_isa} (#1289356)
