@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-561-gf531f93
+%define glibcsrcdir  glibc-2.24-40-gbf79a33
 %define glibcversion 2.23.90
-%define glibcrelease 30%{?dist}
+%define glibcrelease 31%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2266,6 +2266,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Aug 08 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.23.90-31
+- Auto-sync with upstream master.
+
 * Thu Jul 21 2016 Florian Weimer <fweimer@redhat.com> - 2.23.90-30
 - Drop sendmsg/recvmsg compatibility patch (#1344830)
 - glibc-devel depends on libgcc%%{_isa} (#1289356)
