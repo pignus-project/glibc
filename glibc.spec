@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-40-gbf79a33
+%define glibcsrcdir  glibc-2.24-47-gf792117
 %define glibcversion 2.24.90
-%define glibcrelease 1%{?dist}
+%define glibcrelease 2%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2266,6 +2266,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Aug 11 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-2
+- Auto-sync with upstream master,
+  commit 5344dc60e95259d9848bf04165836276c03ac91c
+
 * Mon Aug 08 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.24.90-1
 - Set version to 2.24.90 to match upstream development.
 
