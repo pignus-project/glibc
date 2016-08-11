@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-62-g1915d6d
+%define glibcsrcdir  glibc-2.23-73-g0266710
 %define glibcversion 2.23.1
-%define glibcrelease 8%{?dist}
+%define glibcrelease 9%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2120,6 +2120,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Aug 11 2016 Florian Weimer <fweimer@redhat.com> - 2.23.1-9
+- Auto-sync with upstream release/2.23/master,
+  commit 026671037948fd31009243a2173278dfa0ac9b25.
+- Fix upstream bugs swbz#20005, swbz#20012
+- malloc: Preserve arena free list/thread count invariant (#1356645)
+- x86: Use sysdep.o from libc.a in static libraries (#1352625)
+
 * Thu Jun 02 2016 Florian Weimer <fweimer@redhat.com> - 2.23.1-8
 - Auto-sync with upstream 2.23
   (commit 1915d6d182a55d1eb852643a78ac24bc17783fb0),
