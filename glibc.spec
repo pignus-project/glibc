@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24
+%define glibcsrcdir  glibc-2.24-2-g96cd434
 %define glibcversion 2.24
-%define glibcrelease 1%{?dist}
+%define glibcrelease 2%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2266,6 +2266,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Aug 11 2016 Florian Weimer <fweimer@redhat.com> - 2.24-2
+- Auto-sync with upstream release/2.24/master,
+  commit ea23815a795f72035262953dad5beb03e09c17dd.
+- Translation updates
+- malloc: Preserve arena free list/thread count invariant (#1356645)
+- x86: Use sysdep.o from libc.a in static libraries (#1352625)
+
 * Tue Aug 02 2016 Carlos O'Donell <carlos@redhat.com> - 2.24-1
 - Update to final released glibc 2.24.
 
