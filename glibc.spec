@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-47-gf792117
+%define glibcsrcdir  glibc-2.24-69-gd9067fc
 %define glibcversion 2.24.90
-%define glibcrelease 2%{?dist}
+%define glibcrelease 3%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2266,6 +2266,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Aug 17 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-3
+- Auto-sync with upstream master,
+  commit d9067fca40b8aac156d73cfa44d6875813555a6c, with these changes:
+- Avoid duplicating object files already in libc.a (#1352625)
+- CVE-2016-6323: Backtraces can hang on ARM EABI (32-bit) (swbz#20435)
+- et_EE: locale has wrong {p,n}_cs_precedes value (swbz#20459
+
 * Thu Aug 11 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-2
 - Auto-sync with upstream master,
   commit f79211792127f38d5954419bb3784c8eb7f5e4e5
