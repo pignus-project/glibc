@@ -2268,7 +2268,7 @@ rm -f *.filelist*
 %changelog
 * Thu Aug 11 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-2
 - Auto-sync with upstream master,
-  commit 5344dc60e95259d9848bf04165836276c03ac91c
+  commit f79211792127f38d5954419bb3784c8eb7f5e4e5
 
 * Mon Aug 08 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.24.90-1
 - Set version to 2.24.90 to match upstream development.
