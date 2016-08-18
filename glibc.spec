@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-2-g96cd434
+%define glibcsrcdir  glibc-2.24-11-g8c716c2
 %define glibcversion 2.24
-%define glibcrelease 2%{?dist}
+%define glibcrelease 3%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2266,6 +2266,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Aug 18 2016 Florian Weimer <fweimer@redhat.com> - 2.24-3
+- Auto-sync with upstream release/2.24/master,
+  commit 8c716c2e2f916bc18a3857129c181b96990a87d6, fixing:
+- argp: Do not override GCC keywords with macros (#1366830)
+- CVE-2016-6323: Backtraces can hang on ARM EABI (32-bit) (swbz#20435)
+- Avoid duplicating object files already in libc.a (#1352625)
+- powerpc: fix ifunc-sel.h with GCC 6
+- nptl: reduce time to expected tst-once5 failure
+
 * Thu Aug 11 2016 Florian Weimer <fweimer@redhat.com> - 2.24-2
 - Auto-sync with upstream release/2.24/master,
   commit ea23815a795f72035262953dad5beb03e09c17dd.
