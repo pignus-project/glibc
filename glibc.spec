@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-73-g0266710
+%define glibcsrcdir  glibc-2.23-81-g2eda04e
 %define glibcversion 2.23.1
-%define glibcrelease 9%{?dist}
+%define glibcrelease 10%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2120,6 +2120,19 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Aug 18 2016 Florian Weimer <fweimer@redhat.com> - 2.23.1-10
+- Auto-sync with upstream release/2.23/master,
+  commit 026671037948fd31009243a2173278dfa0ac9b25, fixing:
+- argp: Do not override GCC keywords with macros (#1366830)
+- CVE-2016-6323: Backtraces can hang on armhfp (swbz#20435)
+- Avoid duplicating object files already in libc.a (#1352625)
+- nptl: reduce time to expected tst-once5 failure
+- fopencookie: Mangle function pointers stored on the heap (swbz#20222)
+- nss_db: Fix initialization of iteration position (#1344480)
+- nss_nis: Return proper status from _nss_nis_initgroups_dyn (#1294574)
+- malloc: Avoid premature fallback to malloc (#1348620)
+- nptl: reduce time to expected tst-once5 failure
+
 * Thu Aug 11 2016 Florian Weimer <fweimer@redhat.com> - 2.23.1-9
 - Auto-sync with upstream release/2.23/master,
   commit 026671037948fd31009243a2173278dfa0ac9b25.
