@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-69-gd9067fc
+%define glibcsrcdir  glibc-2.24-86-g66abf9b
 %define glibcversion 2.24.90
-%define glibcrelease 3%{?dist}
+%define glibcrelease 4%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2266,6 +2266,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Aug 21 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-4
+- Auto-sync with upstream master,
+  commit 66abf9bfbe24ac1e7207d26ccad725ed938dc52c, fixing:
+- argp: Do not override GCC keywords with macros (#1366830)
+
 * Wed Aug 17 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-3
 - Auto-sync with upstream master,
   commit d9067fca40b8aac156d73cfa44d6875813555a6c, with these changes:
