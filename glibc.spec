@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-86-g66abf9b
+%define glibcsrcdir  glibc-2.24-91-g7e625f7
 %define glibcversion 2.24.90
-%define glibcrelease 4%{?dist}
+%define glibcrelease 5%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2266,6 +2266,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Aug 26 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-5
+- Auto-sync with upstream master,
+  commit 7e625f7e85b4e88f10dbde35a0641742af581806, fixing:
+- lt_LT locale: use hyphens in d_fmt (swbz#20497)
+- nptl test time reductions (swbz#19946)
+
 * Sun Aug 21 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-4
 - Auto-sync with upstream master,
   commit 66abf9bfbe24ac1e7207d26ccad725ed938dc52c, fixing:
