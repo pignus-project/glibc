@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-91-g7e625f7
+%define glibcsrcdir  glibc-2.24-106-g4d72808
 %define glibcversion 2.24.90
-%define glibcrelease 5%{?dist}
+%define glibcrelease 6%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2266,6 +2266,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Sep 01 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-6
+- Auto-sync with upstream master,
+  commit 4d728087ef8cc826b05bd21d0c74d4eca9b1a27d, fixing:
+- Base <sys/quota.h> on Linux headers (#1360480)
+- Simplify static malloc interposition (swbz#20432)
+
 * Fri Aug 26 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-5
 - Auto-sync with upstream master,
   commit 7e625f7e85b4e88f10dbde35a0641742af581806, fixing:
