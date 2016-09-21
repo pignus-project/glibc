@@ -13,26 +13,24 @@
 # The general idea for the design is in the leading comment
 # in the source code.
 #
-diff --git a/nptl/sysdeps/unix/sysv/linux/Makefile b/nptl/sysdeps/unix/sysv/linux/Makefile
-index 6078e2d..36fd50b 100644
---- a/nptl/Makefile
-+++ b/nptl/Makefile
-@@ -18,7 +18,9 @@
+Index: glibc-2.24-163-ge299076/nptl/Makefile
+===================================================================
+--- glibc-2.24-163-ge299076.orig/nptl/Makefile
++++ glibc-2.24-163-ge299076/nptl/Makefile
+@@ -30,7 +30,8 @@ install-lib-ldscripts := libpthread.so
  
  routines = alloca_cutoff forward libc-lowlevellock libc-cancellation \
  	   libc-cleanup libc_pthread_init libc_multiple_threads \
 -	   register-atfork unregister-atfork
 +	   register-atfork unregister-atfork libc_pthread_atfork
-+
 +static-only-routines += libc_pthread_atfork
  shared-only-routines = forward
  
- libpthread-routines = nptl-init vars events version pt-interp \
-diff --git a/nptl/libc_pthread_atfork.c b/nptl/libc_pthread_atfork.c
-new file mode 100644
-index 0000000..667049a
+ # We need to provide certain routines for compatibility with existing
+Index: glibc-2.24-163-ge299076/nptl/libc_pthread_atfork.c
+===================================================================
 --- /dev/null
-+++ b/nptl/libc_pthread_atfork.c
++++ glibc-2.24-163-ge299076/nptl/libc_pthread_atfork.c
 @@ -0,0 +1,54 @@
 +/* Copyright (C) 2013 Free Software Foundation, Inc.
 +   This file is part of the GNU C Library.
