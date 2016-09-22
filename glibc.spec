@@ -1,4 +1,4 @@
-%define glibcsrcdir  glibc-2.24-163-ge299076
+%define glibcsrcdir  glibc-2.24-180-g17af5da
 %define glibcversion 2.24.90
 %define glibcrelease 8%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
@@ -304,7 +304,6 @@ Patch2038: glibc-rh1335011.patch
 Patch2110: glibc-rh1351108-update-to-unicode-9.0.0.patch
 
 # sln implemented by ldconfig, to conserve disk space.
-Patch2111: glibc-rh1315476-1.patch
 Patch2112: glibc-rh1315476-2.patch
 
 ##############################################################################
@@ -881,7 +880,6 @@ microbenchmark tests on the system.
 %patch2037 -p1
 %patch2038 -p1
 %patch2110 -p1
-%patch2111 -p1
 %patch2112 -p1
 
 ##############################################################################
@@ -2279,6 +2277,15 @@ rm -f *.filelist*
 %changelog
 * Thu Sep 22 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-8
 - Add support for MIPS (#1377795)
+- Drop glibc-rh1315476-1.patch (sln pre-processor cleanup), it was
+  applied upstream.
+- Auto-sync with upstream master,
+  commit 17af5da98cd2c9ec958421ae2108f877e0945451, fixing the following bugs:
+- Fix non-LE TLS in static programs (swbz#19826)
+- resolv: Remove unsupported hook functions from the API (swbz#20016)
+- Remove RR type classification macros (swbz#20592)
+- Remove obsolete DNSSEC support (swbz#20591)
+- manual: Clarify the documentation of strverscmp (swbz#20524)
 
 * Tue Sep 20 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.24.90-7
 - Auto-sync with upstream master.
