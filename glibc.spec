@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.24-163-ge299076
 %define glibcversion 2.24.90
-%define glibcrelease 7%{?dist}
+%define glibcrelease 8%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -37,8 +37,8 @@
 # Run a valgrind smoke test to ensure that the release is compatible and
 # doesn't any new feature that might cause valgrind to abort.
 %if %{with valgrind}
-%ifarch s390 ppc64 ppc64p7
-# There is no valgrind support for 31-bit s390.
+%ifarch s390 ppc64 ppc64p7 %{mips}
+# There is no valgrind support for 31-bit s390, nor for MIPS.
 # The valgrind test does not work on ppc64, ppc64p7 (bug 1273103).
 %undefine with_valgrind
 %endif
@@ -993,6 +993,17 @@ GCC="$GCC -mcpu=power8 -mtune=power8"
 GXX="$GXX -mcpu=power8 -mtune=power8"
 core_with_options="--with-cpu=power8"
 %endif
+%endif
+
+##############################################################################
+# %%build - MIPS options.
+##############################################################################
+%ifarch mips mipsel
+BuildFlags="-march=mips32r2 -mfpxx"
+%endif
+%ifarch mips64 mips64el
+# Without -mrelax-pic-calls ld.so segfaults when built with -O3
+BuildFlags="-march=mips64r2 -mabi=64 -mrelax-pic-calls"
 %endif
 
 ##############################################################################
@@ -2266,6 +2277,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Sep 22 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-8
+- Add support for MIPS (#1377795)
+
 * Tue Sep 20 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.24.90-7
 - Auto-sync with upstream master.
 
