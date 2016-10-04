@@ -320,7 +320,7 @@ Index: b/include/alloca.h
 ===================================================================
 --- a/include/alloca.h
 +++ b/include/alloca.h
-@@ -20,57 +20,17 @@ libc_hidden_proto (__libc_alloca_cutoff)
+@@ -23,57 +23,17 @@ libc_hidden_proto (__libc_alloca_cutoff)
  
  #include <allocalim.h>
  
@@ -377,7 +377,7 @@ Index: b/include/alloca.h
 -     extend_alloca (buf, len, s__); })
  #endif
  
- #endif
+ # endif /* !_ISOMAC */
 Index: b/nis/nss_compat/compat-initgroups.c
 ===================================================================
 --- a/nis/nss_compat/compat-initgroups.c
@@ -558,7 +558,7 @@ Index: b/nscd/aicache.c
  
  #include "dbg_log.h"
  #include "nscd.h"
-@@ -113,10 +114,13 @@ addhstaiX (struct database_dyn *db, int
+@@ -112,10 +113,13 @@ addhstaiX (struct database_dyn *db, int
    int old_res_options = _res.options;
    _res.options &= ~RES_USE_INET6;
  
@@ -576,7 +576,7 @@ Index: b/nscd/aicache.c
    int32_t ttl = INT32_MAX;
    ssize_t total = 0;
    char *key_copy = NULL;
-@@ -129,6 +133,7 @@ addhstaiX (struct database_dyn *db, int
+@@ -128,6 +132,7 @@ addhstaiX (struct database_dyn *db, int
        int status[2] = { NSS_STATUS_UNAVAIL, NSS_STATUS_UNAVAIL };
        int naddrs = 0;
        size_t addrslen = 0;
@@ -584,7 +584,7 @@ Index: b/nscd/aicache.c
        char *canon = NULL;
        size_t canonlen;
  
-@@ -143,12 +148,17 @@ addhstaiX (struct database_dyn *db, int
+@@ -142,12 +147,17 @@ addhstaiX (struct database_dyn *db, int
  	      at = &atmem;
  	      rc6 = 0;
  	      herrno = 0;
@@ -604,7 +604,7 @@ Index: b/nscd/aicache.c
  	    }
  
  	  if (rc6 != 0 && herrno == NETDB_INTERNAL)
-@@ -226,41 +236,38 @@ addhstaiX (struct database_dyn *db, int
+@@ -225,41 +235,38 @@ addhstaiX (struct database_dyn *db, int
  	  while (1)
  	    {
  	      rc6 = 0;
@@ -662,7 +662,7 @@ Index: b/nscd/aicache.c
  	    }
  
  	  if (rc4 != 0 && herrno == NETDB_INTERNAL)
-@@ -286,13 +293,11 @@ addhstaiX (struct database_dyn *db, int
+@@ -285,13 +292,11 @@ addhstaiX (struct database_dyn *db, int
  	      cfct = __nss_lookup_function (nip, "getcanonname_r");
  	      if (cfct != NULL)
  		{
@@ -678,7 +678,7 @@ Index: b/nscd/aicache.c
  		      == NSS_STATUS_SUCCESS)
  		    canon = s;
  		  else
-@@ -321,18 +326,20 @@ addhstaiX (struct database_dyn *db, int
+@@ -320,18 +325,20 @@ addhstaiX (struct database_dyn *db, int
  		      addrfamily = AF_INET6;
  		    }
  
@@ -704,7 +704,7 @@ Index: b/nscd/aicache.c
  		    }
  
  		  if (rc == 0)
-@@ -560,6 +567,10 @@ next_nip:
+@@ -559,6 +566,10 @@ next_nip:
  	dh->usable = false;
      }
  

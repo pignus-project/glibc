@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-180-g17af5da
+%define glibcsrcdir  glibc-2.24-210-gff88ee7
 %define glibcversion 2.24.90
-%define glibcrelease 8%{?dist}
+%define glibcrelease 9%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2275,6 +2275,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Oct 04 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-9
+- Auto-sync with upstream master,
+  commit ff88ee7edfaa439e23c42fccaf3a36cd5f041894, fixing:
+- LONG_WIDTH is incorrectly set to the 64 on 32-bit platforms (#1381582)
+- libio: Multiple fixes for open_{w}memstream (swbz#18241, swbz#20181)
+- Simplify and test _dl_addr_inside_object (swbz#20292)
+
 * Thu Sep 22 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-8
 - Add support for MIPS (#1377795)
 - Drop glibc-rh1315476-1.patch (sln pre-processor cleanup), it was
