@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-210-gff88ee7
+%define glibcsrcdir  glibc-2.24-256-g5140d03
 %define glibcversion 2.24.90
-%define glibcrelease 9%{?dist}
+%define glibcrelease 10%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2275,6 +2275,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Oct 07 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-10
+- Auto-sync with upstream master,
+  commit 5140d036f9c16585448b5908c3a219bd96842161, fixing:
+- resolv: Remove RES_USEBSTRING and its implementation (swbz#20629)
+- Refactor ifunc resolvers due to false debuginfo (swbz#20478)
+
 * Tue Oct 04 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-9
 - Auto-sync with upstream master,
   commit ff88ee7edfaa439e23c42fccaf3a36cd5f041894, fixing:
