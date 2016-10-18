@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.24-256-g5140d03
 %define glibcversion 2.24.90
-%define glibcrelease 10%{?dist}
+%define glibcrelease 11%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -261,6 +261,13 @@ Patch0059: glibc-c-utf8-locale.patch
 
 # Build libcrypt twice, with and without NSS.
 Patch0060: glibc-rh1324623.patch
+
+# Bug 20019: Prototype patch to error on resolution of IFUNC
+# for an uninitialized library.
+Patch0061: glibc-swbz20019.patch
+
+# Bug 13165: New condvar implementation.
+Patch0062: glibc-swbz13165.patch
 
 ##############################################################################
 #
@@ -881,6 +888,8 @@ microbenchmark tests on the system.
 %patch2038 -p1
 %patch2110 -p1
 %patch2112 -p1
+%patch0061 -p1
+%patch0062 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -2275,6 +2284,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Oct 17 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.24.90-11
+- Add prototype support for detecting invalid IFUNC calls (swbz#20019).
+- New POSIX thread condition variable implementation (swbz#13165).
+
 * Fri Oct 07 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-10
 - Auto-sync with upstream master,
   commit 5140d036f9c16585448b5908c3a219bd96842161, fixing:
