@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-256-g5140d03
+%define glibcsrcdir  glibc-2.24-282-gb3918c4
 %define glibcversion 2.24.90
-%define glibcrelease 11%{?dist}
+%define glibcrelease 12%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2284,6 +2284,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Oct 21 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-12
+- Auto-sync with upstream master,
+  commit b3918c44db615637b26d919ce599cd86592316b3, fixing:
+- math: Turn iszero into a function template (#1387415)
+- ARM: Use VSQRT instruction (swbz#20660)
+- math: Stop powerpc copysignl raising "invalid" for sNaN (swbz#20718)
+- x86: Fix FMA and AVX2 detection (swbz#20689)
+- x86: Avoid assertion failure on older Intel CPus (swbz#20647)
+
 * Mon Oct 17 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.24.90-11
 - Add prototype support for detecting invalid IFUNC calls (swbz#20019).
 - New POSIX thread condition variable implementation (swbz#13165).
