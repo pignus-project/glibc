@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-282-gb3918c4
+%define glibcsrcdir  glibc-2.24-285-ge37208c
 %define glibcversion 2.24.90
-%define glibcrelease 12%{?dist}
+%define glibcrelease 13%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2284,6 +2284,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sat Oct 22 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-13
+- Auto-sync with upstream master,
+  commit e37208ce86916af9510ffb9ce7b3c187986f07de, changing:
+- Restore <math.h> compatbility with extern "C" wrappers
+
 * Fri Oct 21 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-12
 - Auto-sync with upstream master,
   commit b3918c44db615637b26d919ce599cd86592316b3, fixing:
