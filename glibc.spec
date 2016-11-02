@@ -1,4 +1,4 @@
-%define glibcsrcdir  glibc-2.24-285-ge37208c
+%define glibcsrcdir  glibc-2.24-326-g9032070
 %define glibcversion 2.24.90
 %define glibcrelease 14%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
@@ -261,10 +261,6 @@ Patch0059: glibc-c-utf8-locale.patch
 
 # Build libcrypt twice, with and without NSS.
 Patch0060: glibc-rh1324623.patch
-
-# Bug 20019: Prototype patch to error on resolution of IFUNC
-# for an uninitialized library.
-Patch0061: glibc-swbz20019.patch
 
 # Bug 13165: New condvar implementation.
 Patch0062: glibc-swbz13165.patch
@@ -886,7 +882,6 @@ microbenchmark tests on the system.
 %patch2037 -p1
 %patch2110 -p1
 %patch2112 -p1
-%patch0061 -p1
 %patch0062 -p1
 
 ##############################################################################
@@ -2283,7 +2278,17 @@ rm -f *.filelist*
 
 %changelog
 * Wed Nov  2 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-14
+- Drop glibc-swbz20019.patch, applied upstream.
 - dlerror returns NULL after dlsym (RTLD_NEXT) lookup failure (#1333945)
+  (fixed by dropping the revert)
+- Auto-sync with upstream master,
+  commit 9032070deaa03431921315f973c548c2c403fecc, fixing:
+- Correct clog10 documentation (swbz#19673)
+- Fix building with -Os (swbz#20729)
+- Properly initialize glob structure with GLOB_BRACE|GLOB_DOOFFS (swbz#20707)
+- powerpc: Fix TOC stub on powerpc64 clone (swbz#20728)
+- math: Make strtod raise "inexact" exceptions (swbz#19380)
+- malloc: Remove malloc_get_state, malloc_set_state (swbz#19473)
 
 * Sat Oct 22 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-13
 - Auto-sync with upstream master,
