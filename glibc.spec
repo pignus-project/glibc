@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.23-81-g2eda04e
+%define glibcsrcdir  glibc-2.23-85-g422facf
 %define glibcversion 2.23.1
-%define glibcrelease 10%{?dist}
+%define glibcrelease 11%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2120,6 +2120,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov 02 2016 Florian Weimer <fweimer@redhat.com> - 2.23.1-11
+- Auto-sync with upstream release/2.23/master,
+  commit 422facff9f2c4972e2dc46090a704d11b840b0c0, fixing:
+- Incorrect argument reduction for cos (#1390683)
+- Fixed x86_64 vector sincos/sincosf ABI (swbz#20024)
+- math: Don't compile do_test with -mavx/-mavx2/-mavx512 (swbz#20384)
+
 * Thu Aug 18 2016 Florian Weimer <fweimer@redhat.com> - 2.23.1-10
 - Auto-sync with upstream release/2.23/master,
   commit 2eda04ec6f55d2a622481aeb51e4c42cf1607995, fixing:
