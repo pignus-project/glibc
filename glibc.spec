@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.24-285-ge37208c
 %define glibcversion 2.24.90
-%define glibcrelease 13%{?dist}
+%define glibcrelease 14%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -305,7 +305,6 @@ Patch2036: glibc-gcc-PR69537.patch
 
 # extend_alloca removal, BZ 18023
 Patch2037: glibc-rh1315108.patch
-Patch2038: glibc-rh1335011.patch
 
 # Upstream BZ 20313
 Patch2110: glibc-rh1351108-update-to-unicode-9.0.0.patch
@@ -885,7 +884,6 @@ microbenchmark tests on the system.
 %patch0060 -p1
 %patch2036 -p1
 %patch2037 -p1
-%patch2038 -p1
 %patch2110 -p1
 %patch2112 -p1
 %patch0061 -p1
@@ -2284,6 +2282,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov  2 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-14
+- dlerror returns NULL after dlsym (RTLD_NEXT) lookup failure (#1333945)
+
 * Sat Oct 22 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-13
 - Auto-sync with upstream master,
   commit e37208ce86916af9510ffb9ce7b3c187986f07de, changing:
