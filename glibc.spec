@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.24-377-g530862a
 %define glibcversion 2.24.90
-%define glibcrelease 15%{?dist}
+%define glibcrelease 16%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -261,6 +261,7 @@ Patch0059: glibc-c-utf8-locale.patch
 
 # Build libcrypt twice, with and without NSS.
 Patch0060: glibc-rh1324623.patch
+Patch0061: glibc-fedora-nss-static-link.patch
 
 # Bug 13165: New condvar implementation.
 Patch0062: glibc-swbz13165.patch
@@ -878,6 +879,7 @@ microbenchmark tests on the system.
 %patch0058 -p1
 %patch0059 -p1
 %patch0060 -p1
+%patch0061 -p1
 %patch2036 -p1
 %patch2037 -p1
 %patch2110 -p1
@@ -2277,6 +2279,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov 16 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-16
+- Do not try to link libcrypt statically during tests
+
 * Wed Nov 16 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-15
 - Auto-sync with upstream master,
   commit 530862a63e0929128dc98fbbd463b120934434fb, fixing:

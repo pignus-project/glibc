@@ -1,0 +1,27 @@
+There is no working static library for NSS in Fedora, so we cannot
+test libcrypt (built with NSS) against it.
+
+Index: b/elf/Makefile
+===================================================================
+--- a/elf/Makefile
++++ b/elf/Makefile
+@@ -1284,7 +1284,6 @@ $(objpfx)tst-dlsym-error: $(libdl)
+ 
+ $(objpfx)tst-linkall-static: \
+   $(common-objpfx)math/libm.a \
+-  $(common-objpfx)crypt/libcrypt.a \
+   $(common-objpfx)resolv/libresolv.a \
+   $(common-objpfx)dlfcn/libdl.a \
+   $(common-objpfx)login/libutil.a \
+Index: b/elf/tst-linkall-static.c
+===================================================================
+--- a/elf/tst-linkall-static.c
++++ b/elf/tst-linkall-static.c
+@@ -32,7 +32,6 @@ void *references[] =
+   {
+     &pow,                       /* libm */
+     &pthread_create,            /* libpthread */
+-    &crypt,                     /* libcrypt */
+     &res_send,                  /* libresolv */
+     &dlopen,                    /* libdl */
+     &login,                     /* libutil */
