@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-326-g9032070
+%define glibcsrcdir  glibc-2.24-377-g530862a
 %define glibcversion 2.24.90
-%define glibcrelease 14%{?dist}
+%define glibcrelease 15%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2277,6 +2277,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov 16 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-15
+- Auto-sync with upstream master,
+  commit 530862a63e0929128dc98fbbd463b120934434fb, fixing:
+- Fix rpcgen buffer overrun (swbz#20790)
+- Fix ppc64 build failure to swbz#20729 fix attempt
+
 * Wed Nov  2 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-14
 - Drop glibc-swbz20019.patch, applied upstream.
 - dlerror returns NULL after dlsym (RTLD_NEXT) lookup failure (#1333945)
