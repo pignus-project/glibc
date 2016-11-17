@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.24-377-g530862a
 %define glibcversion 2.24.90
-%define glibcrelease 16%{?dist}
+%define glibcrelease 17%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -308,6 +308,9 @@ Patch2110: glibc-rh1351108-update-to-unicode-9.0.0.patch
 
 # sln implemented by ldconfig, to conserve disk space.
 Patch2112: glibc-rh1315476-2.patch
+
+# New scalable read-write lock version 2.
+Patch2113: glibc-new-rwlock.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -885,6 +888,7 @@ microbenchmark tests on the system.
 %patch2110 -p1
 %patch2112 -p1
 %patch0062 -p1
+%patch2113 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -2279,6 +2283,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov 16 2016 Carlos O'Donell <carlos@redhat.com> - 2.24.90-17
+* Add new scalable implementation of POSIX read-write locks.
+
 * Wed Nov 16 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-16
 - Do not try to link libcrypt statically during tests
 
