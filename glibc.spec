@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-377-g530862a
+%define glibcsrcdir  glibc-2.24-392-g5ee1a44
 %define glibcversion 2.24.90
-%define glibcrelease 17%{?dist}
+%define glibcrelease 18%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2283,6 +2283,10 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Nov 22 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-18
+- Auto-sync with upstream master,
+  commit 5ee1a4443a3eb0868cef1fe506ae6fb6af33d4ad.
+
 * Wed Nov 16 2016 Carlos O'Donell <carlos@redhat.com> - 2.24.90-17
 * Add new scalable implementation of POSIX read-write locks.
 
