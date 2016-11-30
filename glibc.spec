@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-397-g7a5e3d9
+%define glibcsrcdir  glibc-2.24-427-g9e78f6f
 %define glibcversion 2.24.90
-%define glibcrelease 19%{?dist}
+%define glibcrelease 20%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2283,6 +2283,15 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Nov 30 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-20
+- Auto-sync with upstream master,
+  commit 9e78f6f6e7134a5f299cc8de77370218f8019237, fixing:
+- stdio buffering with certain network file systems (#1400144)
+- libpthread initialization breaks ld.so exceptions (#1393909)
+- x86_64: Use of PLT and GOT in static archives (swbz#20750)
+- localedata, iconvdata: 0x80->Euro sign mapping for GBK (swbz#20864)
+- math: x86_64 -mfpmath=387 float_t, double_t (swbz#20787)
+
 * Wed Nov 23 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-19
 - Auto-sync with upstream master,
   commit 7a5e3d9d633c828d84a9535f26b202a6179978e7:
