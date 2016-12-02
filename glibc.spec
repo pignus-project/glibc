@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-427-g9e78f6f
+%define glibcsrcdir  glibc-2.24-441-g01b23a3
 %define glibcversion 2.24.90
-%define glibcrelease 20%{?dist}
+%define glibcrelease 21%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2283,6 +2283,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Dec 02 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-21
+- Auto-sync with upstream master,
+  commit 01b23a30b42a90b1ebd882a0d81110a1542e504a, fixing:
+- aarch64: Incorrect dynamic TLS resolution (#1400347)
+
 * Wed Nov 30 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-20
 - Auto-sync with upstream master,
   commit 9e78f6f6e7134a5f299cc8de77370218f8019237, fixing:
