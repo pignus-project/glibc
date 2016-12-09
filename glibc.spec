@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-441-g01b23a3
+%define glibcsrcdir  glibc-2.24-458-g0abbe7c
 %define glibcversion 2.24.90
-%define glibcrelease 21%{?dist}
+%define glibcrelease 22%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -261,10 +261,12 @@ Patch0059: glibc-c-utf8-locale.patch
 
 # Build libcrypt twice, with and without NSS.
 Patch0060: glibc-rh1324623.patch
-Patch0061: glibc-fedora-nss-static-link.patch
 
 # Bug 13165: New condvar implementation.
 Patch0062: glibc-swbz13165.patch
+
+# Disable printers which are incompatible with nptl implementation changes.
+Patch0099: glibc-fedora-disable-printers.patch
 
 ##############################################################################
 #
@@ -882,13 +884,13 @@ microbenchmark tests on the system.
 %patch0058 -p1
 %patch0059 -p1
 %patch0060 -p1
-%patch0061 -p1
 %patch2036 -p1
 %patch2037 -p1
 %patch2110 -p1
 %patch2112 -p1
 %patch0062 -p1
 %patch2113 -p1
+%patch0099 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -2283,6 +2285,18 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Dec 09 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-22
+- Auto-sync with upstream master,
+  commit 0abbe7cd700951082b314182a0958d65238297ef, changing:
+- IN6_IS_ADDR_ does not require enabling non-standard extensions (#1138893)
+- Install libm.a as linker script (swbz#20539)
+- Fix writes past the allocated array bounds in execvpe (swbz#20847)
+- Fix hypot sNaN handling (swbz#20940)
+- Fix x86_64/x86 powl handling of sNaN arguments (swbz#20916)
+- Fix sysdeps/ieee754 pow handling of sNaN arguments (swbz#20916)
+- Fix pow (qNaN, 0) result with -lieee (swbz#20919)
+- Fix --enable-nss-crypt failure of tst-linkall-static (swbz#20918)
+
 * Fri Dec 02 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-21
 - Auto-sync with upstream master,
   commit 01b23a30b42a90b1ebd882a0d81110a1542e504a, fixing:

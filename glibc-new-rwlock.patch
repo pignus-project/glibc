@@ -87,9 +87,9 @@ Date:   Thu May 22 16:00:12 2014 +0200
     	(pthread_rwlock_t): Adapt.
     	* sysdeps/x86/bits/pthreadtypes.h (pthread_rwlock_t): Adapt.
 
-Index: glibc-2.24-377-g530862a/nptl/DESIGN-rwlock.txt
+Index: glibc-2.24-458-g0abbe7c/nptl/DESIGN-rwlock.txt
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/DESIGN-rwlock.txt
+--- glibc-2.24-458-g0abbe7c.orig/nptl/DESIGN-rwlock.txt
 +++ /dev/null
 @@ -1,113 +0,0 @@
 -Reader Writer Locks pseudocode
@@ -205,10 +205,10 @@ Index: glibc-2.24-377-g530862a/nptl/DESIGN-rwlock.txt
 -
 -  lll_unlock(rwlock->lock);
 -}
-Index: glibc-2.24-377-g530862a/nptl/Makefile
+Index: glibc-2.24-458-g0abbe7c/nptl/Makefile
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/Makefile
-+++ glibc-2.24-377-g530862a/nptl/Makefile
+--- glibc-2.24-458-g0abbe7c.orig/nptl/Makefile
++++ glibc-2.24-458-g0abbe7c/nptl/Makefile
 @@ -238,10 +238,11 @@ tests = tst-typesizes \
  	tst-robust6 tst-robust7 tst-robust8 tst-robust9 \
  	tst-robustpi1 tst-robustpi2 tst-robustpi3 tst-robustpi4 tst-robustpi5 \
@@ -234,10 +234,10 @@ Index: glibc-2.24-377-g530862a/nptl/Makefile
 +gen-as-const-headers = pthread-errnos.sym unwindbuf.sym \
  		       lowlevelrobustlock.sym pthread-pi-defines.sym
  
- 
-Index: glibc-2.24-377-g530862a/nptl/lowlevelrwlock.sym
+ gen-py-const-headers := nptl_lock_constants.pysym
+Index: glibc-2.24-458-g0abbe7c/nptl/lowlevelrwlock.sym
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/lowlevelrwlock.sym
+--- glibc-2.24-458-g0abbe7c.orig/nptl/lowlevelrwlock.sym
 +++ /dev/null
 @@ -1,16 +0,0 @@
 -#include <stddef.h>
@@ -256,10 +256,10 @@ Index: glibc-2.24-377-g530862a/nptl/lowlevelrwlock.sym
 -FLAGS		offsetof (pthread_rwlock_t, __data.__flags)
 -WRITER		offsetof (pthread_rwlock_t, __data.__writer)
 -PSHARED		offsetof (pthread_rwlock_t, __data.__shared)
-Index: glibc-2.24-377-g530862a/nptl/pthreadP.h
+Index: glibc-2.24-458-g0abbe7c/nptl/pthreadP.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/pthreadP.h
-+++ glibc-2.24-377-g530862a/nptl/pthreadP.h
+--- glibc-2.24-458-g0abbe7c.orig/nptl/pthreadP.h
++++ glibc-2.24-458-g0abbe7c/nptl/pthreadP.h
 @@ -150,9 +150,16 @@ enum
     | PTHREAD_MUTEXATTR_PROTOCOL_MASK | PTHREAD_MUTEXATTR_PRIO_CEILING_MASK)
  
@@ -280,10 +280,10 @@ Index: glibc-2.24-377-g530862a/nptl/pthreadP.h
  
  
  /* Bits used in robust mutex implementation.  */
-Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_common.c
+Index: glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_common.c
 ===================================================================
 --- /dev/null
-+++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_common.c
++++ glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_common.c
 @@ -0,0 +1,924 @@
 +/* POSIX reader--writer lock: core parts.
 +   Copyright (C) 2016 Free Software Foundation, Inc.
@@ -1209,10 +1209,10 @@ Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_common.c
 +      THREAD_GETMEM (THREAD_SELF, tid));
 +  return 0;
 +}
-Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_init.c
+Index: glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_init.c
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_init.c
-+++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_init.c
+--- glibc-2.24-458-g0abbe7c.orig/nptl/pthread_rwlock_init.c
++++ glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_init.c
 @@ -18,7 +18,6 @@
  
  #include "pthreadP.h"
@@ -1260,10 +1260,10 @@ Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_init.c
  
    return 0;
  }
-Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_rdlock.c
+Index: glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_rdlock.c
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_rdlock.c
-+++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_rdlock.c
+--- glibc-2.24-458-g0abbe7c.orig/nptl/pthread_rwlock_rdlock.c
++++ glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_rdlock.c
 @@ -16,165 +16,17 @@
     License along with the GNU C Library; if not, see
     <http://www.gnu.org/licenses/>.  */
@@ -1435,10 +1435,10 @@ Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_rdlock.c
  }
  
  weak_alias (__pthread_rwlock_rdlock, pthread_rwlock_rdlock)
-Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_timedrdlock.c
+Index: glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_timedrdlock.c
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_timedrdlock.c
-+++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_timedrdlock.c
+--- glibc-2.24-458-g0abbe7c.orig/nptl/pthread_rwlock_timedrdlock.c
++++ glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_timedrdlock.c
 @@ -16,121 +16,22 @@
     License along with the GNU C Library; if not, see
     <http://www.gnu.org/licenses/>.  */
@@ -1574,10 +1574,10 @@ Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_timedrdlock.c
 -  return result;
 +  return __pthread_rwlock_rdlock_full (rwlock, abstime);
  }
-Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_timedwrlock.c
+Index: glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_timedwrlock.c
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_timedwrlock.c
-+++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_timedwrlock.c
+--- glibc-2.24-458-g0abbe7c.orig/nptl/pthread_rwlock_timedwrlock.c
++++ glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_timedwrlock.c
 @@ -16,121 +16,22 @@
     License along with the GNU C Library; if not, see
     <http://www.gnu.org/licenses/>.  */
@@ -1713,10 +1713,10 @@ Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_timedwrlock.c
 -  return result;
 +  return __pthread_rwlock_wrlock_full (rwlock, abstime);
  }
-Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_tryrdlock.c
+Index: glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_tryrdlock.c
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_tryrdlock.c
-+++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_tryrdlock.c
+--- glibc-2.24-458-g0abbe7c.orig/nptl/pthread_rwlock_tryrdlock.c
++++ glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_tryrdlock.c
 @@ -18,56 +18,86 @@
  
  #include <errno.h>
@@ -1837,10 +1837,10 @@ Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_tryrdlock.c
 -  return result;
  }
  strong_alias (__pthread_rwlock_tryrdlock, pthread_rwlock_tryrdlock)
-Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_trywrlock.c
+Index: glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_trywrlock.c
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_trywrlock.c
-+++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_trywrlock.c
+--- glibc-2.24-458-g0abbe7c.orig/nptl/pthread_rwlock_trywrlock.c
++++ glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_trywrlock.c
 @@ -18,31 +18,44 @@
  
  #include <errno.h>
@@ -1906,10 +1906,10 @@ Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_trywrlock.c
  }
 +
  strong_alias (__pthread_rwlock_trywrlock, pthread_rwlock_trywrlock)
-Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_unlock.c
+Index: glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_unlock.c
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_unlock.c
-+++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_unlock.c
+--- glibc-2.24-458-g0abbe7c.orig/nptl/pthread_rwlock_unlock.c
++++ glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_unlock.c
 @@ -18,60 +18,29 @@
  
  #include <errno.h>
@@ -1982,10 +1982,10 @@ Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_unlock.c
    return 0;
  }
  
-Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_wrlock.c
+Index: glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_wrlock.c
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/pthread_rwlock_wrlock.c
-+++ glibc-2.24-377-g530862a/nptl/pthread_rwlock_wrlock.c
+--- glibc-2.24-458-g0abbe7c.orig/nptl/pthread_rwlock_wrlock.c
++++ glibc-2.24-458-g0abbe7c/nptl/pthread_rwlock_wrlock.c
 @@ -16,114 +16,18 @@
     License along with the GNU C Library; if not, see
     <http://www.gnu.org/licenses/>.  */
@@ -2106,10 +2106,10 @@ Index: glibc-2.24-377-g530862a/nptl/pthread_rwlock_wrlock.c
 -
  weak_alias (__pthread_rwlock_wrlock, pthread_rwlock_wrlock)
  hidden_def (__pthread_rwlock_wrlock)
-Index: glibc-2.24-377-g530862a/nptl/tst-rwlock10.c
+Index: glibc-2.24-458-g0abbe7c/nptl/tst-rwlock10.c
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/tst-rwlock10.c
-+++ glibc-2.24-377-g530862a/nptl/tst-rwlock10.c
+--- glibc-2.24-458-g0abbe7c.orig/nptl/tst-rwlock10.c
++++ glibc-2.24-458-g0abbe7c/nptl/tst-rwlock10.c
 @@ -16,5 +16,5 @@
     License along with the GNU C Library; see the file COPYING.LIB.  If
     not, see <http://www.gnu.org/licenses/>.  */
@@ -2117,10 +2117,10 @@ Index: glibc-2.24-377-g530862a/nptl/tst-rwlock10.c
 -#define INIT PTHREAD_RWLOCK_INITIALIZER
 +#define KIND PTHREAD_RWLOCK_PREFER_READER_NP
  #include "tst-rwlock8.c"
-Index: glibc-2.24-377-g530862a/nptl/tst-rwlock11.c
+Index: glibc-2.24-458-g0abbe7c/nptl/tst-rwlock11.c
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/tst-rwlock11.c
-+++ glibc-2.24-377-g530862a/nptl/tst-rwlock11.c
+--- glibc-2.24-458-g0abbe7c.orig/nptl/tst-rwlock11.c
++++ glibc-2.24-458-g0abbe7c/nptl/tst-rwlock11.c
 @@ -16,5 +16,5 @@
     License along with the GNU C Library; see the file COPYING.LIB.  If
     not, see <http://www.gnu.org/licenses/>.  */
@@ -2128,10 +2128,10 @@ Index: glibc-2.24-377-g530862a/nptl/tst-rwlock11.c
 -#define INIT PTHREAD_RWLOCK_INITIALIZER
 +#define KIND PTHREAD_RWLOCK_PREFER_READER_NP
  #include "tst-rwlock9.c"
-Index: glibc-2.24-377-g530862a/nptl/tst-rwlock17.c
+Index: glibc-2.24-458-g0abbe7c/nptl/tst-rwlock17.c
 ===================================================================
 --- /dev/null
-+++ glibc-2.24-377-g530862a/nptl/tst-rwlock17.c
++++ glibc-2.24-458-g0abbe7c/nptl/tst-rwlock17.c
 @@ -0,0 +1,19 @@
 +/* Test program for timedout read/write lock functions.
 +   Copyright (C) 2016 Free Software Foundation, Inc.
@@ -2152,10 +2152,10 @@ Index: glibc-2.24-377-g530862a/nptl/tst-rwlock17.c
 +
 +#define KIND PTHREAD_RWLOCK_PREFER_WRITER_NP
 +#include "tst-rwlock8.c"
-Index: glibc-2.24-377-g530862a/nptl/tst-rwlock18.c
+Index: glibc-2.24-458-g0abbe7c/nptl/tst-rwlock18.c
 ===================================================================
 --- /dev/null
-+++ glibc-2.24-377-g530862a/nptl/tst-rwlock18.c
++++ glibc-2.24-458-g0abbe7c/nptl/tst-rwlock18.c
 @@ -0,0 +1,19 @@
 +/* Test program for timedout read/write lock functions.
 +   Copyright (C) 2016 Free Software Foundation, Inc.
@@ -2176,10 +2176,10 @@ Index: glibc-2.24-377-g530862a/nptl/tst-rwlock18.c
 +
 +#define KIND PTHREAD_RWLOCK_PREFER_WRITER_NP
 +#include "tst-rwlock9.c"
-Index: glibc-2.24-377-g530862a/nptl/tst-rwlock19.c
+Index: glibc-2.24-458-g0abbe7c/nptl/tst-rwlock19.c
 ===================================================================
 --- /dev/null
-+++ glibc-2.24-377-g530862a/nptl/tst-rwlock19.c
++++ glibc-2.24-458-g0abbe7c/nptl/tst-rwlock19.c
 @@ -0,0 +1,127 @@
 +/* Test rdlock overflow.
 +   Copyright (C) 2000-2016 Free Software Foundation, Inc.
@@ -2308,17 +2308,17 @@ Index: glibc-2.24-377-g530862a/nptl/tst-rwlock19.c
 +#define TIMEOUT 30
 +#define TEST_FUNCTION do_test ()
 +#include "../test-skeleton.c"
-Index: glibc-2.24-377-g530862a/nptl/tst-rwlock2b.c
+Index: glibc-2.24-458-g0abbe7c/nptl/tst-rwlock2b.c
 ===================================================================
 --- /dev/null
-+++ glibc-2.24-377-g530862a/nptl/tst-rwlock2b.c
++++ glibc-2.24-458-g0abbe7c/nptl/tst-rwlock2b.c
 @@ -0,0 +1,2 @@
 +#define TYPE PTHREAD_RWLOCK_PREFER_WRITER_NP
 +#include "tst-rwlock2.c"
-Index: glibc-2.24-377-g530862a/nptl/tst-rwlock8.c
+Index: glibc-2.24-458-g0abbe7c/nptl/tst-rwlock8.c
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/tst-rwlock8.c
-+++ glibc-2.24-377-g530862a/nptl/tst-rwlock8.c
+--- glibc-2.24-458-g0abbe7c.orig/nptl/tst-rwlock8.c
++++ glibc-2.24-458-g0abbe7c/nptl/tst-rwlock8.c
 @@ -32,11 +32,11 @@
  
  #define DELAY   1000000
@@ -2360,10 +2360,10 @@ Index: glibc-2.24-377-g530862a/nptl/tst-rwlock8.c
  
    /* Make standard error the same as standard output.  */
    dup2 (1, 2);
-Index: glibc-2.24-377-g530862a/nptl/tst-rwlock9.c
+Index: glibc-2.24-458-g0abbe7c/nptl/tst-rwlock9.c
 ===================================================================
---- glibc-2.24-377-g530862a.orig/nptl/tst-rwlock9.c
-+++ glibc-2.24-377-g530862a/nptl/tst-rwlock9.c
+--- glibc-2.24-458-g0abbe7c.orig/nptl/tst-rwlock9.c
++++ glibc-2.24-458-g0abbe7c/nptl/tst-rwlock9.c
 @@ -34,11 +34,11 @@
  #define TIMEOUT 1000000
  #define DELAY   1000000
@@ -2405,11 +2405,11 @@ Index: glibc-2.24-377-g530862a/nptl/tst-rwlock9.c
  
    /* Make standard error the same as standard output.  */
    dup2 (1, 2);
-Index: glibc-2.24-377-g530862a/sysdeps/aarch64/nptl/bits/pthreadtypes.h
+Index: glibc-2.24-458-g0abbe7c/sysdeps/aarch64/nptl/bits/pthreadtypes.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/sysdeps/aarch64/nptl/bits/pthreadtypes.h
-+++ glibc-2.24-377-g530862a/sysdeps/aarch64/nptl/bits/pthreadtypes.h
-@@ -142,13 +142,13 @@ typedef union
+--- glibc-2.24-458-g0abbe7c.orig/sysdeps/aarch64/nptl/bits/pthreadtypes.h
++++ glibc-2.24-458-g0abbe7c/sysdeps/aarch64/nptl/bits/pthreadtypes.h
+@@ -156,13 +156,13 @@ typedef union
  {
    struct
    {
@@ -2430,10 +2430,10 @@ Index: glibc-2.24-377-g530862a/sysdeps/aarch64/nptl/bits/pthreadtypes.h
      int __shared;
      unsigned long int __pad1;
      unsigned long int __pad2;
-Index: glibc-2.24-377-g530862a/sysdeps/arm/nptl/bits/pthreadtypes.h
+Index: glibc-2.24-458-g0abbe7c/sysdeps/arm/nptl/bits/pthreadtypes.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/sysdeps/arm/nptl/bits/pthreadtypes.h
-+++ glibc-2.24-377-g530862a/sysdeps/arm/nptl/bits/pthreadtypes.h
+--- glibc-2.24-458-g0abbe7c.orig/sysdeps/arm/nptl/bits/pthreadtypes.h
++++ glibc-2.24-458-g0abbe7c/sysdeps/arm/nptl/bits/pthreadtypes.h
 @@ -143,12 +143,12 @@ typedef union
  {
    struct
@@ -2462,10 +2462,10 @@ Index: glibc-2.24-377-g530862a/sysdeps/arm/nptl/bits/pthreadtypes.h
    } __data;
    char __size[__SIZEOF_PTHREAD_RWLOCK_T];
    long int __align;
-Index: glibc-2.24-377-g530862a/sysdeps/hppa/nptl/bits/pthreadtypes.h
+Index: glibc-2.24-458-g0abbe7c/sysdeps/hppa/nptl/bits/pthreadtypes.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/sysdeps/hppa/nptl/bits/pthreadtypes.h
-+++ glibc-2.24-377-g530862a/sysdeps/hppa/nptl/bits/pthreadtypes.h
+--- glibc-2.24-458-g0abbe7c.orig/sysdeps/hppa/nptl/bits/pthreadtypes.h
++++ glibc-2.24-458-g0abbe7c/sysdeps/hppa/nptl/bits/pthreadtypes.h
 @@ -168,13 +168,13 @@ typedef union
         next four words are all set to 1 by the Linuxthreads
         PTHREAD_RWLOCK_INITIALIZER. We ignore them in NPTL.  */
@@ -2487,10 +2487,10 @@ Index: glibc-2.24-377-g530862a/sysdeps/hppa/nptl/bits/pthreadtypes.h
      /* An unused word, reserved for future use. It was added
         to maintain the location of the flags from the Linuxthreads
         layout of this structure.  */
-Index: glibc-2.24-377-g530862a/sysdeps/ia64/nptl/bits/pthreadtypes.h
+Index: glibc-2.24-458-g0abbe7c/sysdeps/ia64/nptl/bits/pthreadtypes.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/sysdeps/ia64/nptl/bits/pthreadtypes.h
-+++ glibc-2.24-377-g530862a/sysdeps/ia64/nptl/bits/pthreadtypes.h
+--- glibc-2.24-458-g0abbe7c.orig/sysdeps/ia64/nptl/bits/pthreadtypes.h
++++ glibc-2.24-458-g0abbe7c/sysdeps/ia64/nptl/bits/pthreadtypes.h
 @@ -140,13 +140,13 @@ typedef union
  {
    struct
@@ -2512,10 +2512,10 @@ Index: glibc-2.24-377-g530862a/sysdeps/ia64/nptl/bits/pthreadtypes.h
      int __shared;
      unsigned long int __pad1;
      unsigned long int __pad2;
-Index: glibc-2.24-377-g530862a/sysdeps/m68k/nptl/bits/pthreadtypes.h
+Index: glibc-2.24-458-g0abbe7c/sysdeps/m68k/nptl/bits/pthreadtypes.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/sysdeps/m68k/nptl/bits/pthreadtypes.h
-+++ glibc-2.24-377-g530862a/sysdeps/m68k/nptl/bits/pthreadtypes.h
+--- glibc-2.24-458-g0abbe7c.orig/sysdeps/m68k/nptl/bits/pthreadtypes.h
++++ glibc-2.24-458-g0abbe7c/sysdeps/m68k/nptl/bits/pthreadtypes.h
 @@ -144,19 +144,19 @@ typedef union
  {
    struct
@@ -2543,10 +2543,10 @@ Index: glibc-2.24-377-g530862a/sysdeps/m68k/nptl/bits/pthreadtypes.h
    } __data;
    char __size[__SIZEOF_PTHREAD_RWLOCK_T];
    long int __align;
-Index: glibc-2.24-377-g530862a/sysdeps/microblaze/nptl/bits/pthreadtypes.h
+Index: glibc-2.24-458-g0abbe7c/sysdeps/microblaze/nptl/bits/pthreadtypes.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/sysdeps/microblaze/nptl/bits/pthreadtypes.h
-+++ glibc-2.24-377-g530862a/sysdeps/microblaze/nptl/bits/pthreadtypes.h
+--- glibc-2.24-458-g0abbe7c.orig/sysdeps/microblaze/nptl/bits/pthreadtypes.h
++++ glibc-2.24-458-g0abbe7c/sysdeps/microblaze/nptl/bits/pthreadtypes.h
 @@ -138,12 +138,12 @@ typedef union
  {
    struct
@@ -2575,10 +2575,10 @@ Index: glibc-2.24-377-g530862a/sysdeps/microblaze/nptl/bits/pthreadtypes.h
    } __data;
    char __size[__SIZEOF_PTHREAD_RWLOCK_T];
    long int __align;
-Index: glibc-2.24-377-g530862a/sysdeps/mips/nptl/bits/pthreadtypes.h
+Index: glibc-2.24-458-g0abbe7c/sysdeps/mips/nptl/bits/pthreadtypes.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/sysdeps/mips/nptl/bits/pthreadtypes.h
-+++ glibc-2.24-377-g530862a/sysdeps/mips/nptl/bits/pthreadtypes.h
+--- glibc-2.24-458-g0abbe7c.orig/sysdeps/mips/nptl/bits/pthreadtypes.h
++++ glibc-2.24-458-g0abbe7c/sysdeps/mips/nptl/bits/pthreadtypes.h
 @@ -173,13 +173,13 @@ typedef union
  # if _MIPS_SIM == _ABI64
    struct
@@ -2628,10 +2628,10 @@ Index: glibc-2.24-377-g530862a/sysdeps/mips/nptl/bits/pthreadtypes.h
    } __data;
  # endif
    char __size[__SIZEOF_PTHREAD_RWLOCK_T];
-Index: glibc-2.24-377-g530862a/sysdeps/nios2/nptl/bits/pthreadtypes.h
+Index: glibc-2.24-458-g0abbe7c/sysdeps/nios2/nptl/bits/pthreadtypes.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/sysdeps/nios2/nptl/bits/pthreadtypes.h
-+++ glibc-2.24-377-g530862a/sysdeps/nios2/nptl/bits/pthreadtypes.h
+--- glibc-2.24-458-g0abbe7c.orig/sysdeps/nios2/nptl/bits/pthreadtypes.h
++++ glibc-2.24-458-g0abbe7c/sysdeps/nios2/nptl/bits/pthreadtypes.h
 @@ -143,12 +143,12 @@ typedef union
  {
    struct
@@ -2660,10 +2660,10 @@ Index: glibc-2.24-377-g530862a/sysdeps/nios2/nptl/bits/pthreadtypes.h
    } __data;
    char __size[__SIZEOF_PTHREAD_RWLOCK_T];
    long int __align;
-Index: glibc-2.24-377-g530862a/sysdeps/s390/nptl/bits/pthreadtypes.h
+Index: glibc-2.24-458-g0abbe7c/sysdeps/s390/nptl/bits/pthreadtypes.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/sysdeps/s390/nptl/bits/pthreadtypes.h
-+++ glibc-2.24-377-g530862a/sysdeps/s390/nptl/bits/pthreadtypes.h
+--- glibc-2.24-458-g0abbe7c.orig/sysdeps/s390/nptl/bits/pthreadtypes.h
++++ glibc-2.24-458-g0abbe7c/sysdeps/s390/nptl/bits/pthreadtypes.h
 @@ -193,13 +193,13 @@ typedef union
  # if __WORDSIZE == 64
    struct
@@ -2712,10 +2712,10 @@ Index: glibc-2.24-377-g530862a/sysdeps/s390/nptl/bits/pthreadtypes.h
    } __data;
  # endif
    char __size[__SIZEOF_PTHREAD_RWLOCK_T];
-Index: glibc-2.24-377-g530862a/sysdeps/sh/nptl/bits/pthreadtypes.h
+Index: glibc-2.24-458-g0abbe7c/sysdeps/sh/nptl/bits/pthreadtypes.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/sysdeps/sh/nptl/bits/pthreadtypes.h
-+++ glibc-2.24-377-g530862a/sysdeps/sh/nptl/bits/pthreadtypes.h
+--- glibc-2.24-458-g0abbe7c.orig/sysdeps/sh/nptl/bits/pthreadtypes.h
++++ glibc-2.24-458-g0abbe7c/sysdeps/sh/nptl/bits/pthreadtypes.h
 @@ -143,12 +143,12 @@ typedef union
  {
    struct
@@ -2744,10 +2744,10 @@ Index: glibc-2.24-377-g530862a/sysdeps/sh/nptl/bits/pthreadtypes.h
    } __data;
    char __size[__SIZEOF_PTHREAD_RWLOCK_T];
    long int __align;
-Index: glibc-2.24-377-g530862a/sysdeps/sparc/nptl/bits/pthreadtypes.h
+Index: glibc-2.24-458-g0abbe7c/sysdeps/sparc/nptl/bits/pthreadtypes.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/sysdeps/sparc/nptl/bits/pthreadtypes.h
-+++ glibc-2.24-377-g530862a/sysdeps/sparc/nptl/bits/pthreadtypes.h
+--- glibc-2.24-458-g0abbe7c.orig/sysdeps/sparc/nptl/bits/pthreadtypes.h
++++ glibc-2.24-458-g0abbe7c/sysdeps/sparc/nptl/bits/pthreadtypes.h
 @@ -158,13 +158,13 @@ typedef union
  # if __WORDSIZE == 64
    struct
@@ -2796,10 +2796,10 @@ Index: glibc-2.24-377-g530862a/sysdeps/sparc/nptl/bits/pthreadtypes.h
    } __data;
  # endif
    char __size[__SIZEOF_PTHREAD_RWLOCK_T];
-Index: glibc-2.24-377-g530862a/sysdeps/tile/nptl/bits/pthreadtypes.h
+Index: glibc-2.24-458-g0abbe7c/sysdeps/tile/nptl/bits/pthreadtypes.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/sysdeps/tile/nptl/bits/pthreadtypes.h
-+++ glibc-2.24-377-g530862a/sysdeps/tile/nptl/bits/pthreadtypes.h
+--- glibc-2.24-458-g0abbe7c.orig/sysdeps/tile/nptl/bits/pthreadtypes.h
++++ glibc-2.24-458-g0abbe7c/sysdeps/tile/nptl/bits/pthreadtypes.h
 @@ -173,13 +173,13 @@ typedef union
  # if __WORDSIZE == 64
    struct
@@ -2848,10 +2848,10 @@ Index: glibc-2.24-377-g530862a/sysdeps/tile/nptl/bits/pthreadtypes.h
    } __data;
  # endif
    char __size[__SIZEOF_PTHREAD_RWLOCK_T];
-Index: glibc-2.24-377-g530862a/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
+Index: glibc-2.24-458-g0abbe7c/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
-+++ glibc-2.24-377-g530862a/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
+--- glibc-2.24-458-g0abbe7c.orig/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
++++ glibc-2.24-458-g0abbe7c/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
 @@ -139,13 +139,13 @@ typedef union
  {
    struct
@@ -2873,10 +2873,10 @@ Index: glibc-2.24-377-g530862a/sysdeps/unix/sysv/linux/alpha/bits/pthreadtypes.h
      int __shared;
      unsigned long int __pad1;
      unsigned long int __pad2;
-Index: glibc-2.24-377-g530862a/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
+Index: glibc-2.24-458-g0abbe7c/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
-+++ glibc-2.24-377-g530862a/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
+--- glibc-2.24-458-g0abbe7c.orig/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
++++ glibc-2.24-458-g0abbe7c/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes.h
 @@ -179,13 +179,13 @@ typedef union
  # if __WORDSIZE == 64
    struct
@@ -2925,10 +2925,10 @@ Index: glibc-2.24-377-g530862a/sysdeps/unix/sysv/linux/powerpc/bits/pthreadtypes
  #define __PTHREAD_RWLOCK_ELISION_EXTRA 0
    } __data;
  # endif
-Index: glibc-2.24-377-g530862a/sysdeps/x86/bits/pthreadtypes.h
+Index: glibc-2.24-458-g0abbe7c/sysdeps/x86/bits/pthreadtypes.h
 ===================================================================
---- glibc-2.24-377-g530862a.orig/sysdeps/x86/bits/pthreadtypes.h
-+++ glibc-2.24-377-g530862a/sysdeps/x86/bits/pthreadtypes.h
+--- glibc-2.24-458-g0abbe7c.orig/sysdeps/x86/bits/pthreadtypes.h
++++ glibc-2.24-458-g0abbe7c/sysdeps/x86/bits/pthreadtypes.h
 @@ -191,13 +191,13 @@ typedef union
  # ifdef __x86_64__
    struct
