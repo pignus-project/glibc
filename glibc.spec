@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-458-g0abbe7c
+%define glibcsrcdir  glibc-2.24-461-g92dcaa3
 %define glibcversion 2.24.90
-%define glibcrelease 22%{?dist}
+%define glibcrelease 23%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2285,6 +2285,12 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Dec 12 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-23
+- Auto-sync with upstream master,
+  commit 92dcaa3e2f7bf0f7f1c04cd2fb6a317df1a4e225, fixing:
+- Add getrandom, getentropy (#1172273)
+- Add additional compiler barriers to backtrace tests (swbz#20956)
+
 * Fri Dec 09 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-22
 - Auto-sync with upstream master,
   commit 0abbe7cd700951082b314182a0958d65238297ef, changing:
