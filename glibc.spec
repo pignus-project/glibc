@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-461-g92dcaa3
+%define glibcsrcdir  glibc-2.24-491-ge077349
 %define glibcversion 2.24.90
-%define glibcrelease 23%{?dist}
+%define glibcrelease 24%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2285,6 +2285,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Sun Dec 18 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-24
+- Auto-sync with upstream master,
+  commit e077349ce589466eecd47213db4fae6b80ec18c4, fixing:
+- Warn about assignment in assertions (#1105335)
+- powerpc64/power7 memchr for large input sizes (swbz#20971)
+- fmax, fmin sNaN handling (swbz#20947)
+
 * Mon Dec 12 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-23
 - Auto-sync with upstream master,
   commit 92dcaa3e2f7bf0f7f1c04cd2fb6a317df1a4e225, fixing:
