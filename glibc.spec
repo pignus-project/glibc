@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-491-ge077349
+%define glibcsrcdir  glibc-2.24-519-g81e0662
 %define glibcversion 2.24.90
-%define glibcrelease 24%{?dist}
+%define glibcrelease 25%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2285,6 +2285,16 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Fri Dec 23 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.24.90-25
+- Auto-sync with upstream master,
+  commit 81e0662e5f2c342ffa413826b7b100d56677b613, fixing:
+- Shared object unload assert when calling dlclose (#1398370, swbz#11941)
+- Fix nss_nisplus build with mainline GCC (swbz#20978)
+- Add Intel TSX blacklist for silicon with known errata.
+- Add fmax, fmin, fmaxf, fminf microbenchmarks.
+- Robust mutexes: Fix lost wake-up (swbz#20973).
+- Add fmaxmag, fminmag, roundeven, roundevenf, roundevenl functions.
+
 * Sun Dec 18 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-24
 - Auto-sync with upstream master,
   commit e077349ce589466eecd47213db4fae6b80ec18c4, fixing:
