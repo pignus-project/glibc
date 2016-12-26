@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-519-g81e0662
+%define glibcsrcdir  glibc-2.24-531-gcecbc79
 %define glibcversion 2.24.90
-%define glibcrelease 25%{?dist}
+%define glibcrelease 26%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -1050,6 +1050,7 @@ build()
 %ifarch %{multiarcharches}
 		--enable-multi-arch \
 %endif
+		--enable-stack-protector=strong \
 		--enable-obsolete-rpc \
 		--enable-systemtap \
 		${core_with_options} \
@@ -2285,6 +2286,11 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Dec 26 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-26
+- Auto-sync with upstream master,
+  commit cecbc7967f0bcac718b6f8f8942b58403c0e917c
+- Enable stack protector for most of glibc (#1406731)
+
 * Fri Dec 23 2016 Carlos O'Donell <carlos@systemhalted.org> - 2.24.90-25
 - Auto-sync with upstream master,
   commit 81e0662e5f2c342ffa413826b7b100d56677b613, fixing:
