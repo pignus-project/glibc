@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-531-gcecbc79
+%define glibcsrcdir  glibc-2.24-592-g73dfd08
 %define glibcversion 2.24.90
-%define glibcrelease 26%{?dist}
+%define glibcrelease 27%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -253,12 +253,6 @@ Patch0059: glibc-c-utf8-locale.patch
 
 # Build libcrypt twice, with and without NSS.
 Patch0060: glibc-rh1324623.patch
-
-# Bug 13165: New condvar implementation.
-Patch0062: glibc-swbz13165.patch
-
-# Disable printers which are incompatible with nptl implementation changes.
-Patch0099: glibc-fedora-disable-printers.patch
 
 ##############################################################################
 #
@@ -875,9 +869,7 @@ microbenchmark tests on the system.
 %patch2037 -p1
 %patch2110 -p1
 %patch2112 -p1
-%patch0062 -p1
 %patch2113 -p1
-%patch0099 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -1038,6 +1030,7 @@ build()
 		--enable-multi-arch \
 %endif
 		--enable-stack-protector=strong \
+		--enable-tunables \
 		--enable-obsolete-rpc \
 		--enable-systemtap \
 		${core_with_options} \
@@ -2273,6 +2266,16 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Mon Jan 02 2017 Florian Weimer <fweimer@redhat.com> - 2.24.90-27
+- Auto-sync with upstream master,
+  commit 73dfd088936b9237599e4ab737c7ae2ea7d710e1:
+- Enable tunables.
+- Drop condvar-related patches applied upstream.
+- Update DNS RR type definitions (swbz#20593)
+- CVE-2015-5180: resolv: Fix crash with internal QTYPE (#1249603)
+- sunrpc: Always obtain AF_INET addresses from NSS (swbz#20964)
+
+
 * Mon Dec 26 2016 Florian Weimer <fweimer@redhat.com> - 2.24.90-26
 - Auto-sync with upstream master,
   commit cecbc7967f0bcac718b6f8f8942b58403c0e917c

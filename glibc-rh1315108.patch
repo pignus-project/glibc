@@ -550,17 +550,17 @@ Index: b/nscd/aicache.c
 ===================================================================
 --- a/nscd/aicache.c
 +++ b/nscd/aicache.c
-@@ -26,6 +26,7 @@
- #include <unistd.h>
+@@ -27,6 +27,7 @@
  #include <sys/mman.h>
+ #include <resolv/resolv-internal.h>
  #include <resolv/res_hconf.h>
 +#include <scratch_buffer.h>
  
  #include "dbg_log.h"
  #include "nscd.h"
-@@ -112,10 +113,13 @@ addhstaiX (struct database_dyn *db, int
+@@ -113,10 +114,13 @@ addhstaiX (struct database_dyn *db, int
    int old_res_options = _res.options;
-   _res.options &= ~RES_USE_INET6;
+   _res.options &= ~DEPRECATED_RES_USE_INET6;
  
 -  size_t tmpbuf6len = 1024;
 -  char *tmpbuf6 = alloca (tmpbuf6len);
@@ -576,7 +576,7 @@ Index: b/nscd/aicache.c
    int32_t ttl = INT32_MAX;
    ssize_t total = 0;
    char *key_copy = NULL;
-@@ -128,6 +132,7 @@ addhstaiX (struct database_dyn *db, int
+@@ -129,6 +133,7 @@ addhstaiX (struct database_dyn *db, int
        int status[2] = { NSS_STATUS_UNAVAIL, NSS_STATUS_UNAVAIL };
        int naddrs = 0;
        size_t addrslen = 0;
@@ -584,7 +584,7 @@ Index: b/nscd/aicache.c
        char *canon = NULL;
        size_t canonlen;
  
-@@ -142,12 +147,17 @@ addhstaiX (struct database_dyn *db, int
+@@ -143,12 +148,17 @@ addhstaiX (struct database_dyn *db, int
  	      at = &atmem;
  	      rc6 = 0;
  	      herrno = 0;
@@ -604,7 +604,7 @@ Index: b/nscd/aicache.c
  	    }
  
  	  if (rc6 != 0 && herrno == NETDB_INTERNAL)
-@@ -225,41 +235,38 @@ addhstaiX (struct database_dyn *db, int
+@@ -226,41 +236,38 @@ addhstaiX (struct database_dyn *db, int
  	  while (1)
  	    {
  	      rc6 = 0;
@@ -662,7 +662,7 @@ Index: b/nscd/aicache.c
  	    }
  
  	  if (rc4 != 0 && herrno == NETDB_INTERNAL)
-@@ -285,13 +292,11 @@ addhstaiX (struct database_dyn *db, int
+@@ -286,13 +293,11 @@ addhstaiX (struct database_dyn *db, int
  	      cfct = __nss_lookup_function (nip, "getcanonname_r");
  	      if (cfct != NULL)
  		{
@@ -678,7 +678,7 @@ Index: b/nscd/aicache.c
  		      == NSS_STATUS_SUCCESS)
  		    canon = s;
  		  else
-@@ -320,18 +325,20 @@ addhstaiX (struct database_dyn *db, int
+@@ -321,18 +326,20 @@ addhstaiX (struct database_dyn *db, int
  		      addrfamily = AF_INET6;
  		    }
  
@@ -704,7 +704,7 @@ Index: b/nscd/aicache.c
  		    }
  
  		  if (rc == 0)
-@@ -559,6 +566,10 @@ next_nip:
+@@ -560,6 +567,10 @@ next_nip:
  	dh->usable = false;
      }
  
@@ -1319,7 +1319,7 @@ Index: b/nss/nss_files/files-hosts.c
 @@ -22,7 +22,7 @@
  #include <arpa/nameser.h>
  #include <netdb.h>
- #include <resolv.h>
+ #include <resolv/resolv-internal.h>
 -
 +#include <scratch_buffer.h>
  
@@ -1511,7 +1511,7 @@ Index: b/posix/glob.c
  #endif
  
    if (pattern == NULL || pglob == NULL || (flags & ~__GLOB_FLAGS) != 0)
-@@ -650,33 +651,13 @@ glob (const char *pattern, int flags, in
+@@ -637,33 +638,13 @@ glob (const char *pattern, int flags, in
  		{
  		  struct passwd *p;
  #   if defined HAVE_GETPWNAM_R || defined _LIBC
@@ -1549,7 +1549,7 @@ Index: b/posix/glob.c
  		    {
  		      if (errno != ERANGE)
  			{
-@@ -684,67 +665,37 @@ glob (const char *pattern, int flags, in
+@@ -671,67 +652,37 @@ glob (const char *pattern, int flags, in
  			  break;
  			}
  
@@ -1631,7 +1631,7 @@ Index: b/posix/glob.c
  		  retval = GLOB_NOMATCH;
  		  goto out;
  		}
-@@ -865,57 +816,24 @@ glob (const char *pattern, int flags, in
+@@ -852,57 +803,24 @@ glob (const char *pattern, int flags, in
  	  {
  	    struct passwd *p;
  #  if defined HAVE_GETPWNAM_R || defined _LIBC
@@ -1697,7 +1697,7 @@ Index: b/posix/glob.c
  		  }
  		__set_errno (save);
  	      }
-@@ -944,8 +862,7 @@ glob (const char *pattern, int flags, in
+@@ -931,8 +849,7 @@ glob (const char *pattern, int flags, in
  		    dirname = malloc (home_len + rest_len + 1);
  		    if (dirname == NULL)
  		      {
@@ -1707,7 +1707,7 @@ Index: b/posix/glob.c
  			retval = GLOB_NOSPACE;
  			goto out;
  		      }
-@@ -957,13 +874,11 @@ glob (const char *pattern, int flags, in
+@@ -944,13 +861,11 @@ glob (const char *pattern, int flags, in
  		dirlen = home_len + rest_len;
  		dirname_modified = 1;
  
