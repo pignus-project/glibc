@@ -3,7 +3,7 @@
 export QUILT_PATCHES=$PWD
 # Extract source file name from sources file,
 # and assume it's the same name as the directory.
-source=`cat sources | sed -e 's,^.*  ,,g'`
+source=`awk -F '[() ]+'  '/^[A-Z0-9]+ /{print $2}; /^[0-9a-f]+ /{print $2}' sources`
 srcdir=${source%.tar.gz}
 if [ "$1" == "-f" ] && [ -d "$srcdir" ]; then
     echo Cleaning up $srcdir
