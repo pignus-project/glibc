@@ -248,14 +248,6 @@ Patch0052: glibc-disable-rwlock-elision.patch
 # symlink to it.
 Patch0053: glibc-cs-path.patch
 
-# Fix -Warray-bounds warning for GCC5, likely PR/59124 or PR/66422.
-# See Fedora bug #1263817.
-Patch0054: glibc-res-hconf-gcc5.patch
-Patch0055: glibc-ld-ctype-gcc5.patch
-Patch0056: glibc-gethnamaddr-gcc5.patch
-Patch0057: glibc-dns-host-gcc5.patch
-Patch0058: glibc-bug-regex-gcc5.patch
-
 # Add C.UTF-8 locale into /usr/lib/locale/
 Patch0059: glibc-c-utf8-locale.patch
 
@@ -877,11 +869,6 @@ microbenchmark tests on the system.
 %patch2034 -p1
 %patch0052 -p1
 %patch0053 -p1
-%patch0054 -p1
-%patch0055 -p1
-%patch0056 -p1
-%patch0057 -p1
-%patch0058 -p1
 %patch0059 -p1
 %patch0060 -p1
 %patch2036 -p1
