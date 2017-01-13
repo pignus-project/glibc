@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-592-g73dfd08
+%define glibcsrcdir  glibc-2.24-635-g468e525
 %define glibcversion 2.24.90
-%define glibcrelease 27%{?dist}
+%define glibcrelease 28%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -241,9 +241,6 @@ Patch0046: glibc-rh1013801.patch
 
 Patch0047: glibc-nscd-sysconfig.patch
 
-# Disable rwlock elision if --enable-lock-elision is not used.
-Patch0052: glibc-disable-rwlock-elision.patch
-
 # confstr _CS_PATH should only return /usr/bin on Fedora since /bin is just a
 # symlink to it.
 Patch0053: glibc-cs-path.patch
@@ -296,9 +293,6 @@ Patch2110: glibc-rh1351108-update-to-unicode-9.0.0.patch
 
 # sln implemented by ldconfig, to conserve disk space.
 Patch2112: glibc-rh1315476-2.patch
-
-# New scalable read-write lock version 2.
-Patch2113: glibc-new-rwlock.patch
 
 ##############################################################################
 # End of glibc patches.
@@ -861,7 +855,6 @@ microbenchmark tests on the system.
 %patch0047 -p1
 %patch2033 -p1
 %patch2034 -p1
-%patch0052 -p1
 %patch0053 -p1
 %patch0059 -p1
 %patch0060 -p1
@@ -869,7 +862,6 @@ microbenchmark tests on the system.
 %patch2037 -p1
 %patch2110 -p1
 %patch2112 -p1
-%patch2113 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -2266,6 +2258,16 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Thu Jan 12 2017 Carlos O'Donell <carlos@systemhalted.org> - 2.24.90-28
+- Auto-sync with upstream master,
+  commit 468e525c81a4af10f2e613289b6ff7c950773a9e:
+- Drop rwlock related patches applied upstream.
+- Fix i686 memchr for large input sizes (swbz#21014)
+- Fix x86 strncat for large input sizes (swbz#19390)
+- powerpc: Fix write-after-destroy in lock elision (swbz#20822)
+- New pthread rwlock that is more scalable.
+- Fix testsuite build for GCC 7 -Wformat-truncation.
+
 * Mon Jan 02 2017 Florian Weimer <fweimer@redhat.com> - 2.24.90-27
 - Auto-sync with upstream master,
   commit 73dfd088936b9237599e4ab737c7ae2ea7d710e1:
