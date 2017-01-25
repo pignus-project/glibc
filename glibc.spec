@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-635-g468e525
+%define glibcsrcdir  glibc-2.24-661-g5653ab1
 %define glibcversion 2.24.90
-%define glibcrelease 28%{?dist}
+%define glibcrelease 29%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2258,6 +2258,14 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Jan 25 2017 Florian Weimer <fweimer@redhat.com> - 2.24.90-29
+- Auto-sync with upstream master,
+  commit 5653ab12b4ae15b32d41de7c56b2a4626cd0437a, fixing:
+- ARM fpu_control.h for assemblers requiring VFP insn names (swbz#21047)
+- FAIL in test string/tst-xbzero-opt (swbz#21006)
+- Make soft-float powerpc swapcontext restore the signal mask (swbz#21045)
+- Clear list of acquired robust mutexes in the child after fork (swbz#19402)
+
 * Thu Jan 12 2017 Carlos O'Donell <carlos@systemhalted.org> - 2.24.90-28
 - Auto-sync with upstream master,
   commit 468e525c81a4af10f2e613289b6ff7c950773a9e:
