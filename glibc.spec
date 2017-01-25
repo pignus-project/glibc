@@ -2259,6 +2259,7 @@ rm -f *.filelist*
 
 %changelog
 * Wed Jan 25 2017 Florian Weimer <fweimer@redhat.com> - 2.24.90-29
+- Use vpath in crypt-glibc/Makefile to obtain the test input file.
 - Auto-sync with upstream master,
   commit 5653ab12b4ae15b32d41de7c56b2a4626cd0437a, fixing:
 - ARM fpu_control.h for assemblers requiring VFP insn names (swbz#21047)
