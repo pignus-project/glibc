@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.24-661-g5653ab1
 %define glibcversion 2.24.90
-%define glibcrelease 29%{?dist}
+%define glibcrelease 30%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -924,6 +924,14 @@ BuildFlags="$BuildFlags -mno-tls-direct-seg-refs"
 %endif
 %ifarch x86_64
 BuildFlags="-mtune=generic"
+%endif
+
+##############################################################################
+# %%build - s390 options.
+##############################################################################
+%ifarch s390 s390x
+# The default is to turne for z13 (newer hardware), but build for zEC12.
+BuildFlags="-march=zEC12 -mtune=z13"
 %endif
 
 ##############################################################################
@@ -1966,7 +1974,7 @@ echo ====================TESTING=========================
 #	- ??? for 32-bit x86
 #	- ??? for 64-bit AArch64
 #	- ??? for 32-bit ARM
-#	- ??? for 64-bit s390x
+#	- zEC12 for 64-bit s390x
 #	- ??? for 32-bit s390
 ##############################################################################
 pushd build-%{target}
@@ -2258,6 +2266,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Feb 01 2017 Carlos O'Donell <carlos@redhat.com> - 2.24.90-30
+- Optimize IBM z System builds for zEC12.
+
 * Wed Jan 25 2017 Florian Weimer <fweimer@redhat.com> - 2.24.90-29
 - Use vpath in crypt-glibc/Makefile to obtain the test input file.
 - Auto-sync with upstream master,
