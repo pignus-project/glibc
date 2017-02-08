@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.24-661-g5653ab1
 %define glibcversion 2.24.90
-%define glibcrelease 30%{?dist}
+%define glibcrelease 31%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -250,6 +250,9 @@ Patch0059: glibc-c-utf8-locale.patch
 
 # Build libcrypt twice, with and without NSS.
 Patch0060: glibc-rh1324623.patch
+
+# Fix -Wstrict-overflow issues with gcc 7.0.
+Patch0061: glibc-gcc-strict-overflow.patch
 
 ##############################################################################
 #
@@ -862,6 +865,7 @@ microbenchmark tests on the system.
 %patch2037 -p1
 %patch2110 -p1
 %patch2112 -p1
+%patch0061 -p1
 
 ##############################################################################
 # %%prep - Additional prep required...
@@ -2266,6 +2270,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Feb 08 2017 Carlos O'Donell <carlos@redhat.com> - 2.24.90-31
+- Fix builds with GCC 7.0.
+
 * Wed Feb 01 2017 Carlos O'Donell <carlos@redhat.com> - 2.24.90-30
 - Optimize IBM z System builds for zEC12.
 
