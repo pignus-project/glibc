@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.24-661-g5653ab1
-%define glibcversion 2.24.90
-%define glibcrelease 31%{?dist}
+%define glibcsrcdir  glibc-2.25
+%define glibcversion 2.25
+%define glibcrelease 1%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -9,7 +9,7 @@
 # gzip -9 $(git describe --match 'glibc-*').tar
 #
 # glibc_release_url is only defined when we have a release tarball.
-# % define glibc_release_url http://ftp.gnu.org/gnu/glibc/
+%define glibc_release_url http://ftp.gnu.org/gnu/glibc/
 ##############################################################################
 # We support hte following options:
 # --with/--without,
@@ -2270,6 +2270,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Feb 08 2017 Carlos O'Donell <carlos@redhat.com> - 2.25-1
+- Update to final released glibc 2.25.
+
 * Wed Feb 08 2017 Carlos O'Donell <carlos@redhat.com> - 2.24.90-31
 - Fix builds with GCC 7.0.
 
