@@ -1,6 +1,6 @@
-%define glibcsrcdir  glibc-2.25
+%define glibcsrcdir  glibc-2.25-3-g93cf93e
 %define glibcversion 2.25
-%define glibcrelease 1%{?dist}
+%define glibcrelease 2%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2270,6 +2270,13 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Tue Feb 28 2017 Florian Weimer <fweimer@redhat.com> - 2.25-2
+- Auto-sync with upstream release/2.25/master,
+  commit 93cf93e06ce123439e41d3d62790601c313134cb, fixing:
+- sunrpc: Improvements for UDP client timeout handling (#1346406)
+- sunrpc: Avoid use-after-free read access in clntudp_call (swbz#21115)
+- Fix getting tunable values on big-endian (swbz#21109)
+
 * Wed Feb 08 2017 Carlos O'Donell <carlos@redhat.com> - 2.25-1
 - Update to final released glibc 2.25.
 
