@@ -1,6 +1,6 @@
 %define glibcsrcdir  glibc-2.25-3-g93cf93e
 %define glibcversion 2.25
-%define glibcrelease 2%{?dist}
+%define glibcrelease 3%{?dist}
 # Pre-release tarballs are pulled in from git using a command that is
 # effectively:
 #
@@ -2270,6 +2270,9 @@ rm -f *.filelist*
 %endif
 
 %changelog
+* Wed Mar  1 2017 Jakub Hrozek <jhrozek@redhat.com> - 2.25-3
+- NSS: Prefer sss service for passwd, group databases (#1427646)
+
 * Tue Feb 28 2017 Florian Weimer <fweimer@redhat.com> - 2.25-2
 - Auto-sync with upstream release/2.25/master,
   commit 93cf93e06ce123439e41d3d62790601c313134cb, fixing:
